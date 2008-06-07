@@ -1,0 +1,37 @@
+/*
+* VhaBot - Barbaric Edition
+* Copyright (C) 2005-2008 Remco van Oosterhout
+* See Credits.txt for all aknowledgements.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; version 2 of the License only.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*/
+
+The following people have made contributions to "VhaBot - Barbaric Edition".
+
+- Azgura (EU-Dagon)
+
+The following people have made contributions to "VhaBot - Community Edition" and earlier editions.
+
+- Vhab (rk1)
+- Iriche (rk1)
+- Naturalistic (rk1)
+- Tsuyoi (rk1)
+- Toxor (rk2)
+- Telperion (rk1)
+- Moepl (rk1)
+- Fayelure (rk1)
+- Neksus (rk2)
+
+"VhaBot - Barbaric Edition" and all earlier editions rely on a forked version of "AoChat.NET Library" created by POD13.

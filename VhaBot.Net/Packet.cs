@@ -109,11 +109,6 @@ namespace VhaBot.Net
 		/// the array of packet data in readable format
 		/// </summary>
 		private ArrayList _msg;
-		
-		/// <summary>
-		/// the encoding used to convert bytes into strings
-		/// </summary>
-		protected Encoding _enc = Encoding.GetEncoding("utf-8");
 
 		protected PacketQueue.Priority _priority = PacketQueue.Priority.Standard;
 		public PacketQueue.Priority Priority
@@ -163,15 +158,6 @@ namespace VhaBot.Net
 		internal byte[] PacketData
 		{
 			get { return this._bytes; }
-		}
-
-		/// <summary>
-		/// the encoding for conversion of bytes to strings
-		/// </summary>
-		/// <value>returns a conversion encoding method</value>
-		protected Encoding Encoding
-		{
-			get { return this._enc; }
 		}
 
 		/// <summary>
@@ -226,7 +212,7 @@ namespace VhaBot.Net
             NetString ret;
             if (data.Length >= len && len > 0)
             {
-                ret = new NetString(Encoding.GetEncoding("utf-8").GetString(data, offset, len));
+                ret = new NetString(data, offset, len);
             }
             else
             {

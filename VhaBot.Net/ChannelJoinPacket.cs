@@ -45,6 +45,25 @@ namespace VhaBot.Net
         internal byte Type { get { return ((BigInteger)this.Data[0]).getBytes()[0]; } }
     }
 
+    /// <summary>Combines all essentional channel data into a single class</summary>
+    public class Channel
+    {
+        private readonly BigInteger _id = 0;
+        private readonly String _name = null;
+        private ChannelType _type = ChannelType.Unknown;
+
+        public Channel(BigInteger id, String name, ChannelType type)
+        {
+            this._id = id;
+            this._name = name;
+            this._type = type;
+        }
+
+        public BigInteger ID { get { return this._id; } }
+        public String Name { get { return this._name; } }
+        public ChannelType Type { get { return this._type; } }
+    }
+
     /// <summary>
     /// Holds event args for channel join messages.
     /// </summary>
@@ -105,5 +124,10 @@ namespace VhaBot.Net
         /// Channel type
         /// </summary>
         public ChannelType Type { get { return this._type; } }
+
+        /// <summary>
+        /// Returns combined channel data
+        /// </summary>
+        public Channel GetChannel() { return new Channel(this._id, this._name, this._type); }
     }
 }

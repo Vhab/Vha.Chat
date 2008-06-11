@@ -70,13 +70,14 @@ namespace VhaBot.Net
         /// <param name="characterID">character id</param>
         /// <param name="character">character name</param>
         /// <param name="message">message</param>
-        public ChannelMessageEventArgs(BigInteger channelID, string channel, UInt32 characterID, string character, string message)
+        public ChannelMessageEventArgs(BigInteger channelID, string channel, UInt32 characterID, string character, string message, ChannelType type)
         {
             this._channelID = channelID;
             this._channel = channel;
             this._characterID = characterID;
             this._character = character;
             this._message = message;
+            this._type = type;
         }
 
         public BigInteger ChannelID { get { return this._channelID; } }
@@ -84,6 +85,6 @@ namespace VhaBot.Net
         public UInt32 CharacterID { get { return this._characterID; } }
         public string Character { get { return this._character; } }
         public string Message { get { return this._message; } }
-        public ChannelType Type { get { return this._type; } set { this._type = value; } }
+        public ChannelType Type { get { return this._type; } }
     }
 }

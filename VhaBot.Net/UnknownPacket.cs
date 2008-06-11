@@ -31,7 +31,7 @@ namespace VhaBot.Net
         internal UnknownPacket(Packet.Type type, byte[] data) : base(type, data) { }
         override protected void BytesToData(byte[] data)
         {
-            this.AddData(this.Encoding.GetString(data));
+            this.AddData(new NetString(data, 0, (short)data.Length).Value);
         }
 
         /// <summary>

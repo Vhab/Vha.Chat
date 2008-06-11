@@ -66,8 +66,8 @@ namespace VhaBot.Net
         protected string _character = string.Empty;
         protected ChatState _state = ChatState.Disconnected;
         protected UInt32 _id = 0;
-        protected BigInteger _organizationid = 0;
-        protected string _organization = string.Empty;
+        protected BigInteger _guildid = 0;
+        protected string _guild = string.Empty;
         protected bool _ignoreOfflineTells = true;
         protected bool _ignoreAfkTells = true;
         protected bool _ignoreCharacterLoggedIn = true;
@@ -76,8 +76,7 @@ namespace VhaBot.Net
         protected Thread _sendThread;
         protected Socket _socket;
         protected Dictionary<UInt32, String> _users;
-        protected Dictionary<BigInteger, String> _channels;
-        protected Dictionary<BigInteger, ChannelType> _channelTypes;
+        protected Dictionary<BigInteger, Channel> _channels;
         protected string _serverAddress;
         protected int _port;
         protected PacketQueue _fastQueue;
@@ -94,8 +93,8 @@ namespace VhaBot.Net
         public string Character { get { return this._character; } }
         public string Server { get { return this._serverAddress; } }
         public int Port { get { return this._port; } }
-        public string Organization { get { return this._organization; } }
-        public BigInteger OrganizationID { get { lock (this) { return this._organizationid; } } }
+        public string Guild { get { return this._guild; } }
+        public BigInteger GuildID { get { lock (this) { return this._guildid; } } }
         public ChatState State { get { return this._state; } }
         public bool IgnoreOfflineTells
         {
@@ -162,8 +161,7 @@ namespace VhaBot.Net
                 this._sendThread = new Thread(new ThreadStart(this.RunSender));
                 this._sendThread.IsBackground = true;
                 this._users = new Dictionary<UInt32, String>();
-                this._channels = new Dictionary<BigInteger, String>();
-                this._channelTypes = new Dictionary<BigInteger, ChannelType>();
+                this._channels = new Dictionary<BigInteger, Channel>();
                 this._offlineTells = new List<UInt32>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
@@ -235,7 +233,7 @@ namespace VhaBot.Net
                 if (this._receiveThread.ThreadState == System.Threading.ThreadState.Running)
                 {
                     this._receiveThread.Abort();
-                    this._receiveThread.Join(new TimeSpan(0,0,5));
+                    this._receiveThread.Join(new TimeSpan(0, 0, 5));
                 }
                 this._receiveThread = null;
             }
@@ -523,7 +521,8 @@ namespace VhaBot.Net
                         this.GetChannelName(((ChannelMessagePacket)packet).ChannelID),
                         ((ChannelMessagePacket)packet).CharacterID,
                         this.GetUserName(((ChannelMessagePacket)packet).CharacterID),
-                        ((ChannelMessagePacket)packet).Message
+                        ((ChannelMessagePacket)packet).Message,
+                        this.GetChannelType(((ChannelMessagePacket)packet).ChannelID)
                         ));
                     break;
                 case Packet.Type.FORWARD:
@@ -601,8 +600,6 @@ namespace VhaBot.Net
 
         protected virtual void OnChannelMessageEvent(ChannelMessageEventArgs e)
         {
-
-            e.Type = this.GetChannelType(e.ChannelID);
             this.Debug(this.GetUserName(e.CharacterID) + ": " + e.Message, "[" + e.Channel + "]");
 
             if (this.ChannelMessageEvent != null)
@@ -664,19 +661,16 @@ namespace VhaBot.Net
 
             lock (_channels)
             {
-                this._channels[e.ID] = e.Name;
+                this._channels[e.ID] = e.GetChannel();
             }
-            //this.Debug("Unknown channel type: " + e.TypeID, "[Error]");
+            if (e.Type == ChannelType.Unknown)
+                this.Debug("Unknown channel type: " + e.TypeID, "[Error]");
             this.Debug("Joined channel: " + e.Name + " (ID:" + e.ID + " Type:" + e.Type.ToString() + " Muted:" + e.Mute.ToString() + ")", "[Bot]");
             if (e.Type == ChannelType.Guild)
             {
-                this._organization = e.Name;
-                this._organizationid = e.ID;
-                this.Debug("Registered organization: " + e.Name + " (ID:" + e.ID + ")", "[Bot]");
-            }
-            lock (this._channelTypes)
-            {
-                this._channelTypes[e.ID] = e.Type;
+                this._guild = e.Name;
+                this._guildid = e.ID;
+                this.Debug("Registered guild: " + e.Name + " (ID:" + e.ID + ")", "[Bot]");
             }
 
             if (this.ChannelJoinEvent != null)
@@ -753,7 +747,7 @@ namespace VhaBot.Net
             if (e.Override)
                 this._character = Format.UppercaseFirst(e.Character);
 
-            if (!e.CharacterList.ContainsKey(this._character))
+            if (string.IsNullOrEmpty(this._character) || !e.CharacterList.ContainsKey(this._character))
             {
                 String clist = String.Empty;
                 foreach (String chars in e.CharacterList.Keys)
@@ -920,19 +914,15 @@ namespace VhaBot.Net
 
         public virtual BigInteger GetChannelID(String channelName)
         {
-            BigInteger ChannelID = new BigInteger(0);
             lock (this._channels)
             {
-                if (this._channels.ContainsValue(channelName))
+                foreach (KeyValuePair<BigInteger, Channel> kvp in this._channels)
                 {
-                    foreach (KeyValuePair<BigInteger, String> kvp in this._channels)
-                    {
-                        if (kvp.Value == channelName)
-                            return kvp.Key;
-                    }
+                    if (kvp.Value.Name == channelName)
+                        return kvp.Key;
                 }
             }
-            return ChannelID;
+            return new BigInteger(0);
         }
 
         public virtual string GetChannelName(Int32 channelID) { return this.GetChannelName(new BigInteger(channelID)); }
@@ -945,7 +935,7 @@ namespace VhaBot.Net
             {
                 if (this._channels.ContainsKey(channelID))
                 {
-                    return this._channels[channelID];
+                    return this._channels[channelID].Name;
                 }
                 else
                 {
@@ -954,14 +944,13 @@ namespace VhaBot.Net
             }
         }
 
-        public virtual ChannelType GetChannelType(Int32 channelID) { return this.GetChannelType(new BigInteger(channelID)); }
         public virtual ChannelType GetChannelType(BigInteger channelID)
         {
-            lock (this._channelTypes)
+            lock (this._channels)
             {
-                if (this._channelTypes.ContainsKey(channelID))
+                if (this._channels.ContainsKey(channelID))
                 {
-                    return this._channelTypes[channelID];
+                    return this._channels[channelID].Type;
                 }
                 else
                 {

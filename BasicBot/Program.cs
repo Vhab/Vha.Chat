@@ -56,6 +56,8 @@ namespace BasicBot
         static void OnChannelMessageEvent(Chat chat, ChannelMessageEventArgs e)
         {
             if (chat.ID == e.CharacterID || e.Type != ChannelType.Guild) return;
+            CommandArgs args = new CommandArgs(chat, false, e.CharacterID, e.Character, e.Message);
+            Commands.OnCommand(chat, args);
         }
 
         // Handle private messages

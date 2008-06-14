@@ -52,6 +52,7 @@ namespace BasicBot
             if (e.Args.Length < 2)
             {
                 e.Reply("Correct usage: !random [minimum] [maximum]");
+                return;
             }
             int min = 0;
             int max = 0;

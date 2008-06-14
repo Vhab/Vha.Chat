@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="AmdMuxInfoPacket.cs" />
     <Compile Include="AnonVicinityPacket.cs" />
+    <Compile Include="ClientNamePacket.cs" />
     <Compile Include="NetConvert.cs" />
     <Compile Include="NetString.cs" />
     <Compile Include="BigInteger.cs" />

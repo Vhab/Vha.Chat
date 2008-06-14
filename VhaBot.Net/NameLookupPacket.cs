@@ -38,14 +38,13 @@ namespace VhaBot.Net
 
             int offset = 0;
             this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popByte(ref data, ref offset));
             this.AddData(popString(ref data, ref offset).ToString());
             if ((UInt32)this.Data[0] == UInt32.MaxValue) // It's more reasonable for non-existing characters to have ID 0
                 this.Data[0] = UInt32.MinValue;
         }
 
         internal UInt32 CharacterID { get { return (UInt32)this.Data[0]; } }
-        internal String CharacterName { get { return (String)this.Data[2]; } }
+        internal String CharacterName { get { return (String)this.Data[1]; } }
     }
 
     /// <summary>

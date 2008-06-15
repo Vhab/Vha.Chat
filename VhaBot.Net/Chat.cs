@@ -439,6 +439,13 @@ namespace VhaBot.Net
                     OnLoginOKEvent();
                     break;
                 case Packet.Type.CLIENT_NAME:
+                    packet = new ClientNamePacket(packetData.type, packetData.data);
+                    OnNameLookupEvent(
+                        new NameLookupEventArgs(
+                        ((ClientNamePacket)packet).CharacterID,
+                        ((ClientNamePacket)packet).CharacterName
+                        ));
+                    break;
                 case Packet.Type.NAME_LOOKUP:
                     packet = new NameLookupPacket(packetData.type, packetData.data);
                     OnNameLookupEvent(

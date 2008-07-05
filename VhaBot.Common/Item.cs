@@ -31,25 +31,29 @@ namespace VhaBot.Common
         public readonly Int32 LowID;
         public readonly Int32 HighID;
         public readonly Int32 QL;
+        public readonly string Hash1;
+        public readonly string Hash2;
         public readonly string Raw;
 
-        public Item(string name, Int32 lowid, Int32 highid, Int32 ql, string raw)
+        public Item(string name, Int32 lowid, Int32 highid, Int32 ql, string hash1, string hash2, string raw)
         {
             this.Name = name;
             this.LowID = lowid;
             this.HighID = highid;
             this.QL = ql;
+            this.Hash1 = hash1;
+            this.Hash2 = hash2;
             this.Raw = raw;
         }
 
         public override string ToString()
         {
-            return string.Format("QL {0} {1}", this.QL, this.Name);
+            return HTML.StripTags(this.Name);
         }
 
         public string ToLink()
         {
-            return HTML.CreateItem(this.Name, this.LowID, this.HighID, this.QL);
+            return HTML.CreateItem(HTML.StripTags(this.Name), this.LowID, this.HighID, this.QL, this.Hash1, this.Hash2);
         }
 
         private static Regex Regex;
@@ -58,7 +62,7 @@ namespace VhaBot.Common
             if (raw == null || raw == string.Empty)
                 return new Item[0];
             if (Item.Regex == null)
-                Item.Regex = new Regex("<a href=\"itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})\">([^<]+)</a>");
+                Item.Regex = new Regex("<a([^>]*)href=\"itemref://([0-9]+)/([0-9]+)/([0-9]{1,4})/([^/\"]+)/([^\"]+)\">(.+?)</a>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
             List<Item> items = new List<Item>();
             MatchCollection matches = Item.Regex.Matches(raw);
@@ -66,11 +70,13 @@ namespace VhaBot.Common
             {
                 try
                 {
-                    string name = match.Groups[4].Value;
-                    Int32 lowid = Convert.ToInt32(match.Groups[1].Value);
-                    Int32 highid = Convert.ToInt32(match.Groups[2].Value);
-                    Int32 ql = Convert.ToInt32(match.Groups[3].Value);
-                    items.Add(new Item(name, lowid, highid, ql, match.Groups[0].Value));
+                    string name = match.Groups[7].Value;
+                    Int32 lowid = Convert.ToInt32(match.Groups[2].Value);
+                    Int32 highid = Convert.ToInt32(match.Groups[3].Value);
+                    Int32 ql = Convert.ToInt32(match.Groups[4].Value);
+                    string hash1 = match.Groups[5].Value;
+                    string hash2 = match.Groups[6].Value;
+                    items.Add(new Item(name, lowid, highid, ql, hash1, hash2, match.Groups[0].Value));
                 }
                 catch { }
             }

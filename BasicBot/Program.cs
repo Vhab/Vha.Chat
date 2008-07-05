@@ -22,6 +22,7 @@ using System.Text;
 using System.Diagnostics;
 using VhaBot.Common;
 using VhaBot.Net;
+using VhaBot.Net.Events;
 
 namespace BasicBot
 {
@@ -46,7 +47,7 @@ namespace BasicBot
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
             // Initialize chat connection
             Chat chat = new Chat(configuration.Server, configuration.Port, configuration.Username, configuration.Password, configuration.Character);
-            chat.TellEvent += new TellEventHandler(OnTellEvent);
+            chat.PrivateMessageEvent += new PrivateMessageEventHandler(OnPrivateMessageEvent);
             chat.ChannelMessageEvent += new ChannelMessageEventHandler(OnChannelMessageEvent);
             chat.Connect();
             while (true) Console.ReadLine();
@@ -61,7 +62,7 @@ namespace BasicBot
         }
 
         // Handle private messages
-        static void OnTellEvent(Chat chat, TellEventArgs e)
+        static void OnPrivateMessageEvent(Chat chat, PrivateMessageEventArgs e)
         {
             if (chat.ID == e.CharacterID || e.Outgoing) return;
             CommandArgs args = new CommandArgs(chat, true, e.CharacterID, e.Character, e.Message);

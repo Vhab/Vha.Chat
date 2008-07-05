@@ -38,9 +38,9 @@ namespace VhaBot.Common
             InsideString
         }
 
-        public static readonly String ItemLink = "<a href={0}itemref://{1}/{2}/{3}{0}{4}>";
-        public static readonly String TextLink = "<a href={0}text://{1}{0}{2}>";
-        public static readonly String CommandLink = "<a href={0}chatcmd://{1}{0}{2}>";
+        public static readonly String ItemLink = "<a{6} href={0}itemref://{1}/{2}/{3}/{4}/{5}{0}>";
+        public static readonly String TextLink = "<a{2} href={0}text://{1}{0}>";
+        public static readonly String CommandLink = "<a{2} href={0}chatcmd://{1}{0}>";
         public static readonly String LinkEnd = "</a>";
         public static readonly String CleanLink = " style={0}text-decoration:none{0}";
         public static readonly String ColorStart = "<font color=#{0}>";
@@ -52,33 +52,21 @@ namespace VhaBot.Common
         public static readonly String UnderlineStart = "<u>";
         public static readonly String UnderlineEnd = "</u>";
 
-        public static string CreateItem(string name, int lowID, int highID, int QL) { return CreateItem(name, lowID, highID, QL, false, "'"); }
-        public static string CreateItem(string name, int lowID, int highID, int QL, bool disableStyle) { return CreateItem(name, lowID, highID, QL, disableStyle, "'"); }
-        public static string CreateItem(string name, int lowID, int highID, int QL, bool disableStyle, string quotes)
+        public static string CreateItem(string name, int lowID, int highID, int QL, string hash1, string hash2) { return CreateItem(name, lowID, highID, QL, hash1, hash2, false, "'"); }
+        public static string CreateItem(string name, int lowID, int highID, int QL, string hash1, string hash2, bool disableStyle) { return CreateItem(name, lowID, highID, QL, hash1, hash2, disableStyle, "'"); }
+        public static string CreateItem(string name, int lowID, int highID, int QL, string hash1, string hash2, bool disableStyle, string quotes)
         {
-            if (lowID > highID)
-            {
-                int tmpID = lowID;
-                lowID = highID;
-                highID = tmpID;
-            }
-            return String.Format("{0}{1}{2}", CreateItemStart(lowID, highID, QL, disableStyle, quotes), EscapeString(name), CreateLinkEnd());
+            return String.Format("{0}{1}{2}", CreateItemStart(lowID, highID, QL, hash1, hash2, disableStyle, quotes), EscapeString(name), CreateLinkEnd());
         }
 
-        public static string CreateItemStart(int lowID, int highID, int QL) { return CreateItemStart(lowID, highID, QL, false, "'"); }
-        public static string CreateItemStart(int lowID, int highID, int QL, bool disableStyle) { return CreateItemStart(lowID, highID, QL, disableStyle, "'"); }
-        public static string CreateItemStart(int lowID, int highID, int QL, bool disableStyle, string quotes)
+        public static string CreateItemStart(int lowID, int highID, int QL, string hash1, string hash2) { return CreateItemStart(lowID, highID, QL, hash1, hash2, false, "'"); }
+        public static string CreateItemStart(int lowID, int highID, int QL, string hash1, string hash2, bool disableStyle) { return CreateItemStart(lowID, highID, QL, hash1, hash2, disableStyle, "'"); }
+        public static string CreateItemStart(int lowID, int highID, int QL, string hash1, string hash2, bool disableStyle, string quotes)
         {
-            if (lowID > highID)
-            {
-                int tmpID = lowID;
-                lowID = highID;
-                highID = tmpID;
-            }
             string style = "";
             if (disableStyle)
                 style = String.Format(CleanLink, quotes);
-            return String.Format(ItemLink, quotes, lowID, highID, QL, style);
+            return String.Format(ItemLink, quotes, lowID, highID, QL, hash1, hash2, style);
         }
 
         public static string CreateCommand(string name, string command) { return CreateCommand(name, command, false, "'"); }

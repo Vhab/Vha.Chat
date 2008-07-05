@@ -56,7 +56,23 @@ namespace VhaBot.Common
         Barbarian = 18,
         Ranger = 39,
         Demonologist = 44,
-        HeraldOfXolti = 43,
+        HeraldOfXotli = 43,
         Necromancer = 41
+    }
+
+    public enum CharacterState
+    {
+        Offline = 0,
+        Online = 1,
+        LookingForTeam = 2,
+        AwayFromKeyboard = 3,
+        Unknown = 999
+    }
+
+    public enum SystemMessageType
+    {
+        Unknown = 0,
+        IncommingOfflineMessage = 172363154,
+        OutgoingOfflineMessage = 158601204
     }
 }

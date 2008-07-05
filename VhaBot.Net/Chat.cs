@@ -28,23 +28,30 @@ using System.Threading;
 using System.Diagnostics;
 using System.Timers;
 using VhaBot.Common;
+using VhaBot.Net.Packets;
+using VhaBot.Net.Events;
 
 namespace VhaBot.Net
 {
     public class Chat
     {
+        // Public Settings
         public bool AutoReconnect = true;
         public int ReconnectDelay = 5000;
         public int PingInterval = 60000;
+        public int PingTimeout = 120000;
         public double FastPacketDelay = 10;
         public double SlowPacketDelay = 2200;
+        public bool IgnoreOfflineMessages = true;
+        public bool IgnoreAfkMessages = true;
+        public bool IgnoreCharacterLoggedIn = true;
 
         // Events
         public event AmdMuxInfoEventHandler AmdMuxInfoEvent;
         public event AnonVicinityEventHandler AnonVicinityEvent;
         public event FriendStatusEventHandler FriendStatusEvent;
         public event FriendRemovedEventHandler FriendRemovedEvent;
-        public event CharacterIDEventHandler CharacterIDEvent;
+        public event ClientUnknownEvent ClientUnknownEvent;
         public event PrivateChannelRequestEventHandler PrivateChannelRequestEvent;
         public event NameLookupEventHandler NameLookupEvent;
         public event ForwardEventHandler ForwardEvent;
@@ -53,13 +60,16 @@ namespace VhaBot.Net
         public event SystemMessageEventHandler SystemMessageEvent;
         public event SimpleMessageEventHandler SimpleMessageEvent;
         public event LoginOKEventHandler LoginOKEvent;
+        public event LoginErrorEventHandler LoginErrorEvent;
         public event UnknownPacketEventHandler UnknownPacketEvent;
         public event PrivateChannelStatusEventHandler PrivateChannelStatusEvent;
         public event PrivateChannelMessageEventHandler PrivateChannelMessageEvent;
-        public event TellEventHandler TellEvent;
+        public event PrivateMessageEventHandler PrivateMessageEvent;
+        public event VicinityMessageEventHandler VicinityMessageEvent;
         public event LoginSeedEventHandler LoginSeedEvent;
         public event LoginCharlistEventHandler LoginCharlistEvent;
         public event StatusChangeEventHandler StatusChangeEvent;
+        public event DebugEventHandler DebugEvent;
 
         protected string _account = string.Empty;
         protected string _password = string.Empty;
@@ -68,10 +78,6 @@ namespace VhaBot.Net
         protected UInt32 _id = 0;
         protected BigInteger _guildid = 0;
         protected string _guild = string.Empty;
-        protected bool _ignoreOfflineTells = true;
-        protected bool _ignoreAfkTells = true;
-        protected bool _ignoreCharacterLoggedIn = true;
-        protected bool _removeTempFriends = true;
         protected Thread _receiveThread;
         protected Thread _sendThread;
         protected Socket _socket;
@@ -85,7 +91,7 @@ namespace VhaBot.Net
         protected System.Timers.Timer _reconnectTimer;
         protected ManualResetEvent _lookupReset;
         protected System.Timers.Timer _pingTimer;
-        protected List<UInt32> _offlineTells;
+        protected List<UInt32> _offlineMessages;
         protected DateTime _lastPong = DateTime.Now;
 
         public UInt32 ID { get { return this._id; } }
@@ -94,23 +100,8 @@ namespace VhaBot.Net
         public string Server { get { return this._serverAddress; } }
         public int Port { get { return this._port; } }
         public string Guild { get { return this._guild; } }
-        public BigInteger GuildID { get { lock (this) { return this._guildid; } } }
+        public BigInteger GuildID { get { return this._guildid; } }
         public ChatState State { get { return this._state; } }
-        public bool IgnoreOfflineTells
-        {
-            get { return this._ignoreOfflineTells; }
-            set { this._ignoreOfflineTells = value; }
-        }
-        public bool IgnoreAfkTells
-        {
-            get { return this._ignoreAfkTells; }
-            set { this._ignoreAfkTells = value; }
-        }
-        public bool IgnoreCharacterLoggedIn
-        {
-            get { return this._ignoreCharacterLoggedIn; }
-            set { this._ignoreCharacterLoggedIn = value; }
-        }
         public int SlowQueueCount { get { return this._slowQueue.Count; } }
         public int FastQueueCount { get { return this._fastQueue.Count; } }
 
@@ -162,7 +153,7 @@ namespace VhaBot.Net
                 this._sendThread.IsBackground = true;
                 this._users = new Dictionary<UInt32, String>();
                 this._channels = new Dictionary<BigInteger, Channel>();
-                this._offlineTells = new List<UInt32>();
+                this._offlineMessages = new List<UInt32>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
                 this._slowQueue = new PacketQueue();
@@ -253,8 +244,8 @@ namespace VhaBot.Net
             this._users = null;
             this._channels.Clear();
             this._channels = null;
-            this._offlineTells.Clear();
-            this._offlineTells = null;
+            this._offlineMessages.Clear();
+            this._offlineMessages = null;
             this._fastQueue = null;
             this._slowQueue = null;
             this._reconnectTimer = null;
@@ -277,32 +268,32 @@ namespace VhaBot.Net
                 {
                     if (!_socket.Connected)
                     {
-                        throw new Exception("Connection Lost");
+                        break;
                     }
                     byte[] buffer = new byte[4];
                     int receivedBytes = this._socket.Receive(buffer, buffer.Length, 0);
                     if (receivedBytes == 0 || !this._socket.Connected)
                     {
-                        throw new Exception("Connection Lost");
+                        break;
                     }
                     Packet.Type type = (Packet.Type)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
-                    short lenght = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 2));
-                    if (lenght == 0)
+                    short length = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 2));
+                    if (length == 0)
                     {
-                        ParsePacketData packetData = new ParsePacketData(type, lenght, null);
+                        ParsePacketData packetData = new ParsePacketData(type, length, null);
                         ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
                     }
                     else
                     {
-                        buffer = new byte[lenght];
-                        int bytesLeft = lenght;
+                        buffer = new byte[length];
+                        int bytesLeft = length;
                         while (bytesLeft > 0)
                         {
-                            receivedBytes = this._socket.Receive(buffer, lenght - bytesLeft, bytesLeft, 0);
+                            receivedBytes = this._socket.Receive(buffer, length - bytesLeft, bytesLeft, 0);
                             bytesLeft -= receivedBytes;
                             Thread.Sleep(10);
                         }
-                        ParsePacketData packetData = new ParsePacketData(type, lenght, buffer);
+                        ParsePacketData packetData = new ParsePacketData(type, length, buffer);
                         if (packetData.type == Packet.Type.MESSAGE_SYSTEM || packetData.type == Packet.Type.NAME_LOOKUP)
                             this.ParsePacket(packetData);
                         else
@@ -352,8 +343,8 @@ namespace VhaBot.Net
                         {
                             try
                             {
-                                TellPacket tell = (TellPacket)packet;
-                                this.OnTellEvent(new TellEventArgs(tell.CharacterID, this.GetUserName(tell.CharacterID), tell.Message, true));
+                                PrivateMessagePacket msg = (PrivateMessagePacket)packet;
+                                this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetUserName(msg.CharacterID), msg.Message, true));
                             }
                             catch { }
                         }
@@ -385,17 +376,23 @@ namespace VhaBot.Net
                     OnPongEvent();
                     break;
                 case Packet.Type.LOGIN_SEED:
-                    packet = new LoginMessagePacket(packetData.type, packetData.data);
+                    packet = new LoginSeedPacket(packetData.type, packetData.data);
                     OnLoginSeedEvent(
-                        new LoginMessageEventArgs(
-                        ((LoginMessagePacket)packet).Seed
+                        new LoginSeedEventArgs(
+                        ((LoginSeedPacket)packet).Seed
                         ));
                     break;
                 case Packet.Type.SYSTEM_MESSAGE:
-                case Packet.Type.LOGIN_ERROR:
                     packet = new SimpleStringPacket(packetData.type, packetData.data);
                     OnSimpleMessageEvent(
-                        new SimpleStringPacketEventArgs(
+                        new SimpleMessageEventArgs(
+                        ((SimpleStringPacket)packet).Message
+                        ));
+                    break;
+                case Packet.Type.LOGIN_ERROR:
+                    packet = new SimpleStringPacket(packetData.type, packetData.data);
+                    OnLoginErrorEvent(
+                        new LoginErrorEventArgs(
                         ((SimpleStringPacket)packet).Message
                         ));
                     break;
@@ -416,7 +413,7 @@ namespace VhaBot.Net
                     break;
                 case Packet.Type.CLIENT_UNKNOWN:
                     packet = new SimpleIdPacket(packetData.type, packetData.data);
-                    OnCharacterIDEvent(
+                    OnClientUnknownEvent(
                         new CharacterIDEventArgs(
                         ((SimpleIdPacket)packet).CharacterID,
                         this.GetUserName(((SimpleIdPacket)packet).CharacterID)
@@ -425,7 +422,6 @@ namespace VhaBot.Net
                 case Packet.Type.PRIVATE_CHANNEL_INVITE:
                 case Packet.Type.PRIVATE_CHANNEL_KICK:
                 case Packet.Type.PRIVATE_CHANNEL_PART:
-                    System.Diagnostics.Trace.WriteLine(BitConverter.ToString(packetData.data));
                     packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
                     OnPrivateChannelRequestEvent(
                         new PrivateChannelRequestEventArgs(
@@ -455,14 +451,22 @@ namespace VhaBot.Net
                         ));
                     break;
                 case Packet.Type.PRIVATE_MESSAGE:
-                case Packet.Type.VICINITY_MESSAGE:
-                    packet = new TellPacket(packetData.type, packetData.data);
-                    OnTellEvent(
-                        new TellEventArgs(
-                        ((TellPacket)packet).CharacterID,
-                        this.GetUserName(((TellPacket)packet).CharacterID),
-                        ((TellPacket)packet).Message,
+                    packet = new PrivateMessagePacket(packetData.type, packetData.data);
+                    OnPrivateMessageEvent(
+                        new PrivateMessageEventArgs(
+                        ((PrivateMessagePacket)packet).CharacterID,
+                        this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                        ((PrivateMessagePacket)packet).Message,
                         false
+                        ));
+                    break;
+                case Packet.Type.VICINITY_MESSAGE:
+                    packet = new PrivateMessagePacket(packetData.type, packetData.data);
+                    OnVicinityMessageEvent(
+                        new VicinityMessageEventArgs(
+                        ((PrivateMessagePacket)packet).CharacterID,
+                        this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                        ((PrivateMessagePacket)packet).Message
                         ));
                     break;
                 case Packet.Type.ANON_MESSAGE:
@@ -493,7 +497,7 @@ namespace VhaBot.Net
                         ((ChannelJoinPacket)packet).Name,
                         ((ChannelJoinPacket)packet).Mute,
                         ((ChannelJoinPacket)packet).Logging,
-                        ((ChannelJoinPacket)packet).Type
+                        ((ChannelJoinPacket)packet).ChannelType
                         ));
                     break;
                 case Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN:
@@ -550,7 +554,7 @@ namespace VhaBot.Net
                 case Packet.Type.MESSAGE_SYSTEM:
                     packet = new SystemMessagePacket(packetData.type, packetData.data);
                     OnSystemMessageEvent(
-                        new SystemMessagePacketEventArgs(
+                        new SystemMessageEventArgs(
                         ((SystemMessagePacket)packet).ClientID,
                         ((SystemMessagePacket)packet).WindowID,
                         ((SystemMessagePacket)packet).MessageID
@@ -583,11 +587,14 @@ namespace VhaBot.Net
                 this.UnknownPacketEvent(this, e);
         }
 
-        protected virtual void OnSystemMessageEvent(SystemMessagePacketEventArgs e)
+        protected virtual void OnSystemMessageEvent(SystemMessageEventArgs e)
         {
-            lock (this._offlineTells)
+            if (e.Type == SystemMessageType.IncommingOfflineMessage)
             {
-                _offlineTells.Add(e.ClientID);
+                lock (this._offlineMessages)
+                {
+                    _offlineMessages.Add(e.ClientID);
+                }
             }
             if (this.SystemMessageEvent != null)
                 this.SystemMessageEvent(this, e);
@@ -607,7 +614,7 @@ namespace VhaBot.Net
 
         protected virtual void OnChannelMessageEvent(ChannelMessageEventArgs e)
         {
-            this.Debug(this.GetUserName(e.CharacterID) + ": " + e.Message, "[" + e.Channel + "]");
+            this.Debug(e.Character + ": " + e.Message, "[" + e.Channel + "]");
 
             if (this.ChannelMessageEvent != null)
                 this.ChannelMessageEvent(this, e);
@@ -615,15 +622,15 @@ namespace VhaBot.Net
 
         protected virtual void OnPrivateChannelMessageEvent(PrivateChannelMessageEventArgs e)
         {
-            this.Debug(this.GetUserName(e.CharacterID) + ": " + e.Message, "[" + e.Channel + "]");
+            this.Debug(e.Character + ": " + e.Message, "[" + e.Channel + "]");
 
             if (this.PrivateChannelMessageEvent != null)
                 this.PrivateChannelMessageEvent(this, e);
         }
 
-        protected virtual void OnTellEvent(TellEventArgs e)
+        protected virtual void OnPrivateMessageEvent(PrivateMessageEventArgs e)
         {
-            if (this.IgnoreAfkTells)
+            if (this.IgnoreAfkMessages)
             {
                 string afk = this.GetUserName(e.CharacterID) + " is AFK";
                 if (e.Message.Length > afk.Length)
@@ -634,14 +641,14 @@ namespace VhaBot.Net
                     }
                 }
             }
-            if (this.IgnoreOfflineTells)
+            if (this.IgnoreOfflineMessages)
             {
-                lock (this._offlineTells)
+                lock (this._offlineMessages)
                 {
-                    if (this._offlineTells.Contains(e.CharacterID))
+                    if (this._offlineMessages.Contains(e.CharacterID))
                     {
                         this.Debug(e.Message, "[Offline][" + e.Character + "]:");
-                        this._offlineTells.Remove(e.CharacterID);
+                        this._offlineMessages.Remove(e.CharacterID);
                         return;
                     }
                 }
@@ -651,12 +658,24 @@ namespace VhaBot.Net
             else
                 this.Debug(e.Message, "[" + e.Character + "]:");
 
-            if (this.TellEvent != null)
-                this.TellEvent(this, e);
+            if (this.PrivateMessageEvent != null)
+                this.PrivateMessageEvent(this, e);
+        }
+
+        protected virtual void OnVicinityMessageEvent(VicinityMessageEventArgs e)
+        {
+            this.Debug(e.Character + ": " + e.Message, "[Vicinity]");
+
+            if (this.VicinityMessageEvent != null)
+                this.VicinityMessageEvent(this, e);
         }
 
         protected virtual void OnPrivateChannelStatusEvent(PrivateChannelStatusEventArgs e)
         {
+            if (e.Join)
+                this.Debug(e.Character + " has joined the private channel", "[" + e.Channel + "]");
+            else
+                this.Debug(e.Character + " has left the private channel", "[" + e.Channel + "]");
             if (this.PrivateChannelStatusEvent != null)
                 this.PrivateChannelStatusEvent(this, e);
         }
@@ -686,9 +705,8 @@ namespace VhaBot.Net
 
         protected virtual void OnFriendStatusEvent(FriendStatusEventArgs e)
         {
-            this.Debug("Friend status received: " + e.Character + " (ID:" + e.CharacterID + " Online:" + e.Online.ToString() + " ID2:" + e.ID2 + " Level:" + e.Level + " Class:" + e.Class.ToString() + ")", "[Database]");
+            this.Debug("Friend status received: " + e.Character + " (ID:" + e.CharacterID + " State:" + e.State.ToString() + " ID2:" + e.ID2 + " Level:" + e.Level + " Class:" + e.Class.ToString() + ")", "[Database]");
 
-            e.First = true; //FIXME
             if (this.FriendStatusEvent != null)
                 this.FriendStatusEvent(this, e);
         }
@@ -740,10 +758,10 @@ namespace VhaBot.Net
                 this.PrivateChannelRequestEvent(this, e);
         }
 
-        protected virtual void OnCharacterIDEvent(CharacterIDEventArgs e)
+        protected virtual void OnClientUnknownEvent(CharacterIDEventArgs e)
         {
-            if (this.CharacterIDEvent != null)
-                this.CharacterIDEvent(this, e);
+            if (this.ClientUnknownEvent != null)
+                this.ClientUnknownEvent(this, e);
         }
 
         protected virtual void OnLoginCharacterListEvent(LoginChararacterListEventArgs e)
@@ -766,7 +784,7 @@ namespace VhaBot.Net
             }
             else
             {
-                LoginChar character = (LoginChar)e.CharacterList[this._character];
+                LoginCharacter character = (LoginCharacter)e.CharacterList[this._character];
                 if (character.IsOnline && !this.IgnoreCharacterLoggedIn)
                 {
                     this.Debug("Character " + this._character + " is already online!", "[Auth]");
@@ -784,7 +802,15 @@ namespace VhaBot.Net
             }
         }
 
-        protected virtual void OnSimpleMessageEvent(SimpleStringPacketEventArgs e)
+        protected virtual void OnLoginErrorEvent(LoginErrorEventArgs e)
+        {
+            this.Debug(e.Error, "[Auth]");
+
+            if (this.LoginErrorEvent != null)
+                this.LoginErrorEvent(this, e);
+        }
+
+        protected virtual void OnSimpleMessageEvent(SimpleMessageEventArgs e)
         {
             this.Debug(e.Message, "[System]");
 
@@ -792,10 +818,10 @@ namespace VhaBot.Net
                 this.SimpleMessageEvent(this, e);
         }
 
-        protected virtual void OnLoginSeedEvent(LoginMessageEventArgs e)
+        protected virtual void OnLoginSeedEvent(LoginSeedEventArgs e)
         {
             this.Debug("Logging in with account: " + this._account, "[Auth]");
-            this.SendPacket(new LoginMessagePacket(this._account, this._password, e.Seed));
+            this.SendPacket(new LoginSeedPacket(this._account, this._password, e.Seed));
             this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Login));
             if (this.LoginSeedEvent != null)
                 this.LoginSeedEvent(this, e);
@@ -853,7 +879,7 @@ namespace VhaBot.Net
                 this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
             }
             TimeSpan ts = DateTime.Now.Subtract(this._lastPong);
-            if (ts.TotalMilliseconds > (this.PingInterval * 1.5))
+            if (ts.TotalMilliseconds > (this.PingTimeout))
             {
                 this.Debug("Connection timed out", "[Bot]");
                 this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
@@ -1058,9 +1084,9 @@ namespace VhaBot.Net
         public virtual void SendPrivateMessage(UInt32 userID, string text) { this.SendPrivateMessage(userID, text, PacketQueue.Priority.Standard); }
         public virtual void SendPrivateMessage(UInt32 userID, string text, PacketQueue.Priority priority)
         {
-            if (userID == this._id)
+            if (userID == this._id || userID == 0)
                 return;
-            TellPacket p = new TellPacket(userID, text);
+            PrivateMessagePacket p = new PrivateMessagePacket(userID, text);
             p.Priority = priority;
             this.SendPacket(p);
         }
@@ -1092,33 +1118,22 @@ namespace VhaBot.Net
 
         protected void Debug(string msg, string cat)
         {
+            if (this.DebugEvent != null)
+                this.DebugEvent(this, new DebugEventArgs(this.ToString(), cat + " " + msg));
             Trace.WriteLine("[" + this.ToString() + "] " + cat + " " + msg);
         }
     } // end of Chat
 
-    public class StatusChangeEventArgs : EventArgs
-    {
-        private ChatState _state;
-        public StatusChangeEventArgs(ChatState state)
-        {
-            this._state = state;
-        }
-        public ChatState State
-        {
-            get { return this._state; }
-        }
-    }
-
-    public class ParsePacketData
+    internal class ParsePacketData
     {
         public Packet.Type type;
-        public short lenght = 0;
+        public short length = 0;
         public byte[] data;
 
         public ParsePacketData(Packet.Type t, short l, byte[] d)
         {
             this.type = t;
-            this.lenght = l;
+            this.length = l;
             if (d != null)
             {
                 this.data = new byte[d.Length];

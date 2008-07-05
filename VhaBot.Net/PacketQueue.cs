@@ -22,6 +22,7 @@ using System;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using VhaBot.Net.Packets;
 
 namespace VhaBot.Net
 {

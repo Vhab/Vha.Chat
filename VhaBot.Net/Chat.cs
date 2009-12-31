@@ -78,12 +78,12 @@ namespace VhaBot.Net
         protected UInt32 _id = 0;
         protected BigInteger _organizationid = 0;
         protected string _organization = string.Empty;
+        protected List<Thread> _threads;
         protected Thread _receiveThread;
         protected Thread _sendThread;
         protected Socket _socket;
         protected Dictionary<UInt32, String> _users;
         protected Dictionary<BigInteger, Channel> _channels;
-        protected List<UInt32> _privateChannels;
         protected string _serverAddress;
         protected int _port;
         protected PacketQueue _fastQueue;
@@ -147,6 +147,7 @@ namespace VhaBot.Net
                 {
                     this._socket.Close();
                 }
+                this._threads = new List<Thread>();
                 this._lookupReset = new ManualResetEvent(false);
                 this._receiveThread = new Thread(new ThreadStart(this.RunReceiver));
                 this._receiveThread.IsBackground = true;
@@ -154,7 +155,6 @@ namespace VhaBot.Net
                 this._sendThread.IsBackground = true;
                 this._users = new Dictionary<UInt32, String>();
                 this._channels = new Dictionary<BigInteger, Channel>();
-                this._privateChannels = new List<UInt32>();
                 this._offlineMessages = new List<UInt32>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
@@ -216,38 +216,67 @@ namespace VhaBot.Net
             return false;
         }
 
-        public virtual void Disconnect()
+        public virtual void Disconnect() { Disconnect(false); }
+        public virtual void Disconnect(bool async)
         {
+            // Unhook all events
+            this.AmdMuxInfoEvent = null;
+            this.AnonVicinityEvent = null;
+            this.FriendStatusEvent = null;
+            this.FriendRemovedEvent = null;
+            this.ClientUnknownEvent = null;
+            this.PrivateChannelRequestEvent = null;
+            this.NameLookupEvent = null;
+            this.ForwardEvent = null;
+            this.ChannelJoinEvent = null;
+            this.ChannelMessageEvent = null;
+            this.SystemMessageEvent = null;
+            this.SimpleMessageEvent = null;
+            this.LoginOKEvent = null;
+            this.LoginErrorEvent = null;
+            this.UnknownPacketEvent = null;
+            this.PrivateChannelStatusEvent = null;
+            this.PrivateChannelMessageEvent = null;
+            this.PrivateMessageEvent = null;
+            this.VicinityMessageEvent = null;
+            this.LoginSeedEvent = null;
+            this.LoginCharlistEvent = null;
+            this.StatusChangeEvent = null;
+            this.DebugEvent = null;
+            // Prepare the disconnect
             this._closing = true;
             if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
             if (this._pingTimer != null) { this._pingTimer.Stop(); }
+            // Close it up
+            if (async) ThreadPool.QueueUserWorkItem(new WaitCallback(Disconnect), null);
+            else Disconnect(null);
+        }
+        internal void Disconnect(Object dummy)
+        {
+            if (this._socket != null && this._socket.Connected)
+            {
+                this._socket.Close();
+            }
             if (this._receiveThread != null)
             {
-                if (this._receiveThread.ThreadState == System.Threading.ThreadState.Running)
-                {
-                    this._receiveThread.Abort();
-                    this._receiveThread.Join(new TimeSpan(0, 0, 5));
-                }
+                this._receiveThread.Abort();
+                if (this._receiveThread.IsAlive)
+                    this._receiveThread.Join();
                 this._receiveThread = null;
             }
             if (this._sendThread != null)
             {
-                if (this._sendThread.ThreadState == System.Threading.ThreadState.Running)
-                {
-                    this._sendThread.Abort();
-                    this._sendThread.Join(new TimeSpan(0, 0, 5));
-                }
+                this._sendThread.Abort();
+                if (this._sendThread.IsAlive)
+                    this._sendThread.Join();
                 this._sendThread = null;
             }
-            if (this._socket != null && this._socket.Connected) { this._socket.Close(); }
             this._socket = null;
             this._lookupReset = null;
             if (this._users != null) this._users.Clear();
             this._users = null;
             if (this._channels != null) this._channels.Clear();
             this._channels = null;
-            if (this._privateChannels != null) this._privateChannels.Clear();
-            this._privateChannels = null;
             if (this._offlineMessages != null) this._offlineMessages.Clear();
             this._offlineMessages = null;
             this._fastQueue = null;
@@ -263,13 +292,14 @@ namespace VhaBot.Net
         }
 
         // Receive Thread
-        protected void RunReceiver()
+        internal void RunReceiver()
         {
             this.Debug("Started", "[ReceiveThread]");
             try
             {
                 while (true)
                 {
+                    if (this._closing) break;
                     if (!_socket.Connected)
                     {
                         break;
@@ -299,7 +329,7 @@ namespace VhaBot.Net
                         }
                         ParsePacketData packetData = new ParsePacketData(type, length, buffer);
                         if (packetData.type == Packet.Type.MESSAGE_SYSTEM || packetData.type == Packet.Type.NAME_LOOKUP)
-                            this.ParsePacket(packetData);
+                            this.ParsePacket(packetData, true);
                         else
                             ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
                     }
@@ -312,18 +342,36 @@ namespace VhaBot.Net
             }
             finally
             {
+                // Wait for our child threads to finish
+                while (true)
+                {
+                    Thread t = null;
+                    lock (this._threads)
+                    {
+                        if (this._threads.Count == 0) break;
+                        t = this._threads[0];
+                    }
+                    t.Abort();
+                    if (t.IsAlive) t.Join(new TimeSpan(0, 0, 1));
+                    lock (this._threads)
+                    {
+                        this._threads.Remove(t);
+                    }
+                }
+                // And we're done!
                 this.Debug("Stopped!", "[ReceiveThread]");
                 this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
             }
         }
         // Send Thread
-        protected void RunSender()
+        internal void RunSender()
         {
             this.Debug("Started", "[SendThread]");
             try
             {
                 while (true)
                 {
+                    if (this._closing) break;
                     if (this._socket == null || this._socket.Connected == false)
                     {
                         throw new Exception("Disconnected");
@@ -377,11 +425,16 @@ namespace VhaBot.Net
             }
         }
 
-        protected virtual void ParsePacket(Object o)
+        internal virtual void ParsePacket(Object o) { ParsePacket((ParsePacketData)o, false); }
+        internal virtual void ParsePacket(ParsePacketData packetData, bool local)
         {
-            ParsePacketData packetData = (ParsePacketData)o;
             Packet packet = null;
-
+            // Register this thread
+            if (local == false)
+            {
+                lock (this._threads)
+                    this._threads.Add(Thread.CurrentThread);
+            }
             // figure out the packet type and raise an event.
             switch (packetData.type)
             {
@@ -585,7 +638,10 @@ namespace VhaBot.Net
                         if (BitConverter.ToInt32(packetData.data, 0) == 0 && packetData.data.Length == 4)
                         {
                             Trace.WriteLine("Disconnect packet received.", "[Debug]");
-                            this.Disconnect();
+                            if (local == false)
+                                lock (this._threads)
+                                    this._threads.Remove(Thread.CurrentThread);
+                            this.Disconnect(false);
                             return;
                         }
                     }
@@ -597,6 +653,11 @@ namespace VhaBot.Net
                         ));
                     break;
             } // End switch (packet type)
+            if (local == false)
+            {
+                lock (this._threads)
+                    this._threads.Remove(Thread.CurrentThread);
+            }
         }
 
         #region Events
@@ -691,13 +752,6 @@ namespace VhaBot.Net
 
         protected virtual void OnPrivateChannelStatusEvent(PrivateChannelStatusEventArgs e)
         {
-            if (e.ChannelID != this.ID)
-            {
-                if (e.Join && !this._privateChannels.Contains(e.ChannelID))
-                    this._privateChannels.Add(e.ChannelID);
-                else if (!e.Join && this._privateChannels.Contains(e.ChannelID))
-                    this._privateChannels.Remove(e.ChannelID);
-            }
             if (e.Join)
                 this.Debug(e.Character + " has joined the private channel", "[" + e.Channel + "]");
             else

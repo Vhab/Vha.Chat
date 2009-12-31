@@ -92,16 +92,16 @@ namespace VhaBot.Common
         /// <param name="lowID">LowID of the item</param>
         /// <param name="highID">HighID of the item</param>
         /// <param name="QL">Quality of the item</param>
-        public void AppendItem(string name, int lowID, int highID, int QL, string hash1, string hash2) { this.AppendItem(name, lowID, highID, QL, hash1, hash2, false); }
-        public void AppendItem(string name, int lowID, int highID, int QL, string hash1, string hash2, bool disableStyle)
+        public void AppendItem(string name, int lowID, int highID, int QL) { this.AppendItem(name, lowID, highID, QL, false); }
+        public void AppendItem(string name, int lowID, int highID, int QL, bool disableStyle)
         {
-            this._builder.Append(HTML.CreateItem(name, lowID, highID, QL, hash1, hash2, disableStyle, this._innerQuotes));
+            this._builder.Append(HTML.CreateItem(name, lowID, highID, QL, disableStyle, this._innerQuotes));
         }
 
-        public void AppendItemStart(int lowID, int highID, int QL, string hash1, string hash2) { this.AppendItemStart(lowID, highID, QL, hash1, hash2, false); }
-        public void AppendItemStart(int lowID, int highID, int QL, string hash1, string hash2, bool disableStyle)
+        public void AppendItemStart(int lowID, int highID, int QL) { this.AppendItemStart(lowID, highID, QL, false); }
+        public void AppendItemStart(int lowID, int highID, int QL, bool disableStyle)
         {
-            this._builder.Append(HTML.CreateItemStart(lowID, highID, QL, hash1, hash2, disableStyle, this._innerQuotes));
+            this._builder.Append(HTML.CreateItemStart(lowID, highID, QL, disableStyle, this._innerQuotes));
         }
 
         /// <summary>

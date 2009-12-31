@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -27,7 +27,7 @@ namespace VhaBot.Net.Packets
     {
         internal PrivateChannelStatusPacket(Packet.Type type, byte[] data) : base(type, data) { }
         internal PrivateChannelStatusPacket(UInt32 channelID, UInt32 characterID, bool join)
-            : base((join ? Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN : Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN))
+            : base((join ? Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN : Packet.Type.PRIVATE_CHANNEL_CLIENTPART))
         {
             this.AddData(NetConvert.HostToNetworkOrder(channelID));
             this.AddData(NetConvert.HostToNetworkOrder(characterID));

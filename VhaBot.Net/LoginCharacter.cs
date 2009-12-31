@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -22,11 +22,15 @@ using System;
 
 namespace VhaBot.Net
 {
-	public struct LoginCharacter
+	public class LoginCharacter
 	{
 		public UInt32 ID;
 		public String Name;
 		public Int32 Level;
 		public bool IsOnline;
+        public override string ToString()
+        {
+            return this.Name;
+        }
 	}
 }

@@ -1,3 +1,23 @@
+/*
+* VhaBot.Common
+* Copyright (C) 2005-2008 Remco van Oosterhout
+* See Credits.txt for all aknowledgements.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; version 2 of the License only.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,8 +32,8 @@ namespace VhaBot.Common
         private static Dictionary<Type, XmlSerializer> _serializers = new Dictionary<Type, XmlSerializer>();
         private static XmlSerializer GetSerializer()
         {
-            if (!_serializers.ContainsKey(T)) _serializers.Add(T, new XmlSerializer(T));
-            return _serializers[T];
+            if (!_serializers.ContainsKey(typeof(T))) _serializers.Add(typeof(T), new XmlSerializer(typeof(T)));
+            return _serializers[typeof(T)];
         }
 
         /// <summary>
@@ -27,7 +47,7 @@ namespace VhaBot.Common
             try
             {
                 Stream stream = (Stream)File.Open(file, FileMode.Open, FileAccess.Read);
-                T obj = GetSerializer().Deserialize(stream);
+                T obj = (T)GetSerializer().Deserialize(stream);
                 stream.Close();
                 return obj;
             }
@@ -59,7 +79,7 @@ namespace VhaBot.Common
                 request.Timeout = timeout;
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 Stream stream = response.GetResponseStream();
-                T obj = GetSerializer().Deserialize(stream);
+                T obj = (T)GetSerializer().Deserialize(stream);
                 response.Close();
                 return obj;
             }

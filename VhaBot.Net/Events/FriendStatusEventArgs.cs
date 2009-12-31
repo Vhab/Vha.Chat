@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -33,32 +33,20 @@ namespace VhaBot.Net.Events
         private readonly UInt32 _characterID = 0;
         private readonly string _character;
         private readonly bool _online = false;
-        private readonly CharacterState _state = CharacterState.Unknown;
-        private readonly byte _level = 0;
-        private readonly UInt32 _id2 = 0;
-        private readonly CharacterClass _class = CharacterClass.Unknown;
-        private readonly byte _classID;
+        private readonly bool _temporary = false;
 
         /// <summary>
         /// Event argument constructor
         /// </summary>
         /// <param name="characterID">The character id of the character</param>
         /// <param name="status">The status of the character</param>
-        /// <param name="level">The level of the character</param>
-        /// <param name="id2">Either the last seen timestamp or the playfied id</param>
-        /// <param name="characterClass">The class id of the character</param>
-        public FriendStatusEventArgs(UInt32 characterID, string character, byte state, byte level, UInt32 id2, byte characterClass)
+        /// <param name="temporary">Whether the character is a temporary friend</param>
+        public FriendStatusEventArgs(UInt32 characterID, string character, bool status, bool temporary)
         {
             this._characterID = characterID;
             this._character = character;
-            if (Enum.IsDefined(typeof(CharacterState), (int)state))
-                this._state = (CharacterState)state;
-            this._online = (this._state != CharacterState.Offline);
-            this._level = level;
-            this._id2 = id2;
-            this._classID = characterClass;
-            if (Enum.IsDefined(typeof(CharacterClass), (int)characterClass))
-                this._class = (CharacterClass)characterClass;
+            this._online = status;
+            this._temporary = temporary;
         }
 
         /// <summary>
@@ -71,24 +59,9 @@ namespace VhaBot.Net.Events
         /// </summary>
         public bool Online { get { return this._online; } }
         /// <summary>
-        /// The current state of the character
+        /// Whether the character is a temporary friend
         /// </summary>
-        public CharacterState State { get { return this._state; } }
-        /// <summary>
-        /// Level of the character
-        /// </summary>
-        public byte Level { get { return this._level; } }
-        /// <summary>
-        /// Either the last seen timestamp of the playfield id
-        /// </summary>
-        public UInt32 ID2 { get { return this._id2; } }
-        /// <summary>
-        /// Class of the character
-        /// </summary>
-        public CharacterClass Class { get { return this._class; } }
-        /// <summary>
-        /// Class id of the character
-        /// </summary>
-        public Int32 ClassID { get { return this._classID; } }
+        public bool Temporary { get { return this._temporary; } }
+
     }
 }

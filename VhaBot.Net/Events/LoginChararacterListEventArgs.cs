@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -29,13 +29,11 @@ namespace VhaBot.Net.Events
     /// </summary>
     public class LoginChararacterListEventArgs : EventArgs
     {
-        private readonly Dictionary<string, LoginCharacter> _characters = null;
-        public LoginChararacterListEventArgs(Dictionary<string, LoginCharacter> CharacterList)
+        private readonly LoginCharacter[] _characters = null;
+        public LoginChararacterListEventArgs(LoginCharacter[] CharacterList)
         {
             this._characters = CharacterList;
         }
-        public Dictionary<string, LoginCharacter> CharacterList { get { return this._characters; } }
-        public bool Override = false;
-        public string Character = String.Empty;
+        public LoginCharacter[] CharacterList { get { return this._characters; } }
     }
 }

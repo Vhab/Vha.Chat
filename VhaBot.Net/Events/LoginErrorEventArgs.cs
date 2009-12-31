@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *

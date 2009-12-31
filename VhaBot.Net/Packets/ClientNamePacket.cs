@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -33,13 +33,12 @@ namespace VhaBot.Net.Packets
 
             int offset = 0;
             this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popByte(ref data, ref offset));
             this.AddData(popString(ref data, ref offset).ToString());
             if ((UInt32)this.Data[0] == UInt32.MaxValue)
                 this.Data[0] = UInt32.MinValue;
         }
 
         internal UInt32 CharacterID { get { return (UInt32)this.Data[0]; } }
-        internal String CharacterName { get { return (String)this.Data[2]; } }
+        internal String CharacterName { get { return (String)this.Data[1]; } }
     }
 }

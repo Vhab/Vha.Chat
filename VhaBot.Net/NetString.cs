@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -29,7 +29,7 @@ namespace VhaBot.Net
     {
         protected String _value;
         protected short _length;
-        protected Encoding _encoding = Encoding.GetEncoding("utf-8");
+        protected Encoding _encoding = Encoding.GetEncoding("iso-8859-1");
 
         public NetString(byte[] data) : this(data, 0) { }
         public NetString(byte[] data, int offset)

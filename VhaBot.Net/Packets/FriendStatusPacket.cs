@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -34,16 +34,19 @@ namespace VhaBot.Net.Packets
 
             int offset = 0;
             this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popByte(ref data, ref offset));
-            this.AddData(popByte(ref data, ref offset));
-            this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popByte(ref data, ref offset));
+            this.AddData(popInteger(ref data, ref offset));
+            this.AddData(popData(ref data, ref offset));
         }
 
         internal UInt32 CharacterID { get { return (UInt32)this.Data[0]; } }
-        internal byte Status { get { return (byte)this.Data[1]; } }
-        internal byte Level { get { return (byte)this.Data[2]; } }
-        internal UInt32 ID2 { get { return (UInt32)this.Data[3]; } }
-        internal byte Class { get { return (byte)this.Data[4]; } }
+        internal bool Online { get { return Convert.ToBoolean(this.Data[1]); } }
+        internal bool Temporary
+        {
+            get
+            {
+                byte[] buddyData = (byte[])this.Data[2];
+                return ((buddyData[0] & 0x01) != 0 ? false : true);
+            }
+        }
     }
 }

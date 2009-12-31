@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -31,7 +31,7 @@ namespace VhaBot.Net.Events
     {
         private readonly UInt32 _characterID = 0;
         private readonly string _character;
-        private readonly bool _join = false;
+        private bool _join = false;
 
         /// <summary>
         /// Constructor for private channel requests
@@ -49,11 +49,17 @@ namespace VhaBot.Net.Events
         /// The character id
         /// </summary>
         public UInt32 CharacterID { get { return this._characterID; } }
-        public String Character { get { return this._character; } }
-
         /// <summary>
-        /// Whether the character is joining or leaving
+        /// The character inviting us
         /// </summary>
-        public bool Join { get { return this._join; } }
+        public String Character { get { return this._character; } }
+        /// <summary>
+        /// Whether we accept or decline the join
+        /// </summary>
+        public bool Join
+        {
+            get { return this._join; }
+            set { this._join = value; }
+        }
     }
 }

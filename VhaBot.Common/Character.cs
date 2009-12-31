@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Common
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -29,10 +29,6 @@ namespace VhaBot.Common
         public UInt32 ID = 0;
         public string Name = string.Empty;
         public bool Online = false;
-        public byte Level = 0;
-        public UInt32 LastSeen = 0;
-        public UInt32 Location = 0;
-        public CharacterClass Class = CharacterClass.Unknown;
-        public byte ClassID = 0;
+        public bool Temporary = false;
     }
 }

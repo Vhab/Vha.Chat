@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -28,7 +28,7 @@ namespace VhaBot.Net.Packets
     internal class LoginCharacterListPacket : Packet
     {
         protected short _charactersCount;
-        protected Dictionary<string, LoginCharacter> _characters;
+        protected LoginCharacter[] _characters;
         internal LoginCharacterListPacket(Packet.Type type, byte[] data) : base(type, data) { }
 
         override protected void BytesToData(byte[] data)
@@ -43,6 +43,7 @@ namespace VhaBot.Net.Packets
 
             for (; i < num; i++)
             {
+                cs[i] = new LoginCharacter();
                 cs[i].ID = NetConvert.ToUInt32(IPAddress.NetworkToHostOrder(BitConverter.ToInt32(data, offset)));
                 offset += 4;
             }
@@ -69,16 +70,10 @@ namespace VhaBot.Net.Packets
                 offset += 4;
             }
 
-            this._characters = new Dictionary<string, LoginCharacter>();
+            this._characters = cs;
             this._charactersCount = num;
-
-            foreach (LoginCharacter c in cs)
-            {
-                this._characters.Add(c.Name, c);
-                this.AddData(c);
-            }
         }
-        internal Dictionary<string, LoginCharacter> Characters
+        internal LoginCharacter[] Characters
         {
             get { return this._characters; }
         }

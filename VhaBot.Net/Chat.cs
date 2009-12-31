@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -76,13 +76,14 @@ namespace VhaBot.Net
         protected string _character = string.Empty;
         protected ChatState _state = ChatState.Disconnected;
         protected UInt32 _id = 0;
-        protected BigInteger _guildid = 0;
-        protected string _guild = string.Empty;
+        protected BigInteger _organizationid = 0;
+        protected string _organization = string.Empty;
         protected Thread _receiveThread;
         protected Thread _sendThread;
         protected Socket _socket;
         protected Dictionary<UInt32, String> _users;
         protected Dictionary<BigInteger, Channel> _channels;
+        protected List<UInt32> _privateChannels;
         protected string _serverAddress;
         protected int _port;
         protected PacketQueue _fastQueue;
@@ -99,8 +100,8 @@ namespace VhaBot.Net
         public string Character { get { return this._character; } }
         public string Server { get { return this._serverAddress; } }
         public int Port { get { return this._port; } }
-        public string Guild { get { return this._guild; } }
-        public BigInteger GuildID { get { return this._guildid; } }
+        public string Organization { get { return this._organization; } }
+        public BigInteger OrganizationID { get { return this._organizationid; } }
         public ChatState State { get { return this._state; } }
         public int SlowQueueCount { get { return this._slowQueue.Count; } }
         public int FastQueueCount { get { return this._fastQueue.Count; } }
@@ -153,6 +154,7 @@ namespace VhaBot.Net
                 this._sendThread.IsBackground = true;
                 this._users = new Dictionary<UInt32, String>();
                 this._channels = new Dictionary<BigInteger, Channel>();
+                this._privateChannels = new List<UInt32>();
                 this._offlineMessages = new List<UInt32>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
@@ -240,11 +242,13 @@ namespace VhaBot.Net
             if (this._socket != null && this._socket.Connected) { this._socket.Close(); }
             this._socket = null;
             this._lookupReset = null;
-            this._users.Clear();
+            if (this._users != null) this._users.Clear();
             this._users = null;
-            this._channels.Clear();
+            if (this._channels != null) this._channels.Clear();
             this._channels = null;
-            this._offlineMessages.Clear();
+            if (this._privateChannels != null) this._privateChannels.Clear();
+            this._privateChannels = null;
+            if (this._offlineMessages != null) this._offlineMessages.Clear();
             this._offlineMessages = null;
             this._fastQueue = null;
             this._slowQueue = null;
@@ -302,7 +306,10 @@ namespace VhaBot.Net
                     Thread.Sleep(10);
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                this.Debug("Error: " + ex.ToString(), "[ReceiveThread]");
+            }
             finally
             {
                 this.Debug("Stopped!", "[ReceiveThread]");
@@ -346,7 +353,10 @@ namespace VhaBot.Net
                                 PrivateMessagePacket msg = (PrivateMessagePacket)packet;
                                 this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetUserName(msg.CharacterID), msg.Message, true));
                             }
-                            catch { }
+                            catch (Exception ex)
+                            {
+                                this.Debug("Error: " + ex.ToString(), "[SendThread]");
+                            }
                         }
                         Thread.Sleep((int)this.FastPacketDelay);
                     }
@@ -356,7 +366,10 @@ namespace VhaBot.Net
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                this.Debug("Error: " + ex.ToString(), "[SendThread]");
+            }
             finally
             {
                 this.Debug("Stopped!", "[SendThread]");
@@ -420,14 +433,22 @@ namespace VhaBot.Net
                         ));
                     break;
                 case Packet.Type.PRIVATE_CHANNEL_INVITE:
-                case Packet.Type.PRIVATE_CHANNEL_KICK:
-                case Packet.Type.PRIVATE_CHANNEL_PART:
                     packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
                     OnPrivateChannelRequestEvent(
                         new PrivateChannelRequestEventArgs(
-                        ((PrivateChannelStatusPacket)packet).CharacterID,
-                        this.GetUserName(((PrivateChannelStatusPacket)packet).CharacterID),
-                        ((PrivateChannelStatusPacket)packet).Joined
+                        ((PrivateChannelStatusPacket)packet).ChannelID,
+                        this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                        false
+                        ));
+                    break;
+                case Packet.Type.PRIVATE_CHANNEL_KICK:
+                case Packet.Type.PRIVATE_CHANNEL_PART:
+                    packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
+                    OnPrivateChannelStatusEvent(
+                        new PrivateChannelStatusEventArgs(
+                        ((PrivateChannelStatusPacket)packet).ChannelID,
+                        this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                        this.ID, this.Character, false
                         ));
                     break;
                 case Packet.Type.LOGIN_OK:
@@ -483,10 +504,8 @@ namespace VhaBot.Net
                         new FriendStatusEventArgs(
                         ((FriendStatusPacket)packet).CharacterID,
                         this.GetUserName(((FriendStatusPacket)packet).CharacterID),
-                        ((FriendStatusPacket)packet).Status,
-                        ((FriendStatusPacket)packet).Level,
-                        ((FriendStatusPacket)packet).ID2,
-                        ((FriendStatusPacket)packet).Class
+                        ((FriendStatusPacket)packet).Online,
+                        ((FriendStatusPacket)packet).Temporary
                         ));
                     break;
                 case Packet.Type.CHANNEL_JOIN:
@@ -672,6 +691,13 @@ namespace VhaBot.Net
 
         protected virtual void OnPrivateChannelStatusEvent(PrivateChannelStatusEventArgs e)
         {
+            if (e.ChannelID != this.ID)
+            {
+                if (e.Join && !this._privateChannels.Contains(e.ChannelID))
+                    this._privateChannels.Add(e.ChannelID);
+                else if (!e.Join && this._privateChannels.Contains(e.ChannelID))
+                    this._privateChannels.Remove(e.ChannelID);
+            }
             if (e.Join)
                 this.Debug(e.Character + " has joined the private channel", "[" + e.Channel + "]");
             else
@@ -692,11 +718,11 @@ namespace VhaBot.Net
             if (e.Type == ChannelType.Unknown)
                 this.Debug("Unknown channel type: " + e.TypeID, "[Error]");
             this.Debug("Joined channel: " + e.Name + " (ID:" + e.ID + " Type:" + e.Type.ToString() + " Muted:" + e.Mute.ToString() + ")", "[Bot]");
-            if (e.Type == ChannelType.Guild)
+            if (e.Type == ChannelType.Organization)
             {
-                this._guild = e.Name;
-                this._guildid = e.ID;
-                this.Debug("Registered guild: " + e.Name + " (ID:" + e.ID + ")", "[Bot]");
+                this._organization = e.Name;
+                this._organizationid = e.ID;
+                this.Debug("Registered organization: " + e.Name + " (ID:" + e.ID + ")", "[Bot]");
             }
 
             if (this.ChannelJoinEvent != null)
@@ -705,7 +731,7 @@ namespace VhaBot.Net
 
         protected virtual void OnFriendStatusEvent(FriendStatusEventArgs e)
         {
-            this.Debug("Friend status received: " + e.Character + " (ID:" + e.CharacterID + " State:" + e.State.ToString() + " ID2:" + e.ID2 + " Level:" + e.Level + " Class:" + e.Class.ToString() + ")", "[Database]");
+            this.Debug("Friend status received: " + e.Character + " (ID:" + e.CharacterID + " Online:" + e.Online.ToString() + " Temporary:" + e.Temporary.ToString() + ")", "[Database]");
 
             if (this.FriendStatusEvent != null)
                 this.FriendStatusEvent(this, e);
@@ -756,6 +782,7 @@ namespace VhaBot.Net
         {
             if (this.PrivateChannelRequestEvent != null)
                 this.PrivateChannelRequestEvent(this, e);
+            this.SendPacket(new PrivateChannelStatusPacket(e.CharacterID, e.Join));
         }
 
         protected virtual void OnClientUnknownEvent(CharacterIDEventArgs e)
@@ -769,37 +796,27 @@ namespace VhaBot.Net
             if (this.LoginCharlistEvent != null)
                 this.LoginCharlistEvent(this, e);
 
-            if (e.Override)
-                this._character = Format.UppercaseFirst(e.Character);
-
-            if (string.IsNullOrEmpty(this._character) || !e.CharacterList.ContainsKey(this._character))
+            List<string> characters = new List<string>();
+            foreach (LoginCharacter c in e.CharacterList)
+                characters.Add(c.Name);
+            string characterslist = string.Join(", ", characters.ToArray());
+            
+            if (this._state != ChatState.CharacterSelect && !string.IsNullOrEmpty(this._character))
             {
-                String clist = String.Empty;
-                foreach (String chars in e.CharacterList.Keys)
+                LoginCharacter character = null;
+                foreach (LoginCharacter c in e.CharacterList)
+                    if (c.Name.ToLower() == this._character.ToLower())
+                        character = c;
+                if (character == null)
                 {
-                    clist += chars + " ";
-                }
-                this.Debug(String.Format("The character name, {0}, was not found in {1}.", this._character, clist.Trim()), "[Auth]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Error));
-            }
-            else
-            {
-                LoginCharacter character = (LoginCharacter)e.CharacterList[this._character];
-                if (character.IsOnline && !this.IgnoreCharacterLoggedIn)
-                {
-                    this.Debug("Character " + this._character + " is already online!", "[Auth]");
-                    this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                    this.Debug(String.Format("The character name, {0}, was not found in {1}.", this._character, characterslist), "[Auth]");
+                    this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Error));
                     return;
                 }
-                lock (this._users)
-                    this._users.Add(character.ID, Format.UppercaseFirst(character.Name));
-                this._id = character.ID;
-                SimpleIdPacket packet = new SimpleIdPacket(Packet.Type.LOGIN_SELCHAR, character.ID);
-                packet.Priority = PacketQueue.Priority.Urgent;
-                this.SendPacket(packet);
-                this.Debug("Selecting character: " + this._character, "[Auth]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.CharacterSelect));
+                this.SendLoginCharacter(character);
+                return;
             }
+            this.Debug(String.Format("Character list received: {1}. Awaiting character selection", this._character, characterslist), "[Auth]");
         }
 
         protected virtual void OnLoginErrorEvent(LoginErrorEventArgs e)
@@ -1071,6 +1088,14 @@ namespace VhaBot.Net
             this.SendPacket(p);
         }
 
+        public virtual void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetUserID(channel)); }
+        public virtual void SendPrivateChannelLeave(UInt32 channelID)
+        {
+            PrivateChannelStatusPacket p = new PrivateChannelStatusPacket(channelID, false);
+            p.Priority = PacketQueue.Priority.Urgent;
+            this.SendPacket(p);
+        }
+
         public virtual void SendPrivateChannelMessage(string text) { this.SendPrivateChannelMessage(this._id, text); }
         public virtual void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetUserID(channel), text); }
         public virtual void SendPrivateChannelMessage(UInt32 channelID, string text)
@@ -1108,6 +1133,25 @@ namespace VhaBot.Net
             EmptyPacket p = new EmptyPacket(Packet.Type.PING);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
+        }
+
+        public void SendLoginCharacter(LoginCharacter character)
+        {
+            if (character == null)
+                return;
+            if (character.IsOnline && !this.IgnoreCharacterLoggedIn)
+            {
+                this.Debug("Character " + this._character + " is already online!", "[Auth]");
+                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                return;
+            }
+            this._character = Format.UppercaseFirst(character.Name);
+            this._id = character.ID;
+            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.LOGIN_SELCHAR, character.ID);
+            p.Priority = PacketQueue.Priority.Urgent;
+            this.SendPacket(p);
+            this.Debug("Selecting character: " + this._character, "[Auth]");
+            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.CharacterSelect));
         }
         #endregion
 

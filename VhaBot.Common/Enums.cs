@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Common
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -38,35 +38,11 @@ namespace VhaBot.Common
     public enum ChannelType
     {
         Unknown = 0,
-        Playfield = 0x87,
-        Trade = 0x86,
-        Guild = 0x03
-    }
-
-    public enum CharacterClass
-    {
-        Unknown = 0,
-        Conqueror = 22,
-        DarkTemplar = 31,
-        Guardian = 20,
-        BearShaman = 29,
-        PriestOfMitra = 24,
-        TempestOfSet = 28,
-        Assassin = 34,
-        Barbarian = 18,
-        Ranger = 39,
-        Demonologist = 44,
-        HeraldOfXotli = 43,
-        Necromancer = 41
-    }
-
-    public enum CharacterState
-    {
-        Offline = 0,
-        Online = 1,
-        LookingForTeam = 2,
-        AwayFromKeyboard = 3,
-        Unknown = 999
+        Announcements = 12,
+        General = 135,
+        Organization = 3,
+        Shopping = 356,
+        Towers = 10
     }
 
     public enum SystemMessageType

@@ -63,7 +63,7 @@ namespace BasicBot
             }
             else
             {
-                _chat.SendChannelMessage(_chat.GuildID, message);
+                _chat.SendChannelMessage(_chat.OrganizationID, message);
             }
         }
     }

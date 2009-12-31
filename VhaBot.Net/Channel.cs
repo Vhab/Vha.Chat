@@ -1,5 +1,5 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -40,5 +40,6 @@ namespace VhaBot.Common
         public BigInteger ID { get { return this._id; } }
         public String Name { get { return this._name; } }
         public ChannelType Type { get { return this._type; } }
+        public override string ToString() { return this._name; }
     }
 }

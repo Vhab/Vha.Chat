@@ -913,11 +913,11 @@ namespace VhaBot.Net
                 {
                     this._pingTimer.Start();
                 }
-                else if (e.State == ChatState.Disconnected && this._pingTimer != null)
+                if (e.State == ChatState.Disconnected && this._pingTimer != null)
                 {
                     this._pingTimer.Stop();
                 }
-                else if (e.State == ChatState.Disconnected && this._closing == false && this.AutoReconnect == true)
+                if (e.State == ChatState.Disconnected && this._closing == false && this.AutoReconnect == true)
                 {
                     this._state = ChatState.Reconnecting;
                     e = new StatusChangeEventArgs(this._state);

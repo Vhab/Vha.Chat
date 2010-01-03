@@ -41,6 +41,7 @@ namespace VhaBot.Chat
             this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(Chat_PrivateChannelMessageEvent);
             this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(Chat_PrivateChannelStatusEvent);
             this._chat.VicinityMessageEvent += new VicinityMessageEventHandler(Chat_VicinityMessageEvent);
+            this._chat.StatusChangeEvent += new StatusChangeEventHandler(Chat_StatusChangeEvent);
         }
 
         private void Chat_ChannelMessageEvent(VhaBot.Net.Chat chat, ChannelMessageEventArgs e)
@@ -82,6 +83,11 @@ namespace VhaBot.Chat
                "[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: {1}",
               e.Character, e.Message);
             this._form.AppendLine("Vicinity", message);
+        }
+
+        private void Chat_StatusChangeEvent(VhaBot.Net.Chat chat, StatusChangeEventArgs e)
+        {
+            this._form.AppendLine("Error", "State changed to: " + e.State.ToString());
         }
     }
 }

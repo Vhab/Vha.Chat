@@ -96,7 +96,7 @@ namespace VhaBot.Chat
         {
             this._chat.AutoReconnect = false;
             this._chat.IgnoreAfkMessages = false;
-            this._chat.IgnoreCharacterLoggedIn = false;
+            this._chat.IgnoreCharacterLoggedIn = true;
             this._chat.IgnoreOfflineMessages = false;
             this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(Chat_LoginCharlistEvent);
             this._chat.LoginErrorEvent += new LoginErrorEventHandler(Chat_LoginErrorEvent);
@@ -164,6 +164,7 @@ namespace VhaBot.Chat
             if (result == DialogResult.OK)
             {
                 this._chat.SendLoginCharacter(form.Character);
+                this._chat.AutoReconnect = true;
                 Program.Context.MainForm = new ChatForm(this._chat);
                 this.Close();
                 Program.Context.MainForm.Show();

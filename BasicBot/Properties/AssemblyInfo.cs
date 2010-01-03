@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BasicBot")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Copyright ©  2008-2009 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

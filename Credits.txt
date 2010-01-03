@@ -1,7 +1,6 @@
 /*
-* VhaBot - Barbaric Edition
+* VhaBot
 * Copyright (C) 2005-2008 Remco van Oosterhout
-* See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -18,7 +17,7 @@
 * USA
 */
 
-The following people have made contributions to "VhaBot - Barbaric Edition".
+The following people have made contributions to VhaBot's Age of Conan port.
 
 - Azgura (EU-Dagon)
 

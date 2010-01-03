@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VhaBot.Common", "VhaBot.Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicBot", "BasicBot\BasicBot.csproj", "{27BED0E5-56E7-4380-A02E-C7DC40AA9FD7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VhaBot.Chat", "VhaBot.Chat\VhaBot.Chat.csproj", "{4A2AA0D2-EC00-4EAE-B212-625966041F16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,10 @@ Global
 		{27BED0E5-56E7-4380-A02E-C7DC40AA9FD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27BED0E5-56E7-4380-A02E-C7DC40AA9FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27BED0E5-56E7-4380-A02E-C7DC40AA9FD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A2AA0D2-EC00-4EAE-B212-625966041F16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A2AA0D2-EC00-4EAE-B212-625966041F16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A2AA0D2-EC00-4EAE-B212-625966041F16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A2AA0D2-EC00-4EAE-B212-625966041F16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

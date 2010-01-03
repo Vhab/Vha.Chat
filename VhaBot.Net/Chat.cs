@@ -1,6 +1,6 @@
 /*
 * VhaBot.Net
-* Copyright (C) 2005-2008 Remco van Oosterhout
+* Copyright (C) 2005-2009 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@ namespace VhaBot.Net
         public bool IgnoreOfflineMessages = true;
         public bool IgnoreAfkMessages = true;
         public bool IgnoreCharacterLoggedIn = true;
+        public bool UseThreadPool = true;
 
         // Events
         public event AmdMuxInfoEventHandler AmdMuxInfoEvent;
@@ -201,7 +202,6 @@ namespace VhaBot.Net
                             this._socket = tempSocket;
                             this._receiveThread.Start();
                             this._sendThread.Start();
-                            this._pingTimer.Start();
                             return true;
                         }
                         this.Debug("Failed connecting to " + ipe.ToString(), "[Socket]");
@@ -315,7 +315,10 @@ namespace VhaBot.Net
                     if (length == 0)
                     {
                         ParsePacketData packetData = new ParsePacketData(type, length, null);
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
+                        if (this.UseThreadPool)
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
+                        else
+                            this.ParsePacket(packetData, true);
                     }
                     else
                     {
@@ -328,12 +331,12 @@ namespace VhaBot.Net
                             Thread.Sleep(10);
                         }
                         ParsePacketData packetData = new ParsePacketData(type, length, buffer);
-                        if (packetData.type == Packet.Type.MESSAGE_SYSTEM || packetData.type == Packet.Type.NAME_LOOKUP)
+                        if (this.UseThreadPool == false || packetData.type == Packet.Type.MESSAGE_SYSTEM || packetData.type == Packet.Type.NAME_LOOKUP)
                             this.ParsePacket(packetData, true);
                         else
                             ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
                     }
-                    Thread.Sleep(10);
+                    Thread.Sleep(0);
                 }
             }
             catch (Exception ex)
@@ -906,14 +909,15 @@ namespace VhaBot.Net
             }
             if (this._state != e.State)
             {
-                if (e.State == ChatState.Disconnected)
+                if (e.State == ChatState.Connected && this._pingTimer != null)
                 {
-                    if (this._pingTimer != null)
-                    {
-                        this._pingTimer.Stop();
-                    }
+                    this._pingTimer.Start();
                 }
-                if (e.State == ChatState.Disconnected && this._closing == false && this.AutoReconnect == true)
+                else if (e.State == ChatState.Disconnected && this._pingTimer != null)
+                {
+                    this._pingTimer.Stop();
+                }
+                else if (e.State == ChatState.Disconnected && this._closing == false && this.AutoReconnect == true)
                 {
                     this._state = ChatState.Reconnecting;
                     e = new StatusChangeEventArgs(this._state);
@@ -1191,6 +1195,8 @@ namespace VhaBot.Net
 
         public void SendLoginCharacter(LoginCharacter character)
         {
+            if (this._state != ChatState.Login)
+                throw new Exception("Not expecting character selection!");
             if (character == null)
                 return;
             if (character.IsOnline && !this.IgnoreCharacterLoggedIn)
@@ -1211,7 +1217,11 @@ namespace VhaBot.Net
 
         public override string ToString()
         {
-            return this.Character + "@" + this._serverAddress + ":" + this._port;
+            string str = this.Account;
+            if (!string.IsNullOrEmpty(this.Character))
+                str += ":" + this.Character;
+            str += "@" + this._serverAddress + ":" + this._port;
+            return str;
         }
 
         protected void Debug(string msg, string cat)

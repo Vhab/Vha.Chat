@@ -1,6 +1,6 @@
 /*
 * VhaBot.Net
-* Copyright (C) 2005-2008 Remco van Oosterhout
+* Copyright (C) 2005-2009 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify

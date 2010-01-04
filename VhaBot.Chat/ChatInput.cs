@@ -160,6 +160,9 @@ namespace VhaBot.Chat
                 case "cc":
                     CCCommand(args);
                     break;
+                case "o":
+                    OrgCommand(args);
+                    break;
                 default:
                     this._form.AppendLine("Error", "Unknown command: /" + command);
                     break;
@@ -267,6 +270,21 @@ namespace VhaBot.Chat
             List<string> newArgs = new List<string>(args);
             newArgs.RemoveAt(0);
             Command(newArgs[0], newArgs.ToArray());
+        }
+
+        protected void OrgCommand(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage: /o [message]");
+                return;
+            }
+            if (string.IsNullOrEmpty(this._chat.Organization))
+            {
+                this._form.AppendLine("Error", "This character does not belong to an organization");
+                return;
+            }
+            this._chat.SendChannelMessage(this._chat.OrganizationID, string.Join(" ", args, 1, args.Length - 1));
         }
     }
 }

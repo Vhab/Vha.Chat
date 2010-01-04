@@ -303,13 +303,14 @@ namespace VhaBot.Chat
             // Welcome message
             this.AppendLine("Internal", "Thank you for using <a href='chatcmd:///about' class='Link'>VhaBot.Chat</a>");
             this.AppendLine("Internal", "The following commands are available:");
-            this.AppendLine("Internal", "- /tell [username] [message]");
-            this.AppendLine("Internal", "- /leave [channel]");
-            this.AppendLine("Internal", "- /invite [username]");
-            this.AppendLine("Internal", "- /kick [username]");
+            this.AppendLine("Internal", "- /tell <i>[username] [message]</i>");
+            this.AppendLine("Internal", "- /leave <i>[channel]</i>");
+            this.AppendLine("Internal", "- /invite <i>[username]</i>");
+            this.AppendLine("Internal", "- /kick <i>[username]</i>");
             this.AppendLine("Internal", "- /kickall");
-            this.AppendLine("Internal", "- /addbuddy [username]");
-            this.AppendLine("Internal", "- /rembuddy [username]");
+            this.AppendLine("Internal", "- /addbuddy <i>[username]</i>");
+            this.AppendLine("Internal", "- /rembuddy <i>[username]</i>");
+            this.AppendLine("Internal", "- /o <i>[message]</i>");
             this.AppendLine("Internal", "- /about");
             // Clear queue
             while (this._lines.Count > 0)

@@ -37,7 +37,7 @@ namespace VhaBot.Chat
             InitializeComponent();
             this._html = html;
             this._links = links;
-            this.Info.Navigate("file://" + Environment.CurrentDirectory + System.IO.Path.DirectorySeparatorChar + "Chat.html");
+            this.Info.DocumentText = this._links.Template;
         }
         
         private void Info_Navigating(object sender, WebBrowserNavigatingEventArgs e)

@@ -163,11 +163,11 @@ namespace VhaBot.Chat
             DialogResult result = form.ShowDialog();
             if (result == DialogResult.OK)
             {
-                this._chat.SendLoginCharacter(form.Character);
-                this._chat.AutoReconnect = true;
                 Program.Context.MainForm = new ChatForm(this._chat);
                 this.Close();
                 Program.Context.MainForm.Show();
+                this._chat.SendLoginCharacter(form.Character);
+                this._chat.AutoReconnect = true;
             }
             else
             {

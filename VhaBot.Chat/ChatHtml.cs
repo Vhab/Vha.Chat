@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
@@ -27,6 +28,30 @@ namespace VhaBot.Chat
 {
     public class ChatHtml
     {
+        private string _template = null;
+        public string Template
+        {
+            get
+            {
+                if (_template == null)
+                {
+                    try
+                    {
+                        FileStream stream = File.Open("Chat.html", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        StreamReader reader = new StreamReader(stream);
+                        this._template = reader.ReadToEnd();
+                        reader.Close();
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Unable to load Chat.html", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return "";
+                    }
+                }
+                return this._template;
+            }
+        }
+
         protected ChatForm _form;
         protected ChatInput _input;
         protected Net.Chat _chat;
@@ -57,6 +82,7 @@ namespace VhaBot.Chat
             validTags.Add("BR");
             List<string> validAttributes = new List<string>();
             validAttributes.Add("style");
+            validAttributes.Add("align");
             validAttributes.Add("className");
             validAttributes.Add("color");
             List<string> validHrefs = new List<string>();
@@ -190,7 +216,8 @@ namespace VhaBot.Chat
                 link.Click += new HtmlElementEventHandler(Clicked);
                 link.SetAttribute("title", link.GetAttribute("href"));
                 // Handle FC's 'no decoration' style
-                if (link.Style == "TEXT-DECORATION: none")
+                if (link.Style == null || link.Style == "") continue;
+                if (link.Style.ToLower().Replace(" ", "").Contains("text-decoration:none"))
                 {
                     HtmlElement parent = link.Parent;
                     string col = "";

@@ -118,10 +118,10 @@ namespace VhaBot.Chat
             if (command.Length == 0)
                 return;
             // Split
-            string[] args = command.Split(' ');
-            command = args[0];
             if (command.StartsWith("/"))
                 command = command.Substring(1);
+            string[] args = command.Split(' ');
+            command = args[0];
             // Handle
             Command(command, args);
         }
@@ -150,6 +150,15 @@ namespace VhaBot.Chat
                     break;
                 case "text":
                     TextCommand(args);
+                    break;
+                case "addbuddy":
+                    AddBuddyCommand(args);
+                    break;
+                case "rembuddy":
+                    RemBuddyCommand(args);
+                    break;
+                case "cc":
+                    CCCommand(args);
                     break;
                 default:
                     this._form.AppendLine("Error", "Unknown command: /" + command);
@@ -224,6 +233,40 @@ namespace VhaBot.Chat
         protected void TextCommand(string[] args)
         {
             this._form.AppendLine("Internal", string.Join(" ", args, 1, args.Length - 1));
+        }
+
+        protected void AddBuddyCommand(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage: /addbuddy [username]");
+                return;
+            }
+            if (!CheckUser(args[1])) return;
+            this._chat.SendFriendAdd(args[1]);
+        }
+
+        protected void RemBuddyCommand(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage: /rembuddy [username]");
+                return;
+            }
+            if (!CheckUser(args[1])) return;
+            this._chat.SendFriendRemove(args[1]);
+        }
+
+        protected void CCCommand(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage: /cc [command]");
+                return;
+            }
+            List<string> newArgs = new List<string>(args);
+            newArgs.RemoveAt(0);
+            Command(newArgs[0], newArgs.ToArray());
         }
     }
 }

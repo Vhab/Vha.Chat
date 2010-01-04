@@ -42,43 +42,53 @@ namespace VhaBot.Chat
         protected ChatHtml _links;
         protected Net.Chat _chat;
 
+        protected Queue<string> _lines = new Queue<string>();
+
         public ChatForm(Net.Chat chat)
         {
             InitializeComponent();
-            this.Output.Navigate("file://" + Environment.CurrentDirectory + System.IO.Path.DirectorySeparatorChar + "Chat.html");
 
             this._chat = chat;
             this._chat.FriendStatusEvent += new FriendStatusEventHandler(Chat_FriendStatusEvent);
+            this._chat.FriendRemovedEvent += new FriendRemovedEventHandler(Chat_FriendRemovedEvent);
             this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(Chat_ChannelJoinEvent);
             this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(Chat_PrivateChannelStatusEvent);
             this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(Chat_PrivateChannelRequestEvent);
+            this._chat.StatusChangeEvent += new StatusChangeEventHandler(Chat_StatusChangeEvent);
 
             this.Tree.Nodes.Add(this._online);
             this.Tree.Nodes.Add(this._offline);
             this.Tree.Nodes.Add(this._channels);
             this.Tree.Nodes.Add(this._privateChannels);
 
-            TreeNode node = new TreeNode(this._chat.Character);
-            node.ForeColor = Color.DimGray;
-            this._privateChannels.Nodes.Add(node);
-            this._privateChannels.Expand();
-
             this._input = new ChatInput(this, this._chat);
             this._output = new ChatOutput(this, this._chat);
             this._links = new ChatHtml(this, this._input, this._chat);
+
+            this.Output.DocumentText = this._links.Template;
         }
 
-        public delegate void AppendLineDelegate(string type, string line);
         public void AppendLine(string type, string line)
         {
-            if (this.Output.InvokeRequired)
-            {
-                this.Output.BeginInvoke(new AppendLineDelegate(AppendLine), new object[] { type, line });
-                return;
-            }
             string html = string.Format(
                 "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
                 DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, type, line);
+            AppendLine(html);
+        }
+        public delegate void AppendLineDelegate(string html);
+        private void AppendLine(string html)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new AppendLineDelegate(AppendLine), new object[] { html });
+                return;
+            }
+            // Queue messages if the browser isn't ready yet
+            if (this.Output.Document == null || this.Output.Document.Body == null)
+            {
+                this._lines.Enqueue(html);
+                return;
+            }
             this._links.AppendHtml(this.Output.Document, html, true);
             // Clean up old messages
             while (this.Output.Document.Body.Children.Count > Program.MaximumMessages)
@@ -158,12 +168,25 @@ namespace VhaBot.Chat
                     this._online.RemoveText(e.Character);
                 node.ForeColor = Color.DarkRed;
                 this._offline.Nodes.Add(node);
-                if (this._offline.Nodes.Count == 1)
-                    this._offline.Expand();
             }
         }
 
-        void Chat_PrivateChannelStatusEvent(VhaBot.Net.Chat chat, PrivateChannelStatusEventArgs e)
+        private void Chat_FriendRemovedEvent(VhaBot.Net.Chat chat, CharacterIDEventArgs e)
+        {
+            // Use invoke if needed
+            if (this.Channels.InvokeRequired)
+            {
+                this.Channels.BeginInvoke(new FriendRemovedEventHandler(Chat_FriendRemovedEvent), new object[] { chat, e });
+                return;
+            }
+            // Remove friend
+            if (this._online.ContainsText(e.Character))
+                this._online.RemoveText(e.Character);
+            if (this._offline.ContainsText(e.Character))
+                this._offline.RemoveText(e.Character);
+        }
+
+        private void Chat_PrivateChannelStatusEvent(VhaBot.Net.Chat chat, PrivateChannelStatusEventArgs e)
         {
             // Use invoke if needed
             if (this.Channels.InvokeRequired)
@@ -208,6 +231,28 @@ namespace VhaBot.Chat
             {
                 e.Join = true;
             }
+        }
+
+        private void Chat_StatusChangeEvent(VhaBot.Net.Chat chat, StatusChangeEventArgs e)
+        {
+            // Only really care about being connected
+            if (e.State != ChatState.Connected) return;
+            // Invoke
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new StatusChangeEventHandler(Chat_StatusChangeEvent), new object[] { chat, e });
+                return;
+            }
+            // - Add ourselves to private channel
+            TreeNode node = new TreeNode(this._chat.Character);
+            node.ForeColor = Color.DimGray;
+            this._privateChannels.Nodes.Clear();
+            this._privateChannels.Nodes.Add(node);
+            this._privateChannels.Expand();
+            // - Clear other tree sections
+            this._channels.Nodes.Clear();
+            this._online.Nodes.Clear();
+            this._offline.Nodes.Clear();
         }
 
         private void Input_KeyPress(object sender, KeyPressEventArgs e)
@@ -263,7 +308,15 @@ namespace VhaBot.Chat
             this.AppendLine("Internal", "- /invite [username]");
             this.AppendLine("Internal", "- /kick [username]");
             this.AppendLine("Internal", "- /kickall");
+            this.AppendLine("Internal", "- /addbuddy [username]");
+            this.AppendLine("Internal", "- /rembuddy [username]");
             this.AppendLine("Internal", "- /about");
+            // Clear queue
+            while (this._lines.Count > 0)
+            {
+                string html = this._lines.Dequeue();
+                this.AppendLine(html);
+            }
         }
 
         private void Tree_DoubleClick(object sender, EventArgs e)

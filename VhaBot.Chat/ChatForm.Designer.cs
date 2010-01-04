@@ -41,8 +41,6 @@ namespace VhaBot.Chat
             this.Tree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Tree.Location = new System.Drawing.Point(571, 6);
             this.Tree.Name = "Tree";
-            this.Tree.ShowPlusMinus = false;
-            this.Tree.ShowRootLines = false;
             this.Tree.Size = new System.Drawing.Size(157, 452);
             this.Tree.TabIndex = 0;
             this.Tree.DoubleClick += new System.EventHandler(this.Tree_DoubleClick);

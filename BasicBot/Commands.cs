@@ -1,5 +1,5 @@
 /*
-* BasicBot - An VhaBot.Net example
+* BasicBot - An Vha.Net example
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 
 using System;
 using System.Text;
-using VhaBot.Common;
-using VhaBot.Net;
+using Vha.Common;
+using Vha.Net;
 
 namespace BasicBot
 {
@@ -73,7 +73,7 @@ namespace BasicBot
                 e.Reply("I don't want everyone to see my 1's and 0's");
                 return;
             }
-            e.Reply("You can see me naked at http://svn.vhabion.net/VhaBot/");
+            e.Reply("You can see me naked at http://svn.vhabion.net/Vha/");
         }
 
         // Handle quit command

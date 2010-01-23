@@ -1,5 +1,5 @@
 /*
-* BasicBot - An VhaBot.Net example
+* BasicBot - An Vha.Net example
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using VhaBot.Common;
-using VhaBot.Net;
-using VhaBot.Net.Events;
+using Vha.Common;
+using Vha.Net;
+using Vha.Net.Events;
 
 namespace BasicBot
 {
@@ -43,7 +43,7 @@ namespace BasicBot
                 return;
             }
             _owner = configuration.Owner;
-            // Output debug from VhaBot.Net
+            // Output debug from Vha.Net
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
             // Initialize chat connection
             Chat chat = new Chat(configuration.Server, configuration.Port, configuration.Username, configuration.Password, configuration.Character);

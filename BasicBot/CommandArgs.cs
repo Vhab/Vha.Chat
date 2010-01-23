@@ -1,5 +1,5 @@
 /*
-* BasicBot - An VhaBot.Net example
+* BasicBot - An Vha.Net example
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 
 using System;
 using System.Text;
-using VhaBot.Common;
-using VhaBot.Net;
+using Vha.Common;
+using Vha.Net;
 
 namespace BasicBot
 {

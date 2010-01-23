@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BasicBot")]
-[assembly: AssemblyDescription("An example for Vha.Net")]
+[assembly: AssemblyTitle("Vha.Chat")]
+[assembly: AssemblyDescription("A simple stand alone chat client for Anarchy Online")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BasicBot")]
-[assembly: AssemblyCopyright("Copyright ©  2008-2009 Remco van Oosterhout")]
+[assembly: AssemblyProduct("Vha.Chat")]
+[assembly: AssemblyCopyright("Copyright ©  2009 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("7fee1228-d62f-4484-81d5-a4b57b59b0d8")]
+[assembly: Guid("cea3d723-f020-4bfa-981d-6ebe4c584515")]
 
 // Version information for an assembly consists of the following four values:
 //

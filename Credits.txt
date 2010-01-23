@@ -1,5 +1,5 @@
 /*
-* VhaBot
+* Vha.Chat, Vha.Common, Vha.Net
 * Copyright (C) 2005-2008 Remco van Oosterhout
 *
 * This program is free software; you can redistribute it and/or modify
@@ -33,4 +33,6 @@ The following people have made contributions to "VhaBot - Community Edition" and
 - Fayelure (rk1)
 - Neksus (rk2)
 
-"VhaBot - Barbaric Edition" and all earlier editions rely on a forked version of "AoChat.NET Library" created by POD13.
+Vha.Net and its earlier editions rely on a forked version of "AoChat.NET Library" created by POD13.
+
+The icons used within Vha.Chat are part of the "Tango Project" and have been released to the public domain.

@@ -1,6 +1,6 @@
 namespace VhaBot.Chat
 {
-    partial class StatusForm
+    partial class BrowserForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,41 +28,36 @@ namespace VhaBot.Chat
         /// </summary>
         private void InitializeComponent()
         {
-            this._message = new System.Windows.Forms.Label();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BrowserForm));
+            this._browser = new System.Windows.Forms.WebBrowser();
             this.SuspendLayout();
             // 
-            // _message
+            // _browser
             // 
-            this._message.Location = new System.Drawing.Point(12, 9);
-            this._message.Name = "_message";
-            this._message.Size = new System.Drawing.Size(225, 23);
-            this._message.TabIndex = 0;
-            this._message.Text = "Message";
-            this._message.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this._browser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._browser.Location = new System.Drawing.Point(0, 0);
+            this._browser.MinimumSize = new System.Drawing.Size(20, 20);
+            this._browser.Name = "_browser";
+            this._browser.Size = new System.Drawing.Size(809, 675);
+            this._browser.TabIndex = 0;
             // 
-            // StatusForm
+            // BrowserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(249, 41);
-            this.Controls.Add(this._message);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.ClientSize = new System.Drawing.Size(809, 675);
+            this.Controls.Add(this._browser);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "StatusForm";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
+            this.Name = "BrowserForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "VhaBot.Chat :: Status";
-            this.TopMost = true;
+            this.Text = "VhaBot.Chat :: Browser";
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label _message;
-
-
+        private System.Windows.Forms.WebBrowser _browser;
     }
 }

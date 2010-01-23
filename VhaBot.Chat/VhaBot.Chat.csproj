@@ -9,6 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VhaBot.Chat</RootNamespace>
     <AssemblyName>VhaBot.Chat</AssemblyName>
+    <ApplicationIcon>Application.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,6 +49,12 @@
     <Compile Include="AuthenticationForm.Designer.cs">
       <DependentUpon>AuthenticationForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="BrowserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BrowserForm.Designer.cs">
+      <DependentUpon>BrowserForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ChatForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -75,6 +82,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>AuthenticationForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="BrowserForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>BrowserForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ChatForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ChatForm.cs</DependentUpon>
@@ -99,6 +110,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -134,9 +146,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Application.ico" />
     <Content Include="Chat.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\OptionsBitmap.png" />
+    <None Include="Resources\DisconnectBitmap.png" />
+    <None Include="Resources\ConnectBitmap.png" />
+    <None Include="Resources\ChatIcon.ico" />
+    <None Include="Resources\ChatBitmap.png" />
+    <None Include="Resources\BrowserIcon.ico" />
+    <None Include="Resources\BrowserBitmap.png" />
+    <None Include="Resources\AboutBitmap.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

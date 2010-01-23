@@ -71,6 +71,7 @@ namespace VhaBot.Net
         public event LoginCharlistEventHandler LoginCharlistEvent;
         public event StatusChangeEventHandler StatusChangeEvent;
         public event DebugEventHandler DebugEvent;
+        public event ExceptionEventHandler ExceptionEvent;
 
         protected string _account = string.Empty;
         protected string _password = string.Empty;
@@ -339,9 +340,13 @@ namespace VhaBot.Net
                     Thread.Sleep(0);
                 }
             }
-            catch (Exception ex)
+            catch (ThreadAbortException)
             {
-                this.Debug("Error: " + ex.ToString(), "[ReceiveThread]");
+                this.Debug("Thread aborted", "[ReceiveThread]");
+            }
+            catch (SocketException ex)
+            {
+                this.Debug("Network error: " + ex.ToString(), "[ReceiveThread]");
             }
             finally
             {
@@ -377,7 +382,7 @@ namespace VhaBot.Net
                     if (this._closing) break;
                     if (this._socket == null || this._socket.Connected == false)
                     {
-                        throw new Exception("Disconnected");
+                        break;
                     }
                     if (this._fastQueue.Available || this._slowQueue.Available)
                     {
@@ -399,15 +404,8 @@ namespace VhaBot.Net
                         _socket.Send(buffer, buffer.Length, 0);
                         if (packet.PacketType == Packet.Type.PRIVATE_MESSAGE)
                         {
-                            try
-                            {
-                                PrivateMessagePacket msg = (PrivateMessagePacket)packet;
-                                this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetUserName(msg.CharacterID), msg.Message, true));
-                            }
-                            catch (Exception ex)
-                            {
-                                this.Debug("Error: " + ex.ToString(), "[SendThread]");
-                            }
+                            PrivateMessagePacket msg = (PrivateMessagePacket)packet;
+                            this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetUserName(msg.CharacterID), msg.Message, true));
                         }
                         Thread.Sleep((int)this.FastPacketDelay);
                     }
@@ -417,9 +415,13 @@ namespace VhaBot.Net
                     }
                 }
             }
-            catch (Exception ex)
+            catch (ThreadAbortException)
             {
-                this.Debug("Error: " + ex.ToString(), "[SendThread]");
+                this.Debug("Thread aborted", "[SendThread]");
+            }
+            catch (SocketException ex)
+            {
+                this.Debug("Network error: " + ex.ToString(), "[SendThread]");
             }
             finally
             {
@@ -431,231 +433,241 @@ namespace VhaBot.Net
         internal virtual void ParsePacket(Object o) { ParsePacket((ParsePacketData)o, false); }
         internal virtual void ParsePacket(ParsePacketData packetData, bool local)
         {
-            Packet packet = null;
             // Register this thread
             if (local == false)
             {
                 lock (this._threads)
                     this._threads.Add(Thread.CurrentThread);
             }
-            // figure out the packet type and raise an event.
-            switch (packetData.type)
+            // Handle packet
+            try
             {
-                case Packet.Type.PING:
-                    OnPongEvent();
-                    break;
-                case Packet.Type.LOGIN_SEED:
-                    packet = new LoginSeedPacket(packetData.type, packetData.data);
-                    OnLoginSeedEvent(
-                        new LoginSeedEventArgs(
-                        ((LoginSeedPacket)packet).Seed
-                        ));
-                    break;
-                case Packet.Type.SYSTEM_MESSAGE:
-                    packet = new SimpleStringPacket(packetData.type, packetData.data);
-                    OnSimpleMessageEvent(
-                        new SimpleMessageEventArgs(
-                        ((SimpleStringPacket)packet).Message
-                        ));
-                    break;
-                case Packet.Type.LOGIN_ERROR:
-                    packet = new SimpleStringPacket(packetData.type, packetData.data);
-                    OnLoginErrorEvent(
-                        new LoginErrorEventArgs(
-                        ((SimpleStringPacket)packet).Message
-                        ));
-                    break;
-                case Packet.Type.LOGIN_CHARACTERLIST:
-                    packet = new LoginCharacterListPacket(packetData.type, packetData.data);
-                    OnLoginCharacterListEvent(
-                        new LoginChararacterListEventArgs(
-                        ((LoginCharacterListPacket)packet).Characters
-                        ));
-                    break;
-                case Packet.Type.FRIEND_REMOVED:
-                    packet = new SimpleIdPacket(packetData.type, packetData.data);
-                    OnFriendRemovedEvent(
-                        new CharacterIDEventArgs(
-                        ((SimpleIdPacket)packet).CharacterID,
-                        this.GetUserName(((SimpleIdPacket)packet).CharacterID)
-                        ));
-                    break;
-                case Packet.Type.CLIENT_UNKNOWN:
-                    packet = new SimpleIdPacket(packetData.type, packetData.data);
-                    OnClientUnknownEvent(
-                        new CharacterIDEventArgs(
-                        ((SimpleIdPacket)packet).CharacterID,
-                        this.GetUserName(((SimpleIdPacket)packet).CharacterID)
-                        ));
-                    break;
-                case Packet.Type.PRIVATE_CHANNEL_INVITE:
-                    packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
-                    OnPrivateChannelRequestEvent(
-                        new PrivateChannelRequestEventArgs(
-                        ((PrivateChannelStatusPacket)packet).ChannelID,
-                        this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
-                        false
-                        ));
-                    break;
-                case Packet.Type.PRIVATE_CHANNEL_KICK:
-                case Packet.Type.PRIVATE_CHANNEL_PART:
-                    packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
-                    OnPrivateChannelStatusEvent(
-                        new PrivateChannelStatusEventArgs(
-                        ((PrivateChannelStatusPacket)packet).ChannelID,
-                        this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
-                        this.ID, this.Character, false
-                        ));
-                    break;
-                case Packet.Type.LOGIN_OK:
-                    packet = new EmptyPacket(packetData.type);
-                    OnLoginOKEvent();
-                    break;
-                case Packet.Type.CLIENT_NAME:
-                    packet = new ClientNamePacket(packetData.type, packetData.data);
-                    OnNameLookupEvent(
-                        new NameLookupEventArgs(
-                        ((ClientNamePacket)packet).CharacterID,
-                        ((ClientNamePacket)packet).CharacterName
-                        ));
-                    break;
-                case Packet.Type.NAME_LOOKUP:
-                    packet = new NameLookupPacket(packetData.type, packetData.data);
-                    OnNameLookupEvent(
-                        new NameLookupEventArgs(
-                        ((NameLookupPacket)packet).CharacterID,
-                        ((NameLookupPacket)packet).CharacterName
-                        ));
-                    break;
-                case Packet.Type.PRIVATE_MESSAGE:
-                    packet = new PrivateMessagePacket(packetData.type, packetData.data);
-                    OnPrivateMessageEvent(
-                        new PrivateMessageEventArgs(
-                        ((PrivateMessagePacket)packet).CharacterID,
-                        this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
-                        ((PrivateMessagePacket)packet).Message,
-                        false
-                        ));
-                    break;
-                case Packet.Type.VICINITY_MESSAGE:
-                    packet = new PrivateMessagePacket(packetData.type, packetData.data);
-                    OnVicinityMessageEvent(
-                        new VicinityMessageEventArgs(
-                        ((PrivateMessagePacket)packet).CharacterID,
-                        this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
-                        ((PrivateMessagePacket)packet).Message
-                        ));
-                    break;
-                case Packet.Type.ANON_MESSAGE:
-                    packet = new AnonVicinityPacket(packetData.type, packetData.data);
-                    OnAnonVicinityEvent(
-                        new AnonVicinityEventArgs(
-                        ((AnonVicinityPacket)packet).UnknownString,
-                        ((AnonVicinityPacket)packet).Message
-                        ));
-                    break;
-                case Packet.Type.FRIEND_STATUS:
-                    packet = new FriendStatusPacket(packetData.type, packetData.data);
-                    OnFriendStatusEvent(
-                        new FriendStatusEventArgs(
-                        ((FriendStatusPacket)packet).CharacterID,
-                        this.GetUserName(((FriendStatusPacket)packet).CharacterID),
-                        ((FriendStatusPacket)packet).Online,
-                        ((FriendStatusPacket)packet).Temporary
-                        ));
-                    break;
-                case Packet.Type.CHANNEL_JOIN:
-                    packet = new ChannelJoinPacket(packetData.type, packetData.data);
-                    OnChannelJoinEvent(
-                        new ChannelJoinEventArgs(
-                        ((ChannelJoinPacket)packet).ID,
-                        ((ChannelJoinPacket)packet).Name,
-                        ((ChannelJoinPacket)packet).Mute,
-                        ((ChannelJoinPacket)packet).Logging,
-                        ((ChannelJoinPacket)packet).ChannelType
-                        ));
-                    break;
-                case Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN:
-                case Packet.Type.PRIVATE_CHANNEL_CLIENTPART:
-                    packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
-                    OnPrivateChannelStatusEvent(
-                        new PrivateChannelStatusEventArgs(
-                        ((PrivateChannelStatusPacket)packet).ChannelID,
-                        this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
-                        ((PrivateChannelStatusPacket)packet).CharacterID,
-                        this.GetUserName(((PrivateChannelStatusPacket)packet).CharacterID),
-                        ((PrivateChannelStatusPacket)packet).Joined
-                        ));
-                    break;
-                case Packet.Type.PRIVGRP_MESSAGE:
-                    packet = new PrivateChannelMessagePacket(packetData.type, packetData.data);
-                    OnPrivateChannelMessageEvent(
-                        new PrivateChannelMessageEventArgs(
-                        ((PrivateChannelMessagePacket)packet).ChannelID,
-                        this.GetUserName(((PrivateChannelMessagePacket)packet).ChannelID),
-                        ((PrivateChannelMessagePacket)packet).CharacterID,
-                        this.GetUserName(((PrivateChannelMessagePacket)packet).CharacterID),
-                        ((PrivateChannelMessagePacket)packet).Message,
-                        ((PrivateChannelMessagePacket)packet).ChannelID == this._id
-                        ));
-                    break;
-                case Packet.Type.CHANNEL_MESSAGE:
-                    packet = new ChannelMessagePacket(packetData.type, packetData.data);
-                    OnChannelMessageEvent(
-                        new ChannelMessageEventArgs(
-                        ((ChannelMessagePacket)packet).ChannelID,
-                        this.GetChannelName(((ChannelMessagePacket)packet).ChannelID),
-                        ((ChannelMessagePacket)packet).CharacterID,
-                        this.GetUserName(((ChannelMessagePacket)packet).CharacterID),
-                        ((ChannelMessagePacket)packet).Message,
-                        this.GetChannelType(((ChannelMessagePacket)packet).ChannelID)
-                        ));
-                    break;
-                case Packet.Type.FORWARD:
-                    packet = new ForwardPacket(packetData.type, packetData.data);
-                    OnForwardEvent(
-                        new ForwardEventArgs(
-                        ((ForwardPacket)packet).ID1,
-                        ((ForwardPacket)packet).ID2
-                        ));
-                    break;
-                case Packet.Type.AMD_MUX_INFO:
-                    packet = new AmdMuxInfoPacket(packetData.type, packetData.data);
-                    OnAmdMuxInfoEvent(
-                        new AmdMuxInfoEventArgs(
-                        ((AmdMuxInfoPacket)packet).Message
-                        ));
-                    break;
-                case Packet.Type.MESSAGE_SYSTEM:
-                    packet = new SystemMessagePacket(packetData.type, packetData.data);
-                    OnSystemMessageEvent(
-                        new SystemMessageEventArgs(
-                        ((SystemMessagePacket)packet).ClientID,
-                        ((SystemMessagePacket)packet).WindowID,
-                        ((SystemMessagePacket)packet).MessageID
-                        ));
-                    break;
-                default:
-                    if (packetData.type == Packet.Type.NULL && packetData.data != null)
-                    {
-                        if (BitConverter.ToInt32(packetData.data, 0) == 0 && packetData.data.Length == 4)
+                Packet packet = null;
+                // figure out the packet type and raise an event.
+                switch (packetData.type)
+                {
+                    case Packet.Type.PING:
+                        OnPongEvent();
+                        break;
+                    case Packet.Type.LOGIN_SEED:
+                        packet = new LoginSeedPacket(packetData.type, packetData.data);
+                        OnLoginSeedEvent(
+                            new LoginSeedEventArgs(
+                            ((LoginSeedPacket)packet).Seed
+                            ));
+                        break;
+                    case Packet.Type.SYSTEM_MESSAGE:
+                        packet = new SimpleStringPacket(packetData.type, packetData.data);
+                        OnSimpleMessageEvent(
+                            new SimpleMessageEventArgs(
+                            ((SimpleStringPacket)packet).Message
+                            ));
+                        break;
+                    case Packet.Type.LOGIN_ERROR:
+                        packet = new SimpleStringPacket(packetData.type, packetData.data);
+                        OnLoginErrorEvent(
+                            new LoginErrorEventArgs(
+                            ((SimpleStringPacket)packet).Message
+                            ));
+                        break;
+                    case Packet.Type.LOGIN_CHARACTERLIST:
+                        packet = new LoginCharacterListPacket(packetData.type, packetData.data);
+                        OnLoginCharacterListEvent(
+                            new LoginChararacterListEventArgs(
+                            ((LoginCharacterListPacket)packet).Characters
+                            ));
+                        break;
+                    case Packet.Type.FRIEND_REMOVED:
+                        packet = new SimpleIdPacket(packetData.type, packetData.data);
+                        OnFriendRemovedEvent(
+                            new CharacterIDEventArgs(
+                            ((SimpleIdPacket)packet).CharacterID,
+                            this.GetUserName(((SimpleIdPacket)packet).CharacterID)
+                            ));
+                        break;
+                    case Packet.Type.CLIENT_UNKNOWN:
+                        packet = new SimpleIdPacket(packetData.type, packetData.data);
+                        OnClientUnknownEvent(
+                            new CharacterIDEventArgs(
+                            ((SimpleIdPacket)packet).CharacterID,
+                            this.GetUserName(((SimpleIdPacket)packet).CharacterID)
+                            ));
+                        break;
+                    case Packet.Type.PRIVATE_CHANNEL_INVITE:
+                        packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
+                        OnPrivateChannelRequestEvent(
+                            new PrivateChannelRequestEventArgs(
+                            ((PrivateChannelStatusPacket)packet).ChannelID,
+                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            false
+                            ));
+                        break;
+                    case Packet.Type.PRIVATE_CHANNEL_KICK:
+                    case Packet.Type.PRIVATE_CHANNEL_PART:
+                        packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
+                        OnPrivateChannelStatusEvent(
+                            new PrivateChannelStatusEventArgs(
+                            ((PrivateChannelStatusPacket)packet).ChannelID,
+                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            this.ID, this.Character, false
+                            ));
+                        break;
+                    case Packet.Type.LOGIN_OK:
+                        packet = new EmptyPacket(packetData.type);
+                        OnLoginOKEvent();
+                        break;
+                    case Packet.Type.CLIENT_NAME:
+                        packet = new ClientNamePacket(packetData.type, packetData.data);
+                        OnNameLookupEvent(
+                            new NameLookupEventArgs(
+                            ((ClientNamePacket)packet).CharacterID,
+                            ((ClientNamePacket)packet).CharacterName
+                            ));
+                        break;
+                    case Packet.Type.NAME_LOOKUP:
+                        packet = new NameLookupPacket(packetData.type, packetData.data);
+                        OnNameLookupEvent(
+                            new NameLookupEventArgs(
+                            ((NameLookupPacket)packet).CharacterID,
+                            ((NameLookupPacket)packet).CharacterName
+                            ));
+                        break;
+                    case Packet.Type.PRIVATE_MESSAGE:
+                        packet = new PrivateMessagePacket(packetData.type, packetData.data);
+                        OnPrivateMessageEvent(
+                            new PrivateMessageEventArgs(
+                            ((PrivateMessagePacket)packet).CharacterID,
+                            this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                            ((PrivateMessagePacket)packet).Message,
+                            false
+                            ));
+                        break;
+                    case Packet.Type.VICINITY_MESSAGE:
+                        packet = new PrivateMessagePacket(packetData.type, packetData.data);
+                        OnVicinityMessageEvent(
+                            new VicinityMessageEventArgs(
+                            ((PrivateMessagePacket)packet).CharacterID,
+                            this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                            ((PrivateMessagePacket)packet).Message
+                            ));
+                        break;
+                    case Packet.Type.ANON_MESSAGE:
+                        packet = new AnonVicinityPacket(packetData.type, packetData.data);
+                        OnAnonVicinityEvent(
+                            new AnonVicinityEventArgs(
+                            ((AnonVicinityPacket)packet).UnknownString,
+                            ((AnonVicinityPacket)packet).Message
+                            ));
+                        break;
+                    case Packet.Type.FRIEND_STATUS:
+                        packet = new FriendStatusPacket(packetData.type, packetData.data);
+                        OnFriendStatusEvent(
+                            new FriendStatusEventArgs(
+                            ((FriendStatusPacket)packet).CharacterID,
+                            this.GetUserName(((FriendStatusPacket)packet).CharacterID),
+                            ((FriendStatusPacket)packet).Online,
+                            ((FriendStatusPacket)packet).Temporary
+                            ));
+                        break;
+                    case Packet.Type.CHANNEL_JOIN:
+                        packet = new ChannelJoinPacket(packetData.type, packetData.data);
+                        OnChannelJoinEvent(
+                            new ChannelJoinEventArgs(
+                            ((ChannelJoinPacket)packet).ID,
+                            ((ChannelJoinPacket)packet).Name,
+                            ((ChannelJoinPacket)packet).Mute,
+                            ((ChannelJoinPacket)packet).Logging,
+                            ((ChannelJoinPacket)packet).ChannelType
+                            ));
+                        break;
+                    case Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN:
+                    case Packet.Type.PRIVATE_CHANNEL_CLIENTPART:
+                        packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
+                        OnPrivateChannelStatusEvent(
+                            new PrivateChannelStatusEventArgs(
+                            ((PrivateChannelStatusPacket)packet).ChannelID,
+                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            ((PrivateChannelStatusPacket)packet).CharacterID,
+                            this.GetUserName(((PrivateChannelStatusPacket)packet).CharacterID),
+                            ((PrivateChannelStatusPacket)packet).Joined
+                            ));
+                        break;
+                    case Packet.Type.PRIVGRP_MESSAGE:
+                        packet = new PrivateChannelMessagePacket(packetData.type, packetData.data);
+                        OnPrivateChannelMessageEvent(
+                            new PrivateChannelMessageEventArgs(
+                            ((PrivateChannelMessagePacket)packet).ChannelID,
+                            this.GetUserName(((PrivateChannelMessagePacket)packet).ChannelID),
+                            ((PrivateChannelMessagePacket)packet).CharacterID,
+                            this.GetUserName(((PrivateChannelMessagePacket)packet).CharacterID),
+                            ((PrivateChannelMessagePacket)packet).Message,
+                            ((PrivateChannelMessagePacket)packet).ChannelID == this._id
+                            ));
+                        break;
+                    case Packet.Type.CHANNEL_MESSAGE:
+                        packet = new ChannelMessagePacket(packetData.type, packetData.data);
+                        OnChannelMessageEvent(
+                            new ChannelMessageEventArgs(
+                            ((ChannelMessagePacket)packet).ChannelID,
+                            this.GetChannelName(((ChannelMessagePacket)packet).ChannelID),
+                            ((ChannelMessagePacket)packet).CharacterID,
+                            this.GetUserName(((ChannelMessagePacket)packet).CharacterID),
+                            ((ChannelMessagePacket)packet).Message,
+                            this.GetChannelType(((ChannelMessagePacket)packet).ChannelID)
+                            ));
+                        break;
+                    case Packet.Type.FORWARD:
+                        packet = new ForwardPacket(packetData.type, packetData.data);
+                        OnForwardEvent(
+                            new ForwardEventArgs(
+                            ((ForwardPacket)packet).ID1,
+                            ((ForwardPacket)packet).ID2
+                            ));
+                        break;
+                    case Packet.Type.AMD_MUX_INFO:
+                        packet = new AmdMuxInfoPacket(packetData.type, packetData.data);
+                        OnAmdMuxInfoEvent(
+                            new AmdMuxInfoEventArgs(
+                            ((AmdMuxInfoPacket)packet).Message
+                            ));
+                        break;
+                    case Packet.Type.MESSAGE_SYSTEM:
+                        packet = new SystemMessagePacket(packetData.type, packetData.data);
+                        OnSystemMessageEvent(
+                            new SystemMessageEventArgs(
+                            ((SystemMessagePacket)packet).ClientID,
+                            ((SystemMessagePacket)packet).WindowID,
+                            ((SystemMessagePacket)packet).MessageID
+                            ));
+                        break;
+                    default:
+                        if (packetData.type == Packet.Type.NULL && packetData.data != null)
                         {
-                            Trace.WriteLine("Disconnect packet received.", "[Debug]");
-                            if (local == false)
-                                lock (this._threads)
-                                    this._threads.Remove(Thread.CurrentThread);
-                            this.Disconnect(false);
-                            return;
+                            if (BitConverter.ToInt32(packetData.data, 0) == 0 && packetData.data.Length == 4)
+                            {
+                                Trace.WriteLine("Disconnect packet received.", "[Debug]");
+                                if (local == false)
+                                    lock (this._threads)
+                                        this._threads.Remove(Thread.CurrentThread);
+                                this.Disconnect(false);
+                                return;
+                            }
                         }
-                    }
-                    packet = new UnknownPacket(packetData.type, packetData.data);
-                    OnUnknownPacketEvent(
-                        new UnknownPacketEventArgs(
-                        ((UnknownPacket)packet).PacketType,
-                        ((UnknownPacket)packet).UnknownData
-                        ));
-                    break;
-            } // End switch (packet type)
+                        packet = new UnknownPacket(packetData.type, packetData.data);
+                        OnUnknownPacketEvent(
+                            new UnknownPacketEventArgs(
+                            ((UnknownPacket)packet).PacketType,
+                            ((UnknownPacket)packet).UnknownData
+                            ));
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.Debug("Unexpected exception: " + ex.ToString(), "Error");
+                if (this.ExceptionEvent != null)
+                    this.ExceptionEvent(this, ex);
+            }
             if (local == false)
             {
                 lock (this._threads)

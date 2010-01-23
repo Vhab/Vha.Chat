@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="License.Text" xml:space="preserve">
+  <data name="_license.Text" xml:space="preserve">
     <value>This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; version 2 of the License only.
@@ -131,5 +131,30 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 USA</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAEBAAAAAAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAA
+        AAD///8BhYqI/4KGhWUAAAAFAAAABwAAAAkAAAANAAAADQAAAAsAAAAHAAAABQAAAAP///8B////Af//
+        /wH///8B////AYWKiP+Fioj/hYqI/3Z6eXEAAAAXAAAAGwAAAB0AAAAbAAAAFwAAABEAAAANAAAACf//
+        /wH///8B////Af///wGFioj///////////+Fioj/dHd2WSoqKhkqKioZKioqGS0tLRc0NDQTNDQ0DwAA
+        AAX///8B////Af///wGEiIZjhYqI///////v7+/9/////4WKiP+Fioj/hYqI/4WKiP+Fioj/hYqI/4WK
+        iP+dnZ2N////Af///wH///8BhYqI////////////7u7u/+/v7///////////////////////////////
+        ////////hYqI/4KGhWWFioj/////AYWKiP//////6+vr/+zs7P/t7e3/7u7u/+/v7//v7+//8PDw//Hx
+        8f/y8vL//////4WKiP+Fioj/hYqI/////wGFioj//////+rq6v/r6+v/7Ozs/+zs7P/t7e3/7u7u/+/v
+        7//w8PD/8fHx//////+Fioj//////4WKiP////8BhYqI///////p6en/6enp/+rq6v/r6+v/7Ozs/+3t
+        7f/u7u7/7+/v/+/v7///////hYqI//////+Fioj/hIiGY4WKiP//////6enp/+np6f/p6en/6enp/+rq
+        6v/r6+v/7Ozs/+3t7f/u7u7//////4WKiP///////////4WKiP+Fioj//////+np6f/p6en/6enp/+np
+        6f/p6en/6urq/+vr6//s7Oz/7Ozs//////+Fioj/6+vr//////+Fioj/hYqI///////p6en/6enp/+np
+        6f/p6en/6enp/+np6f/p6en/6urq/+vr6///////hYqI/+rq6v//////hYqI/4WKiP//////////////
+        /////////////////////////////////////////////4WKiP/p6en//////4WKiP+Fioh9hYqI/4WK
+        iP+Fioj/hYqI/4WKiP+Fioj/hYqI/4WKiP+Fioj/hYqI/4WKiP/Exsb/6enp//////+Fioj/////Af//
+        /wH///8BhYqI///////r6+v/6urq/+np6f/p6en/6enp/+np6f/p6en/6enp/+np6f//////hYqI////
+        /wH///8B////AYWKiP///////////////////////////////////////////////////////////4WK
+        iP////8B////Af///wGFiohdhYqI/4WKiP+Fioj/hYqI/4WKiP+Fioj/hYqI/4WKiP+Fioj/hYqI/4WK
+        iP+Fioh9AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA
+        //8AAP//AAD//w==
+</value>
   </data>
 </root>

@@ -74,12 +74,12 @@ namespace VhaBot.Chat
             if (element.FirstChild == null) return;
             // Constraints
             List<string> validTags = new List<string>();
-            validTags.Add("PRE");
-            validTags.Add("SPAN");
-            validTags.Add("DIV");
-            validTags.Add("FONT");
-            validTags.Add("A");
-            validTags.Add("BR");
+            validTags.Add("pre");
+            validTags.Add("span");
+            validTags.Add("div");
+            validTags.Add("font");
+            validTags.Add("a");
+            validTags.Add("br");
             List<string> validAttributes = new List<string>();
             validAttributes.Add("style");
             validAttributes.Add("align");
@@ -103,7 +103,7 @@ namespace VhaBot.Chat
                 {
                     HtmlElement next = current.NextSibling;
                     // Check type against white-list
-                    string tag = current.TagName;
+                    string tag = current.TagName.ToLower();
                     if (!validTags.Contains(tag))
                     {
                         if (current.InnerHtml != null)
@@ -130,9 +130,9 @@ namespace VhaBot.Chat
                 elements.RemoveAt(elements.Count - 1);
                 HtmlElement replacement = null;
                 // Special case for fonts
-                if (current.TagName == "FONT")
+                if (current.TagName.ToLower() == "font")
                 {
-                    replacement = document.CreateElement("SPAN");
+                    replacement = document.CreateElement("span");
                     replacement.Style = "color: " + current.GetAttribute("color");
                 }
                 // Default case
@@ -152,7 +152,7 @@ namespace VhaBot.Chat
                     {
                         foreach (string validHref in validHrefs)
                         {
-                            if (href.StartsWith(validHref))
+                            if (href.ToLower().StartsWith(validHref))
                             {
                                 replacement.SetAttribute("href", href);
                                 break;
@@ -223,7 +223,7 @@ namespace VhaBot.Chat
                     string col = "";
                     while (parent != null)
                     {
-                        if (parent.TagName == "FONT")
+                        if (parent.TagName.ToLower() == "font")
                         {
                             col = parent.GetAttribute("color");
                             if (col != "") break;
@@ -300,7 +300,15 @@ namespace VhaBot.Chat
 
         protected void ItemRefLink(string item)
         {
-            this._form.AppendLine("Error", "itemref:// hasn't been implemented yet...");
+            string url = "http://auno.org/ao/db.php?id={0}&id2={1}&ql={2}";
+            string[] parts = item.Split(new char[] {'/'});
+            if (parts.Length < 3)
+            {
+                this._form.AppendLine("Error", "Invalid itemref link: " + item);
+                return;
+            }
+            Form form = new BrowserForm(string.Format(url, parts[0], parts[1], parts[2]));
+            form.Show();
         }
 
         protected void CharacterLink(string character)

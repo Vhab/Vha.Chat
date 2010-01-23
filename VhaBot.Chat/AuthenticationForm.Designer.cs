@@ -28,104 +28,106 @@ namespace VhaBot.Chat
         /// </summary>
         private void InitializeComponent()
         {
-            this.ServerLabel = new System.Windows.Forms.Label();
-            this.Server = new System.Windows.Forms.ComboBox();
-            this.Account = new System.Windows.Forms.TextBox();
-            this.AccountLabel = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.Password = new System.Windows.Forms.TextBox();
-            this.Login = new System.Windows.Forms.Button();
-            this.Cancel = new System.Windows.Forms.Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AuthenticationForm));
+            this._serverLabel = new System.Windows.Forms.Label();
+            this._server = new System.Windows.Forms.ComboBox();
+            this._account = new System.Windows.Forms.TextBox();
+            this._accountLabel = new System.Windows.Forms.Label();
+            this._passwordLabel = new System.Windows.Forms.Label();
+            this._password = new System.Windows.Forms.TextBox();
+            this._login = new System.Windows.Forms.Button();
+            this._cancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // ServerLabel
+            // _serverLabel
             // 
-            this.ServerLabel.AutoSize = true;
-            this.ServerLabel.Location = new System.Drawing.Point(12, 15);
-            this.ServerLabel.Name = "ServerLabel";
-            this.ServerLabel.Size = new System.Drawing.Size(38, 13);
-            this.ServerLabel.TabIndex = 0;
-            this.ServerLabel.Text = "Server";
+            this._serverLabel.AutoSize = true;
+            this._serverLabel.Location = new System.Drawing.Point(12, 15);
+            this._serverLabel.Name = "_serverLabel";
+            this._serverLabel.Size = new System.Drawing.Size(38, 13);
+            this._serverLabel.TabIndex = 0;
+            this._serverLabel.Text = "Server";
             // 
-            // Server
+            // _server
             // 
-            this.Server.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Server.FormattingEnabled = true;
-            this.Server.Location = new System.Drawing.Point(74, 12);
-            this.Server.Name = "Server";
-            this.Server.Size = new System.Drawing.Size(198, 21);
-            this.Server.TabIndex = 1;
+            this._server.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._server.FormattingEnabled = true;
+            this._server.Location = new System.Drawing.Point(74, 12);
+            this._server.Name = "_server";
+            this._server.Size = new System.Drawing.Size(198, 21);
+            this._server.TabIndex = 1;
             // 
-            // Account
+            // _account
             // 
-            this.Account.Location = new System.Drawing.Point(74, 39);
-            this.Account.Name = "Account";
-            this.Account.Size = new System.Drawing.Size(198, 20);
-            this.Account.TabIndex = 2;
+            this._account.Location = new System.Drawing.Point(74, 39);
+            this._account.Name = "_account";
+            this._account.Size = new System.Drawing.Size(198, 20);
+            this._account.TabIndex = 2;
             // 
-            // AccountLabel
+            // _accountLabel
             // 
-            this.AccountLabel.AutoSize = true;
-            this.AccountLabel.Location = new System.Drawing.Point(12, 42);
-            this.AccountLabel.Name = "AccountLabel";
-            this.AccountLabel.Size = new System.Drawing.Size(47, 13);
-            this.AccountLabel.TabIndex = 3;
-            this.AccountLabel.Text = "Account";
+            this._accountLabel.AutoSize = true;
+            this._accountLabel.Location = new System.Drawing.Point(12, 42);
+            this._accountLabel.Name = "_accountLabel";
+            this._accountLabel.Size = new System.Drawing.Size(47, 13);
+            this._accountLabel.TabIndex = 3;
+            this._accountLabel.Text = "Account";
             // 
-            // label1
+            // _passwordLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 69);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Password";
+            this._passwordLabel.AutoSize = true;
+            this._passwordLabel.Location = new System.Drawing.Point(12, 69);
+            this._passwordLabel.Name = "_passwordLabel";
+            this._passwordLabel.Size = new System.Drawing.Size(53, 13);
+            this._passwordLabel.TabIndex = 4;
+            this._passwordLabel.Text = "Password";
             // 
-            // Password
+            // _password
             // 
-            this.Password.Location = new System.Drawing.Point(74, 66);
-            this.Password.Name = "Password";
-            this.Password.PasswordChar = '*';
-            this.Password.Size = new System.Drawing.Size(198, 20);
-            this.Password.TabIndex = 5;
+            this._password.Location = new System.Drawing.Point(74, 66);
+            this._password.Name = "_password";
+            this._password.PasswordChar = '*';
+            this._password.Size = new System.Drawing.Size(198, 20);
+            this._password.TabIndex = 5;
             // 
-            // Login
+            // _login
             // 
-            this.Login.Location = new System.Drawing.Point(12, 92);
-            this.Login.Name = "Login";
-            this.Login.Size = new System.Drawing.Size(127, 23);
-            this.Login.TabIndex = 6;
-            this.Login.Text = "Login";
-            this.Login.UseVisualStyleBackColor = true;
-            this.Login.Click += new System.EventHandler(this.Login_Click);
+            this._login.Location = new System.Drawing.Point(12, 92);
+            this._login.Name = "_login";
+            this._login.Size = new System.Drawing.Size(127, 23);
+            this._login.TabIndex = 6;
+            this._login.Text = "Login";
+            this._login.UseVisualStyleBackColor = true;
+            this._login.Click += new System.EventHandler(this._login_Click);
             // 
-            // Cancel
+            // _cancel
             // 
-            this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.Cancel.Location = new System.Drawing.Point(145, 92);
-            this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(127, 23);
-            this.Cancel.TabIndex = 7;
-            this.Cancel.Text = "Cancel";
-            this.Cancel.UseVisualStyleBackColor = true;
-            this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
+            this._cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this._cancel.Location = new System.Drawing.Point(145, 92);
+            this._cancel.Name = "_cancel";
+            this._cancel.Size = new System.Drawing.Size(127, 23);
+            this._cancel.TabIndex = 7;
+            this._cancel.Text = "Cancel";
+            this._cancel.UseVisualStyleBackColor = true;
+            this._cancel.Click += new System.EventHandler(this._cancel_Click);
             // 
             // AuthenticationForm
             // 
-            this.AcceptButton = this.Login;
+            this.AcceptButton = this._login;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.Cancel;
+            this.CancelButton = this._cancel;
             this.ClientSize = new System.Drawing.Size(284, 127);
-            this.Controls.Add(this.Cancel);
-            this.Controls.Add(this.Login);
-            this.Controls.Add(this.Password);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.AccountLabel);
-            this.Controls.Add(this.Account);
-            this.Controls.Add(this.Server);
-            this.Controls.Add(this.ServerLabel);
+            this.Controls.Add(this._cancel);
+            this.Controls.Add(this._login);
+            this.Controls.Add(this._password);
+            this.Controls.Add(this._passwordLabel);
+            this.Controls.Add(this._accountLabel);
+            this.Controls.Add(this._account);
+            this.Controls.Add(this._server);
+            this.Controls.Add(this._serverLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AuthenticationForm";
@@ -140,14 +142,14 @@ namespace VhaBot.Chat
 
         #endregion
 
-        private System.Windows.Forms.Label ServerLabel;
-        private System.Windows.Forms.ComboBox Server;
-        private System.Windows.Forms.TextBox Account;
-        private System.Windows.Forms.Label AccountLabel;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox Password;
-        private System.Windows.Forms.Button Login;
-        private System.Windows.Forms.Button Cancel;
+        private System.Windows.Forms.Label _serverLabel;
+        private System.Windows.Forms.ComboBox _server;
+        private System.Windows.Forms.TextBox _account;
+        private System.Windows.Forms.Label _accountLabel;
+        private System.Windows.Forms.Label _passwordLabel;
+        private System.Windows.Forms.TextBox _password;
+        private System.Windows.Forms.Button _login;
+        private System.Windows.Forms.Button _cancel;
     }
 }
 

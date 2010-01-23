@@ -14,13 +14,13 @@ namespace VhaBot.Chat
         {
             InitializeComponent();
             // Set the version
-            this.Version.Text = "Version " + Application.ProductVersion;
+            this._version.Text = "Version " + Application.ProductVersion;
         }
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
             // Focus the form instead of the License textbox
-            this.License.Select(0, 0);
+            this._license.Select(0, 0);
         }
     }
 }

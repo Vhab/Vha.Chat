@@ -38,23 +38,23 @@ namespace VhaBot.Chat
             InitializeComponent();
             foreach (LoginCharacter character in characters)
             {
-                this.CharactersList.Items.Add(character);
+                this._characters.Items.Add(character);
             }
         }
 
-        private void Cancel_Click(object sender, EventArgs e)
+        private void _cancel_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
         }
 
-        private void Select_Click(object sender, EventArgs e)
+        private void _select_Click(object sender, EventArgs e)
         {
-            if (this.CharactersList.SelectedItem == null)
+            if (this._characters.SelectedItem == null)
             {
                 MessageBox.Show("You're required to select a character before logging on.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            this.Character = (LoginCharacter)this.CharactersList.SelectedItem;
+            this.Character = (LoginCharacter)this._characters.SelectedItem;
             this.DialogResult = DialogResult.OK;
         }
     }

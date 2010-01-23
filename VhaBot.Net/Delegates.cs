@@ -52,4 +52,6 @@ namespace VhaBot.Net
 
     public delegate void FriendStatusEventHandler(Chat chat, FriendStatusEventArgs e);
     public delegate void FriendRemovedEventHandler(Chat chat, CharacterIDEventArgs e);
+
+    public delegate void ExceptionEventHandler(Chat chat, Exception e);
 }

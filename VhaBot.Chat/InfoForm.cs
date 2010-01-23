@@ -37,28 +37,28 @@ namespace VhaBot.Chat
             InitializeComponent();
             this._html = html;
             this._links = links;
-            this.Info.DocumentText = this._links.Template;
         }
         
-        private void Info_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+        private void _info_Navigating(object sender, WebBrowserNavigatingEventArgs e)
         {
             if (e.Url.Scheme != "file")
                 e.Cancel = true;
         }
 
-        private void Info_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private void _info_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
+            this._info.Document.Write(this._links.Template);
             // Set background color
-            this.Info.Document.BackColor = this.BackColor;
-            if (this.Info.Document.Body != null)
+            this._info.Document.BackColor = this.BackColor;
+            if (this._info.Document.Body != null)
             {
                 string color = this.ForeColor.R.ToString("X") + this.ForeColor.G.ToString("X") + this.ForeColor.B.ToString("X");
-                this.Info.Document.Body.Style =
+                this._info.Document.Body.Style =
                     "color: #" + color + ";" +
                     "padding: 6px;";
             }
             // Put in some content
-            this._links.AppendHtml(this.Info.Document, this._html);
+            this._links.AppendHtml(this._info.Document, this._html);
         }
     }
 }

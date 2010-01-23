@@ -66,8 +66,19 @@ namespace VhaBot.Chat
             this._chat = chat;
         }
 
-        protected bool CheckUser(string user)
+        protected bool _checkConnection()
         {
+            if (this._chat.State != VhaBot.Common.ChatState.Connected)
+            {
+                this._form.AppendLine("Error", "Not connected");
+                return false;
+            }
+            return true;
+        }
+
+        protected bool _checkUser(string user)
+        {
+            if (!_checkConnection()) return false;
             if (this._chat.GetUserID(user) == 0)
             {
                 this._form.AppendLine("Error", "Unknown user: " + user);
@@ -76,8 +87,9 @@ namespace VhaBot.Chat
             return true;
         }
 
-        protected bool CheckChannel(string channel)
+        protected bool _checkChannel(string channel)
         {
+            if (!_checkConnection()) return false;
             if (this._chat.GetChannelID(channel) == 0)
             {
                 this._form.AppendLine("Error", "Unknown channel: " + channel);
@@ -98,15 +110,15 @@ namespace VhaBot.Chat
                     this._form.AppendLine("Text", message);
                     break;
                 case ChatInputType.Character:
-                    if (!CheckUser(target)) break;
+                    if (!_checkUser(target)) break;
                     this._chat.SendPrivateMessage(target, message);
                     break;
                 case ChatInputType.Channel:
-                    if (!CheckChannel(target)) break;
+                    if (!_checkChannel(target)) break;
                     this._chat.SendChannelMessage(target, message);
                     break;
                 case ChatInputType.PrivateChannel:
-                    if (!CheckUser(target)) break;
+                    if (!_checkUser(target)) break;
                     this._chat.SendPrivateChannelMessage(target, message);
                     break;
             }
@@ -176,7 +188,7 @@ namespace VhaBot.Chat
                 this._form.AppendLine("Error", "Correct usage: /invite [username]");
                 return;
             }
-            if (!CheckUser(args[1])) return;
+            if (!_checkUser(args[1])) return;
             this._form.AppendLine("PG", "Inviting " + args[1] + " to your private channel");
             this._chat.SendPrivateChannelInvite(args[1]);
         }
@@ -188,13 +200,14 @@ namespace VhaBot.Chat
                 this._form.AppendLine("Error", "Correct usage: /kick [username]");
                 return;
             }
-            if (!CheckUser(args[1])) return;
+            if (!_checkUser(args[1])) return;
             this._form.AppendLine("PG", "Kicking " + args[1] + " from your private channel");
             this._chat.SendPrivateChannelKick(args[1]);
         }
 
         protected void KickAllCommand()
         {
+            if (!_checkConnection()) return;
             this._form.AppendLine("PG", "Kicking all users from your private channel");
             this._chat.SendPrivateChannelKickAll();
         }
@@ -206,7 +219,7 @@ namespace VhaBot.Chat
                 this._form.AppendLine("Error", "Correct usage: /leave [private channel]");
                 return;
             }
-            if (!CheckUser(args[1])) return;
+            if (!_checkUser(args[1])) return;
             this._chat.SendPrivateChannelLeave(args[1]);
         }
 
@@ -217,7 +230,7 @@ namespace VhaBot.Chat
                 this._form.AppendLine("Error", "Correct usage: /tell [username] [message]");
                 return;
             }
-            if (!CheckUser(args[1])) return;
+            if (!_checkUser(args[1])) return;
             this._chat.SendPrivateMessage(args[1], string.Join(" ", args, 2, args.Length - 2));
         }
 
@@ -245,7 +258,7 @@ namespace VhaBot.Chat
                 this._form.AppendLine("Error", "Correct usage: /addbuddy [username]");
                 return;
             }
-            if (!CheckUser(args[1])) return;
+            if (!_checkUser(args[1])) return;
             this._chat.SendFriendAdd(args[1]);
         }
 
@@ -256,7 +269,7 @@ namespace VhaBot.Chat
                 this._form.AppendLine("Error", "Correct usage: /rembuddy [username]");
                 return;
             }
-            if (!CheckUser(args[1])) return;
+            if (!_checkUser(args[1])) return;
             this._chat.SendFriendRemove(args[1]);
         }
 
@@ -279,6 +292,7 @@ namespace VhaBot.Chat
                 this._form.AppendLine("Error", "Correct usage: /o [message]");
                 return;
             }
+            if (!_checkConnection()) return;
             if (string.IsNullOrEmpty(this._chat.Organization))
             {
                 this._form.AppendLine("Error", "This character does not belong to an organization");

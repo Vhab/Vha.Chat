@@ -36,15 +36,15 @@ namespace VhaBot.Chat
             this._form = form;
             this._chat = chat;
             // Hook events
-            this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(Chat_ChannelMessageEvent);
-            this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(Chat_PrivateMessageEvent);
-            this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(Chat_PrivateChannelMessageEvent);
-            this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(Chat_PrivateChannelStatusEvent);
-            this._chat.VicinityMessageEvent += new VicinityMessageEventHandler(Chat_VicinityMessageEvent);
-            this._chat.StatusChangeEvent += new StatusChangeEventHandler(Chat_StatusChangeEvent);
+            this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);
+            this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(_chat_PrivateMessageEvent);
+            this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
+            this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
+            this._chat.VicinityMessageEvent += new VicinityMessageEventHandler(_chat_VicinityMessageEvent);
+            this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
         }
 
-        private void Chat_ChannelMessageEvent(VhaBot.Net.Chat chat, ChannelMessageEventArgs e)
+        private void _chat_ChannelMessageEvent(VhaBot.Net.Chat chat, ChannelMessageEventArgs e)
         {
             string message = string.Format(
                 "[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
@@ -52,7 +52,7 @@ namespace VhaBot.Chat
             this._form.AppendLine(e.Type.ToString(), message);
         }
 
-        private void Chat_PrivateMessageEvent(VhaBot.Net.Chat chat, PrivateMessageEventArgs e)
+        private void _chat_PrivateMessageEvent(VhaBot.Net.Chat chat, PrivateMessageEventArgs e)
         {
             string message = string.Format(
                 "[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: {1}",
@@ -61,7 +61,7 @@ namespace VhaBot.Chat
             this._form.AppendLine("PM", message);
         }
 
-        void Chat_PrivateChannelMessageEvent(VhaBot.Net.Chat chat, PrivateChannelMessageEventArgs e)
+        void _chat_PrivateChannelMessageEvent(VhaBot.Net.Chat chat, PrivateChannelMessageEventArgs e)
         {
             string message = string.Format(
                 "[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
@@ -69,7 +69,7 @@ namespace VhaBot.Chat
             this._form.AppendLine("PG", message);
         }
 
-        void Chat_PrivateChannelStatusEvent(VhaBot.Net.Chat chat, PrivateChannelStatusEventArgs e)
+        void _chat_PrivateChannelStatusEvent(VhaBot.Net.Chat chat, PrivateChannelStatusEventArgs e)
         {
             string message = string.Format(
                 "[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a> has {2} the channel",
@@ -77,7 +77,7 @@ namespace VhaBot.Chat
             this._form.AppendLine("PG", message);
         }
 
-        private void Chat_VicinityMessageEvent(VhaBot.Net.Chat chat, VicinityMessageEventArgs e)
+        private void _chat_VicinityMessageEvent(VhaBot.Net.Chat chat, VicinityMessageEventArgs e)
         {
             string message = string.Format(
                "[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: {1}",
@@ -85,7 +85,7 @@ namespace VhaBot.Chat
             this._form.AppendLine("Vicinity", message);
         }
 
-        private void Chat_StatusChangeEvent(VhaBot.Net.Chat chat, StatusChangeEventArgs e)
+        private void _chat_StatusChangeEvent(VhaBot.Net.Chat chat, StatusChangeEventArgs e)
         {
             this._form.AppendLine("Error", "State changed to: " + e.State.ToString());
         }

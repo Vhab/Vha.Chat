@@ -25,6 +25,7 @@ namespace VhaBot.Chat
 {
     public static class Program
     {
+        public static bool MonoMode = false;
         public static int MaximumMessages = 500;
         public static int MaximumTexts = 100;
         public static ApplicationContext Context;
@@ -34,12 +35,46 @@ namespace VhaBot.Chat
         [STAThread]
         static void Main()
         {
+            // Check for mono
+            if (Type.GetType("Mono.Runtime") != null)
+            {
+                MonoMode = true;
+            }
+            // Start application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
 
             Context = new ApplicationContext();
             Context.MainForm = new AuthenticationForm();
             Application.Run(Context);
         }
+
+        // Exception handling
+        public static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            UnhandledException((Exception)e.ExceptionObject);
+        }
+
+        public static void UnhandledException(VhaBot.Net.Chat chat, Exception ex)
+        {
+            UnhandledException(ex);
+        }
+
+        private static void UnhandledException(Exception ex)
+        {
+            DisplayException(ex);
+            MessageBox.Show("An exception has occurred. This application will now close",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
+        }
+
+        private static void DisplayException(Exception ex)
+        {
+            Console.WriteLine("Exception: " + ex.ToString());
+            if (ex.InnerException != null)
+                DisplayException(ex.InnerException);
+        }
+
     }
 }

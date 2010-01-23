@@ -44,31 +44,31 @@ namespace VhaBot.Chat
         private void AuthenticationForm_Load(object sender, EventArgs e)
         {
             // FIXME: Add a dimension file loader here
-            this.Server.Items.Add(new Server("Atlantean", "chat.d1.funcom.com", 7101));
-            this.Server.Items.Add(new Server("Rimor", "chat.d2.funcom.com", 7102));
-            this.Server.Items.Add(new Server("Die Neue Welt", "chat.d3.funcom.com", 7103));
-            this.Server.Items.Add(new Server("Test", "chat.dt.funcom.com", 7109));
+            this._server.Items.Add(new Server("Atlantean", "chat.d1.funcom.com", 7101));
+            this._server.Items.Add(new Server("Rimor", "chat.d2.funcom.com", 7102));
+            this._server.Items.Add(new Server("Die Neue Welt", "chat.d3.funcom.com", 7103));
+            this._server.Items.Add(new Server("Test", "chat.dt.funcom.com", 7109));
         }
 
-        private void Cancel_Click(object sender, EventArgs e)
+        private void _cancel_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void Login_Click(object sender, EventArgs e)
+        private void _login_Click(object sender, EventArgs e)
         {
             // Input verification
-            if (this.Server.SelectedItem == null)
+            if (this._server.SelectedItem == null)
             {
                 MessageBox.Show("You're required to select a server before authenticating.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            if (this.Account.Text.Trim().Length == 0)
+            if (this._account.Text.Trim().Length == 0)
             {
                 MessageBox.Show("You're required to enter your account name before authenticating.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            if (this.Password.Text.Trim().Length == 0)
+            if (this._password.Text.Trim().Length == 0)
             {
                 MessageBox.Show("You're required to enter your password before authenticating.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -77,10 +77,10 @@ namespace VhaBot.Chat
             this._status = new StatusForm();
             this._status.SetMessage("Initializing...");
             // Connect
-            Server server = (Server)this.Server.SelectedItem;
-            this._chat = new VhaBot.Net.Chat(server.Address, server.Port, this.Account.Text, this.Password.Text);
+            Server server = (Server)this._server.SelectedItem;
+            this._chat = new VhaBot.Net.Chat(server.Address, server.Port, this._account.Text, this._password.Text);
             this._chat.UseThreadPool = false;
-            Thread thread = new Thread(new ThreadStart(Connect));
+            Thread thread = new Thread(new ThreadStart(_connect));
             thread.Start();
             // Show status and wait
             DialogResult result = this._status.ShowDialog();
@@ -88,19 +88,20 @@ namespace VhaBot.Chat
             if (result == DialogResult.Abort)
             {
                 this._chat.Disconnect();
-                _chat = null;
+                this._chat = null;
             }
         }
 
-        private void Connect()
+        private void _connect()
         {
             this._chat.AutoReconnect = false;
             this._chat.IgnoreAfkMessages = false;
             this._chat.IgnoreCharacterLoggedIn = true;
             this._chat.IgnoreOfflineMessages = false;
-            this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(Chat_LoginCharlistEvent);
-            this._chat.LoginErrorEvent += new LoginErrorEventHandler(Chat_LoginErrorEvent);
-            this._chat.StatusChangeEvent += new StatusChangeEventHandler(Chat_StatusChangeEvent);
+            this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
+            this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
+            this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+            this._chat.ExceptionEvent += new ExceptionEventHandler(Program.UnhandledException);
             this._chat.Connect();
         }
 
@@ -108,14 +109,14 @@ namespace VhaBot.Chat
         {
             if (_chat != null)
             {
-                this._chat.LoginCharlistEvent -= new LoginCharlistEventHandler(Chat_LoginCharlistEvent);
-                this._chat.LoginErrorEvent -= new LoginErrorEventHandler(Chat_LoginErrorEvent);
-                this._chat.StatusChangeEvent -= new StatusChangeEventHandler(Chat_StatusChangeEvent);
+                this._chat.LoginCharlistEvent -= new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
+                this._chat.LoginErrorEvent -= new LoginErrorEventHandler(_chat_LoginErrorEvent);
+                this._chat.StatusChangeEvent -= new StatusChangeEventHandler(_chat_StatusChangeEvent);
             }
         }
 
         #region Chat Event Handlers
-        private void Chat_StatusChangeEvent(VhaBot.Net.Chat chat, StatusChangeEventArgs e)
+        private void _chat_StatusChangeEvent(VhaBot.Net.Chat chat, StatusChangeEventArgs e)
         {
             if (this._status == null)
                 return;
@@ -133,20 +134,20 @@ namespace VhaBot.Chat
             }
         }
 
-        private void Chat_LoginErrorEvent(VhaBot.Net.Chat chat, LoginErrorEventArgs e)
+        private void _chat_LoginErrorEvent(VhaBot.Net.Chat chat, LoginErrorEventArgs e)
         {
             if (this._status == null)
                 return;
             this._status.SetMessage(e.Error);
         }
 
-        private void Chat_LoginCharlistEvent(VhaBot.Net.Chat chat, LoginChararacterListEventArgs e)
+        private void _chat_LoginCharlistEvent(VhaBot.Net.Chat chat, LoginChararacterListEventArgs e)
         {
             // Run this method locally
             if (this.InvokeRequired)
             {
                 this.BeginInvoke(
-                    new LoginCharlistEventHandler(Chat_LoginCharlistEvent),
+                    new LoginCharlistEventHandler(_chat_LoginCharlistEvent),
                     new object[] { chat, e });
                 return;
             }
@@ -157,7 +158,6 @@ namespace VhaBot.Chat
                 return;
             this._status.DialogResult = DialogResult.OK;
             this._status.Hide();
-            this._status = null;
             this.Hide();
             SelectionForm form = new SelectionForm(e.CharacterList);
             DialogResult result = form.ShowDialog();
@@ -175,6 +175,7 @@ namespace VhaBot.Chat
                 _chat = null;
                 this.Show();
             }
+            this._status = null;
         }
         #endregion
     }

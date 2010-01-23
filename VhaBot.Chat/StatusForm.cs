@@ -34,22 +34,17 @@ namespace VhaBot.Chat
         public StatusForm()
         {
             InitializeComponent();
+            this.DialogResult = DialogResult.Abort;
         }
 
         public void SetMessage(string message)
         {
-            if (this.Message.InvokeRequired)
+            if (this._message.InvokeRequired)
             {
-                this.Message.Invoke(new SetMessageDelegate(SetMessage), new object[] { message });
+                this._message.Invoke(new SetMessageDelegate(SetMessage), new object[] { message });
                 return;
             }
-            this.Message.Text = message;
-        }
-
-        private void StatusForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (e.CloseReason == CloseReason.UserClosing)
-                this.DialogResult = DialogResult.Abort;
+            this._message.Text = message;
         }
     }
 }

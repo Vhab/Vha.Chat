@@ -29,91 +29,92 @@ namespace VhaBot.Chat
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
-            this.Title = new System.Windows.Forms.Label();
-            this.Version = new System.Windows.Forms.Label();
-            this.Copyright = new System.Windows.Forms.Label();
-            this.License = new System.Windows.Forms.TextBox();
-            this.Seperator = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this._title = new System.Windows.Forms.Label();
+            this._version = new System.Windows.Forms.Label();
+            this._copyright = new System.Windows.Forms.Label();
+            this._license = new System.Windows.Forms.TextBox();
+            this._seperator = new System.Windows.Forms.Label();
+            this._topBackground = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
-            // Title
+            // _title
             // 
-            this.Title.AutoSize = true;
-            this.Title.BackColor = System.Drawing.SystemColors.Window;
-            this.Title.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Title.Location = new System.Drawing.Point(12, 9);
-            this.Title.Name = "Title";
-            this.Title.Size = new System.Drawing.Size(133, 25);
-            this.Title.TabIndex = 0;
-            this.Title.Text = "VhaBot.Chat";
+            this._title.AutoSize = true;
+            this._title.BackColor = System.Drawing.SystemColors.Window;
+            this._title.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._title.Location = new System.Drawing.Point(12, 9);
+            this._title.Name = "_title";
+            this._title.Size = new System.Drawing.Size(133, 25);
+            this._title.TabIndex = 0;
+            this._title.Text = "VhaBot.Chat";
             // 
-            // Version
+            // _version
             // 
-            this.Version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Version.BackColor = System.Drawing.SystemColors.Window;
-            this.Version.Location = new System.Drawing.Point(245, 37);
-            this.Version.Name = "Version";
-            this.Version.Size = new System.Drawing.Size(122, 13);
-            this.Version.TabIndex = 1;
-            this.Version.Text = "Version X.X.X";
-            this.Version.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this._version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._version.BackColor = System.Drawing.SystemColors.Window;
+            this._version.Location = new System.Drawing.Point(245, 37);
+            this._version.Name = "_version";
+            this._version.Size = new System.Drawing.Size(122, 13);
+            this._version.TabIndex = 1;
+            this._version.Text = "Version X.X.X";
+            this._version.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
-            // Copyright
+            // _copyright
             // 
-            this.Copyright.AutoSize = true;
-            this.Copyright.BackColor = System.Drawing.SystemColors.Window;
-            this.Copyright.Location = new System.Drawing.Point(12, 37);
-            this.Copyright.Name = "Copyright";
-            this.Copyright.Size = new System.Drawing.Size(203, 13);
-            this.Copyright.TabIndex = 3;
-            this.Copyright.Text = "Copyright © 2009 Remco van Oosterhout";
+            this._copyright.AutoSize = true;
+            this._copyright.BackColor = System.Drawing.SystemColors.Window;
+            this._copyright.Location = new System.Drawing.Point(12, 37);
+            this._copyright.Name = "_copyright";
+            this._copyright.Size = new System.Drawing.Size(203, 13);
+            this._copyright.TabIndex = 3;
+            this._copyright.Text = "Copyright © 2009 Remco van Oosterhout";
             // 
-            // License
+            // _license
             // 
-            this.License.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this._license.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.License.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.License.Location = new System.Drawing.Point(12, 74);
-            this.License.Multiline = true;
-            this.License.Name = "License";
-            this.License.ReadOnly = true;
-            this.License.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.License.Size = new System.Drawing.Size(355, 126);
-            this.License.TabIndex = 4;
-            this.License.Text = resources.GetString("License.Text");
+            this._license.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this._license.Location = new System.Drawing.Point(12, 74);
+            this._license.Multiline = true;
+            this._license.Name = "_license";
+            this._license.ReadOnly = true;
+            this._license.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._license.Size = new System.Drawing.Size(355, 126);
+            this._license.TabIndex = 4;
+            this._license.Text = resources.GetString("_license.Text");
             // 
-            // Seperator
+            // _seperator
             // 
-            this.Seperator.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this._seperator.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.Seperator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.Seperator.Location = new System.Drawing.Point(-5, 60);
-            this.Seperator.Name = "Seperator";
-            this.Seperator.Size = new System.Drawing.Size(395, 2);
-            this.Seperator.TabIndex = 5;
+            this._seperator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._seperator.Location = new System.Drawing.Point(-5, 60);
+            this._seperator.Name = "_seperator";
+            this._seperator.Size = new System.Drawing.Size(395, 2);
+            this._seperator.TabIndex = 5;
             // 
-            // panel1
+            // _topBackground
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.Window;
-            this.panel1.Location = new System.Drawing.Point(-5, -5);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(395, 65);
-            this.panel1.TabIndex = 6;
+            this._topBackground.BackColor = System.Drawing.SystemColors.Window;
+            this._topBackground.Location = new System.Drawing.Point(-5, -5);
+            this._topBackground.Name = "_topBackground";
+            this._topBackground.Size = new System.Drawing.Size(395, 65);
+            this._topBackground.TabIndex = 6;
             // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(379, 212);
-            this.Controls.Add(this.Seperator);
-            this.Controls.Add(this.License);
-            this.Controls.Add(this.Copyright);
-            this.Controls.Add(this.Version);
-            this.Controls.Add(this.Title);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this._seperator);
+            this.Controls.Add(this._license);
+            this.Controls.Add(this._copyright);
+            this.Controls.Add(this._version);
+            this.Controls.Add(this._title);
+            this.Controls.Add(this._topBackground);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutForm";
@@ -127,12 +128,12 @@ namespace VhaBot.Chat
 
         #endregion
 
-        private System.Windows.Forms.Label Title;
-        private System.Windows.Forms.Label Version;
-        private System.Windows.Forms.Label Copyright;
-        private System.Windows.Forms.TextBox License;
-        private System.Windows.Forms.Label Seperator;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label _title;
+        private System.Windows.Forms.Label _version;
+        private System.Windows.Forms.Label _copyright;
+        private System.Windows.Forms.TextBox _license;
+        private System.Windows.Forms.Label _seperator;
+        private System.Windows.Forms.Panel _topBackground;
 
     }
 }

@@ -55,7 +55,7 @@ namespace Vha.Chat
             // 
             this._version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._version.BackColor = System.Drawing.SystemColors.Window;
-            this._version.Location = new System.Drawing.Point(250, 39);
+            this._version.Location = new System.Drawing.Point(263, 39);
             this._version.Name = "_version";
             this._version.Size = new System.Drawing.Size(122, 13);
             this._version.TabIndex = 1;
@@ -83,7 +83,7 @@ namespace Vha.Chat
             this._license.Name = "_license";
             this._license.ReadOnly = true;
             this._license.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._license.Size = new System.Drawing.Size(355, 126);
+            this._license.Size = new System.Drawing.Size(368, 126);
             this._license.TabIndex = 4;
             this._license.Text = resources.GetString("_license.Text");
             // 
@@ -94,11 +94,13 @@ namespace Vha.Chat
             this._seperator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this._seperator.Location = new System.Drawing.Point(-5, 58);
             this._seperator.Name = "_seperator";
-            this._seperator.Size = new System.Drawing.Size(395, 2);
+            this._seperator.Size = new System.Drawing.Size(408, 2);
             this._seperator.TabIndex = 5;
             // 
             // _topBackground
             // 
+            this._topBackground.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this._topBackground.BackColor = System.Drawing.SystemColors.Window;
             this._topBackground.Controls.Add(this._icon);
             this._topBackground.Controls.Add(this._copyright);
@@ -106,7 +108,7 @@ namespace Vha.Chat
             this._topBackground.Controls.Add(this._version);
             this._topBackground.Location = new System.Drawing.Point(-5, -5);
             this._topBackground.Name = "_topBackground";
-            this._topBackground.Size = new System.Drawing.Size(395, 63);
+            this._topBackground.Size = new System.Drawing.Size(408, 63);
             this._topBackground.TabIndex = 6;
             // 
             // _icon
@@ -122,7 +124,7 @@ namespace Vha.Chat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(379, 212);
+            this.ClientSize = new System.Drawing.Size(392, 212);
             this.Controls.Add(this._seperator);
             this.Controls.Add(this._license);
             this.Controls.Add(this._topBackground);

@@ -35,6 +35,9 @@ namespace Vha.Chat
             this._license = new System.Windows.Forms.TextBox();
             this._seperator = new System.Windows.Forms.Label();
             this._topBackground = new System.Windows.Forms.Panel();
+            this._icon = new System.Windows.Forms.PictureBox();
+            this._topBackground.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._icon)).BeginInit();
             this.SuspendLayout();
             // 
             // _title
@@ -42,9 +45,9 @@ namespace Vha.Chat
             this._title.AutoSize = true;
             this._title.BackColor = System.Drawing.SystemColors.Window;
             this._title.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._title.Location = new System.Drawing.Point(12, 9);
+            this._title.Location = new System.Drawing.Point(55, 14);
             this._title.Name = "_title";
-            this._title.Size = new System.Drawing.Size(133, 25);
+            this._title.Size = new System.Drawing.Size(101, 25);
             this._title.TabIndex = 0;
             this._title.Text = "Vha.Chat";
             // 
@@ -52,7 +55,7 @@ namespace Vha.Chat
             // 
             this._version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._version.BackColor = System.Drawing.SystemColors.Window;
-            this._version.Location = new System.Drawing.Point(245, 37);
+            this._version.Location = new System.Drawing.Point(250, 39);
             this._version.Name = "_version";
             this._version.Size = new System.Drawing.Size(122, 13);
             this._version.TabIndex = 1;
@@ -63,7 +66,7 @@ namespace Vha.Chat
             // 
             this._copyright.AutoSize = true;
             this._copyright.BackColor = System.Drawing.SystemColors.Window;
-            this._copyright.Location = new System.Drawing.Point(12, 37);
+            this._copyright.Location = new System.Drawing.Point(57, 39);
             this._copyright.Name = "_copyright";
             this._copyright.Size = new System.Drawing.Size(203, 13);
             this._copyright.TabIndex = 3;
@@ -89,7 +92,7 @@ namespace Vha.Chat
             this._seperator.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._seperator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this._seperator.Location = new System.Drawing.Point(-5, 60);
+            this._seperator.Location = new System.Drawing.Point(-5, 58);
             this._seperator.Name = "_seperator";
             this._seperator.Size = new System.Drawing.Size(395, 2);
             this._seperator.TabIndex = 5;
@@ -97,10 +100,23 @@ namespace Vha.Chat
             // _topBackground
             // 
             this._topBackground.BackColor = System.Drawing.SystemColors.Window;
+            this._topBackground.Controls.Add(this._icon);
+            this._topBackground.Controls.Add(this._copyright);
+            this._topBackground.Controls.Add(this._title);
+            this._topBackground.Controls.Add(this._version);
             this._topBackground.Location = new System.Drawing.Point(-5, -5);
             this._topBackground.Name = "_topBackground";
-            this._topBackground.Size = new System.Drawing.Size(395, 65);
+            this._topBackground.Size = new System.Drawing.Size(395, 63);
             this._topBackground.TabIndex = 6;
+            // 
+            // _icon
+            // 
+            this._icon.BackgroundImage = global::Vha.Chat.Properties.Resources.ChatBigBitmap;
+            this._icon.Location = new System.Drawing.Point(17, 19);
+            this._icon.Name = "_icon";
+            this._icon.Size = new System.Drawing.Size(32, 32);
+            this._icon.TabIndex = 4;
+            this._icon.TabStop = false;
             // 
             // AboutForm
             // 
@@ -109,9 +125,6 @@ namespace Vha.Chat
             this.ClientSize = new System.Drawing.Size(379, 212);
             this.Controls.Add(this._seperator);
             this.Controls.Add(this._license);
-            this.Controls.Add(this._copyright);
-            this.Controls.Add(this._version);
-            this.Controls.Add(this._title);
             this.Controls.Add(this._topBackground);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -121,6 +134,9 @@ namespace Vha.Chat
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat :: About";
             this.Load += new System.EventHandler(this.AboutForm_Load);
+            this._topBackground.ResumeLayout(false);
+            this._topBackground.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._icon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -134,6 +150,7 @@ namespace Vha.Chat
         private System.Windows.Forms.TextBox _license;
         private System.Windows.Forms.Label _seperator;
         private System.Windows.Forms.Panel _topBackground;
+        private System.Windows.Forms.PictureBox _icon;
 
     }
 }

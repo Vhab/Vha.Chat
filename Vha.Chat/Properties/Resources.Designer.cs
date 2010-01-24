@@ -123,6 +123,13 @@ namespace Vha.Chat.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap ChatBigBitmap {
+            get {
+                object obj = ResourceManager.GetObject("ChatBigBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap ChatBitmap {
             get {
                 object obj = ResourceManager.GetObject("ChatBitmap", resourceCulture);

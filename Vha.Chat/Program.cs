@@ -66,6 +66,7 @@ namespace Vha.Chat
             DisplayException(ex);
             MessageBox.Show("An exception has occurred. This application will now close",
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Context.MainForm = null;
             Application.Exit();
         }
 

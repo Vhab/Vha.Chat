@@ -42,7 +42,8 @@ namespace Vha.Common
         General = 135,
         Organization = 3,
         Shopping = 356,
-        Towers = 10
+        Towers = 10,
+        Leaders = 4
     }
 
     public enum SystemMessageType

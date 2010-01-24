@@ -46,5 +46,25 @@ namespace Vha.Net
         {
             return ToUInt32(IPAddress.NetworkToHostOrder(ToInt32(value)));
         }
+
+        public static UInt16 ToUInt16(Int16 value)
+        {
+            return BitConverter.ToUInt16(BitConverter.GetBytes(value), 0);
+        }
+
+        public static Int16 ToInt16(UInt16 value)
+        {
+            return BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
+        }
+
+        public static UInt16 HostToNetworkOrder(UInt16 value)
+        {
+            return ToUInt16(IPAddress.HostToNetworkOrder(ToInt16(value)));
+        }
+
+        public static UInt16 NetworkToHostOrder(UInt16 value)
+        {
+            return ToUInt16(IPAddress.NetworkToHostOrder(ToInt16(value)));
+        }
     }
 }

@@ -135,7 +135,8 @@ namespace Vha.Chat
                 return;
             }
             TreeNode node = new TreeNode(e.Name.Trim('~'));
-            node.ForeColor = Color.DarkBlue;
+            if (e.Muted) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
+            else node.ImageKey = node.SelectedImageKey = "Channel";
             this._channels.Nodes.Add(node);
             if (this._channels.Nodes.Count == 1)
                 this._channels.Expand();
@@ -158,7 +159,7 @@ namespace Vha.Chat
                 if (this._online.ContainsText(e.Character)) return;
                 if (this._offline.ContainsText(e.Character))
                     this._offline.RemoveText(e.Character);
-                node.ForeColor = Color.DarkGreen;
+                node.ImageKey = node.SelectedImageKey = "CharacterOnline";
                 this._online.Nodes.Add(node);
                 if (this._online.Nodes.Count == 1)
                     this._online.Expand();
@@ -168,7 +169,7 @@ namespace Vha.Chat
                 if (this._offline.ContainsText(e.Character)) return;
                 if (this._online.ContainsText(e.Character))
                     this._online.RemoveText(e.Character);
-                node.ForeColor = Color.DarkRed;
+                node.ImageKey = node.SelectedImageKey = "CharacterOffline";
                 this._offline.Nodes.Add(node);
             }
         }
@@ -205,7 +206,7 @@ namespace Vha.Chat
             {
                 if (this._privateChannels.ContainsText(e.Channel)) return;
                 TreeNode node = new TreeNode(e.Channel);
-                node.ForeColor = Color.DimGray;
+                node.ImageKey = node.SelectedImageKey = "Character";
                 this._privateChannels.Nodes.Add(node);
             }
             else
@@ -253,7 +254,7 @@ namespace Vha.Chat
             }
             // - Add ourselves to private channel
             TreeNode node = new TreeNode(this._chat.Character);
-            node.ForeColor = Color.DimGray;
+            node.ImageKey = node.SelectedImageKey = "Character";
             this._privateChannels.Nodes.Clear();
             this._privateChannels.Nodes.Add(node);
             this._privateChannels.Expand();

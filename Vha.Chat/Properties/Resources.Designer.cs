@@ -81,6 +81,48 @@ namespace Vha.Chat.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap ChannelBitmap {
+            get {
+                object obj = ResourceManager.GetObject("ChannelBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap ChannelDisabledBitmap {
+            get {
+                object obj = ResourceManager.GetObject("ChannelDisabledBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CharacterBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharacterBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CharacterOfflineBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharacterOfflineBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CharacterOnlineBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharacterOnlineBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CharactersBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharactersBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap ChatBitmap {
             get {
                 object obj = ResourceManager.GetObject("ChatBitmap", resourceCulture);

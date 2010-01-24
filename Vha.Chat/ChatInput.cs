@@ -1,6 +1,6 @@
 /*
 * Vha.Chat
-* Copyright (C) 2009 Remco van Oosterhout
+* Copyright (C) 2009-2010 Remco van Oosterhout
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by

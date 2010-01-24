@@ -1,5 +1,5 @@
 /*
-* Vha.Net
+* Vha.MDB
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -19,21 +19,23 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Vha.Net.Events
+namespace Vha.MDB
 {
-    /// <summary>
-    /// Class for holding event args for AO Chat system message events.
-    /// </summary>
-    public class SimpleMessageEventArgs : EventArgs
+    public enum Mode
     {
-        private readonly String _message = null;
-        public SimpleMessageEventArgs(String message)
-        {
-            this._message = message;
-        }
-        public String Message { get { return this._message; } }
+        MMDB,
+        MLDB,
+        Unknown
+    }
+
+    public enum ArgumentType
+    {
+        Text,
+        Integer,
+        UnsignedInteger,
+        Float,
+        Reference,
+        Recursive
     }
 }

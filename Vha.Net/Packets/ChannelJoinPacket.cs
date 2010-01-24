@@ -34,14 +34,14 @@ namespace Vha.Net.Packets
             int offset = 0;
             this.AddData(popChannelID(ref data, ref offset));
             this.AddData(popString(ref data, ref offset).ToString());
-            this.AddData(popShort(ref data, ref offset));
+            this.AddData(popUnsignedShort(ref data, ref offset));
             this.AddData(popShort(ref data, ref offset));
         }
 
         internal BigInteger ID { get { return (BigInteger)this.Data[0]; } }
         internal String Name { get { return (String)this.Data[1]; } }
-        internal bool Mute { get { return Convert.ToBoolean((Int16)this.Data[2] & 0x0100); } }
-        internal bool Logging { get { return Convert.ToBoolean((Int16)this.Data[2] & 0x0200); } }
         internal byte ChannelType { get { return ((BigInteger)this.Data[0]).getBytes()[0]; } }
+        internal UInt16 Flags { get { return (UInt16)this.Data[2]; } }
+        internal bool Muted { get { return Convert.ToBoolean(this.Flags & 0x0100); } }
     }
 }

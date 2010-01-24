@@ -73,8 +73,8 @@ namespace Vha.Net.Packets
             LOGIN_SELCHAR = 3,
             FRIEND_ADD = 40,
             FRIEND_REMOVE = 41,
-            GROUP_DATASET = 64,
-            GROUP_CLIMODE = 66,
+            CHANNEL_UPDATE = 64,
+            CHANNEL_CLIMODE = 66,
             PRIVATE_CHANNEL_INVITE = 50,
             PRIVATE_CHANNEL_KICK = 51,
             CLIENTMODE_GET = 70,
@@ -310,6 +310,22 @@ namespace Vha.Net.Packets
 			offset += 2;
 			return ret;
 		}
+
+        /// <summary>
+        /// Method for pulling an unsigned short (2-byte) integer off the array. 
+        /// </summary>
+        /// <param name="data">the byte array</param>
+        /// <param name="offset">index where to begin pulling off the array</param>
+        /// <returns>an unsigned short (2-byte) integer</returns>
+        internal static UInt16 popUnsignedShort(ref byte[] data, ref Int32 offset)
+        {
+            if (data.Length - offset < 2)
+                return 0;
+
+            UInt16 ret = NetConvert.NetworkToHostOrder(BitConverter.ToUInt16(data, offset));
+            offset += 2;
+            return ret;
+        }
 
         /// <summary>
         /// Method for pulling a byte off the array. 

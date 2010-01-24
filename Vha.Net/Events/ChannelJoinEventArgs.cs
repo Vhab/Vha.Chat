@@ -32,8 +32,8 @@ namespace Vha.Net.Events
     {
         private readonly BigInteger _id = 0;
         private readonly String _name = null;
+        private readonly UInt16 _flags = 0;
         private readonly bool _mute = false;
-        private readonly bool _logging = false;
         private readonly byte _typeID = 0;
         private ChannelType _type = ChannelType.Unknown;
 
@@ -43,14 +43,13 @@ namespace Vha.Net.Events
         /// <param name="id">5-byte channel id</param>
         /// <param name="name">channel name</param>
         /// <param name="mute">whether the channel is muted or not</param>
-        /// <param name="logging">whether the channel is logging or not</param>
         /// <param name="channelType">channel type</param>
-        public ChannelJoinEventArgs(BigInteger id, String name, bool mute, bool logging, byte channelType)
+        public ChannelJoinEventArgs(BigInteger id, String name, UInt16 flags, bool mute, byte channelType)
         {
             this._id = id;
             this._name = name;
+            this._flags = flags;
             this._mute = mute;
-            this._logging = logging;
             this._typeID = channelType;
             if (Enum.IsDefined(typeof(ChannelType), (int)channelType))
                 this._type = (ChannelType)channelType;
@@ -67,14 +66,14 @@ namespace Vha.Net.Events
         public String Name { get { return this._name; } }
 
         /// <summary>
-        /// Whether the channel is muted or not
+        /// Channel flags
         /// </summary>
-        public bool Mute { get { return this._mute; } }
+        public UInt16 Flags { get { return this._flags; } }
 
         /// <summary>
-        /// Whether the channel is logging or not
+        /// Whether the channel is muted or not
         /// </summary>
-        public bool Logging { get { return this._logging; } }
+        public bool Muted { get { return this._mute; } }
 
         /// <summary>
         /// Channel type ID

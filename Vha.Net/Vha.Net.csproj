@@ -57,6 +57,7 @@
     <Compile Include="Events\VicinityMessageEventArgs.cs" />
     <Compile Include="Packets\AmdMuxInfoPacket.cs" />
     <Compile Include="Packets\AnonVicinityPacket.cs" />
+    <Compile Include="Packets\ChannelUpdatePacket.cs" />
     <Compile Include="Packets\ClientNamePacket.cs" />
     <Compile Include="NetConvert.cs" />
     <Compile Include="NetString.cs" />

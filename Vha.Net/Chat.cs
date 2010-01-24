@@ -575,8 +575,8 @@ namespace Vha.Net
                             new ChannelJoinEventArgs(
                             ((ChannelJoinPacket)packet).ID,
                             ((ChannelJoinPacket)packet).Name,
-                            ((ChannelJoinPacket)packet).Mute,
-                            ((ChannelJoinPacket)packet).Logging,
+                            ((ChannelJoinPacket)packet).Flags,
+                            ((ChannelJoinPacket)packet).Muted,
                             ((ChannelJoinPacket)packet).ChannelType
                             ));
                         break;
@@ -786,7 +786,7 @@ namespace Vha.Net
             }
             if (e.Type == ChannelType.Unknown)
                 this.Debug("Unknown channel type: " + e.TypeID, "[Error]");
-            this.Debug("Joined channel: " + e.Name + " (ID:" + e.ID + " Type:" + e.Type.ToString() + " Muted:" + e.Mute.ToString() + ")", "[Bot]");
+            this.Debug("Joined channel: " + e.Name + " (ID:" + e.ID + " Type:" + e.Type.ToString() + " Muted:" + e.Muted.ToString() + " Flags:" + e.Flags.ToString() + ")", "[Bot]");
             if (e.Type == ChannelType.Organization)
             {
                 this._organization = e.Name;
@@ -1098,6 +1098,16 @@ namespace Vha.Net
                     _fastQueue.Enqueue(packet.Priority, packet);
                     break;
             }
+        }
+
+        public virtual void SendChannelMute(string channel, bool mute) { this.SendChannelMute(this.GetChannelID(channel), mute); }
+        public virtual void SendChannelMute(BigInteger channelID, bool mute)
+        {
+            this.Debug("Updating channel " + this.GetChannelName(channelID) + " with mute=" + mute.ToString(), "[Bot]");
+
+            ChannelUpdatePacket p = new ChannelUpdatePacket(channelID, mute);
+            p.Priority = PacketQueue.Priority.Standard;
+            this.SendPacket(p);
         }
 
         public virtual void SendChannelMessage(string channel, string text) { this.SendChannelMessage(this.GetChannelID(channel), text, PacketQueue.Priority.Standard); }

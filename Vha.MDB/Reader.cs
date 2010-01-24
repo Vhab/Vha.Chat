@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.IO;
 using System.Xml;
@@ -59,7 +60,7 @@ namespace Vha.MDB
         public Reader()
         {
             this._categories = new List<Category>();
-            this._file = "text.mdb";
+            this._file = "";
         }
 
         public Reader(string file)
@@ -70,7 +71,7 @@ namespace Vha.MDB
 
         public bool Read()
         {
-            FileStream stream = this.Open(this._file);
+            Stream stream = this.Open(this._file);
             if (stream == null)
                 return false;
 
@@ -93,7 +94,7 @@ namespace Vha.MDB
 
         public Entry SpeedRead(Int32 categoryID, Int32 entryID)
         {
-            FileStream stream = this.Open(this._file);
+            Stream stream = this.Open(this._file);
             if (stream == null)
                 return null;
 
@@ -148,34 +149,35 @@ namespace Vha.MDB
             return null;
         }
 
-        private FileStream Open(string file)
+        private Stream Open(string file)
         {
-            FileStream stream;
+            Stream stream;
             try
             {
-                stream = File.OpenRead(file);
+                if (file != "") stream = File.OpenRead(file);
+                else stream = new MemoryStream(Properties.Resources.Text);
             }
             catch
             {
-                Console.WriteLine("ERROR: Unable to open " + this._file);
+                Trace.WriteLine("[MDB] Unable to open " + this._file);
                 return null;
             }
 
             // Some Checks
             if (!stream.CanRead)
             {
-                Console.WriteLine("ERROR: Unable to read " + this._file);
+                Trace.WriteLine("[MDB] Unable to read " + this._file);
                 return null;
             }
             if (!stream.CanSeek)
             {
-                Console.WriteLine("ERROR: Unable to seek " + this._file);
+                Trace.WriteLine("[MDB] Unable to seek " + this._file);
                 return null;
             }
             return stream;
         }
 
-        private void DetectType(FileStream stream)
+        private void DetectType(Stream stream)
         {
             try
             {
@@ -195,7 +197,7 @@ namespace Vha.MDB
         }
 
         #region MMDB Reader
-        protected bool MmdbRead(FileStream stream)
+        protected bool MmdbRead(Stream stream)
         {
             // Go to start position
             stream.Seek(8, SeekOrigin.Begin);
@@ -263,7 +265,7 @@ namespace Vha.MDB
             }
             catch
             {
-                Console.WriteLine("ERROR: Error during reading " + this._file);
+                Trace.WriteLine("[MDB] Error during reading " + this._file);
                 return false;
             }
             if (stream != null)
@@ -273,7 +275,7 @@ namespace Vha.MDB
             return true;
         }
 
-        protected bool MmdbReadKey(FileStream stream, ref Int32 ID, ref Int32 Offset)
+        protected bool MmdbReadKey(Stream stream, ref Int32 ID, ref Int32 Offset)
         {
             try
             {
@@ -292,7 +294,7 @@ namespace Vha.MDB
             catch { return false; }
         }
 
-        protected bool MmdbReadString(FileStream stream, Int32 offset, ref string Message)
+        protected bool MmdbReadString(Stream stream, Int32 offset, ref string Message)
         {
             try
             {
@@ -314,7 +316,7 @@ namespace Vha.MDB
         #endregion
 
         #region MLDB Reader
-        protected bool MldbRead(FileStream stream)
+        protected bool MldbRead(Stream stream)
         {
             stream.Seek(4, SeekOrigin.Begin);
             try
@@ -358,7 +360,7 @@ namespace Vha.MDB
             return false;
         }
 
-        protected bool MldbReadInteger(FileStream stream, ref Int32 Integer)
+        protected bool MldbReadInteger(Stream stream, ref Int32 Integer)
         {
             try
             {

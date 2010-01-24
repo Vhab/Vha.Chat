@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Vha.Net")]
-[assembly: AssemblyCopyright("Copyright ©  2005-2009 Remco van Oosterhout")]
+[assembly: AssemblyCopyright("Copyright ©  2005-2010 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

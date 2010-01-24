@@ -73,7 +73,7 @@ namespace Vha.Common
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.UserAgent = "Vha/1.0";
+                request.UserAgent = "Vha.Common/1.0";
                 request.KeepAlive = false;
                 request.ProtocolVersion = HttpVersion.Version10;
                 request.Timeout = timeout;

@@ -114,8 +114,14 @@ namespace Vha.MDB
             {
                 Entry entry = reader.GetEntry(descrambledMessage.CategoryID, descrambledMessage.EntryID);
                 if (entry != null)
+                {
                     try { descrambledMessage.Value = String.Format(PrintfToFormatString(entry.Message), descrambledMessage.Arguments); }
                     catch { }
+                }
+                else
+                {
+                    descrambledMessage.Value = String.Format("UNKNOWN_MDB:{0}:{1}", descrambledMessage.CategoryID, descrambledMessage.EntryID);
+                }
             }
             return descrambledMessage;
         }

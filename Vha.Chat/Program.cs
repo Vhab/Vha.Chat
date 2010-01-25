@@ -64,10 +64,9 @@ namespace Vha.Chat
         private static void UnhandledException(Exception ex)
         {
             DisplayException(ex);
-            MessageBox.Show("An exception has occurred. This application will now close",
+            MessageBox.Show("An exception has occurred. This application will now close.\n\nException:" + ex.Message,
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Context.MainForm = null;
-            Application.Exit();
+            Environment.Exit(1);
         }
 
         private static void DisplayException(Exception ex)

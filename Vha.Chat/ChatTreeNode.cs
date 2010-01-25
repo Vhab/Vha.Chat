@@ -33,7 +33,7 @@ namespace Vha.Chat
             this._type = type;
         }
 
-        public bool ContainsText(string text)
+        public bool ContainsNode(string text)
         {
             foreach (TreeNode node in this.Nodes)
             {
@@ -43,7 +43,7 @@ namespace Vha.Chat
             return false;
         }
 
-        public void RemoveText(string text)
+        public void RemoveNode(string text)
         {
             foreach (TreeNode node in this.Nodes)
             {
@@ -53,6 +53,24 @@ namespace Vha.Chat
                     return;
                 }
             }
+        }
+
+        public void AddNode(string text, string icon)
+        {
+            TreeNode node = new TreeNode(text);
+            if (string.IsNullOrEmpty(icon) == false)
+                node.ImageKey = node.SelectedImageKey = icon;
+            this.Nodes.Add(node);
+        }
+
+        public TreeNode GetNode(string text)
+        {
+            foreach (TreeNode node in this.Nodes)
+            {
+                if (node.Text == text)
+                    return node;
+            }
+            return null;
         }
 
         public ChatInputType Type { get { return this._type; } }

@@ -150,6 +150,9 @@
     <Content Include="Chat.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\TalkBitmap.png" />
+    <None Include="Resources\LeaveBitmap.png" />
+    <None Include="Resources\DeleteBitmap.png" />
     <None Include="Resources\ChatBigBitmap.png" />
     <None Include="Resources\CharactersBitmap.png" />
     <None Include="Resources\CharacterOnlineBitmap.png" />

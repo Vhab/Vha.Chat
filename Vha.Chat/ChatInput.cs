@@ -175,6 +175,12 @@ namespace Vha.Chat
                 case "o":
                     OrgCommand(args);
                     break;
+                case "mute":
+                    MuteCommand(args);
+                    break;
+                case "unmute":
+                    UnmuteCommand(args);
+                    break;
                 default:
                     this._form.AppendLine("Error", "Unknown command: /" + command);
                     break;
@@ -299,6 +305,30 @@ namespace Vha.Chat
                 return;
             }
             this._chat.SendChannelMessage(this._chat.OrganizationID, string.Join(" ", args, 1, args.Length - 1));
+        }
+
+        protected void MuteCommand(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage: /mute [channel]");
+                return;
+            }
+            string channel = string.Join(" ", args, 1, args.Length - 1);
+            if (!this._checkChannel(channel)) return;
+            this._chat.SendChannelMute(channel, true);
+        }
+
+        protected void UnmuteCommand(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage: /unmute [channel]");
+                return;
+            }
+            string channel = string.Join(" ", args, 1, args.Length - 1);
+            if (!this._checkChannel(channel)) return;
+            this._chat.SendChannelMute(channel, false);
         }
     }
 }

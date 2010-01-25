@@ -177,7 +177,7 @@ namespace Vha.Chat
             if (this._charrefRegex == null)
                 this._charrefRegex = new Regex("charref://[0-9]+/[0-9]+/");
             if (this._textsRegex == null)
-                this._textsRegex = new Regex("href=(\"|')text://([^\\1]*)\\1");
+                this._textsRegex = new Regex("href=(\"|')text://([^\\1]*?)\\1");
             // Some preprocessing
             html = html.Replace("\n", "<br>");
             html = this._charrefRegex.Replace(html, "text://");

@@ -134,10 +134,17 @@ namespace Vha.Chat
                 this._target.BeginInvoke(new ChannelJoinEventHandler(_chat_ChannelJoinEvent), new object[] { chat, e });
                 return;
             }
-            TreeNode node = new TreeNode(e.Name.Trim('~'));
-            if (e.Muted) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
-            else node.ImageKey = node.SelectedImageKey = "Channel";
-            this._channels.Nodes.Add(node);
+            TreeNode node = this._channels.GetNode(e.Name);
+            if (node != null)
+            {
+                if (e.Muted) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
+                else node.ImageKey = node.SelectedImageKey = "Channel";
+            }
+            else
+            {
+                if (e.Muted) this._channels.AddNode(e.Name, "ChannelDisabled");
+                else this._channels.AddNode(e.Name, "Channel");
+            }
             if (this._channels.Nodes.Count == 1)
                 this._channels.Expand();
         }
@@ -153,24 +160,21 @@ namespace Vha.Chat
                 return;
             }
             // Add buddy to list
-            TreeNode node = new TreeNode(e.Character);
             if (e.Online)
             {
-                if (this._online.ContainsText(e.Character)) return;
-                if (this._offline.ContainsText(e.Character))
-                    this._offline.RemoveText(e.Character);
-                node.ImageKey = node.SelectedImageKey = "CharacterOnline";
-                this._online.Nodes.Add(node);
+                if (this._online.ContainsNode(e.Character)) return;
+                if (this._offline.ContainsNode(e.Character))
+                    this._offline.RemoveNode(e.Character);
+                this._online.AddNode(e.Character, "CharacterOnline");
                 if (this._online.Nodes.Count == 1)
                     this._online.Expand();
             }
             else
             {
-                if (this._offline.ContainsText(e.Character)) return;
-                if (this._online.ContainsText(e.Character))
-                    this._online.RemoveText(e.Character);
-                node.ImageKey = node.SelectedImageKey = "CharacterOffline";
-                this._offline.Nodes.Add(node);
+                if (this._offline.ContainsNode(e.Character)) return;
+                if (this._online.ContainsNode(e.Character))
+                    this._online.RemoveNode(e.Character);
+                this._offline.AddNode(e.Character, "CharacterOffline");
             }
         }
 
@@ -183,10 +187,10 @@ namespace Vha.Chat
                 return;
             }
             // Remove friend
-            if (this._online.ContainsText(e.Character))
-                this._online.RemoveText(e.Character);
-            if (this._offline.ContainsText(e.Character))
-                this._offline.RemoveText(e.Character);
+            if (this._online.ContainsNode(e.Character))
+                this._online.RemoveNode(e.Character);
+            if (this._offline.ContainsNode(e.Character))
+                this._offline.RemoveNode(e.Character);
         }
 
         private void _chat_PrivateChannelStatusEvent(Vha.Net.Chat chat, PrivateChannelStatusEventArgs e)
@@ -204,15 +208,13 @@ namespace Vha.Chat
             // Update list
             if (e.Join)
             {
-                if (this._privateChannels.ContainsText(e.Channel)) return;
-                TreeNode node = new TreeNode(e.Channel);
-                node.ImageKey = node.SelectedImageKey = "Character";
-                this._privateChannels.Nodes.Add(node);
+                if (this._privateChannels.ContainsNode(e.Channel)) return;
+                this._privateChannels.AddNode(e.Channel, "Character");
             }
             else
             {
-                if (!this._privateChannels.ContainsText(e.Channel)) return;
-                this._privateChannels.RemoveText(e.Channel);
+                if (!this._privateChannels.ContainsNode(e.Channel)) return;
+                this._privateChannels.RemoveNode(e.Channel);
             }
         }
 
@@ -253,10 +255,8 @@ namespace Vha.Chat
                 return;
             }
             // - Add ourselves to private channel
-            TreeNode node = new TreeNode(this._chat.Character);
-            node.ImageKey = node.SelectedImageKey = "Character";
             this._privateChannels.Nodes.Clear();
-            this._privateChannels.Nodes.Add(node);
+            this._privateChannels.AddNode(this._chat.Character, "Character");
             this._privateChannels.Expand();
             // - Clear other tree sections
             this._channels.Nodes.Clear();
@@ -316,14 +316,16 @@ namespace Vha.Chat
             this._outputBox.Document.Body.Style = "color: #" + color + ";";
             // Welcome message
             this.AppendLine("Internal", "The following commands are available:");
-            this.AppendLine("Internal", "- /tell <i>[username] [message]</i>");
-            this.AppendLine("Internal", "- /leave <i>[channel]</i>");
-            this.AppendLine("Internal", "- /invite <i>[username]</i>");
-            this.AppendLine("Internal", "- /kick <i>[username]</i>");
+            this.AppendLine("Internal", "- /tell [username] [message]");
+            this.AppendLine("Internal", "- /leave [private channel]");
+            this.AppendLine("Internal", "- /invite [username]");
+            this.AppendLine("Internal", "- /kick [username]");
             this.AppendLine("Internal", "- /kickall");
-            this.AppendLine("Internal", "- /addbuddy <i>[username]</i>");
-            this.AppendLine("Internal", "- /rembuddy <i>[username]</i>");
-            this.AppendLine("Internal", "- /o <i>[message]</i>");
+            this.AppendLine("Internal", "- /addbuddy [username]");
+            this.AppendLine("Internal", "- /rembuddy [username]");
+            this.AppendLine("Internal", "- /o [message]");
+            this.AppendLine("Internal", "- /mute [channel]");
+            this.AppendLine("Internal", "- /unmute [channel]");
             this.AppendLine("Internal", "- /about");
             // Clear queue
             while (this._lines.Count > 0)
@@ -343,6 +345,50 @@ namespace Vha.Chat
             string target = this._tree.SelectedNode.Text;
             // Set the target
             this.SetTarget(branch.Type, target);
+        }
+
+        private void _tree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            // Early outs
+            if (e.Button != MouseButtons.Right) return;
+            if (e.Node == null) return;
+            if (e.Node.Parent == null) return;
+            // Get the data
+            ChatTreeNode branch = (ChatTreeNode)e.Node.Parent;
+            string target = e.Node.Text;
+            // Set as selected node
+            this._tree.SelectedNode = e.Node;
+            // Show menu
+            switch (branch.Type)
+            {
+                case ChatInputType.Character:
+                    this._characterMenu.Tag = target;
+                    this._characterMenu.Show((Control)sender, e.Location);
+                    break;
+                case ChatInputType.Channel:
+                    this._channelMenu.Tag = target;
+                    this._channelMenu.Show((Control)sender, e.Location);
+                    // Disable irrelevant buttons
+                    if (e.Node.ImageKey == "ChannelDisabled")
+                    {
+                        this._channelMenu_Mute.Enabled = false;
+                        this._channelMenu_Unmute.Enabled = true;
+                    }
+                    else
+                    {
+                        this._channelMenu_Mute.Enabled = true;
+                        this._channelMenu_Unmute.Enabled = false;
+                    }
+                    break;
+                case ChatInputType.PrivateChannel:
+                    this._privateChannelMenu.Tag = target;
+                    this._privateChannelMenu.Show((Control)sender, e.Location);
+                    this._privateChannelMenu_Leave.Enabled = true;
+                    // Can't leave the channel if it's our own channel
+                    if (target == this._chat.Character)
+                        this._privateChannelMenu_Leave.Enabled = false;
+                    break;
+            }
         }
 
         private void _about_Click(object sender, EventArgs e)
@@ -370,6 +416,48 @@ namespace Vha.Chat
         private void _options_Click(object sender, EventArgs e)
         {
             this.AppendLine("Internal", "Coming soon: Options™");
+        }
+
+        private void _channelMenu_TalkTo_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
+            SetTarget(ChatInputType.Channel, (string)this._channelMenu.Tag);
+        }
+
+        private void _channelMenu_Mute_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
+            this._input.Command("mute " + (string)this._channelMenu.Tag);
+        }
+
+        private void _channelMenu_Unmute_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
+            this._input.Command("unmute " + (string)this._channelMenu.Tag);
+        }
+
+        private void _privateChannelMenu_TalkTo_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
+            SetTarget(ChatInputType.PrivateChannel, (string)this._privateChannelMenu.Tag);
+        }
+
+        private void _privateChannelMenu_Leave_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
+            this._input.Command("leave " + (string)this._privateChannelMenu.Tag);
+        }
+
+        private void _characterMenu_TalkTo_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
+            SetTarget(ChatInputType.Character, (string)this._characterMenu.Tag);
+        }
+
+        private void _characterMenu_Remove_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
+            this._input.Command("rembuddy " + (string)this._characterMenu.Tag);
         }
     }
 }

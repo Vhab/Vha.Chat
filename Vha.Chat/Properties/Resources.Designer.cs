@@ -151,6 +151,13 @@ namespace Vha.Chat.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap DeleteBitmap {
+            get {
+                object obj = ResourceManager.GetObject("DeleteBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap DisconnectBitmap {
             get {
                 object obj = ResourceManager.GetObject("DisconnectBitmap", resourceCulture);
@@ -158,9 +165,23 @@ namespace Vha.Chat.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap LeaveBitmap {
+            get {
+                object obj = ResourceManager.GetObject("LeaveBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap OptionsBitmap {
             get {
                 object obj = ResourceManager.GetObject("OptionsBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap TalkBitmap {
+            get {
+                object obj = ResourceManager.GetObject("TalkBitmap", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

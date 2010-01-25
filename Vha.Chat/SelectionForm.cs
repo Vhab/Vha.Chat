@@ -36,7 +36,9 @@ namespace Vha.Chat
         public SelectionForm(LoginCharacter[] characters)
         {
             InitializeComponent();
-            foreach (LoginCharacter character in characters)
+            List<LoginCharacter> list = new List<LoginCharacter>(characters);
+            list.Sort();
+            foreach (LoginCharacter character in list)
             {
                 this._characters.Items.Add(character);
             }

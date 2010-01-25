@@ -19,10 +19,11 @@
 */
 
 using System;
+using System.Collections.Generic;
 
 namespace Vha.Net
 {
-	public class LoginCharacter
+    public class LoginCharacter : IComparable<LoginCharacter>
 	{
 		public UInt32 ID;
 		public String Name;
@@ -30,7 +31,14 @@ namespace Vha.Net
 		public bool IsOnline;
         public override string ToString()
         {
-            return this.Name;
+            String name = this.Name;
+            if (this.IsOnline)
+                name += " (Online)";
+            return name;
+        }
+        public int CompareTo(LoginCharacter other)
+        {
+            return this.ToString().CompareTo(other.ToString());
         }
 	}
 }

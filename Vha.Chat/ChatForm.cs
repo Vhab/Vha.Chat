@@ -310,7 +310,8 @@ namespace Vha.Chat
                 if (this._inputBox.Text.Trim().Length == 0)
                     return;
                 // History
-                this._history.Insert(0, this._inputBox.Text);
+                if (this._history.Count == 0 || this._history[0] != this._inputBox.Text)
+                    this._history.Insert(0, this._inputBox.Text);
                 while (this._history.Count > Program.MaximumHistory)
                     this._history.RemoveAt(0);
                 this._historyIndex = 0;

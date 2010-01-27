@@ -68,9 +68,9 @@ namespace Vha.Chat
             this._copyright.BackColor = System.Drawing.SystemColors.Window;
             this._copyright.Location = new System.Drawing.Point(57, 39);
             this._copyright.Name = "_copyright";
-            this._copyright.Size = new System.Drawing.Size(203, 13);
+            this._copyright.Size = new System.Drawing.Size(230, 13);
             this._copyright.TabIndex = 3;
-            this._copyright.Text = "Copyright © 2009 Remco van Oosterhout";
+            this._copyright.Text = "Copyright © 2009-2010 Remco van Oosterhout";
             // 
             // _license
             // 

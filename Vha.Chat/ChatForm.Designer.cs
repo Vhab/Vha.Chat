@@ -112,6 +112,7 @@ namespace Vha.Chat
             this._inputBox.Name = "_inputBox";
             this._inputBox.Size = new System.Drawing.Size(451, 21);
             this._inputBox.TabIndex = 2;
+            this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
             // 
             // _target
@@ -200,7 +201,7 @@ namespace Vha.Chat
             // 
             this._channelMenu_TalkTo.Image = global::Vha.Chat.Properties.Resources.TalkBitmap;
             this._channelMenu_TalkTo.Name = "_channelMenu_TalkTo";
-            this._channelMenu_TalkTo.Size = new System.Drawing.Size(152, 22);
+            this._channelMenu_TalkTo.Size = new System.Drawing.Size(122, 22);
             this._channelMenu_TalkTo.Text = "Talk To...";
             this._channelMenu_TalkTo.Click += new System.EventHandler(this._channelMenu_TalkTo_Click);
             // 
@@ -213,7 +214,7 @@ namespace Vha.Chat
             // 
             this._channelMenu_Mute.Image = global::Vha.Chat.Properties.Resources.ChannelDisabledBitmap;
             this._channelMenu_Mute.Name = "_channelMenu_Mute";
-            this._channelMenu_Mute.Size = new System.Drawing.Size(152, 22);
+            this._channelMenu_Mute.Size = new System.Drawing.Size(122, 22);
             this._channelMenu_Mute.Text = "Mute";
             this._channelMenu_Mute.Click += new System.EventHandler(this._channelMenu_Mute_Click);
             // 
@@ -221,7 +222,7 @@ namespace Vha.Chat
             // 
             this._channelMenu_Unmute.Image = global::Vha.Chat.Properties.Resources.ChannelBitmap;
             this._channelMenu_Unmute.Name = "_channelMenu_Unmute";
-            this._channelMenu_Unmute.Size = new System.Drawing.Size(152, 22);
+            this._channelMenu_Unmute.Size = new System.Drawing.Size(122, 22);
             this._channelMenu_Unmute.Text = "Unmute";
             this._channelMenu_Unmute.Click += new System.EventHandler(this._channelMenu_Unmute_Click);
             // 
@@ -238,7 +239,7 @@ namespace Vha.Chat
             // 
             this._privateChannelMenu_TalkTo.Image = global::Vha.Chat.Properties.Resources.TalkBitmap;
             this._privateChannelMenu_TalkTo.Name = "_privateChannelMenu_TalkTo";
-            this._privateChannelMenu_TalkTo.Size = new System.Drawing.Size(152, 22);
+            this._privateChannelMenu_TalkTo.Size = new System.Drawing.Size(122, 22);
             this._privateChannelMenu_TalkTo.Text = "Talk To...";
             this._privateChannelMenu_TalkTo.Click += new System.EventHandler(this._privateChannelMenu_TalkTo_Click);
             // 
@@ -251,7 +252,7 @@ namespace Vha.Chat
             // 
             this._privateChannelMenu_Leave.Image = global::Vha.Chat.Properties.Resources.LeaveBitmap;
             this._privateChannelMenu_Leave.Name = "_privateChannelMenu_Leave";
-            this._privateChannelMenu_Leave.Size = new System.Drawing.Size(152, 22);
+            this._privateChannelMenu_Leave.Size = new System.Drawing.Size(122, 22);
             this._privateChannelMenu_Leave.Text = "Leave";
             this._privateChannelMenu_Leave.Click += new System.EventHandler(this._privateChannelMenu_Leave_Click);
             // 
@@ -262,13 +263,13 @@ namespace Vha.Chat
             this._characterMenu_Seperator,
             this._characterMenu_Remove});
             this._characterMenu.Name = "_characterMenu";
-            this._characterMenu.Size = new System.Drawing.Size(153, 76);
+            this._characterMenu.Size = new System.Drawing.Size(123, 54);
             // 
             // _characterMenu_TalkTo
             // 
             this._characterMenu_TalkTo.Image = global::Vha.Chat.Properties.Resources.TalkBitmap;
             this._characterMenu_TalkTo.Name = "_characterMenu_TalkTo";
-            this._characterMenu_TalkTo.Size = new System.Drawing.Size(152, 22);
+            this._characterMenu_TalkTo.Size = new System.Drawing.Size(122, 22);
             this._characterMenu_TalkTo.Text = "Talk To...";
             this._characterMenu_TalkTo.Click += new System.EventHandler(this._characterMenu_TalkTo_Click);
             // 
@@ -281,7 +282,7 @@ namespace Vha.Chat
             // 
             this._characterMenu_Remove.Image = global::Vha.Chat.Properties.Resources.DeleteBitmap;
             this._characterMenu_Remove.Name = "_characterMenu_Remove";
-            this._characterMenu_Remove.Size = new System.Drawing.Size(152, 22);
+            this._characterMenu_Remove.Size = new System.Drawing.Size(122, 22);
             this._characterMenu_Remove.Text = "Remove";
             this._characterMenu_Remove.Click += new System.EventHandler(this._characterMenu_Remove_Click);
             // 

@@ -107,7 +107,7 @@ namespace Vha.Chat
 
         private void AuthenticationForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (_chat != null)
+            if (this._chat != null)
             {
                 this._chat.LoginCharlistEvent -= new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
                 this._chat.LoginErrorEvent -= new LoginErrorEventHandler(_chat_LoginErrorEvent);
@@ -168,11 +168,12 @@ namespace Vha.Chat
                 Program.Context.MainForm.Show();
                 this._chat.SendLoginCharacter(form.Character);
                 this._chat.AutoReconnect = true;
+                this._chat = null;
             }
             else
             {
                 this._chat.Disconnect();
-                _chat = null;
+                this._chat = null;
                 this.Show();
             }
             this._status = null;

@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Vha;
 using Vha.Net;
 using Vha.Net.Events;
 using Vha.Common;
@@ -46,10 +47,19 @@ namespace Vha.Chat
 
         private void _chat_ChannelMessageEvent(Vha.Net.Chat chat, ChannelMessageEventArgs e)
         {
-            string message = string.Format(
+            string message = e.Message;
+            if (e.Message.StartsWith("~"))
+            {
+                MDB.Message parsedMessage = null;
+                try { parsedMessage = MDB.Parser.Decode(e.Message); }
+                catch {}
+                if (parsedMessage != null && !string.IsNullOrEmpty(parsedMessage.Value))
+                    message = parsedMessage.Value;
+            }
+            string line = string.Format(
                 "[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
-                e.Channel, e.Character, e.Message);
-            this._form.AppendLine(e.Type.ToString(), message);
+                e.Channel, e.Character, message);
+            this._form.AppendLine(e.Type.ToString(), line);
         }
 
         private void _chat_PrivateMessageEvent(Vha.Net.Chat chat, PrivateMessageEventArgs e)

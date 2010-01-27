@@ -140,6 +140,10 @@
       <Project>{711F8307-944C-4864-8D5E-0987C87E903A}</Project>
       <Name>Vha.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Vha.MDB\Vha.MDB.csproj">
+      <Project>{B309DD92-78AE-40DE-89B5-C76C48D874B2}</Project>
+      <Name>Vha.MDB</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Vha.Net\Vha.Net.csproj">
       <Project>{7BA3A4CF-1E58-465C-B614-151F8BEA848E}</Project>
       <Name>Vha.Net</Name>

@@ -60,6 +60,16 @@ namespace Vha.Chat
             TreeNode node = new TreeNode(text);
             if (string.IsNullOrEmpty(icon) == false)
                 node.ImageKey = node.SelectedImageKey = icon;
+            int index = 0;
+            foreach (TreeNode n in this.Nodes)
+            {
+                if (n.Text.CompareTo(text) > 0)
+                {
+                    this.Nodes.Insert(index, node);
+                    return;
+                }
+                index++;
+            }
             this.Nodes.Add(node);
         }
 

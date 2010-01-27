@@ -26,8 +26,9 @@ namespace Vha.Chat
     public static class Program
     {
         public static bool MonoMode = false;
-        public static int MaximumMessages = 500;
-        public static int MaximumTexts = 100;
+        public static int MaximumMessages = 250;
+        public static int MaximumTexts = 50;
+        public static int MaximumHistory = 25;
         public static ApplicationContext Context;
         /// <summary>
         /// The main entry point for the application.

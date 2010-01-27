@@ -43,6 +43,9 @@ namespace Vha.Chat
         protected ChatHtml _links;
         protected Net.Chat _chat;
 
+        protected List<string> _history = new List<string>();
+        protected int _historyIndex = 0;
+
         protected Queue<string> _lines = new Queue<string>();
 
         public ChatForm(Net.Chat chat)
@@ -267,26 +270,66 @@ namespace Vha.Chat
             this._disconnect.Enabled = true;
         }
 
+        private void _inputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up)
+            {
+                e.Handled = true;
+                if (this._historyIndex < this._history.Count)
+                {
+                    this._historyIndex++;
+                    this._inputBox.Text = this._history[this._historyIndex - 1];
+                    this._inputBox.Select(this._inputBox.Text.Length, 0);
+                }
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                e.Handled = true;
+                if (this._historyIndex > 0)
+                {
+                    this._historyIndex--;
+                    if (this._historyIndex == 0)
+                        this._inputBox.Text = "";
+                    else
+                        this._inputBox.Text = this._history[this._historyIndex - 1];
+                    this._inputBox.Select(this._inputBox.Text.Length, 0);
+                }
+            }
+            else
+            {
+                this._historyIndex = 0;
+            }
+        }
+
         private void _inputBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar != '\r') return;
-            e.Handled = true;
-            if (this._inputBox.Text.Trim().Length == 0)
-                return;
-            if (this._inputBox.Text.StartsWith("/"))
+            if (e.KeyChar == (char)Keys.Return)
             {
-                this._input.Command(this._inputBox.Text);
+                e.Handled = true;
+                // Sensible out
+                if (this._inputBox.Text.Trim().Length == 0)
+                    return;
+                // History
+                this._history.Insert(0, this._inputBox.Text);
+                while (this._history.Count > Program.MaximumHistory)
+                    this._history.RemoveAt(0);
+                this._historyIndex = 0;
+                // Handle the input
+                if (this._inputBox.Text.StartsWith("/"))
+                {
+                    this._input.Command(this._inputBox.Text);
+                    this._inputBox.Text = "";
+                    return;
+                }
+                if (this._target.SelectedItem == null)
+                {
+                    AppendLine("Error", "No channel selected");
+                    return;
+                }
+                ChatTarget target = (ChatTarget)this._target.SelectedItem;
+                this._input.Send(target.Type, target.Target, this._inputBox.Text);
                 this._inputBox.Text = "";
-                return;
             }
-            if (this._target.SelectedItem == null)
-            {
-                AppendLine("Error", "No channel selected");
-                return;
-            }
-            ChatTarget target = (ChatTarget)this._target.SelectedItem;
-            this._input.Send(target.Type, target.Target, this._inputBox.Text);
-            this._inputBox.Text = ""; ;
         }
 
         private void _outputBox_Navigating(object sender, WebBrowserNavigatingEventArgs e)

@@ -165,6 +165,9 @@ namespace Vha.Chat
                     replacement.InnerHtml = current.InnerHtml;
                 }
                 current.OuterHtml = replacement.OuterHtml;
+                // Clean up
+                replacement.OuterHtml = "";
+                replacement = null;
             }
         }
 
@@ -208,12 +211,11 @@ namespace Vha.Chat
             // Fill content
             document.Body.InnerHtml += html;
             // Process all links
-            HtmlElementCollection links = document.Body.GetElementsByTagName("a");
+            /*HtmlElement[] links = GetElements(document.Body, "a");
             foreach (HtmlElement link in links)
             {
                 // Hook click event
-                link.Click -= new HtmlElementEventHandler(Clicked);
-                link.Click += new HtmlElementEventHandler(Clicked);
+                //link.Click += new HtmlElementEventHandler(Clicked);
                 link.SetAttribute("title", link.GetAttribute("href"));
                 // Handle FC's 'no decoration' style
                 if (link.Style == null || link.Style == "") continue;
@@ -236,12 +238,37 @@ namespace Vha.Chat
                         link.SetAttribute("className", "NoStyle");
                     }
                 }
+            }*/
+            // Click handler
+            document.Click -= new HtmlElementEventHandler(Clicked);
+            document.Click += new HtmlElementEventHandler(Clicked);
+        }
+
+        protected HtmlElement[] GetElements(HtmlElement element, string tag)
+        {
+            List<HtmlElement> list = new List<HtmlElement>();
+            Stack<HtmlElement> remaining = new Stack<HtmlElement>();
+            remaining.Push(element);
+            while (remaining.Count > 0)
+            {
+                HtmlElement current = remaining.Pop();
+                // Queue child if any
+                foreach (HtmlElement child in current.Children)
+                {
+                    remaining.Push(child);
+                }
+                if (current.TagName.ToLower() == tag.ToLower())
+                    list.Add(current);
             }
+            return list.ToArray();
         }
 
         protected void Clicked(object sender, HtmlElementEventArgs e)
         {
-            HtmlElement element = (HtmlElement)sender;
+            //HtmlElement element = (HtmlElement)sender;
+            HtmlDocument document = (HtmlDocument)sender;
+            HtmlElement element = document.GetElementFromPoint(e.ClientMousePosition);
+            if (element == null || element.TagName.ToLower() != "a") return;
             // Get href
             string href = element.GetAttribute("href").Trim('/');
             if (string.IsNullOrEmpty(href)) return;

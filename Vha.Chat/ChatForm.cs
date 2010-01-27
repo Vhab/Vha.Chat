@@ -243,6 +243,12 @@ namespace Vha.Chat
 
         private void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
         {
+            // Invoke
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new StatusChangeEventHandler(_chat_StatusChangeEvent), new object[] { chat, e });
+                return;
+            }
             // Update buttons when disconnect
             if (e.State == ChatState.Disconnected)
             {
@@ -251,12 +257,6 @@ namespace Vha.Chat
             }
             // Only really care about being connected for the rest of the code
             if (e.State != ChatState.Connected) return;
-            // Invoke
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new StatusChangeEventHandler(_chat_StatusChangeEvent), new object[] { chat, e });
-                return;
-            }
             // - Add ourselves to private channel
             this._privateChannels.Nodes.Clear();
             this._privateChannels.AddNode(this._chat.Character, "Character");

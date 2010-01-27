@@ -44,13 +44,16 @@ namespace Vha.Chat
             // Start application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
+#if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+#endif
 
             Context = new ApplicationContext();
             Context.MainForm = new AuthenticationForm();
             Application.Run(Context);
         }
 
+#if !DEBUG
         // Exception handling
         public static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
@@ -76,6 +79,6 @@ namespace Vha.Chat
             if (ex.InnerException != null)
                 DisplayException(ex.InnerException);
         }
-
+#endif
     }
 }

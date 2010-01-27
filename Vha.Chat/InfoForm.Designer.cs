@@ -41,7 +41,7 @@ namespace Vha.Chat
             this._info.MinimumSize = new System.Drawing.Size(20, 20);
             this._info.Name = "_info";
             this._info.ScriptErrorsSuppressed = true;
-            this._info.Size = new System.Drawing.Size(333, 321);
+            this._info.Size = new System.Drawing.Size(374, 374);
             this._info.TabIndex = 0;
             this._info.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             this._info.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this._info_Navigating);
@@ -52,7 +52,7 @@ namespace Vha.Chat
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(333, 321);
+            this.ClientSize = new System.Drawing.Size(374, 374);
             this.Controls.Add(this._info);
             this.ForeColor = System.Drawing.Color.White;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

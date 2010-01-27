@@ -125,7 +125,7 @@ namespace Vha.Net
         }
 
         // Get this thing ready for running
-        protected virtual void PrepareChat()
+        protected void PrepareChat()
         {
             lock (this)
             {
@@ -174,7 +174,7 @@ namespace Vha.Net
             }
         }
 
-        public virtual bool Connect()
+        public bool Connect()
         {
             lock (this)
             {
@@ -217,10 +217,8 @@ namespace Vha.Net
             return false;
         }
 
-        public virtual void Disconnect() { Disconnect(false); }
-        public virtual void Disconnect(bool async)
+        public void ClearEvents()
         {
-            // Unhook all events
             this.AmdMuxInfoEvent = null;
             this.AnonVicinityEvent = null;
             this.FriendStatusEvent = null;
@@ -244,6 +242,11 @@ namespace Vha.Net
             this.LoginCharlistEvent = null;
             this.StatusChangeEvent = null;
             this.DebugEvent = null;
+        }
+
+        public void Disconnect() { Disconnect(false); }
+        public void Disconnect(bool async)
+        {
             // Prepare the disconnect
             this._closing = true;
             if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
@@ -430,8 +433,8 @@ namespace Vha.Net
             }
         }
 
-        internal virtual void ParsePacket(Object o) { ParsePacket((ParsePacketData)o, false); }
-        internal virtual void ParsePacket(ParsePacketData packetData, bool local)
+        internal void ParsePacket(Object o) { ParsePacket((ParsePacketData)o, false); }
+        internal void ParsePacket(ParsePacketData packetData, bool local)
         {
             // Register this thread
             if (local == false)
@@ -978,7 +981,7 @@ namespace Vha.Net
         #endregion
 
         #region Get Commands
-        public virtual UInt32 GetUserID(string user)
+        public UInt32 GetUserID(string user)
         {
             bool Lookup = false;
             user = Format.UppercaseFirst(user);
@@ -1015,7 +1018,7 @@ namespace Vha.Net
             return 0;
         }
 
-        public virtual string GetUserName(UInt32 userID)
+        public string GetUserName(UInt32 userID)
         {
             if (this._users == null)
                 return "";
@@ -1032,7 +1035,7 @@ namespace Vha.Net
             }
         }
 
-        public virtual BigInteger GetChannelID(String channelName)
+        public BigInteger GetChannelID(String channelName)
         {
             lock (this._channels)
             {
@@ -1045,8 +1048,8 @@ namespace Vha.Net
             return new BigInteger(0);
         }
 
-        public virtual string GetChannelName(Int32 channelID) { return this.GetChannelName(new BigInteger(channelID)); }
-        public virtual string GetChannelName(BigInteger channelID)
+        public string GetChannelName(Int32 channelID) { return this.GetChannelName(new BigInteger(channelID)); }
+        public string GetChannelName(BigInteger channelID)
         {
             if (this._channels == null)
                 return "";
@@ -1064,7 +1067,7 @@ namespace Vha.Net
             }
         }
 
-        public virtual ChannelType GetChannelType(BigInteger channelID)
+        public ChannelType GetChannelType(BigInteger channelID)
         {
             lock (this._channels)
             {
@@ -1081,7 +1084,7 @@ namespace Vha.Net
         #endregion
 
         #region Send Commands
-        public virtual void SendPacket(Packet packet)
+        public void SendPacket(Packet packet)
         {
             if (this._socket == null || !this._socket.Connected)
             {
@@ -1100,8 +1103,8 @@ namespace Vha.Net
             }
         }
 
-        public virtual void SendChannelMute(string channel, bool mute) { this.SendChannelMute(this.GetChannelID(channel), mute); }
-        public virtual void SendChannelMute(BigInteger channelID, bool mute)
+        public void SendChannelMute(string channel, bool mute) { this.SendChannelMute(this.GetChannelID(channel), mute); }
+        public void SendChannelMute(BigInteger channelID, bool mute)
         {
             this.Debug("Updating channel " + this.GetChannelName(channelID) + " with mute=" + mute.ToString(), "[Bot]");
 
@@ -1110,16 +1113,16 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
-        public virtual void SendChannelMessage(string channel, string text) { this.SendChannelMessage(this.GetChannelID(channel), text, PacketQueue.Priority.Standard); }
-        public virtual void SendChannelMessage(BigInteger channelID, string text) { this.SendChannelMessage(channelID, text, PacketQueue.Priority.Standard); }
-        public virtual void SendChannelMessage(BigInteger channelID, string text, PacketQueue.Priority priority)
+        public void SendChannelMessage(string channel, string text) { this.SendChannelMessage(this.GetChannelID(channel), text, PacketQueue.Priority.Standard); }
+        public void SendChannelMessage(BigInteger channelID, string text) { this.SendChannelMessage(channelID, text, PacketQueue.Priority.Standard); }
+        public void SendChannelMessage(BigInteger channelID, string text, PacketQueue.Priority priority)
         {
             ChannelMessagePacket p = new ChannelMessagePacket(channelID, text);
             p.Priority = priority;
             this.SendPacket(p);
         }
 
-        public virtual void SendFriendAdd(string user)
+        public void SendFriendAdd(string user)
         {
             if (string.IsNullOrEmpty(user)) return;
             this.Debug("Adding user to friendslist: " + user, "[Bot]");
@@ -1130,7 +1133,7 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
-        public virtual void SendFriendRemove(string user)
+        public void SendFriendRemove(string user)
         {
             if (string.IsNullOrEmpty(user)) return;
             this.Debug("Removing user from friendslist: " + user, "[Bot]");
@@ -1141,8 +1144,8 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
-        public virtual void SendPrivateChannelInvite(string user) { this.SendPrivateChannelInvite(this.GetUserID(user)); }
-        public virtual void SendPrivateChannelInvite(UInt32 userID)
+        public void SendPrivateChannelInvite(string user) { this.SendPrivateChannelInvite(this.GetUserID(user)); }
+        public void SendPrivateChannelInvite(UInt32 userID)
         {
             if (userID == this._id)
                 return;
@@ -1151,8 +1154,8 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
-        public virtual void SendPrivateChannelKick(string user) { this.SendPrivateChannelKick(this.GetUserID(user)); }
-        public virtual void SendPrivateChannelKick(UInt32 userID)
+        public void SendPrivateChannelKick(string user) { this.SendPrivateChannelKick(this.GetUserID(user)); }
+        public void SendPrivateChannelKick(UInt32 userID)
         {
             if (userID == this._id)
                 return;
@@ -1161,33 +1164,33 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
-        public virtual void SendPrivateChannelKickAll()
+        public void SendPrivateChannelKickAll()
         {
             EmptyPacket p = new EmptyPacket(Packet.Type.PRIVATE_CHANNEL_KICKALL);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
 
-        public virtual void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetUserID(channel)); }
-        public virtual void SendPrivateChannelLeave(UInt32 channelID)
+        public void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetUserID(channel)); }
+        public void SendPrivateChannelLeave(UInt32 channelID)
         {
             PrivateChannelStatusPacket p = new PrivateChannelStatusPacket(channelID, false);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
 
-        public virtual void SendPrivateChannelMessage(string text) { this.SendPrivateChannelMessage(this._id, text); }
-        public virtual void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetUserID(channel), text); }
-        public virtual void SendPrivateChannelMessage(UInt32 channelID, string text)
+        public void SendPrivateChannelMessage(string text) { this.SendPrivateChannelMessage(this._id, text); }
+        public void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetUserID(channel), text); }
+        public void SendPrivateChannelMessage(UInt32 channelID, string text)
         {
             PrivateChannelMessagePacket p = new PrivateChannelMessagePacket(channelID, text);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
 
-        public virtual void SendPrivateMessage(string user, string text) { this.SendPrivateMessage(this.GetUserID(user), text, PacketQueue.Priority.Standard); }
-        public virtual void SendPrivateMessage(UInt32 userID, string text) { this.SendPrivateMessage(userID, text, PacketQueue.Priority.Standard); }
-        public virtual void SendPrivateMessage(UInt32 userID, string text, PacketQueue.Priority priority)
+        public void SendPrivateMessage(string user, string text) { this.SendPrivateMessage(this.GetUserID(user), text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(UInt32 userID, string text) { this.SendPrivateMessage(userID, text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(UInt32 userID, string text, PacketQueue.Priority priority)
         {
             if (userID == this._id || userID == 0)
                 return;
@@ -1196,7 +1199,7 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
-        public virtual void SendNameLookup(string name)
+        public void SendNameLookup(string name)
         {
             lock (this._users)
                 if (this._users.ContainsValue(Format.UppercaseFirst(name)))
@@ -1208,7 +1211,7 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
-        public virtual void SendPing()
+        public void SendPing()
         {
             EmptyPacket p = new EmptyPacket(Packet.Type.PING);
             p.Priority = PacketQueue.Priority.Urgent;

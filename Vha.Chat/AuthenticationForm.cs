@@ -101,7 +101,9 @@ namespace Vha.Chat
             this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
             this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
             this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+#if !DEBUG
             this._chat.ExceptionEvent += new ExceptionEventHandler(Program.UnhandledException);
+#endif
             this._chat.Connect();
         }
 

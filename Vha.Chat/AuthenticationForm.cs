@@ -48,6 +48,7 @@ namespace Vha.Chat
             this._server.Items.Add(new Server("Rimor", "chat.d2.funcom.com", 7102));
             this._server.Items.Add(new Server("Die Neue Welt", "chat.d3.funcom.com", 7103));
             this._server.Items.Add(new Server("Test", "chat.dt.funcom.com", 7109));
+            this._server.SelectedIndex = 0;
         }
 
         private void _cancel_Click(object sender, EventArgs e)

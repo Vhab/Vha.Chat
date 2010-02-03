@@ -165,6 +165,13 @@ namespace Vha.Chat.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap EnterBitmap {
+            get {
+                object obj = ResourceManager.GetObject("EnterBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap LeaveBitmap {
             get {
                 object obj = ResourceManager.GetObject("LeaveBitmap", resourceCulture);

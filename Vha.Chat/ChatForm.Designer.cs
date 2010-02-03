@@ -52,11 +52,15 @@ namespace Vha.Chat
             this._characterMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._characterMenu_TalkTo = new System.Windows.Forms.ToolStripMenuItem();
             this._characterMenu_Seperator = new System.Windows.Forms.ToolStripSeparator();
+            this._characterMenu_Invite = new System.Windows.Forms.ToolStripMenuItem();
             this._characterMenu_Remove = new System.Windows.Forms.ToolStripMenuItem();
+            this._guestsMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this._guestsMenu_Kick = new System.Windows.Forms.ToolStripMenuItem();
             this._buttons.SuspendLayout();
             this._channelMenu.SuspendLayout();
             this._privateChannelMenu.SuspendLayout();
             this._characterMenu.SuspendLayout();
+            this._guestsMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // _tree
@@ -261,30 +265,54 @@ namespace Vha.Chat
             this._characterMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._characterMenu_TalkTo,
             this._characterMenu_Seperator,
+            this._characterMenu_Invite,
             this._characterMenu_Remove});
             this._characterMenu.Name = "_characterMenu";
-            this._characterMenu.Size = new System.Drawing.Size(123, 54);
+            this._characterMenu.Size = new System.Drawing.Size(153, 98);
             // 
             // _characterMenu_TalkTo
             // 
             this._characterMenu_TalkTo.Image = global::Vha.Chat.Properties.Resources.TalkBitmap;
             this._characterMenu_TalkTo.Name = "_characterMenu_TalkTo";
-            this._characterMenu_TalkTo.Size = new System.Drawing.Size(122, 22);
+            this._characterMenu_TalkTo.Size = new System.Drawing.Size(152, 22);
             this._characterMenu_TalkTo.Text = "Talk To...";
             this._characterMenu_TalkTo.Click += new System.EventHandler(this._characterMenu_TalkTo_Click);
             // 
             // _characterMenu_Seperator
             // 
             this._characterMenu_Seperator.Name = "_characterMenu_Seperator";
-            this._characterMenu_Seperator.Size = new System.Drawing.Size(119, 6);
+            this._characterMenu_Seperator.Size = new System.Drawing.Size(149, 6);
+            // 
+            // _characterMenu_Invite
+            // 
+            this._characterMenu_Invite.Image = global::Vha.Chat.Properties.Resources.EnterBitmap;
+            this._characterMenu_Invite.Name = "_characterMenu_Invite";
+            this._characterMenu_Invite.Size = new System.Drawing.Size(152, 22);
+            this._characterMenu_Invite.Text = "Invite";
+            this._characterMenu_Invite.Click += new System.EventHandler(this._characterMenu_Invite_Click);
             // 
             // _characterMenu_Remove
             // 
             this._characterMenu_Remove.Image = global::Vha.Chat.Properties.Resources.DeleteBitmap;
             this._characterMenu_Remove.Name = "_characterMenu_Remove";
-            this._characterMenu_Remove.Size = new System.Drawing.Size(122, 22);
+            this._characterMenu_Remove.Size = new System.Drawing.Size(152, 22);
             this._characterMenu_Remove.Text = "Remove";
             this._characterMenu_Remove.Click += new System.EventHandler(this._characterMenu_Remove_Click);
+            // 
+            // _guestsMenu
+            // 
+            this._guestsMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._guestsMenu_Kick});
+            this._guestsMenu.Name = "_guestsMenu";
+            this._guestsMenu.Size = new System.Drawing.Size(97, 26);
+            // 
+            // _guestsMenu_Kick
+            // 
+            this._guestsMenu_Kick.Image = global::Vha.Chat.Properties.Resources.LeaveBitmap;
+            this._guestsMenu_Kick.Name = "_guestsMenu_Kick";
+            this._guestsMenu_Kick.Size = new System.Drawing.Size(96, 22);
+            this._guestsMenu_Kick.Text = "Kick";
+            this._guestsMenu_Kick.Click += new System.EventHandler(this._guestsMenu_Kick_Click);
             // 
             // ChatForm
             // 
@@ -306,6 +334,7 @@ namespace Vha.Chat
             this._channelMenu.ResumeLayout(false);
             this._privateChannelMenu.ResumeLayout(false);
             this._characterMenu.ResumeLayout(false);
+            this._guestsMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -336,6 +365,9 @@ namespace Vha.Chat
         private System.Windows.Forms.ToolStripMenuItem _characterMenu_TalkTo;
         private System.Windows.Forms.ToolStripSeparator _characterMenu_Seperator;
         private System.Windows.Forms.ToolStripMenuItem _characterMenu_Remove;
+        private System.Windows.Forms.ToolStripMenuItem _characterMenu_Invite;
+        private System.Windows.Forms.ContextMenuStrip _guestsMenu;
+        private System.Windows.Forms.ToolStripMenuItem _guestsMenu_Kick;
 
     }
 }

@@ -101,8 +101,8 @@
       <DependentUpon>InfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsForm.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>OptionsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -166,8 +166,9 @@
     </Content>
     <None Include="Resources\OptionsBigBitmap.png" />
     <None Include="Resources\OptionsIcon.ico" />
-    <None Include="Resources\TalkBitmap.png" />
+    <None Include="Resources\EnterBitmap.png" />
     <None Include="Resources\LeaveBitmap.png" />
+    <None Include="Resources\TalkBitmap.png" />
     <None Include="Resources\DeleteBitmap.png" />
     <None Include="Resources\ChatBigBitmap.png" />
     <None Include="Resources\CharactersBitmap.png" />

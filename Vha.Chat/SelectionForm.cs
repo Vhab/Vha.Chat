@@ -42,6 +42,7 @@ namespace Vha.Chat
             {
                 this._characters.Items.Add(character);
             }
+            this._characters.SelectedIndex = 0;
         }
 
         private void _cancel_Click(object sender, EventArgs e)

@@ -37,6 +37,7 @@ namespace Vha.Chat
         protected ChatTreeNode _offline = new ChatTreeNode(ChatInputType.Character, "Offline");
         protected ChatTreeNode _channels = new ChatTreeNode(ChatInputType.Channel, "Channels");
         protected ChatTreeNode _privateChannels = new ChatTreeNode(ChatInputType.PrivateChannel, "Private Channels");
+        protected ChatTreeNode _guests = new ChatTreeNode(ChatInputType.Character, "Guests");
 
         protected ChatInput _input;
         protected ChatOutput _output;
@@ -64,6 +65,7 @@ namespace Vha.Chat
             this._tree.Nodes.Add(this._offline);
             this._tree.Nodes.Add(this._channels);
             this._tree.Nodes.Add(this._privateChannels);
+            this._tree.Nodes.Add(this._guests);
 
             this._input = new ChatInput(this, this._chat);
             this._output = new ChatOutput(this, this._chat);
@@ -204,20 +206,41 @@ namespace Vha.Chat
                 this._target.BeginInvoke(new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent), new object[] { chat, e });
                 return;
             }
-            // Ignore our own channel
-            if (e.ChannelID == chat.ID) return;
-            // Ignore other characters
-            if (e.CharacterID != chat.ID) return;
-            // Update list
-            if (e.Join)
+            // Handle our own channel
+            if (e.ChannelID == chat.ID)
             {
-                if (this._privateChannels.ContainsNode(e.Channel)) return;
-                this._privateChannels.AddNode(e.Channel, "Character");
+                // (not sure this ever happens, but better safe than sorry)
+                if (e.CharacterID == chat.ID) return;
+                // Update list
+                if (e.Join)
+                {
+                    if (this._guests.ContainsNode(e.Character)) return;
+                    this._guests.AddNode(e.Character, "Character");
+                    if (this._guests.Nodes.Count == 1)
+                        this._guests.Expand();
+                }
+                else
+                {
+                    if (!this._guests.ContainsNode(e.Character)) return;
+                    this._guests.RemoveNode(e.Character);
+                }
             }
+            // Handle remote private channels
             else
             {
-                if (!this._privateChannels.ContainsNode(e.Channel)) return;
-                this._privateChannels.RemoveNode(e.Channel);
+                // Ignore other characters
+                if (e.CharacterID != chat.ID) return;
+                // Update list
+                if (e.Join)
+                {
+                    if (this._privateChannels.ContainsNode(e.Channel)) return;
+                    this._privateChannels.AddNode(e.Channel, "Character");
+                }
+                else
+                {
+                    if (!this._privateChannels.ContainsNode(e.Channel)) return;
+                    this._privateChannels.RemoveNode(e.Channel);
+                }
             }
         }
 
@@ -265,6 +288,7 @@ namespace Vha.Chat
             this._channels.Nodes.Clear();
             this._online.Nodes.Clear();
             this._offline.Nodes.Clear();
+            this._guests.Nodes.Clear();
             // Update buttons
             this._connect.Enabled = false;
             this._disconnect.Enabled = true;
@@ -313,7 +337,7 @@ namespace Vha.Chat
                 if (this._history.Count == 0 || this._history[0] != this._inputBox.Text)
                     this._history.Insert(0, this._inputBox.Text);
                 while (this._history.Count > Program.MaximumHistory)
-                    this._history.RemoveAt(0);
+                    this._history.RemoveAt(this._history.Count - 1);
                 this._historyIndex = 0;
                 // Handle the input
                 if (this._inputBox.Text.StartsWith("/"))
@@ -403,35 +427,62 @@ namespace Vha.Chat
             // Set as selected node
             this._tree.SelectedNode = e.Node;
             // Show menu
-            switch (branch.Type)
+            if (e.Node.Parent == this._online)
             {
-                case ChatInputType.Character:
-                    this._characterMenu.Tag = target;
-                    this._characterMenu.Show((Control)sender, e.Location);
-                    break;
-                case ChatInputType.Channel:
-                    this._channelMenu.Tag = target;
-                    this._channelMenu.Show((Control)sender, e.Location);
-                    // Disable irrelevant buttons
-                    if (e.Node.ImageKey == "ChannelDisabled")
-                    {
-                        this._channelMenu_Mute.Enabled = false;
-                        this._channelMenu_Unmute.Enabled = true;
-                    }
-                    else
-                    {
-                        this._channelMenu_Mute.Enabled = true;
-                        this._channelMenu_Unmute.Enabled = false;
-                    }
-                    break;
-                case ChatInputType.PrivateChannel:
-                    this._privateChannelMenu.Tag = target;
-                    this._privateChannelMenu.Show((Control)sender, e.Location);
+                // Online character menu
+                this._characterMenu.Tag = target;
+                if (this._guests.ContainsNode(target))
+                {
+                    this._characterMenu_Invite.Enabled = false;
+                }
+                else
+                {
+                    this._characterMenu_Invite.Enabled = true;
+                }
+                this._characterMenu.Show((Control)sender, e.Location);
+            }
+            else if (e.Node.Parent == this._offline)
+            {
+                // Offline character menu
+                this._characterMenu.Tag = target;
+                this._characterMenu_Invite.Enabled = false;
+                this._characterMenu.Show((Control)sender, e.Location);
+            }
+            else if (e.Node.Parent == this._channels)
+            {
+                this._channelMenu.Tag = target;
+                // Disable irrelevant buttons
+                if (e.Node.ImageKey == "ChannelDisabled")
+                {
+                    this._channelMenu_Mute.Enabled = false;
+                    this._channelMenu_Unmute.Enabled = true;
+                }
+                else
+                {
+                    this._channelMenu_Mute.Enabled = true;
+                    this._channelMenu_Unmute.Enabled = false;
+                }
+                this._channelMenu.Show((Control)sender, e.Location);
+            }
+            else if (e.Node.Parent == this._privateChannels)
+            {
+                this._privateChannelMenu.Tag = target;
+                // Can't leave the channel if it's our own channel
+                if (target == this._chat.Character)
+                {
+                    this._privateChannelMenu_Leave.Enabled = false;
+                }
+                else
+                {
                     this._privateChannelMenu_Leave.Enabled = true;
-                    // Can't leave the channel if it's our own channel
-                    if (target == this._chat.Character)
-                        this._privateChannelMenu_Leave.Enabled = false;
-                    break;
+                }
+                this._privateChannelMenu.Show((Control)sender, e.Location);
+            }
+            else if (e.Node.Parent == this._guests)
+            {
+                // Guest character menu
+                this._guestsMenu.Tag = target;
+                this._guestsMenu.Show((Control)sender, e.Location);
             }
         }
 
@@ -502,6 +553,18 @@ namespace Vha.Chat
         {
             if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
             this._input.Command("rembuddy " + (string)this._characterMenu.Tag);
+        }
+
+        private void _characterMenu_Invite_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
+            this._input.Command("invite " + (string)this._characterMenu.Tag);
+        }
+
+        private void _guestsMenu_Kick_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._guestsMenu.Tag)) return;
+            this._input.Command("kick " + (string)this._guestsMenu.Tag);
         }
     }
 }

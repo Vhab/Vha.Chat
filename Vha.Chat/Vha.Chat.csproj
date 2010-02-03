@@ -72,6 +72,12 @@
     <Compile Include="InfoForm.Designer.cs">
       <DependentUpon>InfoForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="OptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsForm.Designer.cs">
+      <DependentUpon>OptionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AboutForm.resx">
@@ -93,6 +99,10 @@
     <EmbeddedResource Include="InfoForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>InfoForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>OptionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -154,6 +164,8 @@
     <Content Include="Chat.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\OptionsBigBitmap.png" />
+    <None Include="Resources\OptionsIcon.ico" />
     <None Include="Resources\TalkBitmap.png" />
     <None Include="Resources\LeaveBitmap.png" />
     <None Include="Resources\DeleteBitmap.png" />

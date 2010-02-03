@@ -53,19 +53,39 @@ namespace Vha.Chat
         }
 
         protected ChatForm _form;
-        protected ChatInput _input;
+        protected ChatInput _inputUtil;
         protected Net.Chat _chat;
         protected Dictionary<string, string> _texts;
         protected int _textsIndex = 0;
-        protected Regex _textsRegex;
-        protected Regex _charrefRegex;
+        protected Regex _textsRegex = null;
+        protected Regex _charrefRegex = null;
+        protected Regex _colorRegex = null;
 
         public ChatHtml(ChatForm form, ChatInput input, Net.Chat chat)
         {
             this._form = form;
             this._chat = chat;
-            this._input = input;
+            this._inputUtil = input;
             this._texts = new Dictionary<string, string>();
+        }
+
+        public string InvertColors(string html)
+        {
+            if (this._colorRegex == null)
+                this._colorRegex = new Regex("color=(['\"]?)#([0-9a-fA-F]{6})\\1");
+            MatchCollection matches = this._colorRegex.Matches(html);
+            foreach (Match match in matches)
+            {
+                string seperator = match.Groups[1].Value;
+                string color = match.Groups[2].Value;
+                int r = int.Parse(color.Substring(0, 2), System.Globalization.NumberStyles.AllowHexSpecifier);
+                int g = int.Parse(color.Substring(2, 2), System.Globalization.NumberStyles.AllowHexSpecifier);
+                int b = int.Parse(color.Substring(4, 2), System.Globalization.NumberStyles.AllowHexSpecifier);
+                string inverse = string.Format("{0:X2}{1:X2}{2:X2}", 255 - r, 255 - g, 255 - b);
+                string replacement = string.Format("color={0}#{1}{0}", seperator, inverse);
+                html = html.Substring(0, match.Index) + replacement + html.Substring(match.Index + replacement.Length);
+            }
+            return html;
         }
 
         public void SecureHtml(HtmlDocument document, HtmlElement element)
@@ -322,7 +342,7 @@ namespace Vha.Chat
         
         protected void ChatCmdLink(string command)
         {
-            this._input.Command(command);
+            this._inputUtil.Command(command);
         }
 
         protected void ItemRefLink(string item)

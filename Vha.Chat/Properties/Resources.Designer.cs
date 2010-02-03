@@ -172,10 +172,24 @@ namespace Vha.Chat.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap OptionsBigBitmap {
+            get {
+                object obj = ResourceManager.GetObject("OptionsBigBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap OptionsBitmap {
             get {
                 object obj = ResourceManager.GetObject("OptionsBitmap", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon OptionsIcon {
+            get {
+                object obj = ResourceManager.GetObject("OptionsIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         

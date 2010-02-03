@@ -38,9 +38,9 @@ namespace Vha.Chat
         protected ChatTreeNode _channels = new ChatTreeNode(ChatInputType.Channel, "Channels");
         protected ChatTreeNode _privateChannels = new ChatTreeNode(ChatInputType.PrivateChannel, "Private Channels");
 
-        protected ChatInput _input;
-        protected ChatOutput _output;
-        protected ChatHtml _links;
+        protected ChatInput _inputUtil;
+        protected ChatOutput _outputUtil;
+        protected ChatHtml _htmlUtil;
         protected Net.Chat _chat;
 
         protected List<string> _history = new List<string>();
@@ -65,11 +65,11 @@ namespace Vha.Chat
             this._tree.Nodes.Add(this._channels);
             this._tree.Nodes.Add(this._privateChannels);
 
-            this._input = new ChatInput(this, this._chat);
-            this._output = new ChatOutput(this, this._chat);
-            this._links = new ChatHtml(this, this._input, this._chat);
+            this._inputUtil = new ChatInput(this, this._chat);
+            this._htmlUtil = new ChatHtml(this, this._inputUtil, this._chat);
+            this._outputUtil = new ChatOutput(this, this._htmlUtil, this._chat);
 
-            // Disable unsupported buttons
+            // Disable options button
             this._options.Visible = false;
         }
 
@@ -94,7 +94,7 @@ namespace Vha.Chat
                 this._lines.Enqueue(html);
                 return;
             }
-            this._links.AppendHtml(this._outputBox.Document, html, true);
+            this._htmlUtil.AppendHtml(this._outputBox.Document, html, true);
             // Clean up old messages
             while (this._outputBox.Document.Body.Children.Count > Program.MaximumMessages)
             {
@@ -318,7 +318,7 @@ namespace Vha.Chat
                 // Handle the input
                 if (this._inputBox.Text.StartsWith("/"))
                 {
-                    this._input.Command(this._inputBox.Text);
+                    this._inputUtil.Command(this._inputBox.Text);
                     this._inputBox.Text = "";
                     return;
                 }
@@ -328,7 +328,7 @@ namespace Vha.Chat
                     return;
                 }
                 ChatTarget target = (ChatTarget)this._target.SelectedItem;
-                this._input.Send(target.Type, target.Target, this._inputBox.Text);
+                this._inputUtil.Send(target.Type, target.Target, this._inputBox.Text);
                 this._inputBox.Text = "";
             }
         }
@@ -353,7 +353,7 @@ namespace Vha.Chat
 
         private void _outputBox_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            this._outputBox.Document.Write(this._links.Template);
+            this._outputBox.Document.Write(this._htmlUtil.Template);
             this._outputBox.Document.BackColor = this.BackColor;
             if (this._outputBox.Document.Body == null) return;
             string color = this.ForeColor.R.ToString("X") + this.ForeColor.G.ToString("X") + this.ForeColor.B.ToString("X");
@@ -437,7 +437,7 @@ namespace Vha.Chat
 
         private void _about_Click(object sender, EventArgs e)
         {
-            this._input.Command("about");
+            this._inputUtil.Command("about");
         }
 
         private void _connect_Click(object sender, EventArgs e)
@@ -459,7 +459,8 @@ namespace Vha.Chat
 
         private void _options_Click(object sender, EventArgs e)
         {
-            this.AppendLine("Internal", "Coming soon: Options™");
+            Form options = new OptionsForm();
+            options.ShowDialog();
         }
 
         private void _channelMenu_TalkTo_Click(object sender, EventArgs e)
@@ -471,13 +472,13 @@ namespace Vha.Chat
         private void _channelMenu_Mute_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            this._input.Command("mute " + (string)this._channelMenu.Tag);
+            this._inputUtil.Command("mute " + (string)this._channelMenu.Tag);
         }
 
         private void _channelMenu_Unmute_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            this._input.Command("unmute " + (string)this._channelMenu.Tag);
+            this._inputUtil.Command("unmute " + (string)this._channelMenu.Tag);
         }
 
         private void _privateChannelMenu_TalkTo_Click(object sender, EventArgs e)
@@ -489,7 +490,7 @@ namespace Vha.Chat
         private void _privateChannelMenu_Leave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
-            this._input.Command("leave " + (string)this._privateChannelMenu.Tag);
+            this._inputUtil.Command("leave " + (string)this._privateChannelMenu.Tag);
         }
 
         private void _characterMenu_TalkTo_Click(object sender, EventArgs e)
@@ -501,7 +502,7 @@ namespace Vha.Chat
         private void _characterMenu_Remove_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            this._input.Command("rembuddy " + (string)this._characterMenu.Tag);
+            this._inputUtil.Command("rembuddy " + (string)this._characterMenu.Tag);
         }
     }
 }

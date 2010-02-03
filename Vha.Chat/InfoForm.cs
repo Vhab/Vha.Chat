@@ -30,13 +30,13 @@ namespace Vha.Chat
     public partial class InfoForm : Form
     {
         protected string _html = "";
-        protected ChatHtml _links;
+        protected ChatHtml _htmlUtil;
 
         public InfoForm(ChatHtml links, string html)
         {
             InitializeComponent();
             this._html = html;
-            this._links = links;
+            this._htmlUtil = links;
         }
         
         private void _info_Navigating(object sender, WebBrowserNavigatingEventArgs e)
@@ -47,7 +47,7 @@ namespace Vha.Chat
 
         private void _info_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            this._info.Document.Write(this._links.Template);
+            this._info.Document.Write(this._htmlUtil.Template);
             // Set background color
             this._info.Document.BackColor = this.BackColor;
             if (this._info.Document.Body != null)
@@ -58,7 +58,7 @@ namespace Vha.Chat
                     "padding: 6px;";
             }
             // Put in some content
-            this._links.AppendHtml(this._info.Document, this._html);
+            this._htmlUtil.AppendHtml(this._info.Document, this._html);
         }
     }
 }

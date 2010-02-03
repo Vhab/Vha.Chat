@@ -30,11 +30,13 @@ namespace Vha.Chat
     public class ChatOutput
     {
         protected ChatForm _form;
+        protected ChatHtml _htmlUtil;
         protected Net.Chat _chat;
 
-        public ChatOutput(ChatForm form, Net.Chat chat)
+        public ChatOutput(ChatForm form, ChatHtml html, Net.Chat chat)
         {
             this._form = form;
+            this._htmlUtil = html;
             this._chat = chat;
             // Hook events
             this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);

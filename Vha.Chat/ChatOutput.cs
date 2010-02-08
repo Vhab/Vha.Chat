@@ -32,13 +32,16 @@ namespace Vha.Chat
         protected ChatForm _form;
         protected ChatHtml _htmlUtil;
         protected Net.Chat _chat;
+        protected List<string> _ignoredChannels;
 
         public ChatOutput(ChatForm form, ChatHtml html, Net.Chat chat)
         {
             this._form = form;
             this._htmlUtil = html;
             this._chat = chat;
+            this._ignoredChannels = new List<string>();
             // Hook events
+            this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(_chat_ChannelJoinEvent);
             this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);
             this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(_chat_PrivateMessageEvent);
             this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
@@ -47,8 +50,29 @@ namespace Vha.Chat
             this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
         }
 
+        private void _chat_ChannelJoinEvent(Vha.Net.Chat chat, ChannelJoinEventArgs e)
+        {
+            if (e.Muted)
+            {
+                if (!this._ignoredChannels.Contains(e.Name))
+                {
+                    this._ignoredChannels.Add(e.Name);
+                }
+            }
+            else
+            {
+                if (this._ignoredChannels.Contains(e.Name))
+                {
+                    this._ignoredChannels.Remove(e.Name);
+                }
+            }
+        }
+
         private void _chat_ChannelMessageEvent(Vha.Net.Chat chat, ChannelMessageEventArgs e)
         {
+            // Check if channel is muted
+            if (this._ignoredChannels.Contains(e.Channel)) return;
+            // Process message
             string message = e.Message;
             if (e.Message.StartsWith("~"))
             {

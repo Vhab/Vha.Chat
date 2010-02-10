@@ -29,7 +29,7 @@ namespace Vha.Net
     {
         protected String _value;
         protected short _length;
-        protected Encoding _encoding = Encoding.GetEncoding("iso-8859-1");
+        protected Encoding _encoding = Encoding.GetEncoding("utf-8");
 
         public NetString(byte[] data) : this(data, 0) { }
         public NetString(byte[] data, int offset)

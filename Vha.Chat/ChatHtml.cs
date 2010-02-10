@@ -337,7 +337,7 @@ namespace Vha.Chat
                 return;
             }
             InfoForm form = new InfoForm(this, this._texts[text]);
-            form.Show();
+            FormUtils.InvokeShow(this._form, form);
         }
         
         protected void ChatCmdLink(string command)
@@ -355,7 +355,7 @@ namespace Vha.Chat
                 return;
             }
             Form form = new BrowserForm(string.Format(url, parts[0], parts[1], parts[2]));
-            form.Show();
+            FormUtils.InvokeShow(this._form, form);
         }
 
         protected void CharacterLink(string character)

@@ -29,10 +29,47 @@ namespace Vha.Chat
 {
     public partial class BrowserForm : Form
     {
+        private static int _defaultWidth = -1;
+        private static int _defaultHeight = -1;
+        private static int _defaultLeft = -1;
+        private static int _defaultTop = -1;
+
         public BrowserForm(string url)
         {
             InitializeComponent();
+            // Check for default position
+            if (_defaultLeft != -1 && _defaultTop != -1)
+            {
+                this.Location = new Point(_defaultLeft, _defaultTop);
+                this.StartPosition = FormStartPosition.Manual;
+            }
+            // Check for default size
+            if (_defaultWidth != -1 && _defaultHeight != -1)
+            {
+                this.Size = new Size(_defaultWidth, _defaultHeight);
+            }
+            // Navigate
             this._browser.Navigate(url);
+        }
+
+        private void BrowserForm_Move(object sender, EventArgs e)
+        {
+            _defaultLeft = this.Location.X + 15;
+            _defaultTop = this.Location.Y + 15;
+        }
+
+        private void BrowserForm_Resize(object sender, EventArgs e)
+        {
+            _defaultWidth = this.Size.Width;
+            _defaultHeight = this.Size.Height;
+        }
+
+        private void BrowserForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _defaultWidth = this.Size.Width;
+            _defaultHeight = this.Size.Height;
+            _defaultLeft = this.Location.X;
+            _defaultTop = this.Location.Y;
         }
     }
 }

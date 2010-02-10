@@ -29,6 +29,11 @@ namespace Vha.Chat
 {
     public partial class InfoForm : Form
     {
+        private static int _defaultWidth = -1;
+        private static int _defaultHeight = -1;
+        private static int _defaultLeft = -1;
+        private static int _defaultTop = -1;
+
         protected string _html = "";
         protected ChatHtml _htmlUtil;
 
@@ -37,6 +42,17 @@ namespace Vha.Chat
             InitializeComponent();
             this._html = html;
             this._htmlUtil = links;
+            // Check for default position
+            if (_defaultLeft != -1 && _defaultTop != -1)
+            {
+                this.Location = new Point(_defaultLeft, _defaultTop);
+                this.StartPosition = FormStartPosition.Manual;
+            }
+            // Check for default size
+            if (_defaultWidth != -1 && _defaultHeight != -1)
+            {
+                this.Size = new Size(_defaultWidth, _defaultHeight);
+            }
         }
         
         private void _info_Navigating(object sender, WebBrowserNavigatingEventArgs e)
@@ -59,6 +75,26 @@ namespace Vha.Chat
             }
             // Put in some content
             this._htmlUtil.AppendHtml(this._info.Document, this._html);
+        }
+
+        private void InfoForm_Move(object sender, EventArgs e)
+        {
+            _defaultLeft = this.Location.X + 15;
+            _defaultTop = this.Location.Y + 15;
+        }
+
+        private void InfoForm_Resize(object sender, EventArgs e)
+        {
+            _defaultWidth = this.Size.Width;
+            _defaultHeight = this.Size.Height;
+        }
+
+        private void InfoForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _defaultWidth = this.Size.Width;
+            _defaultHeight = this.Size.Height;
+            _defaultLeft = this.Location.X;
+            _defaultTop = this.Location.Y;
         }
     }
 }

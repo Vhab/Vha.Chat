@@ -27,6 +27,7 @@ namespace Vha.Chat
     public static class FormUtils
     {
         public delegate void FormDelegate(Form form);
+
         public static void InvokeHide(Form form)
         {
             if (form.InvokeRequired)
@@ -55,6 +56,51 @@ namespace Vha.Chat
                 return;
             }
             form.Close();
+        }
+
+        public delegate void InvokeShowDelegate(Form parent, Form form);
+        public static void InvokeShow(Form parent, Form form)
+        {
+            if (form.InvokeRequired)
+            {
+                form.Invoke(new InvokeShowDelegate(InvokeShow), new Object[] { parent, form });
+                return;
+            }
+            // Show form (to initial default values)
+            form.Show(parent);
+            int offsetX = -(form.Size.Width / 2);
+            int offsetY = -(form.Size.Height / 2);
+            // Move window if needed
+            if (form.StartPosition == FormStartPosition.CenterParent)
+            {
+                int centerX = parent.Location.X + (parent.Size.Width / 2);
+                int centerY = parent.Location.Y + (parent.Size.Height / 2);
+                form.Location = new System.Drawing.Point(
+                    centerX + offsetX,
+                    centerY + offsetY);
+            }
+            if (form.StartPosition == FormStartPosition.CenterScreen)
+            {
+                Screen parentScreen = Screen.FromControl(parent);
+                int centerX = parentScreen.WorkingArea.Left + (parentScreen.WorkingArea.Size.Width / 2);
+                int centerY = parentScreen.WorkingArea.Top + (parentScreen.WorkingArea.Size.Height / 2);
+                form.Location = new System.Drawing.Point(
+                    centerX + offsetX,
+                    centerY + offsetY);
+            }
+            else if (form.StartPosition == FormStartPosition.WindowsDefaultLocation)
+            {
+                // Check if this form has been spawned on the wrong screen
+                Screen parentScreen = Screen.FromControl(parent);
+                Screen formScreen = Screen.FromControl(form);
+                if (!parentScreen.Equals(formScreen))
+                {
+                    // Move the form to the right screen
+                    form.Location = new System.Drawing.Point(
+                        (form.Location.X - formScreen.WorkingArea.Left) + parentScreen.WorkingArea.Left,
+                        (form.Location.Y - formScreen.WorkingArea.Top) + parentScreen.WorkingArea.Top);
+                }
+            }
         }
     }
 }

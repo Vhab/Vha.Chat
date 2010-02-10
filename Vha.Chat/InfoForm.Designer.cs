@@ -60,6 +60,9 @@ namespace Vha.Chat
             this.Name = "InfoForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat :: Info";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.InfoForm_FormClosed);
+            this.Move += new System.EventHandler(this.InfoForm_Move);
+            this.Resize += new System.EventHandler(this.InfoForm_Resize);
             this.ResumeLayout(false);
 
         }

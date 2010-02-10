@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace Vha.Chat
 {
@@ -75,18 +76,20 @@ namespace Vha.Chat
             {
                 int centerX = parent.Location.X + (parent.Size.Width / 2);
                 int centerY = parent.Location.Y + (parent.Size.Height / 2);
-                form.Location = new System.Drawing.Point(
+                Point target = new Point(
                     centerX + offsetX,
                     centerY + offsetY);
+                Move(form, Screen.FromControl(parent), target);
             }
             if (form.StartPosition == FormStartPosition.CenterScreen)
             {
-                Screen parentScreen = Screen.FromControl(parent);
-                int centerX = parentScreen.WorkingArea.Left + (parentScreen.WorkingArea.Size.Width / 2);
-                int centerY = parentScreen.WorkingArea.Top + (parentScreen.WorkingArea.Size.Height / 2);
-                form.Location = new System.Drawing.Point(
+                Screen targetScreen = Screen.FromControl(parent);
+                int centerX = targetScreen.WorkingArea.Left + (targetScreen.WorkingArea.Size.Width / 2);
+                int centerY = targetScreen.WorkingArea.Top + (targetScreen.WorkingArea.Size.Height / 2);
+                Point target = new Point(
                     centerX + offsetX,
                     centerY + offsetY);
+                Move(form, targetScreen, target);
             }
             else if (form.StartPosition == FormStartPosition.WindowsDefaultLocation)
             {
@@ -96,11 +99,23 @@ namespace Vha.Chat
                 if (!parentScreen.Equals(formScreen))
                 {
                     // Move the form to the right screen
-                    form.Location = new System.Drawing.Point(
+                    form.Location = new Point(
                         (form.Location.X - formScreen.WorkingArea.Left) + parentScreen.WorkingArea.Left,
                         (form.Location.Y - formScreen.WorkingArea.Top) + parentScreen.WorkingArea.Top);
                 }
             }
+        }
+
+        static public void Move(Form form, Screen screen, Point location)
+        {
+            if (screen != null)
+            {
+                location = new Point(
+                    screen.WorkingArea.Left > location.X ? screen.WorkingArea.Left : location.X,
+                    screen.WorkingArea.Top > location.Y ? screen.WorkingArea.Top : location.Y
+                    );
+            }
+            form.Location = location;
         }
     }
 }

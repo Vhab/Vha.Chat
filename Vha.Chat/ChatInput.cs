@@ -181,6 +181,9 @@ namespace Vha.Chat
                 case "unmute":
                     UnmuteCommand(args);
                     break;
+                case "whois":
+                    WhoisCommand(args);
+                    break;
                 default:
                     this._form.AppendLine("Error", "Unknown command: /" + command);
                     break;
@@ -329,6 +332,17 @@ namespace Vha.Chat
             string channel = string.Join(" ", args, 1, args.Length - 1);
             if (!this._checkChannel(channel)) return;
             this._chat.SendChannelMute(channel, false);
+        }
+
+        protected void WhoisCommand(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage: /whois [username]");
+                return;
+            }
+            if (!_checkUser(args[1])) return;
+            this.Command("/tell helpbot whois " + args[1]);
         }
     }
 }

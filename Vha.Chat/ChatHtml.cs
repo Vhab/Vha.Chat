@@ -28,28 +28,9 @@ namespace Vha.Chat
 {
     public class ChatHtml
     {
-        private string _template = null;
         public string Template
         {
-            get
-            {
-                if (_template == null)
-                {
-                    try
-                    {
-                        FileStream stream = File.Open("Chat.html", FileMode.Open, FileAccess.Read, FileShare.Read);
-                        StreamReader reader = new StreamReader(stream);
-                        this._template = reader.ReadToEnd();
-                        reader.Close();
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Unable to load Chat.html", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return "";
-                    }
-                }
-                return this._template;
-            }
+            get { return Properties.Resources.Chat; }
         }
 
         protected ChatForm _form;

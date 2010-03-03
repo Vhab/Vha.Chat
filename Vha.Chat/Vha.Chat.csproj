@@ -151,9 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
-    <Content Include="Chat.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="Resources\Chat.html" />
     <None Include="Resources\EnterBitmap.png" />
     <None Include="Resources\LeaveBitmap.png" />
     <None Include="Resources\TalkBitmap.png" />

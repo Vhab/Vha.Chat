@@ -25,41 +25,37 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// An element that implies an action related to its child elements
+    /// An element that describes an action related to its child elements
     /// </summary>
-    public class CommandLink : Link
+    public class LinkElement : Element
     {
         /// <summary>
-        /// Returns the command which should be executed
+        /// Returns the action this element describes
         /// </summary>
-        public readonly string Command;
+        public readonly Link Link;
 
         /// <summary>
-        /// Initializes a new instance of CommandLink
+        /// Initializes a new instance of LinkElement
         /// </summary>
-        public CommandLink()
-            : base(LinkType.Command)
+        /// <param name="link">The action (link) related to this element</param>
+        public LinkElement(Link link)
+            : base(ElementType.Link, true)
         {
-            this.Command = "";
+            if (link == null)
+                throw new ArgumentNullException();
+            this.Link = link;
         }
 
         /// <summary>
-        /// Initializes a new instance of CommandLink
+        /// Creates a clone of this LinkElement and its children
         /// </summary>
-        /// <param name="command">The command to be contained within this link</param>
-        public CommandLink(string command)
-            : base(LinkType.Command)
+        /// <returns>A new LinkElement</returns>
+        public override Element Clone()
         {
-            this.Command = command;
-        }
-
-        /// <summary>
-        /// Creates a clone of this CommandLink
-        /// </summary>
-        /// <returns>A new CommandLink</returns>
-        public override Link Clone()
-        {
-            return new CommandLink(this.Command);
+            Element clone = new LinkElement(this.Link);
+            foreach (Element child in this.Children)
+                clone.Children.Add(child.Clone());
+            return clone;
         }
     }
 }

@@ -33,15 +33,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DOM\AlignElement.cs" />
+    <Compile Include="DOM\BreakElement.cs" />
+    <Compile Include="DOM\Color.cs" />
     <Compile Include="DOM\ColorElement.cs" />
     <Compile Include="DOM\CommandLink.cs" />
+    <Compile Include="DOM\ContainerElement.cs" />
     <Compile Include="DOM\Element.cs" />
     <Compile Include="DOM\ElementCollection.cs" />
+    <Compile Include="DOM\ImageElement.cs" />
     <Compile Include="DOM\Link.cs" />
+    <Compile Include="DOM\LinkElement.cs" />
     <Compile Include="DOM\TextElement.cs" />
+    <Compile Include="DOM\UnderlineElement.cs" />
     <Compile Include="Parser.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TextColors.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

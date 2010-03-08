@@ -25,6 +25,9 @@ using System.Text;
 
 namespace Vha.AOML.DOM
 {
+    /// <summary>
+    /// A collection of elements
+    /// </summary>
     public class ElementCollection : IEnumerable<Element>
     {
         /// <summary>

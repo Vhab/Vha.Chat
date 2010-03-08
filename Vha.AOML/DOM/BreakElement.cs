@@ -1,6 +1,6 @@
 /*
-* Vha.Common
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Vha.AOML
+* Copyright (C) 2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -22,13 +22,25 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vha.Common
+namespace Vha.AOML.DOM
 {
-    public class Character
+    public class BreakElement : Element
     {
-        public UInt32 ID = 0;
-        public string Name = string.Empty;
-        public bool Online = false;
-        public bool Temporary = false;
+        /// <summary>
+        /// Initializes a new instance of BreakElement
+        /// </summary>
+        public BreakElement()
+            : base(ElementType.Break, false)
+        {
+        }
+
+        /// <summary>
+        /// Creates a clone of this BreakElement
+        /// </summary>
+        /// <returns>A new BreakElement</returns>
+        public override Element Clone()
+        {
+            return new BreakElement();
+        }
     }
 }

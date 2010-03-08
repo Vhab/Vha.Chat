@@ -25,7 +25,8 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// An element that describes an underlined style for its child elements
+    /// An element that describes an underlined style for its child elements.
+    /// Commonly known as U.
     /// </summary>
     public class UnderlineElement : Element
     {

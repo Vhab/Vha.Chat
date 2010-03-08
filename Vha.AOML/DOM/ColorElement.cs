@@ -25,7 +25,8 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// An element that describes the color of its child elements
+    /// An element that describes the color of its child elements.
+    /// Commonly known as FONT.
     /// </summary>
     public class ColorElement : Element
     {

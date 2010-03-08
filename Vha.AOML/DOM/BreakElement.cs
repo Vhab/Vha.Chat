@@ -24,6 +24,10 @@ using System.Text;
 
 namespace Vha.AOML.DOM
 {
+    /// <summary>
+    /// An element that describes a line break between its siblings.
+    /// Commonly known as BR.
+    /// </summary>
     public class BreakElement : Element
     {
         /// <summary>

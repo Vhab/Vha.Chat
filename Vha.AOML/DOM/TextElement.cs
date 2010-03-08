@@ -24,6 +24,9 @@ using System.Text;
 
 namespace Vha.AOML.DOM
 {
+    /// <summary>
+    /// An element that represents a piece of text within the DOM tree
+    /// </summary>
     public class TextElement : Element
     {
         /// <summary>

@@ -25,34 +25,43 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// An element that describes the color of its child elements
+    /// Identifies the alignment of an AlignElement
     /// </summary>
-    public class ColorElement : Element
+    public enum Alignment
+    {
+        Left,
+        Right,
+        Center
+    }
+
+    /// <summary>
+    /// An element that describes the alignment of its child elements.
+    /// Additionally, this element describes all elements within are contained on their own line (or lines).
+    /// </summary>
+    public class AlignElement : Element
     {
         /// <summary>
-        /// Returns the color of this (and child) elements in HTML color format
+        /// Returns the alignment of this element's children
         /// </summary>
-        public readonly Color Color;
+        public readonly Alignment Alignment;
 
         /// <summary>
-        /// Initializes a new instance of ColorElement
+        /// Initializes a new instance of AlignElement
         /// </summary>
-        /// <param name="color">The color of this element</param>
-        public ColorElement(Color color)
-            : base(ElementType.Color, true)
+        /// <param name="alignment">The alignment of this element</param>
+        public AlignElement(Alignment alignment)
+            : base(ElementType.Align, true)
         {
-            if (color == null)
-                throw new ArgumentNullException();
-            this.Color = color;
+            this.Alignment = alignment;
         }
 
         /// <summary>
-        /// Creates a clone of this ColorElement and its children
+        /// Creates a clone of this AlignElement and its children
         /// </summary>
-        /// <returns>A new ColorElement</returns>
+        /// <returns>A new AlignElement</returns>
         public override Element Clone()
         {
-            Element clone = new ColorElement(this.Color);
+            Element clone = new AlignElement(this.Alignment);
             foreach (Element child in this.Children)
                 clone.Children.Add(child.Clone());
             return clone;

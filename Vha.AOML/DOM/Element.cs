@@ -24,16 +24,24 @@ using System.Text;
 
 namespace Vha.AOML.DOM
 {
+    /// <summary>
+    /// Identifies the type of an Element
+    /// </summary>
     public enum ElementType
     {
+        Container,
         Text,
         Color,
         Align,
+        Underline,
         Link,
         Image,
         Break
     }
 
+    /// <summary>
+    /// Base class for all elements
+    /// </summary>
     public abstract class Element
     {
         /// <summary>
@@ -54,9 +62,38 @@ namespace Vha.AOML.DOM
         public Element Parent { get { return this._parent; } }
 
         /// <summary>
-        /// Returns true if this element supports children.
+        /// Returns true if this element supports children
         /// </summary>
         public bool SupportsChildren { get { return this._supportsChildren; } }
+
+        /// <summary>
+        /// Recursively checks if the given element is a parent of this element
+        /// </summary>
+        /// <param name="element">The element to check against</param>
+        /// <returns>True if the given element is a parent of this element</returns>
+        public bool IsParent(Element element)
+        {
+            if (this.Parent == null) return false;
+            if (element == this.Parent) return true;
+            return this.Parent.IsParent(element);
+        }
+
+        /// <summary>
+        /// Recursively checks if the given element is a child of this element
+        /// </summary>
+        /// <param name="element">The element to check against</param>
+        /// <returns>True if the given element is a child of this element</returns>
+        public bool IsChild(Element element)
+        {
+            if (this.SupportsChildren == false) return false;
+            if (this.Children.Contains(element)) return true;
+            foreach (Element child in this.Children)
+            {
+                if (child.IsChild(element))
+                    return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Returns a clone of the current element, including all its children.
@@ -98,6 +135,8 @@ namespace Vha.AOML.DOM
                 this._parent = parent;
                 throw new InvalidOperationException("Not expecting to be attached. This element already is attached to the parent");
             }
+            if (this.IsChild(parent))
+                throw new InvalidOperationException("Not expecting to be attached. Can not attach this element to one of its children");
             this._parent = parent;
         }
 

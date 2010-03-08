@@ -25,41 +25,28 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// An element that implies an action related to its child elements
+    /// An element that describes an underlined style for its child elements
     /// </summary>
-    public class CommandLink : Link
+    public class UnderlineElement : Element
     {
         /// <summary>
-        /// Returns the command which should be executed
+        /// Initializes a new instance of UnderlineElement
         /// </summary>
-        public readonly string Command;
-
-        /// <summary>
-        /// Initializes a new instance of CommandLink
-        /// </summary>
-        public CommandLink()
-            : base(LinkType.Command)
+        public UnderlineElement()
+            : base(ElementType.Underline, true)
         {
-            this.Command = "";
         }
 
         /// <summary>
-        /// Initializes a new instance of CommandLink
+        /// Creates a clone of this UnderlineElement and its children
         /// </summary>
-        /// <param name="command">The command to be contained within this link</param>
-        public CommandLink(string command)
-            : base(LinkType.Command)
+        /// <returns>A new UnderlineElement</returns>
+        public override Element Clone()
         {
-            this.Command = command;
-        }
-
-        /// <summary>
-        /// Creates a clone of this CommandLink
-        /// </summary>
-        /// <returns>A new CommandLink</returns>
-        public override Link Clone()
-        {
-            return new CommandLink(this.Command);
+            Element clone = new UnderlineElement();
+            foreach (Element child in this.Children)
+                clone.Children.Add(child.Clone());
+            return clone;
         }
     }
 }

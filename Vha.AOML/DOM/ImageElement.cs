@@ -25,41 +25,48 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// An element that implies an action related to its child elements
+    /// Identifies the type of an image of an ImageElement
     /// </summary>
-    public class CommandLink : Link
+    public enum ImageType
+    {
+        TDB, // Gui images
+        RDB // Icons
+    }
+
+    /// <summary>
+    /// An element that describes an image
+    /// </summary>
+    public class ImageElement : Element
     {
         /// <summary>
-        /// Returns the command which should be executed
+        /// Returns the type of the image
         /// </summary>
-        public readonly string Command;
+        public readonly ImageType ImageType;
+        
+        /// <summary>
+        /// Returns the string identifying the image
+        /// </summary>
+        public readonly string Image;
 
         /// <summary>
-        /// Initializes a new instance of CommandLink
+        /// Initializes a new instance of ImageElement
         /// </summary>
-        public CommandLink()
-            : base(LinkType.Command)
+        /// <param name="type">The type of this element's image</param>
+        /// <param name="image">The string identifying this element's image</param>
+        public ImageElement(ImageType type, string image)
+            : base(ElementType.Image, false)
         {
-            this.Command = "";
+            this.ImageType = type;
+            this.Image = image;
         }
 
         /// <summary>
-        /// Initializes a new instance of CommandLink
+        /// Creates a clone of this ImageElement
         /// </summary>
-        /// <param name="command">The command to be contained within this link</param>
-        public CommandLink(string command)
-            : base(LinkType.Command)
+        /// <returns>A new ImageElement</returns>
+        public override Element Clone()
         {
-            this.Command = command;
-        }
-
-        /// <summary>
-        /// Creates a clone of this CommandLink
-        /// </summary>
-        /// <returns>A new CommandLink</returns>
-        public override Link Clone()
-        {
-            return new CommandLink(this.Command);
+            return new ImageElement(this.ImageType, this.Image);
         }
     }
 }

@@ -33,6 +33,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloseNode.cs" />
+    <Compile Include="ContentNode.cs" />
     <Compile Include="DOM\AlignElement.cs" />
     <Compile Include="DOM\BreakElement.cs" />
     <Compile Include="DOM\Color.cs" />
@@ -48,12 +50,15 @@
     <Compile Include="DOM\LinkElement.cs" />
     <Compile Include="DOM\TextElement.cs" />
     <Compile Include="DOM\UnderlineElement.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="OpenNode.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

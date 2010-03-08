@@ -25,7 +25,8 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// An element that describes an action related to its child elements
+    /// An element that describes an action related to its child elements.
+    /// Commonly known as A.
     /// </summary>
     public class LinkElement : Element
     {
@@ -33,6 +34,11 @@ namespace Vha.AOML.DOM
         /// Returns the action this element describes
         /// </summary>
         public readonly Link Link;
+
+        /// <summary>
+        /// Returns whether this link has to be stylized as a link
+        /// </summary>
+        public readonly bool Stylized;
 
         /// <summary>
         /// Initializes a new instance of LinkElement
@@ -47,12 +53,26 @@ namespace Vha.AOML.DOM
         }
 
         /// <summary>
+        /// Initializes a new instance of LinkElement
+        /// </summary>
+        /// <param name="link">The action (link) related to this element</param>
+        /// <param name="stylized">Whether this link has to be stylized</param>
+        public LinkElement(Link link, bool stylized)
+            : base(ElementType.Link, true)
+        {
+            if (link == null)
+                throw new ArgumentNullException();
+            this.Link = link;
+            this.Stylized = stylized;
+        }
+
+        /// <summary>
         /// Creates a clone of this LinkElement and its children
         /// </summary>
         /// <returns>A new LinkElement</returns>
         public override Element Clone()
         {
-            Element clone = new LinkElement(this.Link);
+            Element clone = new LinkElement(this.Link, this.Stylized);
             foreach (Element child in this.Children)
                 clone.Children.Add(child.Clone());
             return clone;

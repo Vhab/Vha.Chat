@@ -41,7 +41,9 @@
     <Compile Include="DOM\ContainerElement.cs" />
     <Compile Include="DOM\Element.cs" />
     <Compile Include="DOM\ElementCollection.cs" />
+    <Compile Include="DOM\ElementLink.cs" />
     <Compile Include="DOM\ImageElement.cs" />
+    <Compile Include="DOM\ItemLink.cs" />
     <Compile Include="DOM\Link.cs" />
     <Compile Include="DOM\LinkElement.cs" />
     <Compile Include="DOM\TextElement.cs" />

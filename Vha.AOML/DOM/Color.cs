@@ -26,6 +26,9 @@ using System.IO;
 
 namespace Vha.AOML.DOM
 {
+    /// <summary>
+    /// A container for 3-component 24-bit colors
+    /// </summary>
     public class Color
     {
         /// <summary>

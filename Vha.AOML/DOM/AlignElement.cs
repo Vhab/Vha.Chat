@@ -37,6 +37,7 @@ namespace Vha.AOML.DOM
     /// <summary>
     /// An element that describes the alignment of its child elements.
     /// Additionally, this element describes all elements within are contained on their own line (or lines).
+    /// Commonly known as DIV.
     /// </summary>
     public class AlignElement : Element
     {

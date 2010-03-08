@@ -34,7 +34,8 @@ namespace Vha.AOML.DOM
     }
 
     /// <summary>
-    /// An element that describes an image
+    /// An element that describes an image.
+    /// Commonly known as IMG.
     /// </summary>
     public class ImageElement : Element
     {

@@ -25,33 +25,47 @@ using System.Text;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// A link to a command to be executed.
-    /// Commonly known as chatcmd://
+    /// A link to an Anarchy Online item.
+    /// Commonly known as itemref://
     /// </summary>
-    public class CommandLink : Link
+    public class ItemLink : Link
     {
         /// <summary>
-        /// Returns the command which should be executed
+        /// Returns the low id of the item which should be shown
         /// </summary>
-        public readonly string Command;
+        public readonly UInt32 LowID;
 
         /// <summary>
-        /// Initializes a new instance of CommandLink
+        /// Returns the high id of the item which should be shown
         /// </summary>
-        /// <param name="command">The command to be contained within this link</param>
-        public CommandLink(string command)
-            : base(LinkType.Command)
+        public readonly UInt32 HighID;
+
+        /// <summary>
+        /// Returns the quality of the item which should be shown
+        /// </summary>
+        public readonly UInt32 Quality;
+
+        /// <summary>
+        /// Initializes a new instance of ItemLink
+        /// </summary>
+        /// <param name="command">The low id of the item</param>
+        /// <param name="command">The high id of the item</param>
+        /// <param name="command">The quality of the item</param>
+        public ItemLink(UInt32 lowID, UInt32 highID, UInt32 quality)
+            : base(LinkType.Item)
         {
-            this.Command = command;
+            this.LowID = lowID;
+            this.HighID = highID;
+            this.Quality = quality;
         }
 
         /// <summary>
-        /// Creates a clone of this CommandLink
+        /// Creates a clone of this ItemLink
         /// </summary>
-        /// <returns>A new CommandLink</returns>
+        /// <returns>A new ItemLink</returns>
         public override Link Clone()
         {
-            return new CommandLink(this.Command);
+            return new ItemLink(this.LowID, this.HighID, this.Quality);
         }
     }
 }

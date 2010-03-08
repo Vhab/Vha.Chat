@@ -30,7 +30,7 @@ namespace Vha.AOML.DOM
     public enum LinkType
     {
         Command,
-        Window,
+        Element,
         Item
     }
 

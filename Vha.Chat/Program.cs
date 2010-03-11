@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Vha.Chat
 {
@@ -67,17 +68,33 @@ namespace Vha.Chat
 
         private static void UnhandledException(Exception ex)
         {
-            DisplayException(ex);
-            MessageBox.Show("An exception has occurred. This application will now close.\n\nException:" + ex.Message,
+            LogException(ex, 0);
+            MessageBox.Show("An exception has occurred. This application will now close.\n" +
+                "The full error message has been written to error.log.\n" +
+                "Please assist us in fixing this bug and report this error at http://forums.vhabot.net/.",
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(1);
         }
 
-        private static void DisplayException(Exception ex)
+        private static void LogException(Exception ex, int depth)
         {
-            Console.WriteLine("Exception: " + ex.ToString());
+            try
+            {
+                FileStream stream = File.Open("error.log", FileMode.Append, FileAccess.Write);
+                StreamWriter writer = new StreamWriter(stream);
+                if (depth == 0)
+                {
+                    writer.WriteLine("-------------------------------------------------------------------------");
+                    writer.WriteLine(DateTime.Now.ToLongDateString() + ", " + DateTime.Now.ToLongTimeString());
+                    writer.WriteLine("-------------------------------------------------------------------------");
+                }
+                writer.WriteLine(ex.ToString());
+                writer.WriteLine();
+                writer.Close();
+            }
+            catch {}
             if (ex.InnerException != null)
-                DisplayException(ex.InnerException);
+                LogException(ex.InnerException, depth + 1);
         }
 #endif
     }

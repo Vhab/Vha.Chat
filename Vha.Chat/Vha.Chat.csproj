@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4A2AA0D2-EC00-4EAE-B212-625966041F16}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -67,6 +67,7 @@
     <Compile Include="ChatHtml.cs" />
     <Compile Include="ChatOutput.cs" />
     <Compile Include="ChatTreeNode.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="FormUtils.cs" />
     <Compile Include="InfoForm.cs">
       <SubType>Form</SubType>
@@ -153,6 +154,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
+    <None Include="Config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\Chat.html" />
     <None Include="Resources\EnterBitmap.png" />
     <None Include="Resources\LeaveBitmap.png" />

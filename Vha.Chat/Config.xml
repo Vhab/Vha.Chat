@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Config>
+  <MaximumMessages>250</MaximumMessages>
+  <MaximumTexts>50</MaximumTexts>
+  <MaximumHistory>25</MaximumHistory>
+  <!-- Valid styles are: Default, Invert, Strip -->
+  <TextStyle>Strip</TextStyle>
+</Config>

@@ -26,6 +26,13 @@ using System.Text.RegularExpressions;
 
 namespace Vha.Chat
 {
+    public enum ChatHtmlStyle
+    {
+        Default,
+        Invert,
+        Strip
+    }
+
     public class ChatHtml
     {
         public string Template
@@ -35,18 +42,51 @@ namespace Vha.Chat
 
         protected ChatForm _form;
         protected ChatInput _input;
-        protected Net.Chat _chat;
         protected Dictionary<string, string> _texts;
         protected int _textsIndex = 0;
-        protected Regex _textsRegex;
-        protected Regex _charrefRegex;
+        protected Regex _textsRegex = null;
+        protected Regex _charrefRegex = null;
+        protected Regex _colorRegex = null;
+        protected Regex _fontRegex = null;
 
-        public ChatHtml(ChatForm form, ChatInput input, Net.Chat chat)
+        public ChatHtml(ChatForm form, ChatInput input)
         {
             this._form = form;
-            this._chat = chat;
             this._input = input;
             this._texts = new Dictionary<string, string>();
+        }
+
+        public string InvertColors(string html)
+        {
+            if (this._colorRegex == null)
+                this._colorRegex = new Regex("color=(['\"]?)#([0-9a-fA-F]{6})\\1");
+            MatchCollection matches = this._colorRegex.Matches(html);
+            foreach (Match match in matches)
+            {
+                string seperator = match.Groups[1].Value;
+                string color = match.Groups[2].Value;
+                int r = int.Parse(color.Substring(0, 2), System.Globalization.NumberStyles.AllowHexSpecifier);
+                int g = int.Parse(color.Substring(2, 2), System.Globalization.NumberStyles.AllowHexSpecifier);
+                int b = int.Parse(color.Substring(4, 2), System.Globalization.NumberStyles.AllowHexSpecifier);
+                string inverse = string.Format("{0:X2}{1:X2}{2:X2}", 255 - r, 255 - g, 255 - b);
+                string replacement = string.Format("color={0}#{1}{0}", seperator, inverse);
+                html = html.Substring(0, match.Index) + replacement + html.Substring(match.Index + replacement.Length);
+            }
+            return html;
+        }
+
+        public string StripColors(string html)
+        {
+            if (this._fontRegex == null)
+                this._fontRegex = new Regex("[<][/]?font[^><]*[>]");
+            MatchCollection matches = this._fontRegex.Matches(html);
+            int offset = 0;
+            foreach (Match match in matches)
+            {
+                html = html.Substring(0, match.Index - offset) + html.Substring(match.Index + match.Length - offset);
+                offset += match.Length;
+            }
+            return html;
         }
 
         public void SecureHtml(HtmlDocument document, HtmlElement element)
@@ -152,8 +192,8 @@ namespace Vha.Chat
             }
         }
 
-        public void AppendHtml(HtmlDocument document, string html) { AppendHtml(document, html, false); }
-        public void AppendHtml(HtmlDocument document, string html, bool oneElement)
+        public void AppendHtml(HtmlDocument document, ChatHtmlStyle style, string html) { AppendHtml(document, style, html, false); }
+        public void AppendHtml(HtmlDocument document, ChatHtmlStyle style, string html, bool oneElement)
         {
             if (document.Body == null)
                 return;
@@ -171,55 +211,31 @@ namespace Vha.Chat
             {
                 // Store text
                 this._textsIndex++;
-                if (this._textsIndex > Program.MaximumTexts) this._textsIndex = 0; // Keep only 50 texts
+                if (this._textsIndex > Program.Configuration.MaximumTexts) this._textsIndex = 0;
                 this._texts[this._textsIndex.ToString()] = match.Groups[2].Value;
                 // Replace link
                 string seperator = match.Groups[1].Value;
                 string replacement = string.Format("href={0}text://{1}{0}", seperator, this._textsIndex);
                 html = html.Replace(match.Groups[0].Value, replacement);
             }
+            // Invert or strip colors if needed
+            if (style == ChatHtmlStyle.Invert)
+                html = InvertColors(html);
+            else if (style == ChatHtmlStyle.Strip)
+                html = StripColors(html);
             // Some hardcore cheating
             HtmlElement tag = document.CreateElement("div");
             // - Without the pre tags, double whitespaces will be stripped
             tag.InnerHtml = "<pre>" + html + "</pre>";
             // - FirstChild is our <pre> tag, we replace double whitespaces here to make them visible
             tag.FirstChild.InnerHtml = tag.FirstChild.InnerHtml.Replace("  ", "&nbsp; ");
-            // - Final round of html fixing
+            // - Final round of html fixing (and font stripping if needed)
             SecureHtml(document, tag.FirstChild);
             // - OneElement assumes the given html contains only a single element and ensures on a single element is added
             if (oneElement) html = tag.FirstChild.FirstChild.OuterHtml;
             else html = tag.FirstChild.InnerHtml;
             // Fill content
             document.Body.InnerHtml += html;
-            // Process all links
-            /*HtmlElement[] links = GetElements(document.Body, "a");
-            foreach (HtmlElement link in links)
-            {
-                // Hook click event
-                //link.Click += new HtmlElementEventHandler(Clicked);
-                link.SetAttribute("title", link.GetAttribute("href"));
-                // Handle FC's 'no decoration' style
-                if (link.Style == null || link.Style == "") continue;
-                if (link.Style.ToLower().Replace(" ", "").Contains("text-decoration:none"))
-                {
-                    HtmlElement parent = link.Parent;
-                    string col = "";
-                    while (parent != null)
-                    {
-                        if (parent.TagName.ToLower() == "font")
-                        {
-                            col = parent.GetAttribute("color");
-                            if (col != "") break;
-                        }
-                        parent = parent.Parent;
-                    }
-                    if (col != "")
-                    {
-                        link.Style = "color: " + col + ";";
-                        link.SetAttribute("className", "NoStyle");
-                    }
-                }
-            }*/
             // Click handler
             document.Click -= new HtmlElementEventHandler(Clicked);
             document.Click += new HtmlElementEventHandler(Clicked);

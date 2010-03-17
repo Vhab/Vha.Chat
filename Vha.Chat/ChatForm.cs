@@ -279,19 +279,24 @@ namespace Vha.Chat
                 this._disconnect.Enabled = false;
             }
             // Only really care about being connected for the rest of the code
-            if (e.State != ChatState.Connected) return;
-            // - Add ourselves to private channel
-            this._privateChannels.Nodes.Clear();
-            this._privateChannels.AddNode(this._chat.Character, "Character");
-            this._privateChannels.Expand();
-            // - Clear other tree sections
-            this._channels.Nodes.Clear();
-            this._online.Nodes.Clear();
-            this._offline.Nodes.Clear();
-            this._guests.Nodes.Clear();
-            // Update buttons
-            this._connect.Enabled = false;
-            this._disconnect.Enabled = true;
+            else if (e.State == ChatState.Reconnecting)
+            {
+                // - Clear tree sections
+                this._channels.Nodes.Clear();
+                this._online.Nodes.Clear();
+                this._offline.Nodes.Clear();
+                this._guests.Nodes.Clear();
+                this._privateChannels.Nodes.Clear();
+            }
+            else if (e.State == ChatState.Connected)
+            {
+                // - Add ourselves to private channel
+                this._privateChannels.AddNode(this._chat.Character, "Character");
+                this._privateChannels.Expand();
+                // Update buttons
+                this._connect.Enabled = false;
+                this._disconnect.Enabled = true;
+            }
         }
 
         private void _inputBox_KeyDown(object sender, KeyEventArgs e)

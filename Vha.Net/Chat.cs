@@ -443,7 +443,9 @@ namespace Vha.Net
                     this._threads.Add(Thread.CurrentThread);
             }
             // Handle packet
+#if !DEBUG
             try
+#endif
             {
                 Packet packet = null;
                 // figure out the packet type and raise an event.
@@ -665,19 +667,20 @@ namespace Vha.Net
                         break;
                 }
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 this.Debug("Unexpected exception: " + ex.ToString(), "Error");
                 if (this.ExceptionEvent != null)
                     this.ExceptionEvent(this, ex);
             }
+#endif
             if (local == false)
             {
                 lock (this._threads)
                     this._threads.Remove(Thread.CurrentThread);
             }
         }
-
         #region Events
         protected virtual void OnUnknownPacketEvent(UnknownPacketEventArgs e)
         {

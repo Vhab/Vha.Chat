@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Net", "Vha.Net\Vha.Net.csproj", "{7BA3A4CF-1E58-465C-B614-151F8BEA848E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{711F8307-944C-4864-8D5E-0987C87E903A} = {711F8307-944C-4864-8D5E-0987C87E903A}

@@ -31,7 +31,7 @@ namespace Vha.AOML
     {
         TagBegin, // <
         TagEnd, // >
-        Identifier, // [a-z]
+        Identifier, // [a-z0-9_\-]
         WhiteSpace, // space, tab, etc
         LineBreak, // newline
         SingleQuote, // '
@@ -55,16 +55,6 @@ namespace Vha.AOML
         /// Returns null if no value is associated with this token type.
         /// </summary>
         public readonly string Value;
-
-        /// <summary>
-        /// Initializes a new token
-        /// </summary>
-        /// <param name="type">The type of the token</param>
-        public Token(TokenType type)
-        {
-            this.Type = type;
-            this.Value = null;
-        }
 
         /// <summary>
         /// Initializes a new token

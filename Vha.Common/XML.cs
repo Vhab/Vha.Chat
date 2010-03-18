@@ -85,5 +85,47 @@ namespace Vha.Common
             }
             catch { return default(T); }
         }
+
+        /// <summary>
+        /// Serializes an object to an XML file
+        /// </summary>
+        /// <param name="file">The relative or full path to the target xml file</param>
+        /// <param name="Obj">The object to be serialized</param>
+        /// <returns>true on success, false on failure</returns>
+        public static bool ToFile(string file, T obj)
+        {
+            // Serialize the data
+            MemoryStream memorystream = new MemoryStream(); //Stream to write serialized output to.
+            Stream filestream = null;
+            try
+            {
+                GetSerializer().Serialize(memorystream, obj);
+            }
+            catch
+            {
+                // Serailization failed
+                if (memorystream != null)
+                    memorystream.Close();
+                return false;
+            }
+            // Write serialized data to file
+            try
+            {
+                filestream = (Stream)File.Open(file, FileMode.Create, FileAccess.Write);
+                memorystream.WriteTo(filestream);
+                filestream.Close();
+                memorystream.Close();
+                return true;
+            }
+            catch
+            {
+                // Clean up and return
+                if (memorystream != null)
+                    memorystream.Close();
+                if (filestream != null)
+                    filestream.Close();
+                return false;
+            }
+        }
     }
 }

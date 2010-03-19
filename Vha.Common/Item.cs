@@ -42,6 +42,22 @@ namespace Vha.Common
             this.Raw = raw;
         }
 
+		/// <summary>
+		/// Create a representation for an item with the given parameters and automatically generate the raw string for the item.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="lowid"></param>
+		/// <param name="highid"></param>
+		/// <param name="ql"></param>
+		public Item(string name, Int32 lowid, Int32 highid, Int32 ql)
+		{
+			this.Name = name;
+			this.LowID = lowid;
+			this.HighID = highid;
+			this.QL = ql;
+			this.Raw = this.ToLink();
+		}
+
         public override string ToString()
         {
             return string.Format("QL {0} {1}", this.QL, this.Name);

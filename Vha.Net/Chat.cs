@@ -53,6 +53,9 @@ namespace Vha.Net
         public event FriendStatusEventHandler FriendStatusEvent;
         public event FriendRemovedEventHandler FriendRemovedEvent;
         public event ClientUnknownEvent ClientUnknownEvent;
+		/// <summary>
+		/// Triggered when receiving an invite to a private channel
+		/// </summary>
         public event PrivateChannelRequestEventHandler PrivateChannelRequestEvent;
         public event NameLookupEventHandler NameLookupEvent;
         public event ForwardEventHandler ForwardEvent;
@@ -83,6 +86,10 @@ namespace Vha.Net
         protected List<Thread> _threads;
         protected Thread _receiveThread;
         protected Thread _sendThread;
+		/// <summary>
+		/// This event is signaled whenever something is added to the send queue.
+		/// </summary>
+		protected ManualResetEvent _sendThread_ResetEvent;
         protected Socket _socket;
         protected Dictionary<UInt32, String> _users;
         protected Dictionary<BigInteger, Channel> _channels;
@@ -97,15 +104,42 @@ namespace Vha.Net
         protected List<UInt32> _offlineMessages;
         protected DateTime _lastPong = DateTime.Now;
 
+		/// <summary>
+		/// My character ID
+		/// </summary>
         public UInt32 ID { get { return this._id; } }
-        public string Account { get { return this._account; } }
+        /// <summary>
+        /// My account name
+        /// </summary>
+		public string Account { get { return this._account; } }
+		/// <summary>
+		/// My character name
+		/// </summary>
         public string Character { get { return this._character; } }
+		/// <summary>
+		/// Address of server I am connected to
+		/// </summary>
         public string Server { get { return this._serverAddress; } }
+		/// <summary>
+		/// Port on server I am connected to
+		/// </summary>
         public int Port { get { return this._port; } }
+		/// <summary>
+		/// Name of organization I am a member of
+		/// </summary>
         public string Organization { get { return this._organization; } }
+		/// <summary>
+		/// ID of organization I am a member of
+		/// </summary>
         public BigInteger OrganizationID { get { return this._organizationid; } }
         public ChatState State { get { return this._state; } }
-        public int SlowQueueCount { get { return this._slowQueue.Count; } }
+        /// <summary>
+        /// Number of entries in the slow outgoing queue
+        /// </summary>
+		public int SlowQueueCount { get { return this._slowQueue.Count; } }
+		/// <summary>
+		/// Number of entries in the fast outgoing queue
+		/// </summary>
         public int FastQueueCount { get { return this._fastQueue.Count; } }
 
         public Chat(string server, int port, string account, string password)
@@ -153,6 +187,7 @@ namespace Vha.Net
                 this._lookupReset = new ManualResetEvent(false);
                 this._receiveThread = new Thread(new ThreadStart(this.RunReceiver));
                 this._receiveThread.IsBackground = true;
+				this._sendThread_ResetEvent = new ManualResetEvent(true); //Resetevent for sendthread.
                 this._sendThread = new Thread(new ThreadStart(this.RunSender));
                 this._sendThread.IsBackground = true;
                 this._users = new Dictionary<UInt32, String>();
@@ -171,9 +206,14 @@ namespace Vha.Net
                 this._pingTimer.Interval = this.PingInterval;
                 this._pingTimer.Elapsed += new ElapsedEventHandler(OnPingTimerEvent);
                 this._lastPong = DateTime.Now;
+				
             }
         }
 
+		/// <summary>
+		/// Connect to chatserver using previously provided parameters
+		/// </summary>
+		/// <returns></returns>
         public bool Connect()
         {
             lock (this)
@@ -217,6 +257,9 @@ namespace Vha.Net
             return false;
         }
 
+		/// <summary>
+		/// Remove all subscriptions from all of my events
+		/// </summary>
         public void ClearEvents()
         {
             this.AmdMuxInfoEvent = null;
@@ -244,7 +287,15 @@ namespace Vha.Net
             this.DebugEvent = null;
         }
 
+		/// <summary>
+		/// Disconnect from chat server synchronously.
+		/// </summary>
         public void Disconnect() { Disconnect(false); }
+
+		/// <summary>
+		/// Disconnect from chatserver.
+		/// </summary>
+		/// <param name="async">weither or not to disconnect in async mode</param>
         public void Disconnect(bool async)
         {
             // Prepare the disconnect
@@ -255,6 +306,10 @@ namespace Vha.Net
             if (async) ThreadPool.QueueUserWorkItem(new WaitCallback(Disconnect), null);
             else Disconnect(null);
         }
+		/// <summary>
+		/// Callback method for disconnecting in async mode.
+		/// </summary>
+		/// <param name="dummy"></param>
         internal void Disconnect(Object dummy)
         {
             if (this._socket != null && this._socket.Connected)
@@ -380,7 +435,7 @@ namespace Vha.Net
             this.Debug("Started", "[SendThread]");
             try
             {
-                while (true)
+                while (this._sendThread_ResetEvent.WaitOne())
                 {
                     if (this._closing) break;
                     if (this._socket == null || this._socket.Connected == false)
@@ -410,7 +465,10 @@ namespace Vha.Net
                             PrivateMessagePacket msg = (PrivateMessagePacket)packet;
                             this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetUserName(msg.CharacterID), msg.Message, true));
                         }
-                        Thread.Sleep((int)this.FastPacketDelay);
+						if (this._fastQueue.Count > 0 || this._slowQueue.Count > 0) //If there is still something in queue, sleep for predefined delay..
+							Thread.Sleep((int)this.FastPacketDelay);
+						else //If there's nothing more in the queues, reset our resetevent.
+							this._sendThread_ResetEvent.Reset();
                     }
                     else
                     {
@@ -984,6 +1042,11 @@ namespace Vha.Net
         #endregion
 
         #region Get Commands
+		/// <summary>
+		/// Retrieve user ID associated with an user name.
+		/// </summary>
+		/// <param name="user"></param>
+		/// <returns>UserID</returns>
         public UInt32 GetUserID(string user)
         {
             bool Lookup = false;
@@ -1021,6 +1084,11 @@ namespace Vha.Net
             return 0;
         }
 
+		/// <summary>
+		/// Retrieve user name associated with an user ID.
+		/// </summary>
+		/// <param name="userID"></param>
+		/// <returns></returns>
         public string GetUserName(UInt32 userID)
         {
             if (userID == 0 || userID == UInt32.MaxValue)
@@ -1040,6 +1108,11 @@ namespace Vha.Net
             }
         }
 
+		/// <summary>
+		/// Retrieve channel ID associated with a channel name
+		/// </summary>
+		/// <param name="channelName"></param>
+		/// <returns></returns>
         public BigInteger GetChannelID(String channelName)
         {
             lock (this._channels)
@@ -1053,8 +1126,18 @@ namespace Vha.Net
             return new BigInteger(0);
         }
 
+		/// <summary>
+		/// Retrieve channel name associated with a channel ID.
+		/// </summary>
+		/// <param name="channelID"></param>
+		/// <returns></returns>
         public string GetChannelName(Int32 channelID) { return this.GetChannelName(new BigInteger(channelID)); }
-        public string GetChannelName(BigInteger channelID)
+        /// <summary>
+        /// Retrieve channel name associated with a channel ID.
+        /// </summary>
+        /// <param name="channelID"></param>
+        /// <returns></returns>
+		public string GetChannelName(BigInteger channelID)
         {
             if (this._channels == null)
                 return "";
@@ -1071,7 +1154,11 @@ namespace Vha.Net
                 }
             }
         }
-
+		/// <summary>
+		/// Retrieve channel type of the provided channel.
+		/// </summary>
+		/// <param name="channelID"></param>
+		/// <returns></returns>
         public ChannelType GetChannelType(BigInteger channelID)
         {
             lock (this._channels)
@@ -1106,9 +1193,20 @@ namespace Vha.Net
                     _fastQueue.Enqueue(packet.Priority, packet);
                     break;
             }
+			this._sendThread_ResetEvent.Set(); //Signal the send thread that we have added something.
         }
 
+		/// <summary>
+		/// Mute or unmute a channel
+		/// </summary>
+		/// <param name="channel">Name of channel to (un)mute</param>
+		/// <param name="mute">true to mute, false to unmute</param>
         public void SendChannelMute(string channel, bool mute) { this.SendChannelMute(this.GetChannelID(channel), mute); }
+		/// <summary>
+		/// Mute or unmute a channel
+		/// </summary>
+		/// <param name="channelID">ID of channel to (un)mute</param>
+		/// <param name="mute">true to mute, false to unmute</param>
         public void SendChannelMute(BigInteger channelID, bool mute)
         {
             this.Debug("Updating channel " + this.GetChannelName(channelID) + " with mute=" + mute.ToString(), "[Bot]");
@@ -1118,8 +1216,24 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Send a channel message (standard priority)
+		/// </summary>
+		/// <param name="channel"></param>
+		/// <param name="text"></param>
         public void SendChannelMessage(string channel, string text) { this.SendChannelMessage(this.GetChannelID(channel), text, PacketQueue.Priority.Standard); }
+		/// <summary>
+		/// Send a channel message (standard priority)
+		/// </summary>
+		/// <param name="channelID"></param>
+		/// <param name="text"></param>
         public void SendChannelMessage(BigInteger channelID, string text) { this.SendChannelMessage(channelID, text, PacketQueue.Priority.Standard); }
+		/// <summary>
+		/// Send a channel message. Custom priority
+		/// </summary>
+		/// <param name="channelID"></param>
+		/// <param name="text"></param>
+		/// <param name="priority"></param>
         public void SendChannelMessage(BigInteger channelID, string text, PacketQueue.Priority priority)
         {
             ChannelMessagePacket p = new ChannelMessagePacket(channelID, text);
@@ -1127,6 +1241,10 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Add a friend. (standard priority)
+		/// </summary>
+		/// <param name="user"></param>
         public void SendFriendAdd(string user)
         {
             if (string.IsNullOrEmpty(user)) return;
@@ -1138,6 +1256,10 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Remove friend. (standard priority)
+		/// </summary>
+		/// <param name="user"></param>
         public void SendFriendRemove(string user)
         {
             if (string.IsNullOrEmpty(user)) return;
@@ -1149,7 +1271,15 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Invite someone to your own private channel. (urgent priority)
+		/// </summary>
+		/// <param name="user"></param>
         public void SendPrivateChannelInvite(string user) { this.SendPrivateChannelInvite(this.GetUserID(user)); }
+		/// <summary>
+		/// Invite someone to your own private channel. (urgent priority)
+		/// </summary>
+		/// <param name="userID"></param>
         public void SendPrivateChannelInvite(UInt32 userID)
         {
             if (userID == this._id)
@@ -1159,7 +1289,15 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Kick someone from your own private channel. (urgent priority)
+		/// </summary>
+		/// <param name="user"></param>
         public void SendPrivateChannelKick(string user) { this.SendPrivateChannelKick(this.GetUserID(user)); }
+		/// <summary>
+		/// Kick someone from your own private channel. (urgent priority)
+		/// </summary>
+		/// <param name="userID"></param>
         public void SendPrivateChannelKick(UInt32 userID)
         {
             if (userID == this._id)
@@ -1169,6 +1307,9 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Kick everyone from your own private channel. (urgent priority)
+		/// </summary>
         public void SendPrivateChannelKickAll()
         {
             EmptyPacket p = new EmptyPacket(Packet.Type.PRIVATE_CHANNEL_KICKALL);
@@ -1176,16 +1317,38 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Leave someone elses private channel. (urgent priority)
+		/// </summary>
+		/// <param name="channel"></param>
         public void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetUserID(channel)); }
-        public void SendPrivateChannelLeave(UInt32 channelID)
+        /// <summary>
+        /// Leave someone elses private channel. (urgent priority)
+        /// </summary>
+        /// <param name="channelID"></param>
+		public void SendPrivateChannelLeave(UInt32 channelID)
         {
             PrivateChannelStatusPacket p = new PrivateChannelStatusPacket(channelID, false);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Send a message to your own private channel (urgent priority).
+		/// </summary>
+		/// <param name="text"></param>
         public void SendPrivateChannelMessage(string text) { this.SendPrivateChannelMessage(this._id, text); }
+		/// <summary>
+		/// Send a message to someone elses private channel. (urgent priority)
+		/// </summary>
+		/// <param name="channel"></param>
+		/// <param name="text"></param>
         public void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetUserID(channel), text); }
+		/// <summary>
+		/// Send a message to someone elses private channel. (urgent priority)
+		/// </summary>
+		/// <param name="channelID"></param>
+		/// <param name="text"></param>
         public void SendPrivateChannelMessage(UInt32 channelID, string text)
         {
             PrivateChannelMessagePacket p = new PrivateChannelMessagePacket(channelID, text);
@@ -1193,8 +1356,24 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Send a private message (tell) to someone. (standard priority)
+		/// </summary>
+		/// <param name="user"></param>
+		/// <param name="text"></param>
         public void SendPrivateMessage(string user, string text) { this.SendPrivateMessage(this.GetUserID(user), text, PacketQueue.Priority.Standard); }
+		/// <summary>
+		/// Send a private message (tell) to someone. (standard priority)
+		/// </summary>
+		/// <param name="userID"></param>
+		/// <param name="text"></param>
         public void SendPrivateMessage(UInt32 userID, string text) { this.SendPrivateMessage(userID, text, PacketQueue.Priority.Standard); }
+		/// <summary>
+		/// Send a private message (tell) to someone.
+		/// </summary>
+		/// <param name="userID"></param>
+		/// <param name="text"></param>
+		/// <param name="priority"></param>
         public void SendPrivateMessage(UInt32 userID, string text, PacketQueue.Priority priority)
         {
             if (userID == this._id || userID == 0)
@@ -1204,6 +1383,10 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Query the server for a "name to user id" lookup. (urgent priority)
+		/// </summary>
+		/// <param name="name"></param>
         public void SendNameLookup(string name)
         {
             lock (this._users)
@@ -1216,6 +1399,9 @@ namespace Vha.Net
             this.SendPacket(p);
         }
 
+		/// <summary>
+		/// Ping the chatserver. (urgent priority)
+		/// </summary>
         public void SendPing()
         {
             EmptyPacket p = new EmptyPacket(Packet.Type.PING);

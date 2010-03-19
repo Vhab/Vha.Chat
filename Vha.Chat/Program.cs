@@ -21,15 +21,14 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
+using Vha.Chat;
+using Vha.Common;
 
 namespace Vha.Chat
 {
     public static class Program
     {
-        public static bool MonoMode = false;
-        public static int MaximumMessages = 250;
-        public static int MaximumTexts = 50;
-        public static int MaximumHistory = 25;
+        public static Config Configuration = null;
         public static ApplicationContext Context;
         /// <summary>
         /// The main entry point for the application.
@@ -37,18 +36,16 @@ namespace Vha.Chat
         [STAThread]
         static void Main()
         {
-            // Check for mono
-            if (Type.GetType("Mono.Runtime") != null)
-            {
-                MonoMode = true;
-            }
+            // Read configuration
+            Config configuration = XML<Config>.FromFile("Config.xml");
+            if (configuration != null) Configuration = configuration;
+            else Configuration = new Config();
             // Start application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
 #if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
 #endif
-
             Context = new ApplicationContext();
             Context.MainForm = new AuthenticationForm();
             Application.Run(Context);

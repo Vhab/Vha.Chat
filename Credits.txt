@@ -17,6 +17,11 @@
 * USA
 */
 
+The following people have made contributions to Vha.Chat or one of the related libraries.
+
+- Vhab (rk1)
+- Demoder (rk2)
+
 The following people have made contributions to VhaBot's Age of Conan port.
 
 - Azgura (EU-Dagon)

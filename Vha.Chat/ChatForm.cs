@@ -68,7 +68,7 @@ namespace Vha.Chat
             this._tree.Nodes.Add(this._guests);
 
             this._inputUtil = new ChatInput(this, this._chat);
-            this._htmlUtil = new ChatHtml(this, this._inputUtil, this._chat);
+            this._htmlUtil = new ChatHtml(this, this._inputUtil);
             this._outputUtil = new ChatOutput(this, this._htmlUtil, this._chat);
 
             // Disable options button
@@ -96,9 +96,9 @@ namespace Vha.Chat
                 this._lines.Enqueue(html);
                 return;
             }
-            this._htmlUtil.AppendHtml(this._outputBox.Document, html, true);
+            this._htmlUtil.AppendHtml(this._outputBox.Document, Program.Configuration.TextStyle, html, true);
             // Clean up old messages
-            while (this._outputBox.Document.Body.Children.Count > Program.MaximumMessages)
+            while (this._outputBox.Document.Body.Children.Count > Program.Configuration.MaximumMessages)
             {
                 this._outputBox.Document.Body.FirstChild.OuterHtml = "";
             }
@@ -341,7 +341,7 @@ namespace Vha.Chat
                 // History
                 if (this._history.Count == 0 || this._history[0] != this._inputBox.Text)
                     this._history.Insert(0, this._inputBox.Text);
-                while (this._history.Count > Program.MaximumHistory)
+                while (this._history.Count > Program.Configuration.MaximumHistory)
                     this._history.RemoveAt(this._history.Count - 1);
                 this._historyIndex = 0;
                 // Handle the input

@@ -52,8 +52,35 @@ namespace Vha.Common
         public static readonly String UnderlineStart = "<u>";
         public static readonly String UnderlineEnd = "</u>";
 
+		/// <summary>
+		/// Create an item reference, with styling and quotation character: '
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="lowID"></param>
+		/// <param name="highID"></param>
+		/// <param name="QL"></param>
+		/// <returns></returns>
         public static string CreateItem(string name, int lowID, int highID, int QL) { return CreateItem(name, lowID, highID, QL, false, "'"); }
+		/// <summary>
+		/// Create an item reference with quotation character: '
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="lowID"></param>
+		/// <param name="highID"></param>
+		/// <param name="QL"></param>
+		/// <param name="disableStyle"></param>
+		/// <returns></returns>
         public static string CreateItem(string name, int lowID, int highID, int QL, bool disableStyle) { return CreateItem(name, lowID, highID, QL, disableStyle, "'"); }
+		/// <summary>
+		/// Create an item reference with a custom quotation character.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="lowID"></param>
+		/// <param name="highID"></param>
+		/// <param name="QL"></param>
+		/// <param name="disableStyle"></param>
+		/// <param name="quotes"></param>
+		/// <returns></returns>
         public static string CreateItem(string name, int lowID, int highID, int QL, bool disableStyle, string quotes)
         {
             if (lowID > highID)
@@ -65,8 +92,32 @@ namespace Vha.Common
             return String.Format("{0}{1}{2}", CreateItemStart(lowID, highID, QL, disableStyle, quotes), EscapeString(name), CreateLinkEnd());
         }
 
+		/// <summary>
+		/// Create the first half of an item reference, with style and quotation character: '
+		/// </summary>
+		/// <param name="lowID"></param>
+		/// <param name="highID"></param>
+		/// <param name="QL"></param>
+		/// <returns></returns>
         public static string CreateItemStart(int lowID, int highID, int QL) { return CreateItemStart(lowID, highID, QL, false, "'"); }
+		/// <summary>
+		/// Create the first half of an item reference with quotation character: '
+		/// </summary>
+		/// <param name="lowID"></param>
+		/// <param name="highID"></param>
+		/// <param name="QL"></param>
+		/// <param name="disableStyle"></param>
+		/// <returns></returns>
         public static string CreateItemStart(int lowID, int highID, int QL, bool disableStyle) { return CreateItemStart(lowID, highID, QL, disableStyle, "'"); }
+		/// <summary>
+		/// Create the first half of an item reference with custom quotation character.
+		/// </summary>
+		/// <param name="lowID"></param>
+		/// <param name="highID"></param>
+		/// <param name="QL"></param>
+		/// <param name="disableStyle"></param>
+		/// <param name="quotes"></param>
+		/// <returns></returns>
         public static string CreateItemStart(int lowID, int highID, int QL, bool disableStyle, string quotes)
         {
             if (lowID > highID)
@@ -81,15 +132,54 @@ namespace Vha.Common
             return String.Format(ItemLink, quotes, lowID, highID, QL, style);
         }
 
+		/// <summary>
+		/// Create a chat command link, with styling and quotation character: '
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="command"></param>
+		/// <returns></returns>
         public static string CreateCommand(string name, string command) { return CreateCommand(name, command, false, "'"); }
+		/// <summary>
+		/// Create a chat command link with quotation character: '
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="command"></param>
+		/// <param name="disableStyle"></param>
+		/// <returns></returns>
         public static string CreateCommand(string name, string command, bool disableStyle) { return CreateCommand(name, command, disableStyle, "'"); }
+		/// <summary>
+		/// Create a chat command link with custom quotation character.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="command"></param>
+		/// <param name="disableStyle"></param>
+		/// <param name="quotes"></param>
+		/// <returns></returns>
         public static string CreateCommand(string name, string command, bool disableStyle, string quotes)
         {
             return String.Format("{0}{1}{2}", CreateCommandStart(command, disableStyle, quotes), EscapeString(name), CreateLinkEnd());
         }
 
+		/// <summary>
+		/// Create the first half of a chat command link, with styling and quotation character: '
+		/// </summary>
+		/// <param name="command"></param>
+		/// <returns></returns>
         public static string CreateCommandStart(string command) { return CreateCommandStart(command, false, "'"); }
+		/// <summary>
+		/// Create the first half of a chat command link with quotation character: '
+		/// </summary>
+		/// <param name="command"></param>
+		/// <param name="disableStyle"></param>
+		/// <returns></returns>
         public static string CreateCommandStart(string command, bool disableStyle) { return CreateCommandStart(command, disableStyle, "'"); }
+		/// <summary>
+		/// Create the first half of a chat command link with custom quotation character.
+		/// </summary>
+		/// <param name="command"></param>
+		/// <param name="disableStyle"></param>
+		/// <param name="quotes"></param>
+		/// <returns></returns>
         public static string CreateCommandStart(string command, bool disableStyle, string quotes)
         {
             string style = "";
@@ -97,16 +187,54 @@ namespace Vha.Common
                 style = String.Format(CleanLink, quotes);
             return String.Format(CommandLink, quotes, HTML.EscapeString(command), style);
         }
-
+		/// <summary>
+		/// Create a clickable link for displaying contents in the InfoView window, with styling and quoatation character: "
+		/// </summary>
+		/// <param name="link"></param>
+		/// <param name="contents"></param>
+		/// <returns></returns>
         public static string CreateWindow(string link, string contents) { return CreateWindow(link, contents, false, "\""); }
+		/// <summary>
+		/// Create a clickable link for displaying contents in the InfoView window with quoatation character: "
+		/// </summary>
+		/// <param name="link"></param>
+		/// <param name="contents"></param>
+		/// <param name="disableStyle"></param>
+		/// <returns></returns>
         public static string CreateWindow(string link, string contents, bool disableStyle) { return CreateWindow(link, contents, disableStyle, "\""); }
+		/// <summary>
+		/// Create a clickable link for displaying contents in the InfoView window, with styling and custom quoatation character.
+		/// </summary>
+		/// <param name="link"></param>
+		/// <param name="contents"></param>
+		/// <param name="disableStyle"></param>
+		/// <param name="quotes"></param>
+		/// <returns></returns>
         public static string CreateWindow(string link, string contents, bool disableStyle, string quotes)
         {
             return String.Format("{0}{1}{2}", CreateWindowStart(contents, disableStyle, quotes), link, CreateLinkEnd());
         }
 
+		/// <summary>
+		/// Create the first half of a clickable link for displaying contents in the InfoView window, with styling and quoatation character: "
+		/// </summary>
+		/// <param name="contents"></param>
+		/// <returns></returns>
         public static string CreateWindowStart(string contents) { return CreateWindowStart(contents, false, "\""); }
+		/// <summary>
+		/// Create the first half of a clickable link for displaying contents in the InfoView window with quoatation character: "
+		/// </summary>
+		/// <param name="contents"></param>
+		/// <param name="disableStyle"></param>
+		/// <returns></returns>
         public static string CreateWindowStart(string contents, bool disableStyle) { return CreateWindowStart(contents, disableStyle, "\""); }
+		/// <summary>
+		/// Create the first half of a clickable link for displaying contents in the InfoView window with custom quoatation character.
+		/// </summary>
+		/// <param name="contents"></param>
+		/// <param name="disableStyle"></param>
+		/// <param name="quotes"></param>
+		/// <returns></returns>
         public static string CreateWindowStart(string contents, bool disableStyle, string quotes)
         {
             string style = "";
@@ -115,11 +243,20 @@ namespace Vha.Common
             return String.Format(TextLink, quotes, contents, style);
         }
 
+		/// <summary>
+		/// End a link. Use this when you used a Create*Start method.
+		/// </summary>
+		/// <returns></returns>
         public static string CreateLinkEnd()
         {
             return LinkEnd;
         }
 
+		/// <summary>
+		/// Use this to start formatting text color.
+		/// </summary>
+		/// <param name="colorHex"></param>
+		/// <returns></returns>
         public static string CreateColorStart(string colorHex)
         {
             if (colorHex.Length == 7 && colorHex.ToCharArray()[0] == '#')
@@ -131,11 +268,21 @@ namespace Vha.Common
                 return "";
         }
 
+		/// <summary>
+		/// Use this to stop the latest text color formatting.
+		/// </summary>
+		/// <returns></returns>
         public static string CreateColorEnd()
         {
             return ColorEnd;
         }
 
+		/// <summary>
+		/// This will format a given string with a given color.
+		/// </summary>
+		/// <param name="colorHex"></param>
+		/// <param name="text"></param>
+		/// <returns></returns>
         public static string CreateColorString(string colorHex, string text)
         {
             text = EscapeString(text);
@@ -146,21 +293,40 @@ namespace Vha.Common
                 return text;
         }
 
+		/// <summary>
+		/// Creates an icon reference
+		/// </summary>
+		/// <param name="iconID"></param>
+		/// <returns></returns>
         public static string CreateIcon(Int32 iconID)
         {
             return string.Format(ImgIcon, iconID);
         }
 
+		/// <summary>
+		/// Creates a GUI image reference
+		/// </summary>
+		/// <param name="imageID"></param>
+		/// <returns></returns>
         public static string CreateImage(string imageID)
         {
             return string.Format(ImgGui, imageID);
         }
 
+		/// <summary>
+		/// Start aligning text
+		/// </summary>
+		/// <param name="alignment"></param>
+		/// <returns></returns>
         public static string CreateAlignStart(string alignment)
         {
             return string.Format(AlignStart, alignment);
         }
 
+		/// <summary>
+		/// Stop aligning text
+		/// </summary>
+		/// <returns></returns>
         public static string CreateAlignEnd()
         {
             return AlignEnd;
@@ -226,6 +392,11 @@ namespace Vha.Common
             return strippedText;
         }
 
+		/// <summary>
+		/// Replace a selection of risky characters with their html-safe equelants.
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns></returns>
         public static string EscapeString(string text)
         {
             text = text.Replace("&", "&amp;");
@@ -236,6 +407,11 @@ namespace Vha.Common
             return text;
         }
 
+		/// <summary>
+		/// Replace html-safe codes with their actual character values 
+		/// </summary>
+		/// <param name="text"></param>
+		/// <returns></returns>
         public static string UnescapeString(string text)
         {
             text = text.Replace("&amp;", "&");
@@ -246,7 +422,18 @@ namespace Vha.Common
             return text;
         }
 
+		/// <summary>
+		/// Retrieve content from a URL. Timeout: 30s
+		/// </summary>
+		/// <param name="url"></param>
+		/// <returns></returns>
         public static string GetHtml(string url) { return GetHtml(url, 30000); }
+		/// <summary>
+		/// Retrieve content from a URL. Custom timeout.
+		/// </summary>
+		/// <param name="url"></param>
+		/// <param name="timeout">Timeout in ms (1s = 1000ms)</param>
+		/// <returns></returns>
         public static string GetHtml(string url, Int32 timeout)
         {
             /*StreamReader stream = null;

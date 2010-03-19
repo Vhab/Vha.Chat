@@ -41,10 +41,25 @@ namespace Vha.Net.Events
             this._join = join;
         }
 
+		/// <summary>
+		/// ID of the owner of the private channel the event occurs in.
+		/// </summary>
         public UInt32 ChannelID { get { return this._channelID; } }
-        public string Channel { get { return this._channel; } }
-        public UInt32 CharacterID { get { return this._characterID; } }
+		/// <summary>
+		/// Name of the owner of the private channel the event occurs in.
+		/// </summary>
+		public string Channel { get { return this._channel; } }
+        /// <summary>
+        /// ID of the user who is triggering this event.
+        /// </summary>
+		public UInt32 CharacterID { get { return this._characterID; } }
+		/// <summary>
+		/// Name of the user who is triggering this event.
+		/// </summary>
         public string Character { get { return this._character; } }
-        public bool Join { get { return this._join; } }
+        /// <summary>
+        /// Whether someone has joined or left this channel. True if the user has joined, false when the user left.
+        /// </summary>
+		public bool Join { get { return this._join; } }
     }
 }

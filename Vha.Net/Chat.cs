@@ -101,6 +101,12 @@ namespace Vha.Net
         protected System.Timers.Timer _pingTimer;
         protected DateTime _lastPong = DateTime.Now;
 
+        /// <summary>
+        /// Proxy server. new Uri("http://proxyserver:port/") for a HTTP proxy supporting Connect().
+        /// new Uri("socks4://userid@proxyserver:port/") for a Socks v4 connection.
+        /// </summary>
+        protected Uri _proxy = null;
+
 		/// <summary>
 		/// My character ID
 		/// </summary>
@@ -121,6 +127,11 @@ namespace Vha.Net
 		/// Port on server I am connected to
 		/// </summary>
         public int Port { get { return this._port; } }
+        /// <summary>
+        /// The proxy this connection is tunneled through.
+        /// Returns null when no proxy is used.
+        /// </summary>
+        public Uri Proxy { get { return this._proxy; } }
 		/// <summary>
 		/// Name of organization I am a member of
 		/// </summary>
@@ -129,6 +140,9 @@ namespace Vha.Net
 		/// ID of organization I am a member of
 		/// </summary>
         public BigInteger OrganizationID { get { return this._organizationid; } }
+        /// <summary>
+        /// The current connection state
+        /// </summary>
         public ChatState State { get { return this._state; } }
         /// <summary>
         /// Number of entries in the slow outgoing queue
@@ -145,7 +159,28 @@ namespace Vha.Net
             this._port = port;
             this._account = account;
             this._password = password;
+            this._proxy = null;
         }
+
+        /// <summary>
+        /// Initializes a new Chat instance
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="port"></param>
+        /// <param name="account"></param>
+        /// <param name="password"></param>
+        /// <param name="proxy">The proxy server this connection should be tunnelled through</param>
+        public Chat(string server, int port, string account, string password, Uri proxy)
+        {
+            if (proxy == null)
+                throw new ArgumentNullException();
+            this._serverAddress = server;
+            this._port = port;
+            this._account = account;
+            this._password = password;
+            this._proxy = proxy;
+        }
+
         public Chat(string server, int port, string account, string password, string character)
         {
             this._serverAddress = server;
@@ -153,6 +188,28 @@ namespace Vha.Net
             this._account = account;
             this._password = password;
             this._character = character;
+            this._proxy = null;
+        }
+
+        /// <summary>
+        /// Initializes a new Chat instance
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="port"></param>
+        /// <param name="account"></param>
+        /// <param name="password"></param>
+        /// <param name="character"></param>
+        /// <param name="proxy">The proxy server this connection should be tunnelled through</param>
+        public Chat(string server, int port, string account, string password, string character, Uri proxy)
+        {
+            if (proxy == null)
+                throw new ArgumentNullException();
+            this._serverAddress = server;
+            this._port = port;
+            this._account = account;
+            this._password = password;
+            this._character = character;
+            this._proxy = proxy;
         }
 
         // Get this thing ready for running
@@ -202,7 +259,6 @@ namespace Vha.Net
                 this._pingTimer.Interval = this.PingInterval;
                 this._pingTimer.Elapsed += new ElapsedEventHandler(OnPingTimerEvent);
                 this._lastPong = DateTime.Now;
-				
             }
         }
 
@@ -224,29 +280,56 @@ namespace Vha.Net
                 this.PrepareChat();
 
                 this.Debug("Connecting to dimension: " + this._serverAddress + ":" + this._port, "[Auth]");
-                try
-                {
-                    IPHostEntry host = Dns.GetHostEntry(this._serverAddress);
-                    foreach (IPAddress addy in host.AddressList)
-                    {
-                        IPEndPoint ipe = new IPEndPoint(addy, this._port);
-                        Socket tempSocket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                        tempSocket.Connect(ipe);
 
-                        if (tempSocket.Connected)
+                bool connected = false; //Set this to true when a connection is successfull.
+                if (this._proxy != null)
+                {
+                    try
+                    {
+                        Proxy np = new Proxy(this._proxy, this._serverAddress, this._port);
+                        if (np.Socket != null)
                         {
-                            this.Debug("Connected to " + ipe.ToString(), "[Socket]");
-                            this._socket = tempSocket;
-                            this._receiveThread.Start();
-                            this._sendThread.Start();
-                            return true;
+                            if (np.Socket.Connected)
+                            {
+                                this._socket = np.Socket;
+                                connected = true;
+                                this.Debug("Connected to " + this._serverAddress.ToString() + ":" + this._port + " through " + np.ToString(), "[Socket]");
+                            }
                         }
-                        this.Debug("Failed connecting to " + ipe.ToString(), "[Socket]");
+                    }
+                    catch { }
+                }
+                if (!connected)  //Only try this if we couldn't connect previously.
+                {
+                    try
+                    {
+                        IPHostEntry host = Dns.GetHostEntry(this._serverAddress);
+                        foreach (IPAddress addy in host.AddressList)
+                        {
+                            IPEndPoint ipe = new IPEndPoint(addy, this._port);
+                            Socket tempSocket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                            tempSocket.Connect(ipe);
+
+                            if (tempSocket.Connected)
+                            {
+                                connected = true;
+                                this._socket = tempSocket;
+                                this.Debug("Connected to " + ipe.ToString(), "[Socket]");
+                            }
+                            else
+                                this.Debug("Failed connecting to " + ipe.ToString(), "[Socket]");
+                        }
+                    }
+                    catch
+                    {
+                        this.Debug("Unknown error during connecting", "[Error]");
                     }
                 }
-                catch
+                if (connected)
                 {
-                    this.Debug("Unknown error during connecting", "[Error]");
+                    this._receiveThread.Start();
+                    this._sendThread.Start();
+                    return true;
                 }
             }
             this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));

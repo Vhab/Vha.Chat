@@ -1,5 +1,5 @@
-/*
-* Vha.Common
+﻿/*
+* Vha.Net
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -22,13 +22,40 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vha.Common
+namespace Vha.Net
 {
-    public class Character
+    public enum ChatState
     {
-        public UInt32 ID = 0;
-        public string Name = string.Empty;
-        public bool Online = false;
-        public bool Temporary = false;
+        Disconnected,
+        Connecting,
+        Login,
+        CharacterSelect,
+        Connected,
+        Reconnecting,
+        Error
+    }
+
+    public enum ChannelType
+    {
+        Unknown = 0,
+        Announcements = 12,
+        General = 135,
+        Organization = 3,
+        Shopping = 356,
+        Towers = 10,
+        Leaders = 4
+    }
+
+    public enum SystemMessageType
+    {
+        Other = 0,
+        IncommingOfflineMessage = 172363154,
+        OutgoingOfflineMessage = 158601204
+    }
+
+    public enum IncomingOfflineMessageArgs
+    {
+        Name = 0,
+        Date = 1
     }
 }

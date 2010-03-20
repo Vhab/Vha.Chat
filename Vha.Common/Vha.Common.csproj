@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{711F8307-944C-4864-8D5E-0987C87E903A}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -34,7 +34,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigInteger.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Base85.cs" />
     <Compile Include="Colors.cs" />

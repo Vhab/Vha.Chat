@@ -1,5 +1,5 @@
-/*
-* Vha.Common
+﻿/*
+* Vha.Net
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vha.Common
+namespace Vha.Net
 {
     public enum ChatState
     {

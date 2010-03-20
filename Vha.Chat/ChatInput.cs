@@ -68,7 +68,7 @@ namespace Vha.Chat
 
         protected bool _checkConnection()
         {
-            if (this._chat.State != Vha.Common.ChatState.Connected)
+            if (this._chat.State != Vha.Net.ChatState.Connected)
             {
                 this._form.AppendLine("Error", "Not connected");
                 return false;

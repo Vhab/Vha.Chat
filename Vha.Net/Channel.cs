@@ -22,7 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Vha.Common
+namespace Vha.Net
 {
     public class Channel
     {

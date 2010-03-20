@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7BA3A4CF-1E58-465C-B614-151F8BEA848E}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channel.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Events\AmdMuxInfoEventArgs.cs" />
     <Compile Include="Events\AnonVicinityEventArgs.cs" />
     <Compile Include="Events\ChannelJoinEventArgs.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="Events\SystemMessageEventArgs.cs" />
     <Compile Include="Events\UnknownPacketEventArgs.cs" />
     <Compile Include="Events\VicinityMessageEventArgs.cs" />
+    <Compile Include="Proxy.cs" />
     <Compile Include="Packets\AmdMuxInfoPacket.cs" />
     <Compile Include="Packets\AnonVicinityPacket.cs" />
     <Compile Include="Packets\ChannelUpdatePacket.cs" />

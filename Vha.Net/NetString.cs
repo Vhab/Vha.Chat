@@ -27,22 +27,23 @@ namespace Vha.Net
 {
     public class NetString
     {
+        public static Encoding Encoding = Encoding.GetEncoding("utf-8");
+
         protected String _value;
         protected short _length;
-        protected Encoding _encoding = Encoding.GetEncoding("utf-8");
 
         public NetString(byte[] data) : this(data, 0) { }
         public NetString(byte[] data, int offset)
         {
             if (data == null || data.Length - offset < 3) { return; }
             this._length = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(data, offset));
-            this._value = this._encoding.GetString(data, 2 + offset, this._length);
+            this._value = NetString.Encoding.GetString(data, 2 + offset, this._length);
         }
         public NetString(byte[] data, int offset, short length)
         {
             if (data == null || data.Length - offset < 3) { return; }
             this._length = length;
-            this._value = this._encoding.GetString(data, offset, this._length);
+            this._value = NetString.Encoding.GetString(data, offset, this._length);
         }
         public NetString(string value)
         {
@@ -57,7 +58,7 @@ namespace Vha.Net
                 return null;
             else
             {
-                byte[] value = _encoding.GetBytes(this._value);
+                byte[] value = NetString.Encoding.GetBytes(this._value);
                 byte[] bytes = new byte[value.Length + 2];
                 BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)value.Length)).CopyTo(bytes, 0);
                 value.CopyTo(bytes, 2);

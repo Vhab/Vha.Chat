@@ -68,7 +68,7 @@ namespace Vha.Net
             {
                 string request = "CONNECT " + dstHost + ":" + dstPort + " HTTP/1.0\r\n\r\n";
                 if (proxySocket.Connected)
-                    proxySocket.Send((new NetString(request)).GetBytes());
+                    proxySocket.Send(NetString.Encoding.GetBytes(request));
                 bool still_talking_to_proxy = proxySocket.Connected; // Only talk to it if we're connected. :)
                 List<byte> proxy_communication = new List<byte>();
                 bool have_return = false;
@@ -101,7 +101,7 @@ namespace Vha.Net
                     }
                 }
                 catch (SocketException) { }
-                string msg = Encoding.UTF8.GetString(proxy_communication.ToArray());
+                string msg = NetString.Encoding.GetString(proxy_communication.ToArray());
                 string[] msg2 = msg.Split("\r\n".ToCharArray());
                 foreach (string m in msg2)
                 {
@@ -142,7 +142,7 @@ namespace Vha.Net
                 //Add our userid.
                 if (this._serverURI.UserName != string.Empty)
                 {
-                    byte[] bytes = (new NetString(this._serverURI.UserName)).GetBytes();
+                    byte[] bytes = NetString.Encoding.GetBytes(this._serverURI.UserName);
                     foreach (byte b in bytes)
                         sendbytes.Add(b);
                 }

@@ -7,6 +7,8 @@
   <TextStyle>Strip</TextStyle>
   <!-- Use http://address:port/ for http proxies -->
   <!-- Use socks4://address:port/ for socks4 proxies -->
+  <!-- Use socks4a://address:port/ for socks4a proxies -->
+  <!-- Use socks5://address:port/ for socks5 proxies -->
   <!-- Add "user:password@" before the address to use authentication -->
   <!-- Leave empty to not use any proxy server -->
   <Proxy></Proxy>

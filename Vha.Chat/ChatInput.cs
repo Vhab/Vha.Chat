@@ -184,6 +184,9 @@ namespace Vha.Chat
                 case "whois":
                     WhoisCommand(args);
                     break;
+                case "help":
+                    HelpCommand();
+                    break;
                 default:
                     this._form.AppendLine("Error", "Unknown command: /" + command);
                     break;
@@ -343,6 +346,24 @@ namespace Vha.Chat
             }
             if (!_checkUser(args[1])) return;
             this.Command("/tell helpbot whois " + args[1]);
+        }
+
+        protected void HelpCommand()
+        {
+            this._form.AppendLine("System",
+                "The following commands are available:<br>" +
+                "/tell [username] [message]<br>" +
+                "/leave [private channel]<br>" +
+                "/invite [username]<br>" +
+                "/kick [username]<br>" +
+                "/kickall<br>" +
+                "/addbuddy [username]<br>" +
+                "/rembuddy [username]<br>" +
+                "/o [message]<br>" +
+                "/mute [channel]<br>" +
+                "/unmute [channel]<br>" +
+                "/cc [command]<br>" +
+                "/about");
         }
     }
 }

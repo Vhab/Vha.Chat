@@ -75,6 +75,12 @@ namespace Vha.Chat
             this._options.Visible = false;
         }
 
+        private void ChatForm_Load(object sender, EventArgs e)
+        {
+            // Focus the input box after the form completed loading
+            this._inputBox.Focus();
+        }
+
         public void AppendLine(string type, string line)
         {
             string html = string.Format(
@@ -388,18 +394,7 @@ namespace Vha.Chat
             string color = this.ForeColor.R.ToString("X") + this.ForeColor.G.ToString("X") + this.ForeColor.B.ToString("X");
             this._outputBox.Document.Body.Style = "color: #" + color + ";";
             // Welcome message
-            this.AppendLine("Internal", "The following commands are available:");
-            this.AppendLine("Internal", "- /tell [username] [message]");
-            this.AppendLine("Internal", "- /leave [private channel]");
-            this.AppendLine("Internal", "- /invite [username]");
-            this.AppendLine("Internal", "- /kick [username]");
-            this.AppendLine("Internal", "- /kickall");
-            this.AppendLine("Internal", "- /addbuddy [username]");
-            this.AppendLine("Internal", "- /rembuddy [username]");
-            this.AppendLine("Internal", "- /o [message]");
-            this.AppendLine("Internal", "- /mute [channel]");
-            this.AppendLine("Internal", "- /unmute [channel]");
-            this.AppendLine("Internal", "- /about");
+            this.AppendLine("Internal", "Type /help to view all available commands");
             // Clear queue
             while (this._lines.Count > 0)
             {

@@ -42,8 +42,6 @@ namespace Vha.Net
         public int PingTimeout = 120000;
         public double FastPacketDelay = 10;
         public double SlowPacketDelay = 2200;
-        public bool IgnoreOfflineMessages = true;
-        public bool IgnoreAfkMessages = true;
         public bool IgnoreCharacterLoggedIn = true;
         public bool UseThreadPool = true;
 
@@ -101,7 +99,6 @@ namespace Vha.Net
         protected System.Timers.Timer _reconnectTimer;
         protected ManualResetEvent _lookupReset;
         protected System.Timers.Timer _pingTimer;
-        protected List<UInt32> _offlineMessages;
         protected DateTime _lastPong = DateTime.Now;
 
 		/// <summary>
@@ -192,7 +189,6 @@ namespace Vha.Net
                 this._sendThread.IsBackground = true;
                 this._users = new Dictionary<UInt32, String>();
                 this._channels = new Dictionary<BigInteger, Channel>();
-                this._offlineMessages = new List<UInt32>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
                 this._slowQueue = new PacketQueue();
@@ -336,8 +332,6 @@ namespace Vha.Net
             this._users = null;
             if (this._channels != null) this._channels.Clear();
             this._channels = null;
-            if (this._offlineMessages != null) this._offlineMessages.Clear();
-            this._offlineMessages = null;
             this._fastQueue = null;
             this._slowQueue = null;
             this._reconnectTimer = null;
@@ -390,7 +384,7 @@ namespace Vha.Net
                             Thread.Sleep(10);
                         }
                         ParsePacketData packetData = new ParsePacketData(type, length, buffer);
-                        if (this.UseThreadPool == false || packetData.type == Packet.Type.MESSAGE_SYSTEM || packetData.type == Packet.Type.NAME_LOOKUP)
+                        if (this.UseThreadPool == false || packetData.type == Packet.Type.NAME_LOOKUP)
                             this.ParsePacket(packetData, true);
                         else
                             ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
@@ -700,7 +694,9 @@ namespace Vha.Net
                             new SystemMessageEventArgs(
                             ((SystemMessagePacket)packet).ClientID,
                             ((SystemMessagePacket)packet).WindowID,
-                            ((SystemMessagePacket)packet).MessageID
+                            ((SystemMessagePacket)packet).MessageID,
+                            ((SystemMessagePacket)packet).Arguments,
+                            ((SystemMessagePacket)packet).Notice
                             ));
                         break;
                     default:
@@ -748,13 +744,11 @@ namespace Vha.Net
 
         protected virtual void OnSystemMessageEvent(SystemMessageEventArgs e)
         {
-            if (e.Type == SystemMessageType.IncommingOfflineMessage)
-            {
-                lock (this._offlineMessages)
-                {
-                    _offlineMessages.Add(e.ClientID);
-                }
-            }
+            this.Debug("Client:" + e.ClientID +
+                " Window:" + e.WindowID +
+                " ID:" + e.MessageID +
+                " Args:" + string.Join(",", e.Arguments) +
+                " Notice:" + e.Notice, "[System]");
             if (this.SystemMessageEvent != null)
                 this.SystemMessageEvent(this, e);
         }
@@ -789,29 +783,6 @@ namespace Vha.Net
 
         protected virtual void OnPrivateMessageEvent(PrivateMessageEventArgs e)
         {
-            if (this.IgnoreAfkMessages)
-            {
-                string afk = this.GetUserName(e.CharacterID) + " is AFK";
-                if (e.Message.Length > afk.Length)
-                {
-                    if (e.Message.Substring(0, afk.Length) == afk)
-                    {
-                        return;
-                    }
-                }
-            }
-            if (this.IgnoreOfflineMessages)
-            {
-                lock (this._offlineMessages)
-                {
-                    if (this._offlineMessages.Contains(e.CharacterID))
-                    {
-                        this.Debug(e.Message, "[Offline][" + e.Character + "]:");
-                        this._offlineMessages.Remove(e.CharacterID);
-                        return;
-                    }
-                }
-            }
             if (e.Outgoing)
                 this.Debug(e.Message, "To [" + e.Character + "]:");
             else
@@ -1268,6 +1239,24 @@ namespace Vha.Net
             ChatCommandPacket p = new ChatCommandPacket("rembuddy", user);
             p.Priority = PacketQueue.Priority.Standard;
 
+            this.SendPacket(p);
+        }
+
+        /// <summary>
+        /// Send a /cc command. (standard priority)
+        /// </summary>
+        /// <param name="command"></param>
+        public void SendChatCommand(string command) { SendChatCommand(command.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries)); }
+        /// <summary>
+        /// Send a /cc command. (standard priority)
+        /// </summary>
+        /// <param name="arguments"></param>
+        public void SendChatCommand(params string[] arguments)
+        {
+            this.Debug("Sending command: /cc " + string.Join(" ", arguments), "[Bot]");
+
+            ChatCommandPacket p = new ChatCommandPacket(arguments);
+            p.Priority = PacketQueue.Priority.Standard;
             this.SendPacket(p);
         }
 

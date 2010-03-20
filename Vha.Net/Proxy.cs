@@ -18,12 +18,14 @@
 * USA
 */
 
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.Net;
 using System.Net.Sockets;
+using Starksoft.Net.Proxy;
 
 namespace Vha.Net
 {
@@ -31,154 +33,110 @@ namespace Vha.Net
     {
         private UriBuilder _serverURI = null;
         private Socket _socket = null;
+        ProxyClientFactory _proxyclientfactory = new ProxyClientFactory();
 
+        /// <summary>
+        /// Returns a connection to the target through the proxy.
+        /// Returns null if no successful connection was enstablished.
+        /// </summary>
         public Socket Socket { get { return this._socket; } }
 
-        public Proxy(Uri proxy, string dstAddress, int dstPort)
+        /// <summary>
+        /// Initialize a new connection to the desired target through the supplied proxy
+        /// </summary>
+        /// <param name="proxy">An URI that contains all required proxy details</param>
+        /// <param name="dstHost">The target host address to connect to</param>
+        /// <param name="dstPort">The target host port to connect to</param>
+        /// <exception cref="ArgumentException">Thrown when an invalid argument is supplied</exception>
+        /// <exception cref="Exception">Thrown when the object failed to initialize. See InnerException for furthur details</exception>
+        public Proxy(Uri proxy, string dstHost, int dstPort)
         {
-            this._serverURI = new UriBuilder(proxy);
-            switch (this._serverURI.Scheme)
+            try
             {
-                case "http": // HTTP proxy.
-                    this.ConnectHttp(dstAddress, dstPort);
-                    break;
-                case "socks4": // SOCKS v4 proxy.
-                    this.ConnectSocks4(dstAddress, dstPort);
-                    break;
-                case "socks5": // SOCKS v5 proxy.
-                    throw new NotImplementedException("Socks5 has not been implemented by this proxy client");
-                default:
-                    throw new ArgumentException("Invalid proxy type");
+                this._serverURI = new UriBuilder(proxy);
+                switch (this._serverURI.Scheme)
+                {
+                    case "http": // HTTP proxy.
+                        this.ConnectHttp(dstHost, dstPort);
+                        break;
+                    case "socks4": // SOCKS v4 proxy.
+                        this.ConnectSocks4(dstHost, dstPort, false);
+                        break;
+                    case "socks4a":
+                        this.ConnectSocks4(dstHost, dstPort, true);
+                        break;
+                    case "socks5": // SOCKS v5 proxy.
+                        this.ConnectSocks5(dstHost, dstPort);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid proxy type");
+                }
+            }
+            catch (ArgumentException) { throw; }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to initialize proxy", ex);
             }
         }
 
         /// <summary>
-        /// Connect to a HTTP proxy and use CONNECT method.
+        /// Use the HTTP proxy client
         /// </summary>
-        /// <param name="dstHost">Which host do we tell the proxy to connect to?</param>
-        /// <param name="dstPort">Which port do we tell the proxy to connect to?</param>
+        /// <param name="dstHost"></param>
+        /// <param name="dstPort"></param>
         private void ConnectHttp(string dstHost, int dstPort)
         {
-            Socket proxySocket;
-            IPHostEntry proxyhost = Dns.GetHostEntry(this._serverURI.Host);
-            IPEndPoint ipe = new IPEndPoint(proxyhost.AddressList[0], this._serverURI.Port);
-            proxySocket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            proxySocket.Connect(ipe);
-            if (proxySocket.Connected) // We have a connection to the proxy..
-            {
-                string request = "CONNECT " + dstHost + ":" + dstPort + " HTTP/1.0\r\n\r\n";
-                if (proxySocket.Connected)
-                    proxySocket.Send(NetString.Encoding.GetBytes(request));
-                bool still_talking_to_proxy = proxySocket.Connected; // Only talk to it if we're connected. :)
-                List<byte> proxy_communication = new List<byte>();
-                bool have_return = false;
-                int num_rn = 0; // Number of \r\n we have. We should wait for two before assessing the situation and tossing the socket along to the rest of the class.
-                try
-                {
-                    while (still_talking_to_proxy)
-                    {
-                        byte[] buff = new byte[1];
-                        proxySocket.Receive(buff, 0, 1, SocketFlags.Partial);
-                        switch (buff[0])
-                        {
-                            case 13: // \r
-                                have_return = true;
-                                proxy_communication.Add(buff[0]);
-                                break;
-                            case 10: // \n
-                                proxy_communication.Add(buff[0]);
-                                if (have_return)
-                                    num_rn++;
-                                if (num_rn == 2)
-                                    still_talking_to_proxy = false;
-                                break;
-                            default:
-                                have_return = false;
-                                proxy_communication.Add(buff[0]);
-                                num_rn = 0;
-                                break;
-                        }
-                    }
-                }
-                catch (SocketException) { }
-                string msg = NetString.Encoding.GetString(proxy_communication.ToArray());
-                string[] msg2 = msg.Split("\r\n".ToCharArray());
-                foreach (string m in msg2)
-                {
-                    if (m.StartsWith("HTTP/1.0 200"))
-                    {
-                        this._socket = proxySocket;
-                        return;
-                    }
-                }
-            }
+            // Retreive a proxyclient. the HTTP proxy client does not support user/pass, so no point checking for those variables.
+            if (this._serverURI.Port == 0) this._serverURI.Port = 8080; // default port in Starksoft.Net.Proxy.Socks4ProxyClient.cs
+            IProxyClient proxyclient = proxyclient = this._proxyclientfactory.CreateProxyClient(ProxyType.Http, this._serverURI.Host, this._serverURI.Port);
+            TcpClient tc = proxyclient.CreateConnection(dstHost, dstPort);
+            if (tc.Connected)
+                this._socket = tc.Client;
         }
 
         /// <summary>
-        /// Connect to a Socks v4 server. This method is experimental/untested. - Demoder
+        /// Use the Socks4 proxy client.
         /// </summary>
-        /// <param name="dstHost">Which host do we tell the proxy to connect to?</param>
-        /// <param name="dstPort">Which port do we tell the proxy to connect to?</param>
-        private void ConnectSocks4(string dstHost, int dstPort)
+        /// <param name="dstHost"></param>
+        /// <param name="dstPort"></param>
+        /// <param name="socks4a">if true, we should use the socks4a client</param>
+        private void ConnectSocks4(string dstHost, int dstPort, bool socks4a)
         {
-            Socket proxySocket;
-            IPHostEntry proxyhost = Dns.GetHostEntry(this._serverURI.Host);
-            IPEndPoint ipe = new IPEndPoint(proxyhost.AddressList[0], this._serverURI.Port);
-            proxySocket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            proxySocket.Connect(ipe);
-            if (proxySocket.Connected) // We have a connection to the proxy..
-            {
-                List<byte> sendbytes = new List<byte>();
-                sendbytes.Add(4); // Socks version number.
-                sendbytes.Add(1); // Command request. 1= connect
-                // Add destination port.
-                byte[] tmpbytes = BitConverter.GetBytes(dstPort);
-                foreach (byte b in tmpbytes)
-                    sendbytes.Add(b);
-                // Add destination IP.
-                tmpbytes = ((Dns.GetHostEntry(dstHost)).AddressList[0]).GetAddressBytes();
-                foreach (byte b in tmpbytes)
-                    sendbytes.Add(b);
-                //Add our userid.
-                if (this._serverURI.UserName != string.Empty)
-                {
-                    byte[] bytes = NetString.Encoding.GetBytes(this._serverURI.UserName);
-                    foreach (byte b in bytes)
-                        sendbytes.Add(b);
-                }
-                // Add final nullbyte.
-                sendbytes.Add(0);
-                // Send our bytes!
-                proxySocket.Send(sendbytes.ToArray());
+            IProxyClient proxyclient;
+            // Socks4 or Socks4a?
+            ProxyType pt;
+            if (socks4a) pt = ProxyType.Socks4a;
+            else pt = ProxyType.Socks4;
 
-                bool accepted = false;
-                // Now receive the reply.
-                for (int i = 0; i < 8; i++)
-                {
-                    byte[] buff = new byte[1];
-                    try
-                    {
-                        proxySocket.Receive(buff, 0, 1, SocketFlags.Partial);
-                    }
-                    catch { }
-                    if (i == 1)
-                    {
-                        switch (buff[0])
-                        {
-                            case 90: // Request granted.
-                                accepted = true;
-                                return;
-                            case 91: // Request rejected or failed
-                            case 92: // Request rejected becasue SOCKS server cannot connect to identd on the client
-                            case 93: // Request rejected because the client program and identd report different user-ids
-                            default: // Unhandled
-                                return;
-                        }
-                    }
-                }
-                if (accepted)
-                    this._socket = proxySocket;
-            }
+            // If we don't have a port definition
+            if (this._serverURI.Port == 0) this._serverURI.Port = 1080; // default port in Starksoft.Net.Proxy.Socks4ProxyClient.cs. No override in Socks4a.
+
+            // Connect
+            if (this._serverURI.UserName != string.Empty) // If the user provided an username
+                proxyclient = this._proxyclientfactory.CreateProxyClient(pt, this._serverURI.Host, this._serverURI.Port, this._serverURI.UserName, string.Empty); // Socks v4 only supports UserID as auth
+            else
+                proxyclient = this._proxyclientfactory.CreateProxyClient(pt, this._serverURI.Host, this._serverURI.Port);
+            TcpClient tc = proxyclient.CreateConnection(dstHost, dstPort);
+            if (tc.Connected)
+                this._socket = tc.Client;
+        }
+
+        /// <summary>
+        /// Use the Socks5 client.
+        /// </summary>
+        /// <param name="dstHost"></param>
+        /// <param name="dstPort"></param>
+        private void ConnectSocks5(string dstHost, int dstPort)
+        {
+            if (this._serverURI.Port == 0) this._serverURI.Port = 1080; // default port in Starksoft.Net.Proxy.Socks5ProxyClient.cs
+            IProxyClient proxyclient;
+            if (this._serverURI.UserName != string.Empty || this._serverURI.Password != string.Empty) // If the user provided an username
+                proxyclient = this._proxyclientfactory.CreateProxyClient(ProxyType.Socks5, this._serverURI.Host, this._serverURI.Port, this._serverURI.UserName, this._serverURI.Password); // Socks v5 supports user+pass auth.
+            else
+                proxyclient = this._proxyclientfactory.CreateProxyClient(ProxyType.Socks5, this._serverURI.Host, this._serverURI.Port);
+            TcpClient tc = proxyclient.CreateConnection(dstHost, dstPort);
+            if (tc.Connected)
+                this._socket = tc.Client;
         }
 
         public override string ToString()

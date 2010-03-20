@@ -12,5 +12,6 @@ namespace Vha.Chat
         public int MaximumTexts = 99;
         public int MaximumHistory = 99;
         public ChatHtmlStyle TextStyle = ChatHtmlStyle.Default;
+        public string Proxy;
     }
 }

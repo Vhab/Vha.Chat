@@ -30,23 +30,31 @@ namespace Vha.Net.Events
     /// </summary>
     public class SystemMessageEventArgs : EventArgs
     {
-        private readonly UInt32 _client = 0;
-        private readonly UInt32 _window = 0;
-        private readonly UInt32 _msg = 0;
+        private readonly UInt32 _clientid = 0;
+        private readonly UInt32 _windowid = 0;
+        private readonly UInt32 _messageid = 0;
+        private readonly string[] _arguments = new string[0];
         private readonly SystemMessageType _type;
+        private readonly string _notice;
 
-        public SystemMessageEventArgs(UInt32 clientID, UInt32 windowID, UInt32 messageID)
+        public SystemMessageEventArgs(UInt32 clientID, UInt32 windowID, UInt32 messageID, string[] arguments, string notice)
         {
-            this._client = clientID;
-            this._window = windowID;
-            this._msg = messageID;
+            this._clientid = clientID;
+            this._windowid = windowID;
+            this._messageid = messageID;
+            this._arguments = arguments;
             if (Enum.IsDefined(typeof(SystemMessageType), (int)messageID))
                 this._type = (SystemMessageType)messageID;
+            else this._type = SystemMessageType.Other;
+            this._notice = notice;
         }
 
-        public UInt32 ClientID { get { return this._client; } }
-        public UInt32 WindowID { get { return this._window; } }
-        public UInt32 MessageID { get { return this._msg; } }
+        public UInt32 ClientID { get { return this._clientid; } }
+        public UInt32 WindowID { get { return this._windowid; } }
+        public UInt32 MessageID { get { return this._messageid; } }
+        public UInt32 CategoryID { get { return 20000; } } // Hardcoded MDB category ID
+        public string[] Arguments { get { return this._arguments; } }
         public SystemMessageType Type { get { return this._type; } }
+        public string Notice { get { return this._notice; } }
     }
 }

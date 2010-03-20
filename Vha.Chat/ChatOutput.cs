@@ -46,6 +46,8 @@ namespace Vha.Chat
             this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
             this._chat.VicinityMessageEvent += new VicinityMessageEventHandler(_chat_VicinityMessageEvent);
             this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+            this._chat.SystemMessageEvent += new SystemMessageEventHandler(_chat_SystemMessageEvent);
+            this._chat.SimpleMessageEvent += new SimpleMessageEventHandler(_chat_SimpleMessageEvent);
         }
 
         private void _chat_ChannelJoinEvent(Vha.Net.Chat chat, ChannelJoinEventArgs e)
@@ -122,6 +124,27 @@ namespace Vha.Chat
         private void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
         {
             this._form.AppendLine("Error", "State changed to: " + e.State.ToString());
+        }
+
+        private void _chat_SystemMessageEvent(Vha.Net.Chat chat, SystemMessageEventArgs e)
+        {
+            MDB.Reader reader = new MDB.Reader();
+            MDB.Entry entry = reader.SpeedRead((int)e.CategoryID, (int)e.MessageID);
+            // Failed to get the entry
+            if (entry == null)
+            {
+                this._form.AppendLine("System", "Unknown system message " + e.MessageID);
+                return;
+            }
+            // Format message
+            string template = MDB.Parser.PrintfToFormatString(entry.Message);
+            string message = string.Format(template, e.Arguments);
+            this._form.AppendLine("System", message);
+        }
+
+        private void _chat_SimpleMessageEvent(Vha.Net.Chat chat, SimpleMessageEventArgs e)
+        {
+            this._form.AppendLine("System", e.Message);
         }
     }
 }

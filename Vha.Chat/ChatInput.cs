@@ -291,7 +291,7 @@ namespace Vha.Chat
             }
             List<string> newArgs = new List<string>(args);
             newArgs.RemoveAt(0);
-            Command(newArgs[0], newArgs.ToArray());
+            this._chat.SendChatCommand(newArgs.ToArray());
         }
 
         protected void OrgCommand(string[] args)

@@ -96,9 +96,7 @@ namespace Vha.Chat
         private void _connect()
         {
             this._chat.AutoReconnect = false;
-            this._chat.IgnoreAfkMessages = false;
             this._chat.IgnoreCharacterLoggedIn = true;
-            this._chat.IgnoreOfflineMessages = false;
             this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
             this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
             this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);

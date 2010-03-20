@@ -48,8 +48,14 @@ namespace Vha.Common
 
     public enum SystemMessageType
     {
-        Unknown = 0,
+        Other = 0,
         IncommingOfflineMessage = 172363154,
         OutgoingOfflineMessage = 158601204
+    }
+
+    public enum IncomingOfflineMessageArgs
+    {
+        Name = 0,
+        Date = 1
     }
 }

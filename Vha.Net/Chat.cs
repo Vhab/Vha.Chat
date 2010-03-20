@@ -299,7 +299,7 @@ namespace Vha.Net
                         }
                         else
                         {
-                            throw new SocketException();
+                            throw new Exception();
                         }
                     }
                     catch

@@ -17,6 +17,7 @@
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
 */
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -67,7 +68,7 @@ namespace Vha.Net
             {
                 string request = "CONNECT " + dstHost + ":" + dstPort + " HTTP/1.0\r\n\r\n";
                 if (proxySocket.Connected)
-                    proxySocket.Send(Encoding.UTF8.GetBytes(request));
+                    proxySocket.Send((new NetString(request)).GetBytes());
                 bool still_talking_to_proxy = proxySocket.Connected; // Only talk to it if we're connected. :)
                 List<byte> proxy_communication = new List<byte>();
                 bool have_return = false;
@@ -77,7 +78,6 @@ namespace Vha.Net
                     while (still_talking_to_proxy)
                     {
                         byte[] buff = new byte[1];
-
                         proxySocket.Receive(buff, 0, 1, SocketFlags.Partial);
                         switch (buff[0])
                         {
@@ -134,30 +134,22 @@ namespace Vha.Net
                 // Add destination port.
                 byte[] tmpbytes = BitConverter.GetBytes(dstPort);
                 foreach (byte b in tmpbytes)
-                {
                     sendbytes.Add(b);
-                }
-                // Added destination IP.
+                // Add destination IP.
                 tmpbytes = ((Dns.GetHostEntry(dstHost)).AddressList[0]).GetAddressBytes();
                 foreach (byte b in tmpbytes)
-                {
                     sendbytes.Add(b);
-                }
-                // Add our userid.
+                //Add our userid.
                 if (this._serverURI.UserName != string.Empty)
                 {
-                    char[] chararray = this._serverURI.UserName.ToCharArray();
-                    foreach (char c in chararray)
-                    {
-                        byte[] bytes = BitConverter.GetBytes(c);
-                        sendbytes.Add(bytes[0]);
-                    }
+                    byte[] bytes = (new NetString(this._serverURI.UserName)).GetBytes();
+                    foreach (byte b in bytes)
+                        sendbytes.Add(b);
                 }
                 // Add final nullbyte.
                 sendbytes.Add(0);
                 // Send our bytes!
                 proxySocket.Send(sendbytes.ToArray());
-
 
                 bool accepted = false;
                 // Now receive the reply.
@@ -189,10 +181,9 @@ namespace Vha.Net
             }
         }
 
-
         public override string ToString()
         {
-            return _serverURI.Scheme + ":// " + _serverURI.Host + ":" + _serverURI.Port; // Manually construct, as we don't want to risk echoing user/pass into debug stream.
+            return this._serverURI.Scheme + ":// " + this._serverURI.Host + ":" + this._serverURI.Port; // Manually construct, as we don't want to risk echoing user/pass into debug stream.
         }
     }
 }

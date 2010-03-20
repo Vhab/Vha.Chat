@@ -284,9 +284,10 @@ namespace Vha.Net
                 bool connected = false; //Set this to true when a connection is successfull.
                 if (this._proxy != null)
                 {
+                    Proxy np = null;
                     try
                     {
-                        Proxy np = new Proxy(this._proxy, this._serverAddress, this._port);
+                        np = new Proxy(this._proxy, this._serverAddress, this._port);
                         if (np.Socket != null)
                         {
                             if (np.Socket.Connected)
@@ -296,8 +297,20 @@ namespace Vha.Net
                                 this.Debug("Connected to " + this._serverAddress.ToString() + ":" + this._port + " through " + np.ToString(), "[Socket]");
                             }
                         }
+                        else
+                        {
+                            throw new SocketException();
+                        }
                     }
-                    catch { }
+                    catch
+                    {
+                        if (np == null)
+                            this.Debug("Failed construct proxy connection", "[Socket]");
+                        else if (np.Socket == null)
+                            this.Debug("Failed connecting to proxy server " + np.ToString(), "[Socket]");
+                        else
+                            this.Debug("Failed connecting to " + this._serverAddress.ToString() + ":" + this._port + " through " + np.ToString(), "[Socket]");
+                    }
                 }
                 if (!connected)  //Only try this if we couldn't connect previously.
                 {

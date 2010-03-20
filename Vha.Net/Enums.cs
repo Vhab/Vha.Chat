@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.Net
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
@@ -24,22 +24,38 @@ using System.Text;
 
 namespace Vha.Net
 {
-    public class Channel
+    public enum ChatState
     {
-        private readonly BigInteger _id = 0;
-        private readonly String _name = null;
-        private ChannelType _type = ChannelType.Unknown;
+        Disconnected,
+        Connecting,
+        Login,
+        CharacterSelect,
+        Connected,
+        Reconnecting,
+        Error
+    }
 
-        public Channel(BigInteger id, String name, ChannelType type)
-        {
-            this._id = id;
-            this._name = name;
-            this._type = type;
-        }
+    public enum ChannelType
+    {
+        Unknown = 0,
+        Announcements = 12,
+        General = 135,
+        Organization = 3,
+        Shopping = 356,
+        Towers = 10,
+        Leaders = 4
+    }
 
-        public BigInteger ID { get { return this._id; } }
-        public String Name { get { return this._name; } }
-        public ChannelType Type { get { return this._type; } }
-        public override string ToString() { return this._name; }
+    public enum SystemMessageType
+    {
+        Other = 0,
+        IncommingOfflineMessage = 172363154,
+        OutgoingOfflineMessage = 158601204
+    }
+
+    public enum IncomingOfflineMessageArgs
+    {
+        Name = 0,
+        Date = 1
     }
 }

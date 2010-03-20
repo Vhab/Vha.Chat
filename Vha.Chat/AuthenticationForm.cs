@@ -79,7 +79,16 @@ namespace Vha.Chat
             this._status.SetMessage("Initializing...");
             // Connect
             Server server = (Server)this._server.SelectedItem;
-            this._chat = new Vha.Net.Chat(server.Address, server.Port, this._account.Text, this._password.Text);
+            if (string.IsNullOrEmpty(Program.Configuration.Proxy))
+            {
+                // Connect without proxy
+                this._chat = new Vha.Net.Chat(server.Address, server.Port, this._account.Text, this._password.Text);
+            }
+            else
+            {
+                // Connect with proxy
+                this._chat = new Vha.Net.Chat(server.Address, server.Port, this._account.Text, this._password.Text, new Uri(Program.Configuration.Proxy));
+            }
             this._chat.UseThreadPool = false;
             Thread thread = new Thread(new ThreadStart(_connect));
             thread.Start();

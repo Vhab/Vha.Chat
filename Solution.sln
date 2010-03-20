@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Chat", "Vha.Chat\Vha.Ch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.MDB", "Vha.MDB\Vha.MDB.csproj", "{B309DD92-78AE-40DE-89B5-C76C48D874B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starksoft.Net.Proxy", "Starksoft.Net.Proxy\Starksoft.Net.Proxy.csproj", "{56EB350E-089E-40BB-97CB-F2745A4251AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56EB350E-089E-40BB-97CB-F2745A4251AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56EB350E-089E-40BB-97CB-F2745A4251AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56EB350E-089E-40BB-97CB-F2745A4251AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56EB350E-089E-40BB-97CB-F2745A4251AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -33,7 +33,7 @@ namespace Vha.Chat
     {
         public LoginCharacter Character = null;
 
-        public SelectionForm(LoginCharacter[] characters)
+        public SelectionForm(Net.Chat chat, LoginCharacter[] characters)
         {
             InitializeComponent();
             List<LoginCharacter> list = new List<LoginCharacter>(characters);
@@ -42,7 +42,25 @@ namespace Vha.Chat
             {
                 this._characters.Items.Add(character);
             }
-            this._characters.SelectedIndex = 0;
+
+            this._characters.SelectedIndex = 0; // Default to selecting the first character
+            if (Program.Configuration.Accounts.Count > 0)
+            {
+                foreach (ConfigAccount amap in Program.Configuration.Accounts)
+                {
+                    if (amap.Account == chat.Account)
+                    {
+                        foreach (LoginCharacter lc in this._characters.Items)
+                        {
+                            // Automatically select the last used character
+                            if (lc.Name == amap.Character)
+                            {
+                                this._characters.SelectedIndex = this._characters.Items.IndexOf(lc);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void _cancel_Click(object sender, EventArgs e)

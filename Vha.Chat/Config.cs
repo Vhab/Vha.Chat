@@ -13,5 +13,25 @@ namespace Vha.Chat
         public int MaximumHistory = 99;
         public ChatHtmlStyle TextStyle = ChatHtmlStyle.Default;
         public string Proxy;
+        /// <summary>
+        /// Last logged in dimension.
+        /// </summary>
+        public string Dimension = "";
+        /// <summary>
+        /// Last logged in account
+        /// </summary>
+        public string Account = "";
+        /// <summary>
+        /// Last logged in characters per account
+        /// </summary>
+        public List<ConfigAccount> Accounts = new List<ConfigAccount>();
+    }
+
+    public class ConfigAccount
+    {
+        [XmlAttribute("account")]
+        public string Account = "";
+        [XmlAttribute("character")]
+        public string Character = "";
     }
 }

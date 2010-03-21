@@ -60,6 +60,7 @@ namespace Vha.Chat
             this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
             this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
             this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+            this._chat.LoginOKEvent += new LoginOKEventHandler(_chat_LoginOKEvent);
 
             this._tree.Nodes.Add(this._online);
             this._tree.Nodes.Add(this._offline);
@@ -302,6 +303,37 @@ namespace Vha.Chat
                 // Update buttons
                 this._connect.Enabled = false;
                 this._disconnect.Enabled = true;
+            }
+        }
+        
+        /// <summary>
+        /// This checks if used dimension+account+character is the same as the stored values. If not, store.
+        /// </summary>
+        /// <param name="chat"></param>
+        /// <param name="e"></param>
+        private void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)
+        {
+            //Has 'last connected with' values been changed?
+            ConfigAccount oldamap = null;
+            foreach (ConfigAccount amap in Program.Configuration.Accounts)
+                if (amap.Account == chat.Account)
+                    oldamap = amap;
+            ConfigAccount myamap = oldamap;
+            if (Program.Configuration.Account != chat.Account
+                || myamap == null
+                || myamap.Character != chat.Character
+                || Program.Configuration.Dimension != chat.Server)
+            {
+                // Add changes to config.
+                Program.Configuration.Account = chat.Account;
+                // Last selected character, per account.
+                if (myamap == null) myamap = new ConfigAccount();
+                myamap.Account = chat.Account;
+                myamap.Character = chat.Character;
+                if (oldamap != null) Program.Configuration.Accounts.Remove(oldamap);
+                Program.Configuration.Accounts.Add(myamap);
+                Program.Configuration.Dimension = chat.Server;
+                Vha.Common.XML<Config>.ToFile(Program.ConfigurationFile, Program.Configuration);
             }
         }
 

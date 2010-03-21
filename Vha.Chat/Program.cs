@@ -29,6 +29,11 @@ namespace Vha.Chat
     public static class Program
     {
         public static Config Configuration = null;
+        /// <summary>
+        /// Location of configuration file.
+        /// </summary>
+        public static string ConfigurationFile = "Config.xml"; 
+        public static Ignore Ignores = null; // Will be initialized at a later, more appropriate time
         public static ApplicationContext Context;
         /// <summary>
         /// The main entry point for the application.
@@ -37,7 +42,7 @@ namespace Vha.Chat
         static void Main()
         {
             // Read configuration
-            Config configuration = XML<Config>.FromFile("Config.xml");
+            Config configuration = XML<Config>.FromFile(Program.ConfigurationFile);
             if (configuration != null) Configuration = configuration;
             else Configuration = new Config();
             // Start application

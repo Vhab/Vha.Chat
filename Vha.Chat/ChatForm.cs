@@ -60,6 +60,7 @@ namespace Vha.Chat
             this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
             this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
             this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+            this._chat.LoginOKEvent += new LoginOKEventHandler(_chat_LoginOKEvent);
 
             this._tree.Nodes.Add(this._online);
             this._tree.Nodes.Add(this._offline);
@@ -77,7 +78,7 @@ namespace Vha.Chat
 
         private void ChatForm_Load(object sender, EventArgs e)
         {
-            // Focus the input box after the form completed loading
+            // FIXME: Focus the input box after the form completed loading
             this._inputBox.Focus();
         }
 
@@ -258,6 +259,14 @@ namespace Vha.Chat
                 this.Invoke(new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent), new object[] { chat, e });
                 return;
             }
+            // Check if the person sending the invite is on ignore.
+            if (Program.Ignores != null)
+                if (Program.Ignores.Contains(e.CharacterID, e.Character))
+                {
+                    e.Join = false;
+                    return;
+                }
+
             // Show dialog
             DialogResult result = MessageBox.Show(
                 "You have been invited to " + e.Character + "'s private channel. Do you wish to join?",
@@ -302,6 +311,41 @@ namespace Vha.Chat
                 // Update buttons
                 this._connect.Enabled = false;
                 this._disconnect.Enabled = true;
+                // Create ignore list. Doing so here does not let us ignore offline tells, since they are already received.
+                // It will have to do untill there's a safe method to create it before any messages are actually received,
+                // but still after character selection has succeeded.
+                Program.Ignores = new Ignore(Program.Configuration.IgnoreMethod, chat, true);
+            }
+        }
+
+        /// <summary>
+        /// This checks if used dimension+account+character is the same as the stored values. If not, store.
+        /// </summary>
+        /// <param name="chat"></param>
+        /// <param name="e"></param>
+        private void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)
+        {
+            // Has 'last connected with' values been changed?
+            ConfigAccount oldamap = null;
+            foreach (ConfigAccount amap in Program.Configuration.Accounts)
+                if (amap.Account == chat.Account)
+                    oldamap = amap;
+            ConfigAccount myamap = oldamap;
+            if (Program.Configuration.Account != chat.Account
+                || myamap == null
+                || myamap.Character != chat.Character
+                || Program.Configuration.Dimension != chat.Server)
+            {
+                // Add changes to config.
+                Program.Configuration.Account = chat.Account;
+                // Last selected character, per account.
+                if (myamap == null) myamap = new ConfigAccount();
+                myamap.Account = chat.Account;
+                myamap.Character = chat.Character;
+                if (oldamap != null) Program.Configuration.Accounts.Remove(oldamap);
+                Program.Configuration.Accounts.Add(myamap);
+                Program.Configuration.Dimension = chat.Server;
+                Vha.Common.XML<Config>.ToFile(Program.ConfigurationFile, Program.Configuration);
             }
         }
 

@@ -69,6 +69,7 @@
     <Compile Include="ChatTreeNode.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="FormUtils.cs" />
+    <Compile Include="Ignore.cs" />
     <Compile Include="InfoForm.cs">
       <SubType>Form</SubType>
     </Compile>

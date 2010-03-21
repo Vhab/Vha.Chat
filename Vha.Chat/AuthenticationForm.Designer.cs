@@ -31,12 +31,12 @@ namespace Vha.Chat
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AuthenticationForm));
             this._serverLabel = new System.Windows.Forms.Label();
             this._server = new System.Windows.Forms.ComboBox();
-            this._account = new System.Windows.Forms.TextBox();
             this._accountLabel = new System.Windows.Forms.Label();
             this._passwordLabel = new System.Windows.Forms.Label();
             this._password = new System.Windows.Forms.TextBox();
             this._login = new System.Windows.Forms.Button();
             this._cancel = new System.Windows.Forms.Button();
+            this._account = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // _serverLabel
@@ -56,13 +56,6 @@ namespace Vha.Chat
             this._server.Name = "_server";
             this._server.Size = new System.Drawing.Size(198, 21);
             this._server.TabIndex = 1;
-            // 
-            // _account
-            // 
-            this._account.Location = new System.Drawing.Point(74, 39);
-            this._account.Name = "_account";
-            this._account.Size = new System.Drawing.Size(198, 20);
-            this._account.TabIndex = 2;
             // 
             // _accountLabel
             // 
@@ -88,14 +81,14 @@ namespace Vha.Chat
             this._password.Name = "_password";
             this._password.PasswordChar = '*';
             this._password.Size = new System.Drawing.Size(198, 20);
-            this._password.TabIndex = 5;
+            this._password.TabIndex = 3;
             // 
             // _login
             // 
             this._login.Location = new System.Drawing.Point(12, 92);
             this._login.Name = "_login";
             this._login.Size = new System.Drawing.Size(127, 23);
-            this._login.TabIndex = 6;
+            this._login.TabIndex = 4;
             this._login.Text = "Login";
             this._login.UseVisualStyleBackColor = true;
             this._login.Click += new System.EventHandler(this._login_Click);
@@ -106,10 +99,18 @@ namespace Vha.Chat
             this._cancel.Location = new System.Drawing.Point(145, 92);
             this._cancel.Name = "_cancel";
             this._cancel.Size = new System.Drawing.Size(127, 23);
-            this._cancel.TabIndex = 7;
+            this._cancel.TabIndex = 5;
             this._cancel.Text = "Cancel";
             this._cancel.UseVisualStyleBackColor = true;
             this._cancel.Click += new System.EventHandler(this._cancel_Click);
+            // 
+            // _account
+            // 
+            this._account.FormattingEnabled = true;
+            this._account.Location = new System.Drawing.Point(74, 40);
+            this._account.Name = "_account";
+            this._account.Size = new System.Drawing.Size(198, 21);
+            this._account.TabIndex = 2;
             // 
             // AuthenticationForm
             // 
@@ -118,12 +119,12 @@ namespace Vha.Chat
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancel;
             this.ClientSize = new System.Drawing.Size(284, 127);
+            this.Controls.Add(this._account);
             this.Controls.Add(this._cancel);
             this.Controls.Add(this._login);
             this.Controls.Add(this._password);
             this.Controls.Add(this._passwordLabel);
             this.Controls.Add(this._accountLabel);
-            this.Controls.Add(this._account);
             this.Controls.Add(this._server);
             this.Controls.Add(this._serverLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -133,8 +134,8 @@ namespace Vha.Chat
             this.Name = "AuthenticationForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Vha.Chat :: Authentication";
-            this.Load += new System.EventHandler(this.AuthenticationForm_Load);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AuthenticationForm_FormClosed);
+            this.Load += new System.EventHandler(this.AuthenticationForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -144,12 +145,12 @@ namespace Vha.Chat
 
         private System.Windows.Forms.Label _serverLabel;
         private System.Windows.Forms.ComboBox _server;
-        private System.Windows.Forms.TextBox _account;
         private System.Windows.Forms.Label _accountLabel;
         private System.Windows.Forms.Label _passwordLabel;
         private System.Windows.Forms.TextBox _password;
         private System.Windows.Forms.Button _login;
         private System.Windows.Forms.Button _cancel;
+        private System.Windows.Forms.ComboBox _account;
     }
 }
 

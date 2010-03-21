@@ -187,6 +187,9 @@ namespace Vha.Chat
                 case "help":
                     HelpCommand();
                     break;
+                case "ignore":
+                    IgnoreCommand(args);
+                    break;
                 default:
                     this._form.AppendLine("Error", "Unknown command: /" + command);
                     break;
@@ -245,6 +248,48 @@ namespace Vha.Chat
             if (!_checkUser(args[1])) return;
             this._chat.SendPrivateMessage(args[1], string.Join(" ", args, 2, args.Length - 2));
         }
+
+        protected void IgnoreCommand(string[] args)
+        {
+            if (Program.Ignores == null)
+            {
+                this._form.AppendLine("Error", "The ignore list hasn't been initialized yet, please be patient");
+                return;
+            }
+            if (args.Length < 2)
+            {
+                this._form.AppendLine("Error", "Correct usage:<br>/ignore [username]<br>/ignore list");
+                return;
+            }
+            if (args[1] == "list")
+            {
+                string[] ignoredusers = Program.Ignores.ToNameArray();
+                switch (ignoredusers.Length)
+                {
+                    case 0:
+                        this._form.AppendLine("Internal", "There are no users on your ignore list");
+                        break;
+                    case 1:
+                        this._form.AppendLine("Internal", "You have ignored " + ignoredusers[0] + "");
+                        break;
+                    default:
+                        this._form.AppendLine("Internal", "You have ignored " + ignoredusers.Length.ToString() + " users:<br>- " + string.Join("<br>- ", ignoredusers));
+                        break;
+                }
+            }
+            else
+            {
+                if (!_checkUser(args[1])) return;
+                string name = args[1].Substring(0, 1).ToUpper() + args[1].Substring(1).ToLower();
+                uint uid = _chat.GetUserID(name);
+                string action = string.Empty;
+                if (Program.Ignores.Toggle(uid, name))
+                    this._form.AppendLine("Internal", "Added " + name + " to the ignore list");
+                else
+                    this._form.AppendLine("Internal", "Removed " + name + " from the ignore list");
+            }
+        }
+
 
         delegate void AboutCommandDelegate();
         protected void AboutCommand()
@@ -350,7 +395,7 @@ namespace Vha.Chat
 
         protected void HelpCommand()
         {
-            this._form.AppendLine("System",
+            this._form.AppendLine("Internal",
                 "The following commands are available:<br>" +
                 "/tell [username] [message]<br>" +
                 "/leave [private channel]<br>" +
@@ -360,6 +405,8 @@ namespace Vha.Chat
                 "/addbuddy [username]<br>" +
                 "/rembuddy [username]<br>" +
                 "/o [message]<br>" +
+                "/ignore [username]<br>" +
+                "/ignore list<br>" +
                 "/mute [channel]<br>" +
                 "/unmute [channel]<br>" +
                 "/cc [command]<br>" +

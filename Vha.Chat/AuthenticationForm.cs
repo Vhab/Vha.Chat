@@ -48,7 +48,31 @@ namespace Vha.Chat
             this._server.Items.Add(new Server("Rimor", "chat.d2.funcom.com", 7102));
             this._server.Items.Add(new Server("Die Neue Welt", "chat.d3.funcom.com", 7103));
             this._server.Items.Add(new Server("Test", "chat.dt.funcom.com", 7109));
-            this._server.SelectedIndex = 0;
+
+            this._server.SelectedIndex = 0; // Default to selecting index 0.
+            if (!string.IsNullOrEmpty(Program.Configuration.Dimension))
+            {
+                foreach (Server s in this._server.Items) // Automatically select the last used server.
+                {
+                    if (s.Address == Program.Configuration.Dimension) // Compare with host for now, since there's no inter-class available data on what server name is what dimension etc.
+                        this._server.SelectedIndex = this._server.Items.IndexOf(s);
+                }
+            }
+            this._account.Text = Program.Configuration.Account; // Automatically insert last account name
+            // Add list of used accounts. Alphabetical order.
+            if (Program.Configuration.Accounts.Count > 0)
+            {
+                List<string> accounts = new List<string>();
+                foreach (ConfigAccount acc in Program.Configuration.Accounts)
+                {
+                    accounts.Add(acc.Account);
+                }
+                accounts.Sort(delegate(string A, string B) { return A.CompareTo(B); });
+                foreach (string s in accounts)
+                {
+                    this._account.Items.Add(s);
+                }
+            }
         }
 
         private void _cancel_Click(object sender, EventArgs e)
@@ -169,7 +193,7 @@ namespace Vha.Chat
             this._status.DialogResult = DialogResult.OK;
             this._status.Hide();
             this.Hide();
-            SelectionForm form = new SelectionForm(e.CharacterList);
+            SelectionForm form = new SelectionForm(chat, e.CharacterList);
             DialogResult result = form.ShowDialog();
             if (result == DialogResult.OK)
             {

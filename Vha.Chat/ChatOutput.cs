@@ -33,6 +33,10 @@ namespace Vha.Chat
         protected ChatHtml _htmlUtil;
         protected Net.Chat _chat;
         protected List<string> _ignoredChannels;
+        /// <summary>
+        /// List containing uids of private channels I am in.
+        /// </summary>
+        protected List<uint> _privateChannels = new List<uint>();
 
         public ChatOutput(ChatForm form, ChatHtml html, Net.Chat chat)
         {
@@ -80,7 +84,7 @@ namespace Vha.Chat
             {
                 MDB.Message parsedMessage = null;
                 try { parsedMessage = MDB.Parser.Decode(e.Message); }
-                catch {}
+                catch { }
                 if (parsedMessage != null && !string.IsNullOrEmpty(parsedMessage.Value))
                     message = parsedMessage.Value;
             }
@@ -109,10 +113,29 @@ namespace Vha.Chat
 
         void _chat_PrivateChannelStatusEvent(Vha.Net.Chat chat, PrivateChannelStatusEventArgs e)
         {
-            string message = string.Format(
-                "[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a> has {2} the channel",
-                e.Channel, e.Character, e.Join ? "joined" : "left");
-            this._form.AppendLine("PG", message);
+            // Check if we *should* report this message at all.
+            bool report = true;
+            if (e.Join && e.CharacterID == chat.ID)
+            {
+                if (this._privateChannels.Contains(e.ChannelID))
+                    report = false;
+                else
+                    this._privateChannels.Add(e.ChannelID);
+            }
+            else if (e.CharacterID == chat.ID)
+            {
+                if (!this._privateChannels.Contains(e.ChannelID)) // We're not in this channel
+                    report = false;
+                else
+                    this._privateChannels.Remove(e.ChannelID);
+            }
+            if (report)
+            {
+                string message = string.Format(
+                    "[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a> has {2} the channel",
+                    e.Channel, e.Character, e.Join ? "joined" : "left");
+                this._form.AppendLine("PG", message);
+            }
         }
 
         private void _chat_VicinityMessageEvent(Vha.Net.Chat chat, VicinityMessageEventArgs e)

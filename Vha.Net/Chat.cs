@@ -309,7 +309,7 @@ namespace Vha.Net
                         else if (np.Socket == null)
                             this.Debug("Failed connecting to proxy server " + np.ToString(), "[Socket]");
                         else
-                            this.Debug("Failed connecting to " + this._serverAddress.ToString() + ":" + this._port + " through " + np.ToString(), "[Socket]");
+                            this.Debug("Failed connecting to " + this._serverAddress + ":" + this._port.ToString() + " through " + np.ToString(), "[Socket]");
                     }
                 }
                 if (!connected)  //Only try this if we couldn't connect previously.

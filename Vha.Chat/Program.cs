@@ -31,7 +31,7 @@ namespace Vha.Chat
         /// <summary>
         /// Returns the non-runtime-editable initial configuration
         /// </summary>
-        public static Config Configuration = null;
+        public static Configuration Configuration = null;
         /// <summary>
         /// Returns the chat client context
         /// </summary>

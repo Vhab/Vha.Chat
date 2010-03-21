@@ -67,7 +67,6 @@
     <Compile Include="ChatHtml.cs" />
     <Compile Include="ChatOutput.cs" />
     <Compile Include="ChatTreeNode.cs" />
-    <Compile Include="Config.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="FormUtils.cs" />
@@ -79,6 +78,8 @@
       <DependentUpon>InfoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Message.cs" />
+    <Compile Include="Options.cs">
+    </Compile>
     <Compile Include="OptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -168,9 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
-    <None Include="Config.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Content Include="Configuration.xml" />
     <None Include="Resources\Chat.html" />
     <None Include="Resources\OptionsBigBitmap.png" />
     <None Include="Resources\OptionsIcon.ico" />

@@ -83,20 +83,20 @@ namespace Vha.Chat
     {
         public readonly MessageTarget Target;
         public readonly MessageClass Class;
-        public readonly string Message;
+        public readonly string Text;
 
-        public Message(MessageTarget target, MessageClass messageClass, string message)
+        public Message(MessageTarget target, MessageClass messageClass, string text)
         {
             if (target == null)
                 throw new ArgumentNullException();
             this.Target = target;
             this.Class = messageClass;
-            this.Message = message;
+            this.Text = text;
         }
 
         public override string ToString()
         {
-            return this.Message;
+            return this.Text;
         }
 
         public bool Equals(Message message)
@@ -104,7 +104,7 @@ namespace Vha.Chat
             if (message == null) return false;
             if (this.Target != message.Target) return false;
             if (this.Class != message.Class) return false;
-            if (this.Message != message.Message) return false;
+            if (this.Text != message.Text) return false;
             return true;
         }
     }

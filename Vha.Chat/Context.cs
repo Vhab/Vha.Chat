@@ -39,7 +39,7 @@ namespace Vha.Chat
         /// <summary>
         /// Returns direct access to the chat instance
         /// </summary>
-        public Chat Chat { get { return null; } }
+        public Net.Chat Chat { get { return null; } }
         /// <summary>
         /// Returns the toolset to manage the users on the ignore list
         /// </summary>
@@ -118,12 +118,12 @@ namespace Vha.Chat
         #region Internal
         private Options _options;
         private Input _input;
-        private Chat _chat;
+        private Net.Chat _chat;
 
         private Dictionary<string, Channel> _channels;
         private Dictionary<string, Friend> _friends;
 
-        internal Context(Chat chat)
+        internal Context(Net.Chat chat)
         {
             this._chat = chat;
             // Hook events

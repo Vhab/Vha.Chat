@@ -43,21 +43,14 @@ namespace Vha.Chat
 
         private void AuthenticationForm_Load(object sender, EventArgs e)
         {
-            // FIXME: Add a dimension file loader here
-            this._server.Items.Add(new Server("Atlantean", "chat.d1.funcom.com", 7101));
-            this._server.Items.Add(new Server("Rimor", "chat.d2.funcom.com", 7102));
-            this._server.Items.Add(new Server("Die Neue Welt", "chat.d3.funcom.com", 7103));
-            this._server.Items.Add(new Server("Test", "chat.dt.funcom.com", 7109));
-
-            this._server.SelectedIndex = 0; // Default to selecting index 0.
-            if (!string.IsNullOrEmpty(Program.Configuration.Dimension))
+            foreach (Server server in Program.Servers.Servers)
             {
-                foreach (Server s in this._server.Items) // Automatically select the last used server.
-                {
-                    if (s.Address == Program.Configuration.Dimension) // Compare with host for now, since there's no inter-class available data on what server name is what dimension etc.
-                        this._server.SelectedIndex = this._server.Items.IndexOf(s);
-                }
+                this._server.Items.Add(server);
+                if (this._server.Items.Count == 1) this._server.SelectedIndex = 0; //Make sure we always select the first one, so that if we don't find the last used server, at least some server is selected.
+                else if (server.Name == Program.Configuration.Dimension)
+                    this._server.SelectedIndex = this._server.Items.Count - 1; //this works because count starts at 1 and index starts at 0.
             }
+            
             this._account.Text = Program.Configuration.Account; // Automatically insert last account name
             // Add list of used accounts. Alphabetical order.
             if (Program.Configuration.Accounts.Count > 0)

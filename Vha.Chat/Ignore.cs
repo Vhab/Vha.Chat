@@ -72,10 +72,17 @@ namespace Vha.Chat
         }
 
         /// <summary>
-        /// Saves the ignore list to files
+        /// Saves the ignore list to the file path associated with this instance
         /// </summary>
         /// <returns></returns>
-        public bool Save() { return this.Save(""); }
+        public bool Save()
+        {
+            lock (this._file)
+            {
+                if (string.IsNullOrEmpty(this._file)) return false;
+                return this.Save(this._file, false);
+            }
+        }
         /// <summary>
         /// Saves the ignore list to file, updates internal record of file location to provided path
         /// </summary>
@@ -92,14 +99,12 @@ namespace Vha.Chat
         /// <returns></returns>
         public bool Save(string path, bool UpdateFilePath)
         {
-            this._synchronized = UpdateFilePath;
+            if (string.IsNullOrEmpty(path)) return false;
+            if (UpdateFilePath) //Should we update the file path?
+                lock (this._file)
+                    this._file = path;
             lock (this._entries)
-            {
-                if (!string.IsNullOrEmpty(path))
-                    return Common.XML<Entries>.ToFile(path, this._entries);
-                else
-                    return Common.XML<Entries>.ToFile(this._file, this._entries);
-            }
+                return Common.XML<Entries>.ToFile(path, this._entries);
         }
 
         /// <summary>
@@ -161,6 +166,12 @@ namespace Vha.Chat
         #endregion
 
         #region Operators
+        /// <summary>
+        /// Combines two ignore lists into one. Ignore.File will be nilled.
+        /// </summary>
+        /// <param name="i1"></param>
+        /// <param name="i2"></param>
+        /// <returns></returns>
         public static Ignore operator +(Ignore i1, Ignore i2)
         {
             Ignore ignore = new Ignore();
@@ -178,6 +189,7 @@ namespace Vha.Chat
             {
                 ignore.Add(ids2[i], names2[i]);
             }
+            if (i1._synchronized || i2._synchronized) ignore.Syncronized = true;
             return ignore;
         }
         #endregion

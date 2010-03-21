@@ -20,15 +20,19 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Vha.Chat
 {
     public class Server
     {
+        [XmlAttribute("name")]
         public string Name;
+        [XmlAttribute("address")]
         public string Address;
+        [XmlAttribute("port")]
         public int Port;
-
+        
         public Server() { }
         public Server(string name, string address, int port)
         {
@@ -36,10 +40,10 @@ namespace Vha.Chat
             this.Address = address;
             this.Port = port;
         }
-
+        
         public override string ToString()
         {
             return this.Name;
-        }
+        } 
     }
 }

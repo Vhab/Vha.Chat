@@ -133,6 +133,7 @@
       <DependentUpon>SelectionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Server.cs" />
+    <Compile Include="ServerList.cs" />
     <Compile Include="StatusForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -156,6 +157,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
+    <None Include="Servers.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -316,15 +316,11 @@ namespace Vha.Chat
                     // 2) Create a new scope to not overflow this methods scope with junk members.
                     string file= "ignore/";
                     if (!Directory.Exists(file)) Directory.CreateDirectory(file);
+                    Server s = Program.Servers.Get(chat.Server, chat.Port);
                     string dim;
-                    switch (chat.Server)
-                    {
-                        case "chat.d1.funcom.com": dim = "rk1"; break;
-                        case "chat.d2.funcom.com": dim = "rk2"; break;
-                        case "chat.d3.funcom.com": dim = "rk3"; break;
-                        case "chat.dt.funcom.com": dim = "test"; break;
-                        default: dim = "unknown"; break;
-                    }
+                    if (s == null) dim = "unknown";
+                    else dim = s.Name;
+
                     switch (Program.Configuration.IgnoreMethod)
                     {
                         case IgnoreMethod.Dimension:
@@ -352,6 +348,11 @@ namespace Vha.Chat
         private void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)
         {
             // Has 'last connected with' values been changed?
+            Server s = Program.Servers.Get(chat.Server, chat.Port);
+            string Server;
+            if (s == null) Server = "unknown";
+            else Server = s.Name;
+
             ConfigAccount oldamap = null;
             foreach (ConfigAccount amap in Program.Configuration.Accounts)
                 if (amap.Account == chat.Account)
@@ -360,7 +361,7 @@ namespace Vha.Chat
             if (Program.Configuration.Account != chat.Account
                 || myamap == null
                 || myamap.Character != chat.Character
-                || Program.Configuration.Dimension != chat.Server)
+                || Program.Configuration.Dimension != Server)
             {
                 // Add changes to config.
                 Program.Configuration.Account = chat.Account;
@@ -370,7 +371,7 @@ namespace Vha.Chat
                 myamap.Character = chat.Character;
                 if (oldamap != null) Program.Configuration.Accounts.Remove(oldamap);
                 Program.Configuration.Accounts.Add(myamap);
-                Program.Configuration.Dimension = chat.Server;
+                Program.Configuration.Dimension = Server;
                 Vha.Common.XML<Config>.ToFile(Program.ConfigurationFile, Program.Configuration);
             }
         }

@@ -76,6 +76,11 @@ namespace Vha.Chat
         {
             // Check if channel is muted
             if (this._ignoredChannels.Contains(e.Channel)) return;
+            // Check ignored users list
+            if (Program.Ignores != null)
+                if (Program.Ignores.Contains(e.CharacterID, e.Character))
+                    return;
+
             // Process message
             string message = e.Message;
             if (e.Message.StartsWith("~"))
@@ -94,6 +99,10 @@ namespace Vha.Chat
 
         private void _chat_PrivateMessageEvent(Vha.Net.Chat chat, PrivateMessageEventArgs e)
         {
+            // Check ignored users list
+            if (Program.Ignores != null)
+                if (Program.Ignores.Contains(e.CharacterID, e.Character))
+                    return;
             string message = string.Format(
                 "[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: {1}",
                e.Character, e.Message);
@@ -103,6 +112,10 @@ namespace Vha.Chat
 
         void _chat_PrivateChannelMessageEvent(Vha.Net.Chat chat, PrivateChannelMessageEventArgs e)
         {
+            // Check ignored users list
+            if (Program.Ignores != null)
+                if (Program.Ignores.Contains(e.CharacterID, e.Character))
+                    return;
             string message = string.Format(
                 "[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
                 e.Channel, e.Character, e.Message);
@@ -138,6 +151,10 @@ namespace Vha.Chat
 
         private void _chat_VicinityMessageEvent(Vha.Net.Chat chat, VicinityMessageEventArgs e)
         {
+            // Check ignored users list
+            if (Program.Ignores != null)
+                if (Program.Ignores.Contains(e.CharacterID, e.Character))
+                    return;
             string message = string.Format(
                "[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: {1}",
               e.Character, e.Message);

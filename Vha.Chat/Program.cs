@@ -33,6 +33,7 @@ namespace Vha.Chat
         /// Location of configuration file.
         /// </summary>
         public static string ConfigurationFile = "Config.xml"; 
+        public static Ignore Ignores = null; // Will be initialized at a later, more appropriate time
         public static ApplicationContext Context;
         /// <summary>
         /// The main entry point for the application.

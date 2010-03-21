@@ -14,6 +14,10 @@ namespace Vha.Chat
         public ChatHtmlStyle TextStyle = ChatHtmlStyle.Default;
         public string Proxy;
         /// <summary>
+        /// Unique ignore lists per...
+        /// </summary>
+        public Ignore.Method IgnoreMethod = Ignore.Method.Dimension;
+        /// <summary>
         /// Last logged in dimension.
         /// </summary>
         public string Dimension = "";

@@ -253,7 +253,10 @@ namespace Vha.Chat
         {
             if (Program.Ignores == null)
             {
-                this._form.AppendLine("Error", "The ignore list hasn't been initialized yet, please be patient");
+                if (Program.Configuration.IgnoreEnabled)
+                    this._form.AppendLine("Error", "The ignore list hasn't been initialized yet, please be patient");
+                else
+                    this._form.AppendLine("Internal", "The ignore feature is disabled.");
                 return;
             }
             if (args.Length < 2)

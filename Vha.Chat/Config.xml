@@ -12,8 +12,11 @@
   <!-- Add "user:password@" before the address to use authentication -->
   <!-- Leave empty to not use any proxy server -->
   <Proxy></Proxy>
+  <!-- Is the ignore system enabled? -->
+  <IgnoreEnabled>true</IgnoreEnabled>
   <!-- Unique ignore list per: Dimension, Account or Character -->
   <IgnoreMethod>Dimension</IgnoreMethod>
+  
   <!-- Last logged in dimension -->
   <Dimension></Dimension>
   <!-- Last logged in account -->

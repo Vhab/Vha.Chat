@@ -32,29 +32,32 @@ namespace Vha.Chat
          * so that we can list sensible character names to the user.
          * -- Demoder
          */
-        public enum Method
-        {
-            /// <summary>
-            /// Per dimension
-            /// </summary>
-            Dimension,
-            /// <summary>
-            /// Per dimension+account
-            /// </summary>
-            Account,
-            /// <summary>
-            /// Per dimension+character
-            /// </summary>
-            Character
-        }
-
         #region Members
         private Entries _entries = null;
         private bool _synchronized = false;
         private string _file = string.Empty;
+
+        /// <summary>
+        /// Am I syncronizing to disk?
+        /// </summary>
+        public bool Syncronized { get { return this._synchronized; } set { this._synchronized = value; } }
+        /// <summary>
+        /// Where do I store my data?
+        /// </summary>
+        public string File { get { return this._file; } }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Initialize an empty ignore list.
+        /// </summary>
+        public Ignore()
+        {
+            this._entries = new Entries();
+            this._file = "";
+            this._synchronized = false;
+        }
+
         /// <summary>
         /// Initialize a new Ignore object, the simple way
         /// </summary>
@@ -69,55 +72,27 @@ namespace Vha.Chat
         }
 
         /// <summary>
-        /// Initialize a new Ignore object based on more complex parameters
-        /// </summary>
-        public Ignore(Method type, Net.Chat chat, bool synchronized)
-        {
-            this._synchronized = synchronized;
-            System.IO.Directory.CreateDirectory("ignore");
-            string file = "ignore/";
-            string dim = string.Empty;
-            //Manual override untill server list is loaded from a file with "smart data" attached.
-            switch (chat.Server)
-            {
-                case "chat.d1.funcom.com": dim = "rk1"; break;
-                case "chat.d2.funcom.com": dim = "rk2"; break;
-                case "chat.d3.funcom.com": dim = "rk3"; break;
-                case "chat.dt.funcom.com": dim = "test"; break;
-                default: dim = "unknown"; break;
-            }
-            switch (type)
-            {
-                case Method.Dimension:
-                    file += dim;
-                    break;
-                case Method.Account:
-                    file += dim + "-" + chat.Account;
-                    break;
-                case Method.Character:
-                    file += dim + "-" + chat.ID;
-                    break;
-                default:
-                    throw new ArgumentException("Invalid Ignore.Method");
-            }
-            file += ".xml";
-            this._entries = Common.XML<Entries>.FromFile(file);
-            if (this._entries == null) this._entries = new Entries(); //If we don't have a stored ignore list, create a blank one. It won't get saved to disk untill it's changed.
-            this._file = file;
-        }
-
-        /// <summary>
         /// Saves the ignore list to files
         /// </summary>
         /// <returns></returns>
-        public bool Save() { return Save(""); }
+        public bool Save() { return this.Save(""); }
         /// <summary>
-        /// Saves the ignore list to files
+        /// Saves the ignore list to file, updates internal record of file location to provided path
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public bool Save(string path)
+        public bool Save(string path) { return this.Save(path, true); }
+        
+
+        /// <summary>
+        /// Saves the ignore list to file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="UpdateFilePath">Should we update the default file path?</param>
+        /// <returns></returns>
+        public bool Save(string path, bool UpdateFilePath)
         {
+            this._synchronized = UpdateFilePath;
             lock (this._entries)
             {
                 if (!string.IsNullOrEmpty(path))
@@ -182,6 +157,28 @@ namespace Vha.Chat
                 output.Sort(delegate(string A, string B) { return A.CompareTo(B); });
                 return output.ToArray();
             }
+        }
+        #endregion
+
+        #region Operators
+        public static Ignore operator +(Ignore i1, Ignore i2)
+        {
+            Ignore ignore = new Ignore();
+            // Add first
+            uint[] ids1 = i1.ToIDArray();
+            string[] names1 = i1.ToNameArray();
+            for (int i = 0; i < ids1.Length; i++)
+            {
+                ignore.Add(ids1[i], names1[i]);
+            }
+            // Add second
+            uint[] ids2 = i2.ToIDArray();
+            string[] names2 = i2.ToNameArray();
+            for (int i = 0; i < ids2.Length; i++)
+            {
+                ignore.Add(ids2[i], names2[i]);
+            }
+            return ignore;
         }
         #endregion
 

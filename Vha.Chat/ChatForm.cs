@@ -76,12 +76,6 @@ namespace Vha.Chat
             this._options.Visible = false;
         }
 
-        private void ChatForm_Load(object sender, EventArgs e)
-        {
-            // FIXME: Focus the input box after the form completed loading
-            this._inputBox.Focus();
-        }
-
         public void AppendLine(string type, string line)
         {
             string html = string.Format(
@@ -311,10 +305,42 @@ namespace Vha.Chat
                 // Update buttons
                 this._connect.Enabled = false;
                 this._disconnect.Enabled = true;
+                
                 // Create ignore list. Doing so here does not let us ignore offline tells, since they are already received.
                 // It will have to do untill there's a safe method to create it before any messages are actually received,
                 // but still after character selection has succeeded.
-                Program.Ignores = new Ignore(Program.Configuration.IgnoreMethod, chat, true);
+                if (Program.Configuration.IgnoreEnabled)
+                {
+                    //Dual function:
+                    // 1) check if we should enable the ignore system.
+                    // 2) Create a new scope to not overflow this methods scope with junk members.
+                    string file= "ignore/";
+                    if (!Directory.Exists(file)) Directory.CreateDirectory(file);
+                    string dim;
+                    switch (chat.Server)
+                    {
+                        case "chat.d1.funcom.com": dim = "rk1"; break;
+                        case "chat.d2.funcom.com": dim = "rk2"; break;
+                        case "chat.d3.funcom.com": dim = "rk3"; break;
+                        case "chat.dt.funcom.com": dim = "test"; break;
+                        default: dim = "unknown"; break;
+                    }
+                    switch (Program.Configuration.IgnoreMethod)
+                    {
+                        case IgnoreMethod.Dimension:
+                            file += dim+".xml";
+                            break;
+                        case IgnoreMethod.Account:
+                            file += String.Format("{0}-{1}.xml", dim , chat.Account);
+                            break;
+                        case IgnoreMethod.Character:
+                            file += String.Format("{0}-{1}.xml", dim, chat.ID);
+                            break;
+                        default:
+                            throw new ArgumentException("Invalid Ignore.Method");
+                    }
+                    Program.Ignores = new Ignore(file, true);
+                }
             }
         }
 
@@ -422,12 +448,7 @@ namespace Vha.Chat
 
         private void ChatForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (this._chat == null) return;
-            if (this._chat.State != ChatState.Disconnected)
-            {
-                this._chat.Disconnect();
-            }
-            this._chat = null;
+
         }
 
         private void _outputBox_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)

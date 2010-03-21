@@ -538,10 +538,10 @@ namespace Vha.Chat
         private void _connect_Click(object sender, EventArgs e)
         {
             // Return to authorization window
-            Program.Context.MainForm = new AuthenticationForm();
+            Program.Application.MainForm = new AuthenticationForm();
             // Close this window before showing auth window
             this.Close();
-            Program.Context.MainForm.Show();
+            Program.Application.MainForm.Show();
         }
 
         private void _disconnect_Click(object sender, EventArgs e)

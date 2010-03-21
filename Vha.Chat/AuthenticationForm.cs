@@ -197,9 +197,9 @@ namespace Vha.Chat
             DialogResult result = form.ShowDialog();
             if (result == DialogResult.OK)
             {
-                Program.Context.MainForm = new ChatForm(this._chat);
+                Program.Application.MainForm = new ChatForm(this._chat);
                 this.Close();
-                Program.Context.MainForm.Show();
+                Program.Application.MainForm.Show();
                 this._chat.SendLoginCharacter(form.Character);
                 this._chat.AutoReconnect = true;
                 this._chat = null;

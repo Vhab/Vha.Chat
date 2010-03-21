@@ -68,6 +68,8 @@
     <Compile Include="ChatOutput.cs" />
     <Compile Include="ChatTreeNode.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Context.cs" />
     <Compile Include="FormUtils.cs" />
     <Compile Include="Ignore.cs" />
     <Compile Include="InfoForm.cs">
@@ -76,6 +78,7 @@
     <Compile Include="InfoForm.Designer.cs">
       <DependentUpon>InfoForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Message.cs" />
     <Compile Include="OptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>

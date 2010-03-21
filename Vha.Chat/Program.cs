@@ -28,13 +28,18 @@ namespace Vha.Chat
 {
     public static class Program
     {
+        /// <summary>
+        /// Returns the non-runtime-editable initial configuration
+        /// </summary>
         public static Config Configuration = null;
         /// <summary>
-        /// Location of configuration file.
+        /// Returns the chat client context
         /// </summary>
-        public static string ConfigurationFile = "Config.xml"; 
-        public static Ignore Ignores = null; // Will be initialized at a later, more appropriate time
-        public static ApplicationContext Context;
+        public static Context Context = null;
+        /// <summary>
+        /// Returns the main ApplicationContext to control the main form
+        /// </summary>
+        public static ApplicationContext Application;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -42,18 +47,18 @@ namespace Vha.Chat
         static void Main()
         {
             // Read configuration
-            Config configuration = XML<Config>.FromFile(Program.ConfigurationFile);
+            Configuration configuration = XML<Configuration>.FromFile("Configuration.xml");
             if (configuration != null) Configuration = configuration;
-            else Configuration = new Config();
+            else Configuration = new Configuration();
             // Start application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
 #if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
 #endif
-            Context = new ApplicationContext();
-            Context.MainForm = new AuthenticationForm();
-            Application.Run(Context);
+            Application = new ApplicationContext();
+            Application.MainForm = new AuthenticationForm();
+            Application.Run(Application);
         }
 
 #if !DEBUG

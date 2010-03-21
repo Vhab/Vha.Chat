@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.Chat
 * Copyright (C) 2009-2010 Remco van Oosterhout
 *
@@ -22,26 +22,13 @@ using System.Xml.Serialization;
 
 namespace Vha.Chat
 {
-    public class Server
+    [XmlRoot("Root"), Serializable]
+    public class Configuration
     {
-        [XmlAttribute("Name")]
-        public string Name;
-        [XmlAttribute("Address")]
-        public string Address;
-        [XmlAttribute("Port")]
-        public int Port;
-
-        public Server() { }
-        public Server(string name, string address, int port)
-        {
-            this.Name = name;
-            this.Address = address;
-            this.Port = port;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
-        }
+        public string OptionsPath = "%APPDATA%\\Vha.Chat\\";
+        public string OptionsFile = "Options.xml";
+        public string IgnoresPath = "%APPDATA%\\Vha.Chat\\Ignores\\";
+        [XmlElement("Server")]
+        public Server[] Servers;
     }
 }

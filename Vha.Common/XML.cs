@@ -44,14 +44,20 @@ namespace Vha.Common
         /// <remarks>Returns NULL when the operation fails</remarks>
         public static T FromFile(string file)
         {
+            Stream stream=null;
             try
             {
-                Stream stream = (Stream)File.Open(file, FileMode.Open, FileAccess.Read);
+                stream = (Stream)File.Open(file, FileMode.Open, FileAccess.Read);
                 T obj = (T)GetSerializer().Deserialize(stream);
                 stream.Close();
                 return obj;
             }
-            catch { return default(T); }
+            catch
+            {
+                if (stream != null)
+                    stream.Close();
+                return default(T);
+            }
         }
 
         /// <summary>

@@ -62,6 +62,10 @@ namespace Vha.Net.Events
         /// Whether the character is a temporary friend
         /// </summary>
         public bool Temporary { get { return this._temporary; } }
-
+        /// <summary>
+        /// Returns combined friend data
+        /// </summary>
+        /// <returns>A new instance of Friend</returns>
+        public Friend GetFriend() { return new Friend(this.CharacterID, this.Character, this.Online, this.Temporary); }
     }
 }

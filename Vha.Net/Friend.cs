@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.Net
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
@@ -24,22 +24,25 @@ using System.Text;
 
 namespace Vha.Net
 {
-    public class Channel
+    public class Friend
     {
-        private readonly BigInteger _id = 0;
-        private readonly String _name = null;
-        private readonly ChannelType _type = ChannelType.Unknown;
+        private readonly UInt32 _id;
+        private readonly String _name;
+        private readonly bool _online;
+        private readonly bool _temporary;
 
-        public Channel(BigInteger id, String name, ChannelType type)
+        public Friend(UInt32 id, String name, bool online, bool temporary)
         {
             this._id = id;
             this._name = name;
-            this._type = type;
+            this._online = online;
+            this._temporary = temporary;
         }
 
         public BigInteger ID { get { return this._id; } }
         public String Name { get { return this._name; } }
-        public ChannelType Type { get { return this._type; } }
+        public bool Online { get { return this._online; } }
+        public bool Temporary { get { return this._temporary; } }
         public override string ToString() { return this._name; }
     }
 }

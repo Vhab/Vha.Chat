@@ -74,6 +74,23 @@ namespace Vha.Chat
 
             // Disable unsupported buttons
             this._options.Visible = false;
+            //Update buttons to reflect the state of chat.
+            switch (chat.State)
+            {
+                case ChatState.Connected:
+                case ChatState.Connecting:
+                case ChatState.Reconnecting:
+                case ChatState.Login:
+                case ChatState.CharacterSelect:
+                    this._connect.Visible = this._connect.Enabled = false;
+                    this._disconnect.Visible = this._disconnect.Enabled = false;
+                    break;
+                case ChatState.Disconnected:
+                case ChatState.Error:
+                    this._connect.Visible = this._connect.Enabled = true;
+                    this._disconnect.Visible = this._disconnect.Enabled = true;
+                    break;
+            }
         }
 
         public void AppendLine(string type, string line)
@@ -284,8 +301,8 @@ namespace Vha.Chat
             // Update buttons when disconnect
             if (e.State == ChatState.Disconnected)
             {
-                this._connect.Enabled = true;
-                this._disconnect.Enabled = false;
+                this._connect.Enabled = this._connect.Visible = true;
+                this._disconnect.Enabled = this._disconnect.Visible = false;
             }
             // Only really care about being connected for the rest of the code
             else if (e.State == ChatState.Reconnecting)
@@ -296,6 +313,9 @@ namespace Vha.Chat
                 this._offline.Nodes.Clear();
                 this._guests.Nodes.Clear();
                 this._privateChannels.Nodes.Clear();
+                // Update buttons
+                this._connect.Enabled = this._connect.Visible = false;
+                this._disconnect.Enabled = this._disconnect.Visible = true;
             }
             else if (e.State == ChatState.Connected)
             {
@@ -303,8 +323,8 @@ namespace Vha.Chat
                 this._privateChannels.AddNode(this._chat.Character, "Character");
                 this._privateChannels.Expand();
                 // Update buttons
-                this._connect.Enabled = false;
-                this._disconnect.Enabled = true;
+                this._connect.Enabled = this._connect.Visible = false;
+                this._disconnect.Enabled = this._disconnect.Visible = true;
                 
                 // Create ignore list. Doing so here does not let us ignore offline tells, since they are already received.
                 // It will have to do untill there's a safe method to create it before any messages are actually received,

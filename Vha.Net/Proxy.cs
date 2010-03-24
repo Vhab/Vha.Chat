@@ -151,11 +151,11 @@ namespace Vha.Net
             return this._serverURI.Scheme + ":// " + this._serverURI.Host + ":" + this._serverURI.Port; // Manually construct, as we don't want to risk echoing user/pass into debug stream.
         }
 
-        #region Classes
+        #region Structures
         /// <summary>
         /// Contains information about a supported protocol. This may be used to create configuration GUIs.
         /// </summary>
-        public class Protocol
+        public struct Protocol
         {
             public Protocol(string scheme, SupportLevel username, SupportLevel password, SupportLevel user_and_pass)
             {

@@ -61,6 +61,28 @@ namespace Vha.Common
         }
 
         /// <summary>
+        /// Deserializes XML from stream
+        /// </summary>
+        /// <param name="stream">Stream to deserialize</param>
+        /// <param name="CloseStream">Should we close stream?</param>
+        /// <returns></returns>
+        public static T FromStream(Stream stream, bool CloseStream)
+        {
+            try
+            {
+                T obj = (T)GetSerializer().Deserialize(stream);
+                if (CloseStream) stream.Close();
+                return obj;
+            }
+            catch
+            {
+                if (stream != null && CloseStream)
+                    stream.Close();
+                return default(T);
+            }
+        }
+
+        /// <summary>
         /// Reads xml from a web server and deserializes it into object T
         /// </summary>
         /// <param name="url">The url to the xml file to be deserialized</param>
@@ -130,6 +152,34 @@ namespace Vha.Common
                     memorystream.Close();
                 if (filestream != null)
                     filestream.Close();
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Writes to an already opened stream.
+        /// </summary>
+        /// <param name="stream">Stream to write to</param>
+        /// <param name="obj">Object to write to stream</param>
+        /// <param name="CloseStream">Should we close the stream when done?</param>
+        /// <exception cref="ArgumentNullException">If any of the provided parameters are null</exception>
+        /// <returns></returns>
+        public static bool ToStream(Stream stream, T obj, bool CloseStream)
+        {
+            if (stream == null) throw new ArgumentNullException("stream");
+            if (obj == null) throw new ArgumentNullException("obj");
+            // Serialize the data
+            try
+            {
+                GetSerializer().Serialize(stream, obj);
+                if (CloseStream) stream.Close();
+                return true;
+            }
+            catch
+            {
+                // Serailization failed
+                if (CloseStream && stream != null)
+                    stream.Close();
                 return false;
             }
         }

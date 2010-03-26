@@ -83,12 +83,12 @@ namespace Vha.Chat
                 case ChatState.Login:
                 case ChatState.CharacterSelect:
                     this._connect.Visible = this._connect.Enabled = false;
-                    this._disconnect.Visible = this._disconnect.Enabled = false;
+                    this._disconnect.Visible = this._disconnect.Enabled = true;
                     break;
                 case ChatState.Disconnected:
                 case ChatState.Error:
                     this._connect.Visible = this._connect.Enabled = true;
-                    this._disconnect.Visible = this._disconnect.Enabled = true;
+                    this._disconnect.Visible = this._disconnect.Enabled = false;
                     break;
             }
         }
@@ -325,38 +325,6 @@ namespace Vha.Chat
                 // Update buttons
                 this._connect.Enabled = this._connect.Visible = false;
                 this._disconnect.Enabled = this._disconnect.Visible = true;
-                
-                // Create ignore list. Doing so here does not let us ignore offline tells, since they are already received.
-                // It will have to do untill there's a safe method to create it before any messages are actually received,
-                // but still after character selection has succeeded.
-                if (Program.Configuration.IgnoreEnabled)
-                {
-                    //Dual function:
-                    // 1) check if we should enable the ignore system.
-                    // 2) Create a new scope to not overflow this methods scope with junk members.
-                    string file= "ignore/";
-                    if (!Directory.Exists(file)) Directory.CreateDirectory(file);
-                    Server s = Program.Servers.Get(chat.Server, chat.Port);
-                    string dim;
-                    if (s == null) dim = "unknown";
-                    else dim = s.Name;
-
-                    switch (Program.Configuration.IgnoreMethod)
-                    {
-                        case IgnoreMethod.Dimension:
-                            file += dim+".xml";
-                            break;
-                        case IgnoreMethod.Account:
-                            file += String.Format("{0}-{1}.xml", dim , chat.Account);
-                            break;
-                        case IgnoreMethod.Character:
-                            file += String.Format("{0}-{1}.xml", dim, chat.ID);
-                            break;
-                        default:
-                            throw new ArgumentException("Invalid Ignore.Method");
-                    }
-                    Program.Ignores = new Ignore(file, true);
-                }
             }
         }
 

@@ -26,6 +26,10 @@ namespace Vha.Chat
     public enum IgnoreMethod
     {
         /// <summary>
+        /// No method - Ignore system is disabled
+        /// </summary>
+        None,
+        /// <summary>
         /// Per dimension
         /// </summary>
         Dimension,
@@ -37,5 +41,20 @@ namespace Vha.Chat
         /// Per dimension+character
         /// </summary>
         Character
+    }
+    public enum IgnoreResult
+    {
+        /// <summary>
+        /// Removed entry
+        /// </summary>
+        Removed,
+        /// <summary>
+        /// Added entry
+        /// </summary>
+        Added,
+        /// <summary>
+        /// Error occured
+        /// </summary>
+        Error
     }
 }

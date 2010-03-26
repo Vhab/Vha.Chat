@@ -35,12 +35,7 @@ namespace Vha.Chat
         /// <summary>
         /// Unique ignore lists per...
         /// </summary>
-        public IgnoreMethod IgnoreMethod = IgnoreMethod.Dimension;
-
-        /// <summary>
-        /// Is the ignore system enabled?
-        /// </summary>
-        public bool IgnoreEnabled = true;
+        public IgnoreMethod IgnoreMethod = IgnoreMethod.Account;
 
         /// <summary>
         /// Last logged in dimension.

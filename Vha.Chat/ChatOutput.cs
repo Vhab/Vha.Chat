@@ -168,6 +168,15 @@ namespace Vha.Chat
 
         private void _chat_SystemMessageEvent(Vha.Net.Chat chat, SystemMessageEventArgs e)
         {
+            //Apply ignore filter to "received offline message from" messages. :)
+            if (e.MessageID == (uint)SystemMessageType.IncommingOfflineMessage)
+            {
+                string username=(string)e.Arguments[(int)IncomingOfflineMessageArgs.Name];
+                // Check ignored users list
+                if (Program.Ignores != null)
+                    if (Program.Ignores.Contains(chat.GetUserID(username), username))
+                        return;
+            }
             MDB.Reader reader = new MDB.Reader();
             MDB.Entry entry = reader.SpeedRead((int)e.CategoryID, (int)e.MessageID);
             // Failed to get the entry

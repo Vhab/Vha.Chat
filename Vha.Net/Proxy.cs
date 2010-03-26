@@ -31,9 +31,16 @@ namespace Vha.Net
 {
     public class Proxy
     {
+
         private UriBuilder _serverURI = null;
         private Socket _socket = null;
         ProxyClientFactory _proxyclientfactory = new ProxyClientFactory();
+        public Protocol[] SupportedProtocols = new Protocol[] { 
+            new Protocol("http", Protocol.SupportLevel.None, Protocol.SupportLevel.None, Protocol.SupportLevel.None),
+            new Protocol("socks4", Protocol.SupportLevel.Optional, Protocol.SupportLevel.None, Protocol.SupportLevel.None),
+            new Protocol("socks4a", Protocol.SupportLevel.Optional, Protocol.SupportLevel.None, Protocol.SupportLevel.None),
+            new Protocol("socks5", Protocol.SupportLevel.Optional, Protocol.SupportLevel.None, Protocol.SupportLevel.Optional)
+        };
 
         /// <summary>
         /// Returns a connection to the target through the proxy.
@@ -130,7 +137,7 @@ namespace Vha.Net
         {
             if (this._serverURI.Port == 0) this._serverURI.Port = 1080; // default port in Starksoft.Net.Proxy.Socks5ProxyClient.cs
             IProxyClient proxyclient;
-            if (this._serverURI.UserName != string.Empty || this._serverURI.Password != string.Empty) // If the user provided an username
+            if (this._serverURI.UserName != string.Empty && this._serverURI.Password != string.Empty) // If the user provided an username
                 proxyclient = this._proxyclientfactory.CreateProxyClient(ProxyType.Socks5, this._serverURI.Host, this._serverURI.Port, this._serverURI.UserName, this._serverURI.Password); // Socks v5 supports user+pass auth.
             else
                 proxyclient = this._proxyclientfactory.CreateProxyClient(ProxyType.Socks5, this._serverURI.Host, this._serverURI.Port);
@@ -143,5 +150,41 @@ namespace Vha.Net
         {
             return this._serverURI.Scheme + ":// " + this._serverURI.Host + ":" + this._serverURI.Port; // Manually construct, as we don't want to risk echoing user/pass into debug stream.
         }
+
+        #region Structures
+        /// <summary>
+        /// Contains information about a supported protocol. This may be used to create configuration GUIs.
+        /// </summary>
+        public struct Protocol
+        {
+            public Protocol(string scheme, SupportLevel username, SupportLevel password, SupportLevel user_and_pass)
+            {
+                this.Scheme = scheme;
+                this.Username = username;
+                this.Password = password;
+                this.UserAndPassword = user_and_pass;
+            }
+            // The idea here is to know what we need to supply.
+            public string Scheme;
+            /// <summary>
+            /// Can we provide only username?
+            /// </summary>
+            public SupportLevel Username;
+            /// <summary>
+            /// Can we provide only password?
+            /// </summary>
+            public SupportLevel Password;
+            /// <summary>
+            /// Can we provide username+password?
+            /// </summary>
+            public SupportLevel UserAndPassword;
+            public enum SupportLevel
+            {
+                None,
+                Optional,
+                Required
+            }
+        }
+        #endregion
     }
 }

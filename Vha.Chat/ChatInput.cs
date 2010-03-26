@@ -448,15 +448,12 @@ namespace Vha.Chat
                 "/rembuddy [username]<br>" +
                 "/o [message]<br>" +
                 "/ignore [username]<br>" +
-                "/ignore list<br>";
-#if DEBUG //"method" only changes ignore method for the current user. This needs a fix.
-            text += "/ignore method [new method]<br>";
-#endif
-            text += "/mute [channel]<br>" +
+                "/ignore list<br>" +
+                "/ignore method [new method]<br>" +
+                "/mute [channel]<br>" +
                 "/unmute [channel]<br>" +
                 "/cc [command]<br>" +
                 "/about";
-
             this._form.AppendLine("Internal", text);
         }
     }

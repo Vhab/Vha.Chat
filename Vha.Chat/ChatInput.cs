@@ -129,6 +129,8 @@ namespace Vha.Chat
             // Empty message
             if (command.Length == 0)
                 return;
+            // trim end of command to get rid of trailing whitespace. Don't trim start, in case user prefixed the command with space in order to *say* it.
+            command = command.TrimEnd();
             // Split
             if (command.StartsWith("/"))
                 command = command.Substring(1);
@@ -253,12 +255,16 @@ namespace Vha.Chat
         {
             if (Program.Ignores == null)
             {
-                this._form.AppendLine("Error", "The ignore list hasn't been initialized yet, please be patient");
+                if (Program.Configuration.IgnoreMethod == IgnoreMethod.None)
+                    this._form.AppendLine("Internal", "The ignore feature is disabled.");
+                else
+                    this._form.AppendLine("Error", "The ignore list hasn't been initialized yet, please be patient");
                 return;
             }
             if (args.Length < 2)
             {
-                this._form.AppendLine("Error", "Correct usage:<br>/ignore [username]<br>/ignore list");
+                string txt = "Correct usage:<br>/ignore [username]<br>/ignore list<br>/ignore method [newmethod]";
+                this._form.AppendLine("Error", txt);
                 return;
             }
             if (args[1] == "list")
@@ -269,12 +275,40 @@ namespace Vha.Chat
                     case 0:
                         this._form.AppendLine("Internal", "There are no users on your ignore list");
                         break;
-                    case 1:
-                        this._form.AppendLine("Internal", "You have ignored " + ignoredusers[0] + "");
-                        break;
                     default:
-                        this._form.AppendLine("Internal", "You have ignored " + ignoredusers.Length.ToString() + " users:<br>- " + string.Join("<br>- ", ignoredusers));
+                        this._form.AppendLine("Internal", "You have ignored the following " + ignoredusers.Length.ToString() + " user(s):<br>- " + string.Join("<br>- ", ignoredusers));
                         break;
+                }
+            }
+            else if (args[1] == "method")
+            {
+                List<string> ignoremethods = new List<string>();
+                if (args.Length < 3)
+                    this._form.AppendLine("Internal", String.Format("Ignores are currently stored per: {0}<br>Available methods: {1}", Program.Configuration.IgnoreMethod, string.Join(", ", System.Enum.GetNames(typeof(IgnoreMethod)))));
+                else
+                {
+                    //Check if provided string is correct.
+                    IgnoreMethod method = Program.Configuration.IgnoreMethod;
+                    try
+                    {
+                        string input = args[2].Substring(0, 1).ToUpper() + args[2].Substring(1).ToLower();
+                        Type type = typeof(IgnoreMethod);
+                        method = (IgnoreMethod)Enum.Parse(type, input);
+                    }
+                    catch (ArgumentException)
+                    { //Argument not valid.
+                        this._form.AppendLine("Internal", String.Format("Improper storage method", Program.Configuration.IgnoreMethod));
+                        return;
+                    }
+                    if (method == Program.Configuration.IgnoreMethod)
+                    {   //Already using this ignore method.
+                        this._form.AppendLine("Internal", String.Format("Ignores are already stored per {0}, no changes made", Program.Configuration.IgnoreMethod));
+                        return;
+                    }
+                    //All checks done. Now combine the two, and save at new location.
+                    IgnoreMethod oldmethod = Program.Ignores.Method;
+                    Program.Ignores.Method = method;
+                    this._form.AppendLine("Internal", String.Format("Ignore storage method successfully changed from {0} to {1}", oldmethod, method));
                 }
             }
             else
@@ -283,10 +317,19 @@ namespace Vha.Chat
                 string name = args[1].Substring(0, 1).ToUpper() + args[1].Substring(1).ToLower();
                 uint uid = _chat.GetUserID(name);
                 string action = string.Empty;
-                if (Program.Ignores.Toggle(uid, name))
-                    this._form.AppendLine("Internal", "Added " + name + " to the ignore list");
-                else
-                    this._form.AppendLine("Internal", "Removed " + name + " from the ignore list");
+                IgnoreResult r = Program.Ignores.Toggle(uid, name);
+                switch (r)
+                {
+                    case IgnoreResult.Added:
+                        this._form.AppendLine("Internal", string.Format("Added {0} to the ignore list", name));
+                        break;
+                    case IgnoreResult.Removed:
+                        this._form.AppendLine("Internal", string.Format("Removed {0} from the ignore list", name));
+                        break;
+                    case IgnoreResult.Error:
+                        this._form.AppendLine("Error", string.Format("Invalid user: {0}", name));
+                        break;
+                }
             }
         }
 
@@ -395,8 +438,7 @@ namespace Vha.Chat
 
         protected void HelpCommand()
         {
-            this._form.AppendLine("Internal",
-                "The following commands are available:<br>" +
+            string text = "The following commands are available:<br>" +
                 "/tell [username] [message]<br>" +
                 "/leave [private channel]<br>" +
                 "/invite [username]<br>" +
@@ -407,10 +449,12 @@ namespace Vha.Chat
                 "/o [message]<br>" +
                 "/ignore [username]<br>" +
                 "/ignore list<br>" +
+                "/ignore method [new method]<br>" +
                 "/mute [channel]<br>" +
                 "/unmute [channel]<br>" +
                 "/cc [command]<br>" +
-                "/about");
+                "/about";
+            this._form.AppendLine("Internal", text);
         }
     }
 }

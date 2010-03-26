@@ -74,7 +74,7 @@ namespace Vha.Chat
             this._tree.Name = "_tree";
             this._tree.SelectedImageIndex = 0;
             this._tree.Size = new System.Drawing.Size(182, 488);
-            this._tree.TabIndex = 0;
+            this._tree.TabIndex = 3;
             this._tree.DoubleClick += new System.EventHandler(this._tree_DoubleClick);
             this._tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this._tree_NodeMouseClick);
             // 
@@ -101,7 +101,7 @@ namespace Vha.Chat
             this._outputBox.Name = "_outputBox";
             this._outputBox.ScriptErrorsSuppressed = true;
             this._outputBox.Size = new System.Drawing.Size(599, 461);
-            this._outputBox.TabIndex = 1;
+            this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             this._outputBox.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this._outputBox_Navigating);
             this._outputBox.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this._outputBox_DocumentCompleted);
@@ -115,7 +115,7 @@ namespace Vha.Chat
             this._inputBox.Multiline = true;
             this._inputBox.Name = "_inputBox";
             this._inputBox.Size = new System.Drawing.Size(451, 21);
-            this._inputBox.TabIndex = 2;
+            this._inputBox.TabIndex = 0;
             this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
             // 
@@ -128,7 +128,7 @@ namespace Vha.Chat
             this._target.Location = new System.Drawing.Point(6, 502);
             this._target.Name = "_target";
             this._target.Size = new System.Drawing.Size(142, 21);
-            this._target.TabIndex = 4;
+            this._target.TabIndex = 1;
             // 
             // _connect
             // 
@@ -189,7 +189,7 @@ namespace Vha.Chat
             this._buttons.Name = "_buttons";
             this._buttons.Padding = new System.Windows.Forms.Padding(6);
             this._buttons.Size = new System.Drawing.Size(799, 32);
-            this._buttons.TabIndex = 5;
+            this._buttons.TabIndex = 2;
             // 
             // _channelMenu
             // 
@@ -328,8 +328,6 @@ namespace Vha.Chat
             this.Name = "ChatForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat";
-            this.Load += new System.EventHandler(this.ChatForm_Load);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatForm_FormClosing);
             this._buttons.ResumeLayout(false);
             this._buttons.PerformLayout();
             this._channelMenu.ResumeLayout(false);

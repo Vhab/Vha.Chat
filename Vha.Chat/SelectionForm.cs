@@ -26,16 +26,22 @@ using System.Text;
 using System.Windows.Forms;
 using Vha.Net;
 using Vha.Common;
+using System.IO;
 
 namespace Vha.Chat
 {
     public partial class SelectionForm : Form
     {
         public LoginCharacter Character = null;
+        /// <summary>
+        /// Store chat library till later.
+        /// </summary>
+        private Net.Chat _chat=null;
 
         public SelectionForm(Net.Chat chat, LoginCharacter[] characters)
         {
             InitializeComponent();
+            this._chat = chat; //Store chat libary so we can create ignore list *before* actually logging in.
             List<LoginCharacter> list = new List<LoginCharacter>(characters);
             list.Sort();
             foreach (LoginCharacter character in list)
@@ -77,6 +83,21 @@ namespace Vha.Chat
             }
             this.Character = (LoginCharacter)this._characters.SelectedItem;
             this.DialogResult = DialogResult.OK;
+           
+            // Create ignore list. Doing so here lets us ignore offline tells and system messages reporting them,
+            // since we haven't *really* selected a character yet.. but we know which one we are selecting.
+            if (true)
+            {
+                //Create a new scope to not overflow this methods scope with junk members.
+                string dir = "ignore";
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                Server s = Program.Servers.Get(this._chat.Server, this._chat.Port);
+                string dim;
+                if (s == null) dim = "unknown";
+                else dim = s.Name;
+                if (Program.Configuration.IgnoreMethod != IgnoreMethod.None)
+                    Program.Ignores = new Ignore(string.Format("{0}/{1}.xml", dir, dim), Program.Configuration.IgnoreMethod, _chat.Account, this.Character.ID);
+            }
         }
     }
 }

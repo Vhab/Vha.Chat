@@ -74,12 +74,23 @@ namespace Vha.Chat
 
             // Disable options button
             this._options.Visible = false;
-        }
-
-        private void ChatForm_Load(object sender, EventArgs e)
-        {
-            // FIXME: Focus the input box after the form completed loading
-            this._inputBox.Focus();
+            //Update buttons to reflect the state of chat.
+            switch (chat.State)
+            {
+                case ChatState.Connected:
+                case ChatState.Connecting:
+                case ChatState.Reconnecting:
+                case ChatState.Login:
+                case ChatState.CharacterSelect:
+                    this._connect.Visible = this._connect.Enabled = false;
+                    this._disconnect.Visible = this._disconnect.Enabled = true;
+                    break;
+                case ChatState.Disconnected:
+                case ChatState.Error:
+                    this._connect.Visible = this._connect.Enabled = true;
+                    this._disconnect.Visible = this._disconnect.Enabled = false;
+                    break;
+            }
         }
 
         public void AppendLine(string type, string line)
@@ -290,8 +301,8 @@ namespace Vha.Chat
             // Update buttons when disconnect
             if (e.State == ChatState.Disconnected)
             {
-                this._connect.Enabled = true;
-                this._disconnect.Enabled = false;
+                this._connect.Enabled = this._connect.Visible = true;
+                this._disconnect.Enabled = this._disconnect.Visible = false;
             }
             // Only really care about being connected for the rest of the code
             else if (e.State == ChatState.Reconnecting)
@@ -302,6 +313,9 @@ namespace Vha.Chat
                 this._offline.Nodes.Clear();
                 this._guests.Nodes.Clear();
                 this._privateChannels.Nodes.Clear();
+                // Update buttons
+                this._connect.Enabled = this._connect.Visible = false;
+                this._disconnect.Enabled = this._disconnect.Visible = true;
             }
             else if (e.State == ChatState.Connected)
             {
@@ -309,12 +323,8 @@ namespace Vha.Chat
                 this._privateChannels.AddNode(this._chat.Character, "Character");
                 this._privateChannels.Expand();
                 // Update buttons
-                this._connect.Enabled = false;
-                this._disconnect.Enabled = true;
-                // Create ignore list. Doing so here does not let us ignore offline tells, since they are already received.
-                // It will have to do untill there's a safe method to create it before any messages are actually received,
-                // but still after character selection has succeeded.
-                Program.Ignores = new Ignore(Program.Configuration.IgnoreMethod, chat, true);
+                this._connect.Enabled = this._connect.Visible = false;
+                this._disconnect.Enabled = this._disconnect.Visible = true;
             }
         }
 
@@ -326,6 +336,11 @@ namespace Vha.Chat
         private void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)
         {
             // Has 'last connected with' values been changed?
+            Server s = Program.Servers.Get(chat.Server, chat.Port);
+            string Server;
+            if (s == null) Server = "unknown";
+            else Server = s.Name;
+
             ConfigAccount oldamap = null;
             foreach (ConfigAccount amap in Program.Configuration.Accounts)
                 if (amap.Account == chat.Account)
@@ -334,7 +349,7 @@ namespace Vha.Chat
             if (Program.Configuration.Account != chat.Account
                 || myamap == null
                 || myamap.Character != chat.Character
-                || Program.Configuration.Dimension != chat.Server)
+                || Program.Configuration.Dimension != Server)
             {
                 // Add changes to config.
                 Program.Configuration.Account = chat.Account;
@@ -344,7 +359,7 @@ namespace Vha.Chat
                 myamap.Character = chat.Character;
                 if (oldamap != null) Program.Configuration.Accounts.Remove(oldamap);
                 Program.Configuration.Accounts.Add(myamap);
-                Program.Configuration.Dimension = chat.Server;
+                Program.Configuration.Dimension = Server;
                 Vha.Common.XML<Config>.ToFile(Program.ConfigurationFile, Program.Configuration);
             }
         }
@@ -422,12 +437,7 @@ namespace Vha.Chat
 
         private void ChatForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (this._chat == null) return;
-            if (this._chat.State != ChatState.Disconnected)
-            {
-                this._chat.Disconnect();
-            }
-            this._chat = null;
+
         }
 
         private void _outputBox_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)

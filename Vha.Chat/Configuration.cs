@@ -19,16 +19,35 @@
 
 using System;
 using System.Xml.Serialization;
+using Vha.Chat.Data;
 
 namespace Vha.Chat
 {
-    [XmlRoot("Root"), Serializable]
     public class Configuration
     {
-        public string OptionsPath = "%APPDATA%\\Vha.Chat\\";
-        public string OptionsFile = "Options.xml";
-        public string IgnoresPath = "%APPDATA%\\Vha.Chat\\Ignores\\";
-        [XmlElement("Server")]
-        public Server[] Servers;
+        public readonly string OptionsPath;
+        public readonly string OptionsFile;
+        public readonly string IgnoresPath;
+        public readonly Server[] Servers;
+
+        public Configuration(Base data)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (data.Type != typeof(ConfigurationV1))
+                throw new ArgumentException("Invalid config data type: " + data.Type.ToString());
+            ConfigurationV1 config = (ConfigurationV1)data;
+            this.OptionsPath = config.IgnoresPath;
+            this.OptionsFile = config.OptionsFile;
+            this.IgnoresPath = config.IgnoresPath;
+            this.Servers = config.Servers.ConvertAll<Server>(
+                new Converter<ConfigurationV1Server,Server>(this._convertServer))
+                .ToArray();
+        }
+
+        private Server _convertServer(ConfigurationV1Server server)
+        {
+            return new Server(server.Name, server.Address, server.Port);
+        }
     }
 }

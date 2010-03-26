@@ -18,36 +18,10 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Vha.Chat
 {
-    public enum MessageClass
-    {
-        None,
-        Internal,
-        Organization,
-        General,
-        Announcements,
-        Towers,
-        Shopping,
-        Vicinity,
-        Text,
-        PM,
-        PG,
-        Error,
-        System,
-    }
-
-    public enum MessageType
-    {
-        None,
-        Character,
-        Channel,
-        PrivateChannel
-    }
-
     public class MessageTarget
     {
         public readonly MessageType Type;
@@ -75,36 +49,6 @@ namespace Vha.Chat
             if (target == null) return false;
             if (this.Type != target.Type) return false;
             if (this.Target != target.Target) return false;
-            return true;
-        }
-    }
-
-    public class Message
-    {
-        public readonly MessageTarget Target;
-        public readonly MessageClass Class;
-        public readonly string Text;
-
-        public Message(MessageTarget target, MessageClass messageClass, string text)
-        {
-            if (target == null)
-                throw new ArgumentNullException();
-            this.Target = target;
-            this.Class = messageClass;
-            this.Text = text;
-        }
-
-        public override string ToString()
-        {
-            return this.Text;
-        }
-
-        public bool Equals(Message message)
-        {
-            if (message == null) return false;
-            if (this.Target != message.Target) return false;
-            if (this.Class != message.Class) return false;
-            if (this.Text != message.Text) return false;
             return true;
         }
     }

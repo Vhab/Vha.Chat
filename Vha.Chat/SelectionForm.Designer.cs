@@ -55,6 +55,7 @@ namespace Vha.Chat
             // 
             // _cancel
             // 
+            this._cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this._cancel.Location = new System.Drawing.Point(145, 40);
             this._cancel.Name = "_cancel";
             this._cancel.Size = new System.Drawing.Size(127, 23);
@@ -75,8 +76,10 @@ namespace Vha.Chat
             // 
             // SelectionForm
             // 
+            this.AcceptButton = this._select;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this._cancel;
             this.ClientSize = new System.Drawing.Size(284, 75);
             this.Controls.Add(this._cancel);
             this.Controls.Add(this._select);

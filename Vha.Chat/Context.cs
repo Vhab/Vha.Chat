@@ -21,9 +21,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Vha.Net;
+using Vha.Chat.Data;
+using Vha.Chat.Events;
 
 namespace Vha.Chat
 {
+    public delegate void Handler(Context context);
     public delegate void Handler<T>(Context context, T args);
 
     public class Context
@@ -48,47 +51,47 @@ namespace Vha.Chat
         /// <summary>
         /// Fires whenever a new message is available
         /// </summary>
-        public event Handler<Message> MessageEvent;
+        public event Handler<MessageEventArgs> MessageEvent;
         /// <summary>
         /// Fires when a friend was first seen or was just added to the friends list
         /// </summary>
-        public event EventHandler FriendAddedEvent;
+        public event Handler FriendAddedEvent;
         /// <summary>
         /// Fires when a user is removed from the friends list
         /// </summary>
-        public event EventHandler FriendRemovedEvent;
+        public event Handler FriendRemovedEvent;
         /// <summary>
         /// Fires when a friend who is already on the friends list changes status
         /// </summary>
-        public event EventHandler FriendUpdatedEvent;
+        public event Handler FriendUpdatedEvent;
         /// <summary>
         /// Fires when a channel is seen for the first time
         /// </summary>
-        public event EventHandler ChannelAddedEvent;
+        public event Handler ChannelAddedEvent;
         /// <summary>
         /// Fires when an already known channel changes status
         /// </summary>
-        public event EventHandler ChannelUpdatedEvent;
+        public event Handler ChannelUpdatedEvent;
         /// <summary>
         /// Fires when this client joins a remote private channel
         /// </summary>
-        public event EventHandler PrivateChannelJoinEvent;
+        public event Handler PrivateChannelJoinEvent;
         /// <summary>
         /// Fires when this client leaves a remote private channel
         /// </summary>
-        public event EventHandler PrivateChannelLeaveEvent;
+        public event Handler PrivateChannelLeaveEvent;
         /// <summary>
         /// Fires when this client is invited to join a remote private channel
         /// </summary>
-        public event EventHandler PrivateChannelInviteEvent;
+        public event Handler PrivateChannelInviteEvent;
         /// <summary>
         /// Fires when a user joins our local private channel
         /// </summary>
-        public event EventHandler UserJoinEvent;
+        public event Handler UserJoinEvent;
         /// <summary>
         /// Fires when a user leaves our local private channel
         /// </summary>
-        public event EventHandler UserLeaveEvent;
+        public event Handler UserLeaveEvent;
 
         /// <summary>
         /// Whether this context contains the given channel

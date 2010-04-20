@@ -63,9 +63,18 @@ namespace Vha.Net.Packets
                         this._arguments.Add(popString(ref data, ref offset).Value);
                         if (offset == oldOffset) return; // return, or we'd be stuck in an endless loop.
                         break;
+                    case (Byte)'I':
+                        offset++;
+                        this._arguments.Add(
+                            IPAddress.NetworkToHostOrder(
+                                BitConverter.ToInt32(data, offset)
+                            ).ToString()
+                        );
+                        offset += 4;
+                        break;
                     default:
                         offset = 0;
-                        this._arguments.Add(new NetString(data).Value); // Add the entire "to-be-decoded" message as the last entry, for debugging purposes.
+                        this._arguments.Add(NetString.Encoding.GetString(data)); // Add the entire "to-be-decoded" message as the last entry, for debugging purposes.
                         return; // Bail out due to failure
                 }
             }

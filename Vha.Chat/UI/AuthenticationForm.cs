@@ -28,8 +28,9 @@ using System.Threading;
 using Vha.Net;
 using Vha.Net.Events;
 using Vha.Common;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
     public partial class AuthenticationForm : Form
     {
@@ -43,11 +44,11 @@ namespace Vha.Chat
 
         private void AuthenticationForm_Load(object sender, EventArgs e)
         {
-            foreach (Server server in Program.Servers.Servers)
+            foreach (Dimension dimension in Program.Servers.Servers)
             {
-                this._server.Items.Add(server);
+                this._server.Items.Add(dimension);
                 if (this._server.Items.Count == 1) this._server.SelectedIndex = 0; //Make sure we always select the first one, so that if we don't find the last used server, at least some server is selected.
-                else if (server.Name == Program.Configuration.Dimension)
+                else if (dimension.Name == Program.Configuration.Dimension)
                     this._server.SelectedIndex = this._server.Items.Count - 1; //this works because count starts at 1 and index starts at 0.
             }
             
@@ -95,7 +96,7 @@ namespace Vha.Chat
             this._status = new StatusForm();
             this._status.SetMessage("Initializing...");
             // Connect
-            Server server = (Server)this._server.SelectedItem;
+            Dimension server = (Dimension)this._server.SelectedItem;
             if (string.IsNullOrEmpty(Program.Configuration.Proxy))
             {
                 // Connect without proxy

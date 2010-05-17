@@ -24,24 +24,20 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
-    public partial class InfoForm : Form
+    public partial class BrowserForm : Form
     {
         private static int _defaultWidth = -1;
         private static int _defaultHeight = -1;
         private static int _defaultLeft = -1;
         private static int _defaultTop = -1;
 
-        protected string _html = "";
-        protected ChatHtml _htmlUtil;
-
-        public InfoForm(ChatHtml links, string html)
+        public BrowserForm(string url)
         {
             InitializeComponent();
-            this._html = html;
-            this._htmlUtil = links;
             // Check for default position
             if (_defaultLeft != -1 && _defaultTop != -1)
             {
@@ -53,43 +49,23 @@ namespace Vha.Chat
             {
                 this.Size = new Size(_defaultWidth, _defaultHeight);
             }
-        }
-        
-        private void _info_Navigating(object sender, WebBrowserNavigatingEventArgs e)
-        {
-            if (e.Url.Scheme != "file")
-                e.Cancel = true;
+            // Navigate
+            this._browser.Navigate(url);
         }
 
-        private void _info_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            this._info.Document.Write(this._htmlUtil.Template);
-            // Set background color
-            this._info.Document.BackColor = this.BackColor;
-            if (this._info.Document.Body != null)
-            {
-                string color = this.ForeColor.R.ToString("X") + this.ForeColor.G.ToString("X") + this.ForeColor.B.ToString("X");
-                this._info.Document.Body.Style =
-                    "color: #" + color + ";" +
-                    "padding: 6px;";
-            }
-            // Put in some content
-            this._htmlUtil.AppendHtml(this._info.Document, ChatHtmlStyle.Default, this._html);
-        }
-
-        private void InfoForm_Move(object sender, EventArgs e)
+        private void BrowserForm_Move(object sender, EventArgs e)
         {
             _defaultLeft = this.Location.X + 15;
             _defaultTop = this.Location.Y + 15;
         }
 
-        private void InfoForm_Resize(object sender, EventArgs e)
+        private void BrowserForm_Resize(object sender, EventArgs e)
         {
             _defaultWidth = this.Size.Width;
             _defaultHeight = this.Size.Height;
         }
 
-        private void InfoForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void BrowserForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             _defaultWidth = this.Size.Width;
             _defaultHeight = this.Size.Height;

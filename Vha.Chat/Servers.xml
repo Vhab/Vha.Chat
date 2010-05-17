@@ -1,7 +1,0 @@
-﻿<?xml version="1.0"?>
-<Servers>
-  <Server name="Atlantean" address="chat.d1.funcom.com" port="7101" />
-  <Server name="Rimor" address="chat.d2.funcom.com" port="7102" />
-  <Server name="Die Neue Welt" address="chat.d3.funcom.com" port="7103" />
-  <Server name="Test" address="chat.dt.funcom.com" port="7109" />
-</Servers>

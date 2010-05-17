@@ -28,8 +28,9 @@ using System.Windows.Forms;
 using Vha.Net;
 using Vha.Net.Events;
 using Vha.Common;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
     public partial class ChatForm : Form
     {
@@ -336,7 +337,7 @@ namespace Vha.Chat
         private void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)
         {
             // Has 'last connected with' values been changed?
-            Server s = Program.Servers.Get(chat.Server, chat.Port);
+            Dimension s = Program.Servers.Get(chat.Server, chat.Port);
             string Server;
             if (s == null) Server = "unknown";
             else Server = s.Name;

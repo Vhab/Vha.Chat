@@ -1,4 +1,4 @@
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
     partial class AuthenticationForm
     {

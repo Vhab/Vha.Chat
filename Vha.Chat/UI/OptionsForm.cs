@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Vha.Chat
 * Copyright (C) 2009-2010 Remco van Oosterhout
 *
@@ -19,29 +19,30 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Text;
+using System.Windows.Forms;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
-    public class Input
+    public partial class OptionsForm : Form
     {
-        public bool CheckConnection(bool output);
-
-        public bool CheckUser(string user, bool output);
-
-        public bool CheckChannel(string channel, bool output);
-
-        public void Send(MessageTarget target, string message, bool allowCommands);
-
-        public void Command(string command);
-
-        #region Internal
-        internal Input(Context context)
+        public OptionsForm()
         {
-            this._context = context;
+            InitializeComponent();
         }
 
-        private Context _context;
-        #endregion
+        private void _save_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void _cancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

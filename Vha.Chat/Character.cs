@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.Chat
 * Copyright (C) 2009-2010 Remco van Oosterhout
 *
@@ -18,30 +18,22 @@
 */
 
 using System;
-using System.Xml.Serialization;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Vha.Chat
 {
-    public class Server
+    public class Character
     {
-        [XmlAttribute("Name")]
-        public string Name;
-        [XmlAttribute("Address")]
-        public string Address;
-        [XmlAttribute("Port")]
-        public int Port;
+        public readonly string Name;
+        public readonly UInt32 ID;
+        public readonly bool Online;
 
-        public Server() { }
-        public Server(string name, string address, int port)
+        public Character(string name, UInt32 id, bool online)
         {
             this.Name = name;
-            this.Address = address;
-            this.Port = port;
-        }
-
-        public override string ToString()
-        {
-            return this.Name;
+            this.ID = id;
+            this.Online = online;
         }
     }
 }

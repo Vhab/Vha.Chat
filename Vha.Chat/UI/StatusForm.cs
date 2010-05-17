@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Vha.Chat
 * Copyright (C) 2009-2010 Remco van Oosterhout
 *
@@ -19,29 +19,33 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Text;
+using System.Windows.Forms;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
-    public class Input
+    public partial class StatusForm : Form
     {
-        public bool CheckConnection(bool output);
+        public delegate void SetMessageDelegate(string message);
 
-        public bool CheckUser(string user, bool output);
-
-        public bool CheckChannel(string channel, bool output);
-
-        public void Send(MessageTarget target, string message, bool allowCommands);
-
-        public void Command(string command);
-
-        #region Internal
-        internal Input(Context context)
+        public StatusForm()
         {
-            this._context = context;
+            InitializeComponent();
+            this.DialogResult = DialogResult.Abort;
         }
 
-        private Context _context;
-        #endregion
+        public void SetMessage(string message)
+        {
+            if (this._message.InvokeRequired)
+            {
+                this._message.Invoke(new SetMessageDelegate(SetMessage), new object[] { message });
+                return;
+            }
+            this._message.Text = message;
+        }
     }
 }

@@ -39,34 +39,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutForm.cs">
+    <Compile Include="Character.cs" />
+    <Compile Include="Events\SelectCharacterEventArgs.cs" />
+    <Compile Include="UI\AboutForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutForm.Designer.cs">
+    <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AuthenticationForm.cs">
+    <Compile Include="UI\AuthenticationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AuthenticationForm.Designer.cs">
+    <Compile Include="UI\AuthenticationForm.Designer.cs">
       <DependentUpon>AuthenticationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="BrowserForm.cs">
+    <Compile Include="UI\BrowserForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BrowserForm.Designer.cs">
+    <Compile Include="UI\BrowserForm.Designer.cs">
       <DependentUpon>BrowserForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ChatForm.cs">
+    <Compile Include="UI\ChatForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ChatForm.Designer.cs">
+    <Compile Include="UI\ChatForm.Designer.cs">
       <DependentUpon>ChatForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ChatInput.cs" />
-    <Compile Include="ChatHtml.cs" />
-    <Compile Include="ChatOutput.cs" />
-    <Compile Include="ChatTreeNode.cs" />
+    <Compile Include="UI\ChatHtml.cs" />
+    <Compile Include="UI\ChatTreeNode.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Context.cs" />
@@ -75,47 +75,47 @@
     <Compile Include="Data\OptionsV1.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Events\MessageEventArgs.cs" />
-    <Compile Include="FormUtils.cs" />
+    <Compile Include="UI\Utils.cs" />
     <Compile Include="Ignore.cs" />
-    <Compile Include="InfoForm.cs">
+    <Compile Include="UI\InfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="InfoForm.Designer.cs">
+    <Compile Include="UI\InfoForm.Designer.cs">
       <DependentUpon>InfoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Input.cs" />
     <Compile Include="MessageTarget.cs" />
     <Compile Include="Options.cs">
     </Compile>
-    <Compile Include="OptionsForm.cs">
+    <Compile Include="UI\OptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsForm.Designer.cs">
+    <Compile Include="UI\OptionsForm.Designer.cs">
       <DependentUpon>OptionsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AboutForm.resx">
+    <EmbeddedResource Include="UI\AboutForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AuthenticationForm.resx">
+    <EmbeddedResource Include="UI\AuthenticationForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>AuthenticationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="BrowserForm.resx">
+    <EmbeddedResource Include="UI\BrowserForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>BrowserForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ChatForm.resx">
+    <EmbeddedResource Include="UI\ChatForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ChatForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InfoForm.resx">
+    <EmbeddedResource Include="UI\InfoForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>InfoForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsForm.resx">
+    <EmbeddedResource Include="UI\OptionsForm.resx">
       <DependentUpon>OptionsForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -124,11 +124,11 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SelectionForm.resx">
+    <EmbeddedResource Include="UI\SelectionForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>SelectionForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="StatusForm.resx">
+    <EmbeddedResource Include="UI\StatusForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>StatusForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -146,17 +146,17 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SelectionForm.cs">
+    <Compile Include="UI\SelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SelectionForm.Designer.cs">
+    <Compile Include="UI\SelectionForm.Designer.cs">
       <DependentUpon>SelectionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Server.cs" />
-    <Compile Include="StatusForm.cs">
+    <Compile Include="Dimension.cs" />
+    <Compile Include="UI\StatusForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="StatusForm.Designer.cs">
+    <Compile Include="UI\StatusForm.Designer.cs">
       <DependentUpon>StatusForm.cs</DependentUpon>
     </Compile>
   </ItemGroup>

@@ -23,8 +23,9 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
     public enum ChatHtmlStyle
     {
@@ -314,7 +315,7 @@ namespace Vha.Chat
                 return;
             }
             InfoForm form = new InfoForm(this, this._texts[text]);
-            FormUtils.InvokeShow(this._form, form);
+            Utils.InvokeShow(this._form, form);
         }
         
         protected void ChatCmdLink(string command)
@@ -332,7 +333,7 @@ namespace Vha.Chat
                 return;
             }
             Form form = new BrowserForm(string.Format(url, parts[0], parts[1], parts[2]));
-            FormUtils.InvokeShow(this._form, form);
+            Utils.InvokeShow(this._form, form);
         }
 
         protected void CharacterLink(string character)

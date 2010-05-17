@@ -29,8 +29,8 @@ namespace Vha.Chat.Data
         public string OptionsPath = "%APPDATA%\\Vha.Chat\\";
         public string OptionsFile = "Options.xml";
         public string IgnoresPath = "%APPDATA%\\Vha.Chat\\Ignores\\";
-        [XmlElement("Server")]
-        public List<ConfigurationV1Server> Servers;
+        [XmlElement("Dimension")]
+        public List<ConfigurationV1Dimension> Dimensions;
 
         #region Implement Base
         public ConfigurationV1()
@@ -41,7 +41,7 @@ namespace Vha.Chat.Data
         #endregion
     }
 
-    public class ConfigurationV1Server
+    public class ConfigurationV1Dimension
     {
         [XmlAttribute("Name")]
         public string Name;

@@ -23,12 +23,15 @@ using Vha.Chat.Data;
 
 namespace Vha.Chat
 {
+    /// <summary>
+    /// Read-only instance of Data.ConfigurationV1
+    /// </summary>
     public class Configuration
     {
         public readonly string OptionsPath;
         public readonly string OptionsFile;
         public readonly string IgnoresPath;
-        public readonly Server[] Servers;
+        public readonly Dimension[] Dimensions;
 
         public Configuration(Base data)
         {
@@ -40,14 +43,14 @@ namespace Vha.Chat
             this.OptionsPath = config.IgnoresPath;
             this.OptionsFile = config.OptionsFile;
             this.IgnoresPath = config.IgnoresPath;
-            this.Servers = config.Servers.ConvertAll<Server>(
-                new Converter<ConfigurationV1Server,Server>(this._convertServer))
+            this.Dimensions = config.Dimensions.ConvertAll<Dimension>(
+                new Converter<ConfigurationV1Dimension,Dimension>(this._convertDimension))
                 .ToArray();
         }
 
-        private Server _convertServer(ConfigurationV1Server server)
+        private Dimension _convertDimension(ConfigurationV1Dimension dimension)
         {
-            return new Server(server.Name, server.Address, server.Port);
+            return new Dimension(dimension.Name, dimension.Address, dimension.Port);
         }
     }
 }

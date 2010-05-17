@@ -29,10 +29,6 @@ namespace Vha.Chat
     public static class Program
     {
         /// <summary>
-        /// Returns the non-runtime-editable initial configuration
-        /// </summary>
-        public static Configuration Configuration = null;
-        /// <summary>
         /// Returns the chat client context
         /// </summary>
         public static Context Context = null;
@@ -46,10 +42,6 @@ namespace Vha.Chat
         [STAThread]
         static void Main()
         {
-            // Read configuration
-            Configuration configuration = XML<Configuration>.FromFile("Configuration.xml");
-            if (configuration != null) Configuration = configuration;
-            else Configuration = new Configuration();
             // Start application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);

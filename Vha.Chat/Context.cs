@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Vha.Net;
-using Vha.Chat.Data;
 using Vha.Chat.Events;
 
 namespace Vha.Chat
@@ -31,6 +30,11 @@ namespace Vha.Chat
 
     public class Context
     {
+        #region Components
+        /// <summary>
+        /// Returns the initial read-only application configuration
+        /// </summary>
+        public Configuration Configuration { get { return null; } }
         /// <summary>
         /// Returns the user customizable options
         /// </summary>
@@ -40,14 +44,24 @@ namespace Vha.Chat
         /// </summary>
         public Input Input { get { return null; } }
         /// <summary>
-        /// Returns direct access to the chat instance
-        /// </summary>
-        public Net.Chat Chat { get { return null; } }
-        /// <summary>
         /// Returns the toolset to manage the users on the ignore list
         /// </summary>
         public Ignore Ignore { get { return null; } }
+        /// <summary>
+        /// Returns direct access to the chat instance
+        /// </summary>
+        public Net.Chat Chat { get { return null; } }
+        #endregion
 
+        #region Events
+        /// <summary>
+        /// Fires when the internal state of the Context changed
+        /// </summary>
+        public event Handler<ContextState> StateEvent;
+        /// <summary>
+        /// Fires when the user is required to select a character
+        /// </summary>
+        public event Handler<SelectCharacterEventArgs> SelectCharacterEvent;
         /// <summary>
         /// Fires whenever a new message is available
         /// </summary>
@@ -55,23 +69,23 @@ namespace Vha.Chat
         /// <summary>
         /// Fires when a friend was first seen or was just added to the friends list
         /// </summary>
-        public event Handler FriendAddedEvent;
+        public event Handler<Friend> FriendAddedEvent;
         /// <summary>
         /// Fires when a user is removed from the friends list
         /// </summary>
-        public event Handler FriendRemovedEvent;
+        public event Handler<Friend> FriendRemovedEvent;
         /// <summary>
         /// Fires when a friend who is already on the friends list changes status
         /// </summary>
-        public event Handler FriendUpdatedEvent;
+        public event Handler<Friend> FriendUpdatedEvent;
         /// <summary>
         /// Fires when a channel is seen for the first time
         /// </summary>
-        public event Handler ChannelAddedEvent;
+        public event Handler<Channel> ChannelAddedEvent;
         /// <summary>
         /// Fires when an already known channel changes status
         /// </summary>
-        public event Handler ChannelUpdatedEvent;
+        public event Handler<Channel> ChannelUpdatedEvent;
         /// <summary>
         /// Fires when this client joins a remote private channel
         /// </summary>
@@ -92,7 +106,59 @@ namespace Vha.Chat
         /// Fires when a user leaves our local private channel
         /// </summary>
         public event Handler UserLeaveEvent;
+        #endregion
 
+        #region Attributes
+        public ContextState State { get { return this._state; } }
+        /// <summary>
+        /// Returns the current dimension.
+        /// Will throw an error if the current state is Disconnected.
+        /// </summary>
+        public string Dimension
+        {
+            get
+            {
+                if (this.State == ContextState.Disconnected)
+                    throw new InvalidOperationException("Context.Dimension is not available while in state " + this.State);
+                return this._dimension;
+            }
+        }
+        /// <summary>
+        /// Returns the current account.
+        /// Will throw an error if the current state is Disconnected.
+        /// </summary>
+        public string Account
+        {
+            get
+            {
+                if (this.State == ContextState.Disconnected)
+                    throw new InvalidOperationException("Context.Account is not available while in state " + this.State);
+                return this._account;
+            }
+        }
+        /// <summary>
+        /// Returns the current character.
+        /// Will throw an error if the current state is not Connected or Reconnecting.
+        /// </summary>
+        public string Character
+        {
+            get
+            {
+                if (this.State != ContextState.Connected &&
+                    this.State != ContextState.Reconnecting &&
+                    this.State != ContextState.CharacterSelection)
+                    throw new InvalidOperationException("Context.Character is not available while in state " + this.State);
+                return this._character;
+            }
+        }
+        #endregion
+
+        #region 'Preperation' and 'state' methods
+        public void Connect(string dimension, string account, string password);
+        public void Disconnect();
+        #endregion
+
+        #region 'Showtime' methods
         /// <summary>
         /// Whether this context contains the given channel
         /// </summary>
@@ -117,20 +183,48 @@ namespace Vha.Chat
         /// <param name="user">The name of the user (case-insensitive)</param>
         /// <returns>An isntance of Friend or null on failure</returns>
         public Friend GetFriend(string user);
+        /// <summary>
+        /// Write output to one of the listening output targets
+        /// </summary>
+        /// <param name="target">Describes the original/target of the message</param>
+        /// <param name="messageClass">Describes the class of the message</param>
+        /// <param name="message">The message itself</param>
+        public void Write(MessageTarget target, MessageClass messageClass, string message);
+        #endregion
 
         #region Internal
+        private Configuration _configuration;
         private Options _options;
         private Input _input;
-        private Net.Chat _chat;
+        private Net.Chat _chat = null;
+        private string _dimension = null;
+        private string _account = null;
+        private string _character = null;
+        private ContextState _state = ContextState.Disconnected;
 
         private Dictionary<string, Channel> _channels;
         private Dictionary<string, Friend> _friends;
 
-        internal Context(Net.Chat chat)
+        internal Context()
         {
-            this._chat = chat;
-            // Hook events
+            // Read initial configuration
+            Base configuration = Base.Load("Configuration.xml");
+            if (configuration == null) configuration = new Data.ConfigurationV1();
+            while (configuration.CanUpgrade) configuration = configuration.Upgrade();
+            this._configuration = new Configuration(configuration);
+
+            // Read options
+            Base options = Base.Load(this.Configuration.OptionsPath + this.Configuration.OptionsFile);
+            if (options == null) options = new Data.OptionsV1();
+            while (options.CanUpgrade) options = options.Upgrade();
+            this._options = new Options(options);
+
+            // 
         }
+
+        #region Chat callbacks
+
         #endregion
+        #endregion // Internal
     }
 }

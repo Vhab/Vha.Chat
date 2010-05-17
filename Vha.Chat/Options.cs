@@ -25,6 +25,9 @@ using Vha.Chat.Data;
 
 namespace Vha.Chat
 {
+    /// <summary>
+    /// A wrapper around Data.OptionsV1 with modification tracking
+    /// </summary>
     public class Options
     {
         public int MaximumMessages
@@ -42,7 +45,7 @@ namespace Vha.Chat
             get { return this._options.MaximumHistory; }
             set { this._options.MaximumHistory = value; this.Touch(); }
         }
-        public ChatHtmlStyle TextStyle
+        public UI.ChatHtmlStyle TextStyle
         {
             get { return this._options.TextStyle; }
             set { this._options.TextStyle = value; this.Touch(); }
@@ -108,7 +111,7 @@ namespace Vha.Chat
         /// </summary>
         public void Touch()
         {
-            this.Touch();
+            this._modified = true;
         }
 
         public void Save()
@@ -116,8 +119,8 @@ namespace Vha.Chat
             lock (this)
             {
                 this._options.Save(
-                  Program.Configuration.OptionsPath +
-                  Program.Configuration.OptionsFile);
+                  Program.Context.Configuration.OptionsPath +
+                  Program.Context.Configuration.OptionsFile);
                 this._modified = false;
             }
         }
@@ -127,7 +130,7 @@ namespace Vha.Chat
         {
             if (data == null)
                 throw new ArgumentNullException("data");
-            if (data.Type != typeof(ConfigurationV1))
+            if (data.Type != typeof(OptionsV1))
                 throw new ArgumentException("Invalid config data type: " + data.Type.ToString());
             this._options = (OptionsV1)data;
             this._modified = false;
@@ -182,6 +185,11 @@ namespace Vha.Chat
 
     public class OptionsAccount
     {
+        public string Dimension
+        {
+            get { return this._account.Dimension; }
+            set { this._account.Dimension = value; this._parent.Touch(); }
+        }
         public string Name
         {
             get { return this._account.Name; }

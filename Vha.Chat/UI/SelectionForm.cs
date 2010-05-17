@@ -24,11 +24,12 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 using Vha.Net;
 using Vha.Common;
-using System.IO;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
     public partial class SelectionForm : Form
     {
@@ -91,7 +92,7 @@ namespace Vha.Chat
                 //Create a new scope to not overflow this methods scope with junk members.
                 string dir = "ignore";
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                Server s = Program.Servers.Get(this._chat.Server, this._chat.Port);
+                Dimension s = Program.Servers.Get(this._chat.Server, this._chat.Port);
                 string dim;
                 if (s == null) dim = "unknown";
                 else dim = s.Name;

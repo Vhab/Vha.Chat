@@ -18,14 +18,12 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
+using System.Windows.Forms;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
-    public static class FormUtils
+    public static class Utils
     {
         public delegate void FormDelegate(Form form);
 

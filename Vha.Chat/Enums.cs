@@ -23,6 +23,35 @@ using System.Text;
 
 namespace Vha.Chat
 {
+    public enum ContextState
+    {
+        /// <summary>
+        /// The context is currently not connected.
+        /// The next state is Connecting.
+        /// </summary>
+        Disconnected,
+        /// <summary>
+        /// The context is in temporary idle state before attempting to connect again.
+        /// The next state is Connecting or Disconnected.
+        /// </summary>
+        Reconnecting,
+        /// <summary>
+        /// The context is trying to connect.
+        /// The next state is CharacterSelection or Disconnected.
+        /// </summary>
+        Connecting,
+        /// <summary>
+        /// The context is connected and the user just selected a character to login with.
+        /// The next state is Disconnected or Connected.
+        /// </summary>
+        CharacterSelection,
+        /// <summary>
+        /// The context is fully connected.
+        /// The next state is Disconnected or Reconnecting.
+        /// </summary>
+        Connected
+    }
+
     public enum MessageClass
     {
         None,
@@ -63,7 +92,7 @@ namespace Vha.Chat
         /// </summary>
         Account,
         /// <summary>
-        /// Per dimension+character
+        /// Per dimension+account+character
         /// </summary>
         Character
     }

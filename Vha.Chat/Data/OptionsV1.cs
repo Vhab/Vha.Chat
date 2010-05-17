@@ -26,10 +26,10 @@ namespace Vha.Chat.Data
 {
     public class OptionsV1 : Base
     {
-        public int MaximumMessages = 999;
-        public int MaximumTexts = 99;
-        public int MaximumHistory = 99;
-        public ChatHtmlStyle TextStyle = ChatHtmlStyle.Default;
+        public int MaximumMessages = 250;
+        public int MaximumTexts = 50;
+        public int MaximumHistory = 20;
+        public UI.ChatHtmlStyle TextStyle = ChatHtmlStyle.Default;
 
         public OptionsV1Proxy Proxy = null;
 
@@ -65,6 +65,8 @@ namespace Vha.Chat.Data
 
     public class OptionsV1Account
     {
+        [XmlAttribute("Dimension")]
+        public string Dimension = "";
         [XmlAttribute("Name")]
         public string Name = "";
         [XmlAttribute("Character")]

@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Vha.Chat
 * Copyright (C) 2009-2010 Remco van Oosterhout
 *
@@ -18,30 +18,30 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Xml.Serialization;
 
 namespace Vha.Chat
 {
-    public class Input
+    public class Dimension
     {
-        public bool CheckConnection(bool output);
+        [XmlAttribute("Name")]
+        public string Name;
+        [XmlAttribute("Address")]
+        public string Address;
+        [XmlAttribute("Port")]
+        public int Port;
 
-        public bool CheckUser(string user, bool output);
-
-        public bool CheckChannel(string channel, bool output);
-
-        public void Send(MessageTarget target, string message, bool allowCommands);
-
-        public void Command(string command);
-
-        #region Internal
-        internal Input(Context context)
+        public Dimension() { }
+        public Dimension(string name, string address, int port)
         {
-            this._context = context;
+            this.Name = name;
+            this.Address = address;
+            this.Port = port;
         }
 
-        private Context _context;
-        #endregion
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.Chat
 * Copyright (C) 2009-2010 Remco van Oosterhout
 *
@@ -19,32 +19,25 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Text;
-using System.Windows.Forms;
 
-namespace Vha.Chat
+namespace Vha.Chat.Events
 {
-    public partial class StatusForm : Form
+    public class SelectCharacterEventArgs
     {
-        public delegate void SetMessageDelegate(string message);
+        /// <summary>
+        /// Fill this variable with a character from Characters to select it as active character.
+        /// Leaving this variable null will cause the system to assume the attempt to connect should be aborted.
+        /// </summary>
+        public Character Character = null;
+        /// <summary>
+        /// A list of all characters available on the account
+        /// </summary>
+        public readonly Character[] Characters;
 
-        public StatusForm()
+        public SelectCharacterEventArgs(Character[] characters)
         {
-            InitializeComponent();
-            this.DialogResult = DialogResult.Abort;
-        }
-
-        public void SetMessage(string message)
-        {
-            if (this._message.InvokeRequired)
-            {
-                this._message.Invoke(new SetMessageDelegate(SetMessage), new object[] { message });
-                return;
-            }
-            this._message.Text = message;
+            this.Characters = characters;
         }
     }
 }

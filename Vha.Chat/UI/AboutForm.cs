@@ -5,8 +5,9 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Vha.Chat;
 
-namespace Vha.Chat
+namespace Vha.Chat.UI
 {
     public partial class AboutForm : Form
     {
@@ -19,7 +20,6 @@ namespace Vha.Chat
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
-            // Focus the form instead of the License textbox
             this._license.Select(0, 0);
         }
     }

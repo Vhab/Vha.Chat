@@ -63,6 +63,10 @@ namespace Vha.Chat
         /// </summary>
         public event Handler<SelectCharacterEventArgs> SelectCharacterEvent;
         /// <summary>
+        /// Fires when a recoverable error has occured, like incorrect arguments or failing to connect.
+        /// </summary>
+        public event Handler<ErrorEventArgs> ErrorEvent;
+        /// <summary>
         /// Fires whenever a new message is available
         /// </summary>
         public event Handler<MessageEventArgs> MessageEvent;
@@ -154,7 +158,27 @@ namespace Vha.Chat
         #endregion
 
         #region 'Preperation' and 'state' methods
-        public void Connect(string dimension, string account, string password);
+        /// <summary>
+        /// Connect to an Anarchy Online chat server.
+        /// This method will throw an error if the state is not Disconnected.
+        /// </summary>
+        /// <param name="dimension"></param>
+        /// <param name="account"></param>
+        /// <param name="password"></param>
+        public void Connect(string dimension, string account, string password)
+        {
+            // check state
+            // create chat
+            // Set settings
+            this._chat.AutoReconnect = false;
+            this._chat.IgnoreCharacterLoggedIn = true;
+            this._chat.UseThreadPool = false;
+            // connect async
+            // hook events (including exceptions)
+        }
+        /// <summary>
+        /// Disconnect from the chat server.
+        /// </summary>
         public void Disconnect();
         #endregion
 

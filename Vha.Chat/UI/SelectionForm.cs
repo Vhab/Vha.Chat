@@ -33,39 +33,37 @@ namespace Vha.Chat.UI
 {
     public partial class SelectionForm : Form
     {
-        public LoginCharacter Character = null;
-        /// <summary>
-        /// Store chat library till later.
-        /// </summary>
-        private Net.Chat _chat=null;
+        public Character Character = null;
 
-        public SelectionForm(Net.Chat chat, LoginCharacter[] characters)
+        public SelectionForm(Context context, Character[] characters)
         {
             InitializeComponent();
-            this._chat = chat; //Store chat libary so we can create ignore list *before* actually logging in.
-            List<LoginCharacter> list = new List<LoginCharacter>(characters);
+            List<Character> list = new List<Character>(characters);
             list.Sort();
             foreach (LoginCharacter character in list)
             {
                 this._characters.Items.Add(character);
             }
 
-            this._characters.SelectedIndex = 0; // Default to selecting the first character
-            if (Program.Configuration.Accounts.Count > 0)
+            // Default to selecting the first character
+            this._characters.SelectedIndex = 0;
+            foreach (OptionsAccount account in context.Options.Accounts)
             {
-                foreach (ConfigAccount amap in Program.Configuration.Accounts)
+                if (account.Account == context.Account)
                 {
-                    if (amap.Account == chat.Account)
+                    // Check if the last used dimension matches
+                    if (account.Dimension != context.Dimension)
+                        break;
+                    // Find matching 'last used' character
+                    foreach (Character character in this._characters.Items)
                     {
-                        foreach (LoginCharacter lc in this._characters.Items)
+                        if (character.Name == account.Character)
                         {
-                            // Automatically select the last used character
-                            if (lc.Name == amap.Character)
-                            {
-                                this._characters.SelectedIndex = this._characters.Items.IndexOf(lc);
-                            }
+                            this._characters.SelectedIndex = this._characters.Items.IndexOf(character);
+                            break;
                         }
                     }
+                    break;
                 }
             }
         }
@@ -82,12 +80,12 @@ namespace Vha.Chat.UI
                 MessageBox.Show("You're required to select a character before logging on.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            this.Character = (LoginCharacter)this._characters.SelectedItem;
+            this.Character = (Character)this._characters.SelectedItem;
             this.DialogResult = DialogResult.OK;
            
             // Create ignore list. Doing so here lets us ignore offline tells and system messages reporting them,
             // since we haven't *really* selected a character yet.. but we know which one we are selecting.
-            if (true)
+            /*if (true)
             {
                 //Create a new scope to not overflow this methods scope with junk members.
                 string dir = "ignore";
@@ -98,7 +96,7 @@ namespace Vha.Chat.UI
                 else dim = s.Name;
                 if (Program.Configuration.IgnoreMethod != IgnoreMethod.None)
                     Program.Ignores = new Ignore(string.Format("{0}/{1}.xml", dir, dim), Program.Configuration.IgnoreMethod, _chat.Account, this.Character.ID);
-            }
+            }*/
         }
     }
 }

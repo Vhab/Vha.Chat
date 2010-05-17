@@ -119,14 +119,14 @@ namespace Vha.Chat
             lock (this)
             {
                 this._options.Save(
-                  Program.Context.Configuration.OptionsPath +
-                  Program.Context.Configuration.OptionsFile);
+                  this._context.Configuration.OptionsPath +
+                  this._context.Configuration.OptionsFile);
                 this._modified = false;
             }
         }
 
         #region Internal
-        internal Options(Base data)
+        internal Options(Context context, Base data)
         {
             if (data == null)
                 throw new ArgumentNullException("data");
@@ -134,10 +134,12 @@ namespace Vha.Chat
                 throw new ArgumentException("Invalid config data type: " + data.Type.ToString());
             this._options = (OptionsV1)data;
             this._modified = false;
+            this._context = context;
         }
 
         private OptionsV1 _options;
         private bool _modified;
+        private Context _context;
         #endregion
     }
 

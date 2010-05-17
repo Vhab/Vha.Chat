@@ -29,44 +29,54 @@ using Vha.Net;
 using Vha.Net.Events;
 using Vha.Common;
 using Vha.Chat;
+using Vha.Chat.Events;
 
 namespace Vha.Chat.UI
 {
     public partial class AuthenticationForm : Form
     {
         protected StatusForm _status = null;
-        protected Net.Chat _chat = null;
+        protected Context _context = null;
 
-        public AuthenticationForm()
+        public AuthenticationForm(Context context)
         {
+            this._context = context;
             InitializeComponent();
         }
 
         private void AuthenticationForm_Load(object sender, EventArgs e)
         {
-            foreach (Dimension dimension in Program.Servers.Servers)
+            // Add dimensions
+            foreach (Dimension dimension in this._context.Configuration.Dimensions)
             {
                 this._server.Items.Add(dimension);
-                if (this._server.Items.Count == 1) this._server.SelectedIndex = 0; //Make sure we always select the first one, so that if we don't find the last used server, at least some server is selected.
-                else if (dimension.Name == Program.Configuration.Dimension)
-                    this._server.SelectedIndex = this._server.Items.Count - 1; //this works because count starts at 1 and index starts at 0.
+                if (this._server.Items.Count == 1)
+                    this._server.SelectedIndex = 0; // Make sure we always select the first one, so that if we don't find the last used server, at least some server is selected.
+                else if (dimension.Name == this._context.Options.Dimension)
+                    this._server.SelectedIndex = this._server.Items.Count - 1; // this works because count starts at 1 and index starts at 0.
             }
-            
-            this._account.Text = Program.Configuration.Account; // Automatically insert last account name
-            // Add list of used accounts. Alphabetical order.
-            if (Program.Configuration.Accounts.Count > 0)
-            {
-                List<string> accounts = new List<string>();
-                foreach (ConfigAccount acc in Program.Configuration.Accounts)
-                {
-                    accounts.Add(acc.Account);
-                }
-                accounts.Sort(delegate(string A, string B) { return A.CompareTo(B); });
-                foreach (string s in accounts)
-                {
-                    this._account.Items.Add(s);
-                }
-            }
+
+            // Add accounts (sorted alphabetically)
+            this._account.Text = this._context.Options.Account;
+            List<string> accounts = new List<string>();
+            foreach (ConfigAccount acc in this._context.Options.Accounts)
+                accounts.Add(acc.Account);
+            accounts.Sort();
+            foreach (string acc in accounts)
+                this._account.Items.Add(acc);
+
+            // Hook events
+            this._context.StateEvent += new Handler<ContextState>(_context_StateEvent);
+            this._context.SelectCharacterEvent += new Handler<SelectCharacterEventArgs>(_context_SelectCharacterEvent);
+            this._context.ErrorEvent += new Handler<ErrorEventArgs>(_context_ErrorEvent);
+        }
+
+        private void AuthenticationForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            // Unhook events
+            this._context.StateEvent -= new Handler<ContextState>(_context_StateEvent);
+            this._context.SelectCharacterEvent -= new Handler<SelectCharacterEventArgs>(_context_SelectCharacterEvent);
+            this._context.ErrorEvent -= new Handler<ErrorEventArgs>(_context_ErrorEvent);
         }
 
         private void _cancel_Click(object sender, EventArgs e)
@@ -96,115 +106,95 @@ namespace Vha.Chat.UI
             this._status = new StatusForm();
             this._status.SetMessage("Initializing...");
             // Connect
-            Dimension server = (Dimension)this._server.SelectedItem;
-            if (string.IsNullOrEmpty(Program.Configuration.Proxy))
-            {
-                // Connect without proxy
-                this._chat = new Vha.Net.Chat(server.Address, server.Port, this._account.Text, this._password.Text);
-            }
-            else
-            {
-                // Connect with proxy
-                this._chat = new Vha.Net.Chat(server.Address, server.Port, this._account.Text, this._password.Text, new Uri(Program.Configuration.Proxy));
-            }
-            this._chat.UseThreadPool = false;
-            Thread thread = new Thread(new ThreadStart(_connect));
-            thread.Start();
-            // Show status and wait
+            Dimension dimension = (Dimension)this._server.SelectedItem;
+            this._context.Connect(dimension.Name, this._account.Text, this._password.Text);
+            // Show dialog
             DialogResult result = this._status.ShowDialog();
             this._status = null;
             if (result == DialogResult.Abort)
-            {
-                this._chat.Disconnect();
-                this._chat = null;
-            }
+                this._context.Disconnect();
         }
 
-        private void _connect()
-        {
-            this._chat.AutoReconnect = false;
-            this._chat.IgnoreCharacterLoggedIn = true;
-            this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
-            this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
-            this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
-#if !DEBUG
-            this._chat.ExceptionEvent += new ExceptionEventHandler(Program.UnhandledException);
-#endif
-            this._chat.Connect();
-        }
-
-        private void AuthenticationForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (this._chat != null)
-            {
-                this._chat.LoginCharlistEvent -= new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
-                this._chat.LoginErrorEvent -= new LoginErrorEventHandler(_chat_LoginErrorEvent);
-                this._chat.StatusChangeEvent -= new StatusChangeEventHandler(_chat_StatusChangeEvent);
-            }
-        }
-
-        #region Chat Event Handlers
-        private void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
-        {
-            if (this._status == null)
-                return;
-            switch (e.State)
-            {
-                case ChatState.Connecting:
-                    this._status.SetMessage("Connecting...");
-                    break;
-                case ChatState.Login:
-                    this._status.SetMessage("Authenticating...");
-                    break;
-                case ChatState.CharacterSelect:
-                    this._status.SetMessage("Selecting character...");
-                    break;
-            }
-        }
-
-        private void _chat_LoginErrorEvent(Vha.Net.Chat chat, LoginErrorEventArgs e)
-        {
-            if (this._status == null)
-                return;
-            this._status.SetMessage(e.Error);
-        }
-
-        private void _chat_LoginCharlistEvent(Vha.Net.Chat chat, LoginChararacterListEventArgs e)
+        #region Context event handlers
+        private void _context_SelectCharacterEvent(Context context, SelectCharacterEventArgs args)
         {
             // Run this method locally
             if (this.InvokeRequired)
             {
-                this.BeginInvoke(
-                    new LoginCharlistEventHandler(_chat_LoginCharlistEvent),
-                    new object[] { chat, e });
+                this.Invoke(
+                    new Handler<SelectCharacterEventArgs>(_context_SelectCharacterEvent),
+                    new object[] { context, args });
                 return;
             }
             // Early out
-            if (this._status == null)
-                return;
             if (e.CharacterList.Length == 0)
                 return;
+            if (this._status == null)
+                return;
+            // Hide current form
             this._status.DialogResult = DialogResult.OK;
             this._status.Hide();
+            this._status = null;
             this.Hide();
-            SelectionForm form = new SelectionForm(chat, e.CharacterList);
+            // Show character selection dialog
+            SelectionForm form = new SelectionForm(context, args.Characters);
             DialogResult result = form.ShowDialog();
             if (result == DialogResult.OK)
             {
-                Program.Application.MainForm = new ChatForm(this._chat);
-                this.Close();
-                Program.Application.MainForm.Show();
-                this._chat.SendLoginCharacter(form.Character);
-                this._chat.AutoReconnect = true;
-                this._chat = null;
+                // Select character
+                args.Character = form.Character;
             }
             else
             {
-                this._chat.Disconnect();
-                this._chat = null;
+                // Return to authentication screen
                 this.Show();
             }
-            this._status = null;
+        }
+
+        private void _context_StateEvent(Context context, ContextState args)
+        {
+            // Run this method locally
+            if (this.InvokeRequired)
+            {
+                this.Invoke(
+                    new Handler<ContextState>(_context_StateEvent),
+                    new object[] { context, args });
+                return;
+            }
+            // Handle state change
+            switch (args)
+            {
+                case ContextState.Connecting:
+                    if (this._status != null)
+                        this._status.SetMessage("Connecting...");
+                    break;
+                case ContextState.CharacterSelection:
+                    if (this._status != null)
+                        this._status.SetMessage("Selecting character...");
+                    break;
+                case ContextState.Connected:
+                    // Hide status form
+                    if (this._status != null)
+                    {
+                        this._status.DialogResult = DialogResult.OK;
+                        this._status.Hide();
+                    }
+                    // Display main form
+                    this.Hide();
+                    Program.Application.MainForm = new ChatForm(context);
+                    this.Close();
+                    Program.Application.MainForm.Show();
+                    break;
+                case ContextState.Disconnected:
+                    // Likely already showing an error message, let's not do anything
+                    break;
+            }
+        }
+
+        private void _context_ErrorEvent(Context context, ErrorEventArgs args)
+        {
+            if (this._status != null)
+                this._status.SetMessage(args.Message);
         }
         #endregion
     }

@@ -22,16 +22,13 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
 using Vha.Chat;
+using Vha.Chat.UI;
 using Vha.Common;
 
 namespace Vha.Chat
 {
     public static class Program
     {
-        /// <summary>
-        /// Returns the chat client context
-        /// </summary>
-        public static Context Context = null;
         /// <summary>
         /// Returns the main ApplicationContext to control the main form
         /// </summary>
@@ -42,14 +39,17 @@ namespace Vha.Chat
         [STAThread]
         static void Main()
         {
-            // Start application
+            // Create context
+            Context context = new Context();
+            // Initialize Windows.Forms application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
 #if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
 #endif
+            // Start application
             Application = new ApplicationContext();
-            Application.MainForm = new AuthenticationForm();
+            Application.MainForm = new AuthenticationForm(context);
             Application.Run(Application);
         }
 

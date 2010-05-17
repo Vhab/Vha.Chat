@@ -52,6 +52,16 @@ namespace Vha.Chat
         Connected
     }
 
+
+
+    public enum ErrorType
+    {
+        /// <summary>
+        /// An error triggered while attempting to enstablish a connection
+        /// </summary>
+        Login
+    }
+
     public enum MessageClass
     {
         None,

@@ -3,29 +3,26 @@
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; version 2 of the License only.
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
 *
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+* THE SOFTWARE.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using System.Net.Cache;
-using System.Net.Sockets;
-using System.IO;
-using System.Threading;
 
 namespace Vha.Common
 {
@@ -420,140 +417,6 @@ namespace Vha.Common
             text = text.Replace("&lt;", "<");
             text = text.Replace("&gt;", ">");
             return text;
-        }
-
-		/// <summary>
-		/// Retrieve content from a URL. Timeout: 30s
-		/// </summary>
-		/// <param name="url"></param>
-		/// <returns></returns>
-        public static string GetHtml(string url) { return GetHtml(url, 30000); }
-		/// <summary>
-		/// Retrieve content from a URL. Custom timeout.
-		/// </summary>
-		/// <param name="url"></param>
-		/// <param name="timeout">Timeout in ms (1s = 1000ms)</param>
-		/// <returns></returns>
-        public static string GetHtml(string url, Int32 timeout)
-        {
-            /*StreamReader stream = null;
-            string result = null;
-            try
-            {
-                DateTime timeStart = DateTime.Now;
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                if (timeout != 0)
-                {
-                    request.Timeout = timeout;
-                    request.ReadWriteTimeout = timeout;
-                }
-                request.UserAgent = "AoLib/" + AoLib.Net.Chat.VERSION + "(" + AoLib.Net.Chat.VERSIONSTRING + ")";
-                request.KeepAlive = false;
-                request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                stream = new StreamReader(response.GetResponseStream());
-                result = stream.ReadToEnd();
-            }
-            catch { }
-            finally
-            {
-                if (stream != null)
-                    stream.Close();
-            }
-            return result;*/
-
-            // Parse URI
-            if (!url.StartsWith("http://"))
-                return null;
-            if (url.Split('/').Length < 3)
-                url = url + "/";
-            if (url.Split('/').Length < 3)
-                return null;
-            if (url.Length < 9)
-                return null;
-
-            url = url.Substring(7);
-            string domain = url.Substring(0, url.IndexOf('/'));
-            string get = url.Substring(url.IndexOf('/'));
-            string result = null;
-            Int32 port = 80;
-            if (domain.Contains(":"))
-            {
-                try
-                {
-                    port = Convert.ToInt32(domain.Substring(domain.IndexOf(':')).Trim(':'));
-                    domain = domain.Substring(0, domain.IndexOf(':'));
-                }
-                catch { return null; }
-            }
-            if (!get.StartsWith("/"))
-                get = "/" + get;
-            domain = domain.Trim('/');
-
-            TcpClient client = null;
-            NetworkStream stream = null;
-            try
-            {
-                // Connect
-                client = new TcpClient();
-                client.Connect(domain, port);
-
-                // Build and Send Request
-                string request = String.Format("GET {0} HTTP/1.0{2}Host: {1}{2}", get, domain, "\r\n");
-                request += String.Format("Connection: Close{0}User-Agent: Vha/0.8 {0}{0}", "\r\n");
-
-                client.ReceiveTimeout = timeout;
-                client.SendTimeout = timeout;
-                stream = client.GetStream();
-                byte[] buffer = Encoding.ASCII.GetBytes(request);
-                stream.Write(buffer, 0, buffer.Length);
-                
-                // Get Response
-                StreamReader reader = new StreamReader(stream);
-                string response = reader.ReadLine();
-                string[] responseParts = response.Split(' ');
-                if (responseParts.Length > 1)
-                {
-                    string responseVersion = responseParts[0];
-                    string responseCode = responseParts[1];
-                    string responseStatus = responseParts[2];
-
-                    if (responseCode == "200")
-                    {
-                        // Find the Content
-                        while (true)
-                        {
-                            string line = reader.ReadLine();
-                            if (line == string.Empty || line == null)
-                                break;
-                        }
-                        // Read the content
-                        result = string.Empty;
-                        for (int i = 0; i < 3; i++)
-                        {
-                            if (!client.Connected)
-                                break;
-
-                            string tmp = reader.ReadToEnd();
-                            if (tmp != null && tmp != string.Empty)
-                            {
-                                result += tmp;
-                                i = 0;
-                            }
-                            Thread.Sleep(50);
-                        }
-                    }
-                }
-            }
-            catch { }
-            finally
-            {
-                if (stream != null)
-                    stream.Close();
-                if (client != null)
-                    client.Close();
-            }
-            return result;
         }
     }
 }

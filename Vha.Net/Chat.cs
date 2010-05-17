@@ -34,9 +34,9 @@ using Vha.Net.Events;
 namespace Vha.Net
 {
     public class Chat
-    {
-        // Public Settings
-        public bool AutoReconnect = true;
+	{
+		#region Public settings
+		public bool AutoReconnect = true;
         public int ReconnectDelay = 5000;
         public int PingInterval = 60000;
         public int PingTimeout = 120000;
@@ -44,11 +44,15 @@ namespace Vha.Net
         public double SlowPacketDelay = 2200;
         public bool IgnoreCharacterLoggedIn = true;
         public bool UseThreadPool = true;
-
-        // Events
-        public event AmdMuxInfoEventHandler AmdMuxInfoEvent;
+		public object Tag = null;
+		#endregion
+		#region Events
+		public event AmdMuxInfoEventHandler AmdMuxInfoEvent;
         public event AnonVicinityEventHandler AnonVicinityEvent;
-        public event FriendStatusEventHandler FriendStatusEvent;
+        /// <summary>
+        /// Notices about friends being online or offline
+        /// </summary>
+		public event FriendStatusEventHandler FriendStatusEvent;
         public event FriendRemovedEventHandler FriendRemovedEvent;
         public event ClientUnknownEvent ClientUnknownEvent;
 		/// <summary>
@@ -73,8 +77,10 @@ namespace Vha.Net
         public event StatusChangeEventHandler StatusChangeEvent;
         public event DebugEventHandler DebugEvent;
         public event ExceptionEventHandler ExceptionEvent;
+		#endregion
 
-        protected string _account = string.Empty;
+		#region Protected members
+		protected string _account = string.Empty;
         protected string _password = string.Empty;
         protected string _character = string.Empty;
         protected ChatState _state = ChatState.Disconnected;
@@ -106,7 +112,9 @@ namespace Vha.Net
         /// new Uri("socks4://userid@proxyserver:port/") for a Socks v4 connection.
         /// </summary>
         protected Uri _proxy = null;
+		#endregion
 
+		#region Public attributes
 		/// <summary>
 		/// My character ID
 		/// </summary>
@@ -152,8 +160,35 @@ namespace Vha.Net
 		/// Number of entries in the fast outgoing queue
 		/// </summary>
         public int FastQueueCount { get { return this._fastQueue.Count; } }
+		#endregion
 
-        public Chat(string server, int port, string account, string password)
+		#region Constructors
+		/// <summary>
+		/// </summary>
+		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
+        public Chat(Uri connectionString)
+        {
+            UriBuilder ub = new UriBuilder(connectionString);
+            this._serverAddress = ub.Host;
+            this._port = ub.Port;
+            this._account = ub.UserName;
+            this._password = ub.Password;
+            if (!string.IsNullOrEmpty(ub.Path))
+                this._character = Format.UppercaseFirst(ub.Path.Substring(1)); //Start at 1 to remove the initial /
+            this._proxy = null;
+        }
+
+		/// <summary>
+		/// </summary>
+		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
+		/// <param name="proxy">The proxy server this connection should be tunnelled through</param>
+        public Chat(Uri connectionString, Uri proxy)
+            : this(connectionString)
+        {
+            this._proxy = proxy;
+        }
+
+		public Chat(string server, int port, string account, string password)
         {
             this._serverAddress = server;
             this._port = port;
@@ -187,7 +222,7 @@ namespace Vha.Net
             this._port = port;
             this._account = account;
             this._password = password;
-            this._character = character;
+            this._character = Format.UppercaseFirst(character);
             this._proxy = null;
         }
 
@@ -208,11 +243,12 @@ namespace Vha.Net
             this._port = port;
             this._account = account;
             this._password = password;
-            this._character = character;
+            this._character = Format.UppercaseFirst(character);
             this._proxy = proxy;
-        }
+		}
+		#endregion
 
-        // Get this thing ready for running
+		// Get this thing ready for running
         protected void PrepareChat()
         {
             lock (this)
@@ -377,8 +413,9 @@ namespace Vha.Net
             this.LoginCharlistEvent = null;
             this.StatusChangeEvent = null;
             this.DebugEvent = null;
-        }
+		}
 
+		#region Disconnect
 		/// <summary>
 		/// Disconnect from chat server synchronously.
 		/// </summary>
@@ -438,9 +475,10 @@ namespace Vha.Net
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
-        }
+		}
+		#endregion
 
-        // Receive Thread
+		// Receive Thread
         internal void RunReceiver()
         {
             this.Debug("Started", "[ReceiveThread]");

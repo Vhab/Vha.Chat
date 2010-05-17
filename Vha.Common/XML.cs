@@ -3,27 +3,30 @@
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; version 2 of the License only.
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
 *
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+* THE SOFTWARE.
 */
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
 using System.IO;
-using System.Net;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Vha.Common
 {
@@ -32,9 +35,15 @@ namespace Vha.Common
         private static Dictionary<Type, XmlSerializer> _serializers = new Dictionary<Type, XmlSerializer>();
         public static XmlSerializer GetSerializer(Type type)
         {
-            if (!_serializers.ContainsKey(type)) _serializers.Add(type, new XmlSerializer(type));
-            return _serializers[type];
+            lock (_serializers)
+            {
+                if (!_serializers.ContainsKey(type))
+                    _serializers.Add(type, new XmlSerializer(type));
+                return _serializers[type];
+            }
         }
+
+        
 
         /// <summary>
         /// Reads an xml file and deserializes it into object T
@@ -64,8 +73,8 @@ namespace Vha.Common
         /// <summary>
         /// Deserializes XML from stream
         /// </summary>
-        /// <param name="stream">Stream to deserialize</param>
         /// <param name="type">Type of the object</param>
+        /// <param name="stream">Stream to deserialize</param>
         /// <param name="closeStream">Should we close stream?</param>
         /// <returns></returns>
         public static Object FromStream(Type type, Stream stream, bool closeStream)
@@ -85,37 +94,54 @@ namespace Vha.Common
         }
 
         /// <summary>
+        /// Deserializes XML from a string of xml
+        /// </summary>
+        /// <param name="type">Type of the object</param>
+        /// <param name="xml">XML data contained in a string</param>
+        /// <returns></returns>
+        public static Object FromString(Type type, string xml)
+        {
+            if (string.IsNullOrEmpty(xml))
+                return null;
+            StringReader source = null;
+            XmlTextReader reader = null;
+            try
+            {
+                source = new StringReader(xml);
+                reader = new XmlTextReader(source);
+                Object obj = GetSerializer(type).Deserialize(reader);
+                return obj;
+            }
+            catch { return null; }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+                if (source != null)
+                    source.Close();
+            }
+        }
+
+        /// <summary>
         /// Reads xml from a web server and deserializes it into object T
         /// </summary>
         /// <param name="type">Type of the object</param>
         /// <param name="url">The url to the xml file to be deserialized</param>
         /// <returns>The deserialized object</returns>
         /// <remarks>Returns NULL when the operation fails</remarks>
-        public static Object FromUrl(Type type, string url) { return FromUrl(type, url, 30000); }
+        public static Object FromUrl(Type type, string url) { return FromUrl(type, url, 30000, true); }
         /// <summary>
         /// Reads xml from a web server and deserializes it into object T
         /// </summary>
         /// <param name="type">Type of the object</param>
         /// <param name="url">The url to the xml file to be deserialized</param>
         /// <param name="timeout">Request timeout in miliseconds</param>
+        /// <param name="keepalive">Keep the connection alive</param>
         /// <returns>The deserialized object</returns>
         /// <remarks>Returns NULL when the operation fails</remarks>
-        public static Object FromUrl(Type type, string url, int timeout)
+        public static Object FromUrl(Type type, string url, int timeout, bool keepalive)
         {
-            try
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.UserAgent = "Vha.Common/1.0";
-                request.KeepAlive = false;
-                request.ProtocolVersion = HttpVersion.Version10;
-                request.Timeout = timeout;
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream stream = response.GetResponseStream();
-                Object obj = GetSerializer(type).Deserialize(stream);
-                response.Close();
-                return obj;
-            }
-            catch { return null; }
+            return FromString(type, Web.GetSource(url, timeout, keepalive));
         }
 
         /// <summary>
@@ -146,6 +172,7 @@ namespace Vha.Common
             {
                 filestream = (Stream)File.Open(file, FileMode.Create, FileAccess.Write);
                 memorystream.WriteTo(filestream);
+                filestream.Flush();
                 filestream.Close();
                 memorystream.Close();
                 return true;
@@ -189,6 +216,28 @@ namespace Vha.Common
                 return false;
             }
         }
+
+        /// <summary>
+        /// Serialize object to an existing XmlWriter
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="type"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool ToXmlWriter(XmlWriter writer, Type type, Object obj)
+        {
+            if (writer == null) throw new ArgumentNullException("writer");
+            if (obj == null) throw new ArgumentNullException("obj");
+            try
+            {
+                GetSerializer(type).Serialize(writer, obj);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 
     public static class XML<T> where T : class
@@ -222,6 +271,16 @@ namespace Vha.Common
         }
 
         /// <summary>
+        /// Deserializes XML from a string of xml
+        /// </summary>
+        /// <param name="xml">XML data contained in a string</param>
+        /// <returns></returns>
+        public static T FromString(string xml)
+        {
+            return (T)XML.FromString(typeof(T), xml);
+        }
+
+        /// <summary>
         /// Reads xml from a web server and deserializes it into object T
         /// </summary>
         /// <param name="url">The url to the xml file to be deserialized</param>
@@ -236,11 +295,12 @@ namespace Vha.Common
         /// </summary>
         /// <param name="url">The url to the xml file to be deserialized</param>
         /// <param name="timeout">Request timeout in miliseconds</param>
+        /// <param name="keepalive">Keep the connection alive</param>
         /// <returns>The deserialized object</returns>
         /// <remarks>Returns NULL when the operation fails</remarks>
-        public static T FromUrl(string url, int timeout)
+        public static T FromUrl(string url, int timeout, bool keepalive)
         {
-            return (T)XML.FromUrl(typeof(T), url, timeout);
+            return (T)XML.FromUrl(typeof(T), url, timeout, keepalive);
         }
 
         /// <summary>
@@ -253,7 +313,7 @@ namespace Vha.Common
         {
             return XML.ToFile(file, typeof(T), obj);
         }
-        
+
         /// <summary>
         /// Writes to an already opened stream.
         /// </summary>
@@ -266,5 +326,16 @@ namespace Vha.Common
         {
             return XML.ToStream(stream, typeof(T), obj, closeStream);
         }
-    }
+
+        /// <summary>
+        /// Serialize object to an existing XmlWriter
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool ToXmlWriter(XmlWriter writer, Object obj)
+        {
+            return XML.ToXmlWriter(writer, typeof(T), obj);
+        }
+    }   
 }

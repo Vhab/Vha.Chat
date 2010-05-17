@@ -52,6 +52,8 @@ namespace Vha.Chat
             this._characters.SelectedIndex = 0; // Default to selecting the first character
             if (Program.Configuration.Accounts.Count > 0)
             {
+				bool Selected = false;
+				string ServerName = Program.Servers.Get(chat.Server, chat.Port).Name;
                 foreach (ConfigAccount amap in Program.Configuration.Accounts)
                 {
                     if (amap.Account == chat.Account)
@@ -61,10 +63,19 @@ namespace Vha.Chat
                             // Automatically select the last used character
                             if (lc.Name == amap.Character)
                             {
-                                this._characters.SelectedIndex = this._characters.Items.IndexOf(lc);
+								if (ServerName == amap.Dimension || amap.Dimension == string.Empty)
+								{
+									this._characters.SelectedIndex = this._characters.Items.IndexOf(lc);
+									Selected = true;
+									if (ServerName == amap.Dimension)
+									{	//If we're selecting the character by dimension, and not the 1.1.6-compatible string.Empty match
+										break;
+									}
+								}
                             }
                         }
                     }
+					if (Selected) break;
                 }
             }
         }

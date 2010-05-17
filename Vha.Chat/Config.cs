@@ -53,6 +53,8 @@ namespace Vha.Chat
 
     public class ConfigAccount
     {
+		[XmlAttribute("dimesion")]
+		public string Dimension = string.Empty;
         [XmlAttribute("account")]
         public string Account = "";
         [XmlAttribute("character")]

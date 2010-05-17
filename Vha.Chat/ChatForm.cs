@@ -349,6 +349,7 @@ namespace Vha.Chat
             if (Program.Configuration.Account != chat.Account
                 || myamap == null
                 || myamap.Character != chat.Character
+				|| myamap.Dimension != Server
                 || Program.Configuration.Dimension != Server)
             {
                 // Add changes to config.
@@ -357,6 +358,7 @@ namespace Vha.Chat
                 if (myamap == null) myamap = new ConfigAccount();
                 myamap.Account = chat.Account;
                 myamap.Character = chat.Character;
+				myamap.Dimension = Program.Servers.Get(chat.Server, chat.Port).Name;
                 if (oldamap != null) Program.Configuration.Accounts.Remove(oldamap);
                 Program.Configuration.Accounts.Add(myamap);
                 Program.Configuration.Dimension = Server;

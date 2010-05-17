@@ -3,8 +3,8 @@
   <OptionsPath>%APPDATA%\Vha.Chat\</OptionsPath>
   <OptionsFile>Options.xml</OptionsFile>
   <IgnoresPath>%APPDATA%\Vha.Chat\Ignores\</IgnoresPath>
-  <Server Name="Atlantean" Address="chat.d1.funcom.com" Port="7101" />
-  <Server Name="Rimor" Address="chat.d2.funcom.com" Port="7102" />
-  <Server Name="Die Neue Welt" Address="chat.d3.funcom.com" Port="7103" />
-  <Server Name="Test" Address="chat.dt.funcom.com" Port="7109" />
+  <Dimension Name="Atlantean" Address="chat.d1.funcom.com" Port="7101" />
+  <Dimension Name="Rimor" Address="chat.d2.funcom.com" Port="7102" />
+  <Dimension Name="Die Neue Welt" Address="chat.d3.funcom.com" Port="7103" />
+  <Dimension Name="Test" Address="chat.dt.funcom.com" Port="7109" />
 </Root>

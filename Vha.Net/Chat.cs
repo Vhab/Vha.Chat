@@ -163,6 +163,31 @@ namespace Vha.Net
 		#endregion
 
 		#region Constructors
+		/// <summary>
+		/// </summary>
+		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
+        public Chat(Uri connectionString)
+        {
+            UriBuilder ub = new UriBuilder(connectionString);
+            this._serverAddress = ub.Host;
+            this._port = ub.Port;
+            this._account = ub.UserName;
+            this._password = ub.Password;
+            if (!string.IsNullOrEmpty(ub.Path))
+                this._character = Format.UppercaseFirst(ub.Path.Substring(1)); //Start at 1 to remove the initial /
+            this._proxy = null;
+        }
+
+		/// <summary>
+		/// </summary>
+		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
+		/// <param name="proxy">The proxy server this connection should be tunnelled through</param>
+        public Chat(Uri connectionString, Uri proxy)
+            : this(connectionString)
+        {
+            this._proxy = proxy;
+        }
+
 		public Chat(string server, int port, string account, string password)
         {
             this._serverAddress = server;
@@ -197,7 +222,7 @@ namespace Vha.Net
             this._port = port;
             this._account = account;
             this._password = password;
-            this._character = character;
+            this._character = Format.UppercaseFirst(character);
             this._proxy = null;
         }
 
@@ -218,7 +243,7 @@ namespace Vha.Net
             this._port = port;
             this._account = account;
             this._password = password;
-            this._character = character;
+            this._character = Format.UppercaseFirst(character);
             this._proxy = proxy;
 		}
 		#endregion

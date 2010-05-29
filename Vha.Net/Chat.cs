@@ -76,7 +76,9 @@ namespace Vha.Net
         public event LoginCharlistEventHandler LoginCharlistEvent;
         public event StatusChangeEventHandler StatusChangeEvent;
         public event DebugEventHandler DebugEvent;
+#if !DEBUG
         public event ExceptionEventHandler ExceptionEvent;
+#endif
 		#endregion
 
 		#region Protected members
@@ -298,6 +300,24 @@ namespace Vha.Net
             }
         }
 
+        #region Connect
+        /// <summary>
+        /// Connect to chatserver using previously provided parameters
+        /// </summary>
+        /// <param name="async">Whether to use a blocking call to connect</param>
+        /// <returns></returns>
+        public bool Connect(bool async)
+        {
+            if (async)
+            {
+                Thread thread = new Thread(new ThreadStart(_connect));
+                thread.Start();
+                return false;
+            }
+            else return Connect();
+        }
+        internal void _connect() { Connect(); }
+
 		/// <summary>
 		/// Connect to chatserver using previously provided parameters
 		/// </summary>
@@ -317,9 +337,10 @@ namespace Vha.Net
 
                 this.Debug("Connecting to dimension: " + this._serverAddress + ":" + this._port, "[Auth]");
 
-                bool connected = false; //Set this to true when a connection is successfull.
+                bool connected = false; // Set this to true when a connection is successfull.
                 if (this._proxy != null)
                 {
+                    // Try connecting through a proxy
                     Proxy np = null;
                     try
                     {
@@ -348,8 +369,9 @@ namespace Vha.Net
                             this.Debug("Failed connecting to " + this._serverAddress + ":" + this._port.ToString() + " through " + np.ToString(), "[Socket]");
                     }
                 }
-                if (!connected)  //Only try this if we couldn't connect previously.
+                else
                 {
+                    // Try connecting without a proxy
                     try
                     {
                         IPHostEntry host = Dns.GetHostEntry(this._serverAddress);
@@ -384,8 +406,9 @@ namespace Vha.Net
             this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
             return false;
         }
+        #endregion
 
-		/// <summary>
+        /// <summary>
 		/// Remove all subscriptions from all of my events
 		/// </summary>
         public void ClearEvents()
@@ -413,33 +436,16 @@ namespace Vha.Net
             this.LoginCharlistEvent = null;
             this.StatusChangeEvent = null;
             this.DebugEvent = null;
+#if !DEBUG
+            this.ExceptionEvent = null;
+#endif
 		}
 
 		#region Disconnect
 		/// <summary>
 		/// Disconnect from chat server synchronously.
 		/// </summary>
-        public void Disconnect() { Disconnect(false); }
-
-		/// <summary>
-		/// Disconnect from chatserver.
-		/// </summary>
-		/// <param name="async">weither or not to disconnect in async mode</param>
-        public void Disconnect(bool async)
-        {
-            // Prepare the disconnect
-            this._closing = true;
-            if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
-            if (this._pingTimer != null) { this._pingTimer.Stop(); }
-            // Close it up
-            if (async) ThreadPool.QueueUserWorkItem(new WaitCallback(Disconnect), null);
-            else Disconnect(null);
-        }
-		/// <summary>
-		/// Callback method for disconnecting in async mode.
-		/// </summary>
-		/// <param name="dummy"></param>
-        internal void Disconnect(Object dummy)
+        public void Disconnect()
         {
             if (this._socket != null && this._socket.Connected)
             {
@@ -475,7 +481,26 @@ namespace Vha.Net
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
-		}
+        }
+
+		/// <summary>
+		/// Disconnect from chatserver.
+		/// </summary>
+		/// <param name="async">weither or not to disconnect in async mode</param>
+        public void Disconnect(bool async)
+        {
+            // Prepare the disconnect
+            this._closing = true;
+            if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
+            if (this._pingTimer != null) { this._pingTimer.Stop(); }
+            // Close it up
+            if (async)
+            {
+                Thread thread = new Thread(new ThreadStart(Disconnect));
+                thread.Start();
+            }
+            else Disconnect();
+        }
 		#endregion
 
 		// Receive Thread
@@ -700,7 +725,7 @@ namespace Vha.Net
                             new PrivateChannelStatusEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
                             this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
-                            this.ID, this.Character, false
+                            this.ID, this.Character, false, false
                             ));
                         break;
                     case Packet.Type.LOGIN_OK:
@@ -780,7 +805,8 @@ namespace Vha.Net
                             this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
                             ((PrivateChannelStatusPacket)packet).CharacterID,
                             this.GetUserName(((PrivateChannelStatusPacket)packet).CharacterID),
-                            ((PrivateChannelStatusPacket)packet).Joined
+                            ((PrivateChannelStatusPacket)packet).Joined,
+                            ((PrivateChannelStatusPacket)packet).ChannelID == this._id
                             ));
                         break;
                     case Packet.Type.PRIVGRP_MESSAGE:

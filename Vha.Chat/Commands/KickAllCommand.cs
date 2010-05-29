@@ -40,7 +40,7 @@ namespace Vha.Chat.Commands
                 new string[] { "kickall" }, // Examples
                 // Description
                 "The kickall command allows you to kick all users from your private channel."
-                )
+            )
         { }
     }
 }

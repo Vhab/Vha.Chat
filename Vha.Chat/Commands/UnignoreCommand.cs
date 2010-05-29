@@ -22,25 +22,24 @@ using System.Text;
 
 namespace Vha.Chat.Commands
 {
-    public class KickCommand : Command
+    public class UnignoreCommand : Command
     {
         public override bool Process(Context context, string command, string[] args)
         {
             if (!context.Input.CheckArguments(command, 1, true)) return false;
             if (!context.Input.CheckUser(args[0])) return false;
-            context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
+            context.Write(MessageClass.Internal, "TODO: implement unignore command");
             return true;
         }
 
-        public KickCommand()
+        public UnignoreCommand()
             : base(
-                "Private channel kick", // Name
-                new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
-                new string[] { "kick Vhab" }, // Examples
+                "Unignore user", // Name
+                new string[] { "unignore" }, // Triggers
+                new string[] { "unignore [username]" }, // Usage
+                new string[] { "unignore Vhab" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The unignore command allows you to undo the effects of the ignore command for a specific user."
             )
         { }
     }

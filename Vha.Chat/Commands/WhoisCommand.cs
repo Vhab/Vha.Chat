@@ -22,25 +22,24 @@ using System.Text;
 
 namespace Vha.Chat.Commands
 {
-    public class KickCommand : Command
+    public class WhoisCommand : Command
     {
         public override bool Process(Context context, string command, string[] args)
         {
             if (!context.Input.CheckArguments(command, 1, true)) return false;
             if (!context.Input.CheckUser(args[0])) return false;
-            context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
-            return true;
+            context.Input.Send(new MessageTarget(MessageType.Character, "Helpbot"), "whois " + args[0]);
         }
 
-        public KickCommand()
+        public WhoisCommand()
             : base(
-                "Private channel kick", // Name
-                new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
-                new string[] { "kick Vhab" }, // Examples
+                "Character information", // Name
+                new string[] { "whois" }, // Triggers
+                new string[] { "whois [username]" }, // Usage
+                new string[] { "whois Vhab" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The whois command allows you to obtain information like profession, level and organization for a specific user.\n" +
+                "This command requires Helpbot to be available and online on your dimension."
             )
         { }
     }

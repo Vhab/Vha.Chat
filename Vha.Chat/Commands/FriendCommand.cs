@@ -26,7 +26,7 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string command, string[] args)
         {
-            if (!context.Input.CheckArguments(command, 2)) return false;
+            if (!context.Input.CheckArguments(command, 2, true)) return false;
             if (args[0].ToLower() == "add")
             {
                 if (!context.Input.CheckUser(args[1])) return false;
@@ -46,13 +46,13 @@ namespace Vha.Chat.Commands
         public FriendCommand()
             : base(
                 "Adding and removing friends", // Name
-                new string[] { "friend" }, // Triggers
+                new string[] { "friend", "f" }, // Triggers
                 new string[] { "friend add [username]", "friend remove [username]" }, // Usage
                 new string[] { "friend add Vhab", "friend remove Helpbot" }, // Examples
                 // Description
                 "The friend commands allows you to add and remove users from your friendslist." +
                 "Adding users to your friendslist allows you to see whether they're currently online or offline."
-                )
+            )
         { }
     }
 }

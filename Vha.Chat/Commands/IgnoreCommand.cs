@@ -22,25 +22,25 @@ using System.Text;
 
 namespace Vha.Chat.Commands
 {
-    public class KickCommand : Command
+    public class IgnoreCommand : Command
     {
         public override bool Process(Context context, string command, string[] args)
         {
             if (!context.Input.CheckArguments(command, 1, true)) return false;
             if (!context.Input.CheckUser(args[0])) return false;
-            context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
+            context.Write(MessageClass.Internal, "TODO: implement ignore command");
             return true;
         }
 
-        public KickCommand()
+        public IgnoreCommand()
             : base(
-                "Private channel kick", // Name
-                new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
-                new string[] { "kick Vhab" }, // Examples
+                "Ignore user", // Name
+                new string[] { "ignore" }, // Triggers
+                new string[] { "ignore [username]" }, // Usage
+                new string[] { "ignore Vhab" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The ignore command allows you to prevent users from sending messages to you.\n" +
+                "Once a user has been put on ignore, he/she no longer is able to contact you in any way through the chat server."
             )
         { }
     }

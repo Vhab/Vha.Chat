@@ -26,7 +26,7 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string command, string[] args)
         {
-            if (!context.Input.CheckArguments(command, 1)) return false;
+            if (!context.Input.CheckArguments(command, 1, true)) return false;
             if (!context.Input.CheckUser(args[0])) return false;
             context.Chat.SendPrivateChannelInvite(args[0]);
             context.Write(MessageClass.PG, "Inviting " + args[0] + " to your private channel");
@@ -41,7 +41,7 @@ namespace Vha.Chat.Commands
                 new string[] { "invite Vhab" }, // Examples
                 // Description
                 "The invite command allows you to invite a user into your private channel."
-                )
+            )
         { }
     }
 }

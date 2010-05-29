@@ -26,8 +26,8 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string command, string[] args)
         {
-            if (!context.Input.CheckArguments(command, 1)) return false;
-            if (!context.Input.CheckPrivateChannel(args[0])) return false;
+            if (!context.Input.CheckArguments(command, 1, true)) return false;
+            if (!context.Input.CheckPrivateChannel(args[0], true)) return false;
             context.Chat.SendPrivateChannelLeave(args[0]);
             return true;
         }
@@ -40,6 +40,7 @@ namespace Vha.Chat.Commands
                 new string[] { "leave Helpbot" }, // Examples
                 // Description
                 "The leave command allows you to leave a remote private channel."
-                ) { }
+            )
+        { }
     }
 }

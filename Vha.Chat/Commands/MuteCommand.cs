@@ -22,25 +22,25 @@ using System.Text;
 
 namespace Vha.Chat.Commands
 {
-    public class KickCommand : Command
+    public class MuteCommand : Command
     {
         public override bool Process(Context context, string command, string[] args)
         {
             if (!context.Input.CheckArguments(command, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0])) return false;
-            context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
+            string channel = string.Join(" ", args, 1, args.Length - 1);
+            if (!context.Input.CheckChannel(channel)) return false;
+            context.Chat.SendChannelMute(channel, true);
             return true;
         }
 
-        public KickCommand()
+        public MuteCommand()
             : base(
-                "Private channel kick", // Name
-                new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
-                new string[] { "kick Vhab" }, // Examples
+                "Mute public channel", // Name
+                new string[] { "mute" }, // Triggers
+                new string[] { "mute [channel]" }, // Usage
+                new string[] { "mute Neutral OOC" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The mute command allows you to mute messages from a certain public channel."
             )
         { }
     }

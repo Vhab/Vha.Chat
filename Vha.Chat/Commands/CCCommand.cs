@@ -22,25 +22,23 @@ using System.Text;
 
 namespace Vha.Chat.Commands
 {
-    public class KickCommand : Command
+    public class CCCommand : Command
     {
         public override bool Process(Context context, string command, string[] args)
         {
             if (!context.Input.CheckArguments(command, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0])) return false;
-            context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
-            return true;
+            if (!context.Input.CheckConnection()) return false;
+            context.Chat.SendChatCommand(args);
         }
 
-        public KickCommand()
+        public CCCommand()
             : base(
-                "Private channel kick", // Name
-                new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
-                new string[] { "kick Vhab" }, // Examples
+                "Chat command", // Name
+                new string[] { "cc" }, // Triggers
+                new string[] { "cc [command]" }, // Usage
+                new string[] { "cc help", "cc addbuddy Vhab" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The cc command allows you to execute chat commands as they are available on the remote server."
             )
         { }
     }

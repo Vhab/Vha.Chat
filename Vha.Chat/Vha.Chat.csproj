@@ -40,12 +40,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Character.cs" />
+    <Compile Include="Commands\CCCommand.cs" />
     <Compile Include="Commands\FriendCommand.cs" />
+    <Compile Include="Commands\HelpCommand.cs" />
+    <Compile Include="Commands\IgnoreCommand.cs" />
     <Compile Include="Commands\InviteCommand.cs" />
     <Compile Include="Commands\KickAllCommand.cs" />
     <Compile Include="Commands\KickCommand.cs" />
     <Compile Include="Commands\LeaveCommand.cs" />
+    <Compile Include="Commands\MuteCommand.cs" />
+    <Compile Include="Commands\OrganizationCommand.cs" />
     <Compile Include="Commands\TellCommand.cs" />
+    <Compile Include="Commands\TextCommand.cs" />
+    <Compile Include="Commands\UnignoreCommand.cs" />
+    <Compile Include="Commands\UnmuteCommand.cs" />
+    <Compile Include="Commands\WhoisCommand.cs" />
     <Compile Include="Events\ErrorEventArgs.cs" />
     <Compile Include="Events\SelectCharacterEventArgs.cs" />
     <Compile Include="MessageSource.cs" />

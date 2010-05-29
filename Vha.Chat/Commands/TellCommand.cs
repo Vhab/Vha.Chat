@@ -26,7 +26,7 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string command, string[] args)
         {
-            if (!context.Input.CheckArguments(command, 2)) return false;
+            if (!context.Input.CheckArguments(command, 2, true)) return false;
             if (!context.Input.CheckUser(args[0])) return false;
             string message = string.Join(" ", args, 1, args.Length - 1);
             context.Input.Send(new MessageTarget(MessageType.Character, args[0]), message);
@@ -35,13 +35,13 @@ namespace Vha.Chat.Commands
         public TellCommand()
             : base(
                 "Private message", // Name
-                new string[] { "tell" }, // Triggers
+                new string[] { "tell", "t" }, // Triggers
                 new string[] { "tell [username] [message]" }, // Usage
                 new string[] { "tell Vhab hey there, how are you doing?" }, // Examples
                 // Description
                 "The tell command allows you to send a private message to another user.\n" +
                 "This message can only be seen by you and the recipient."
-                )
+            )
         { }
     }
 }

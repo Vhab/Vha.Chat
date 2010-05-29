@@ -22,25 +22,25 @@ using System.Text;
 
 namespace Vha.Chat.Commands
 {
-    public class KickCommand : Command
+    public class TextCommand : Command
     {
         public override bool Process(Context context, string command, string[] args)
         {
             if (!context.Input.CheckArguments(command, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0])) return false;
-            context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
+            string message = string.Join(" ", args, 0, args.Length);
+            context.Write(MessageClass.Internal, message);
             return true;
         }
 
-        public KickCommand()
+        public TextCommand()
             : base(
-                "Private channel kick", // Name
-                new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
-                new string[] { "kick Vhab" }, // Examples
+                "Print text", // Name
+                new string[] { "text" }, // Triggers
+                new string[] { "text [text]" }, // Usage
+                new string[] { "text Ping? Pong!" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The text command allows you to print text directly to the output window." +
+                "These messages will only appear locally and will not be sent accross the chat server."
             )
         { }
     }

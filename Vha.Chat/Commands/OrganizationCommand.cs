@@ -22,25 +22,25 @@ using System.Text;
 
 namespace Vha.Chat.Commands
 {
-    public class KickCommand : Command
+    public class OrganizationCommand : Command
     {
         public override bool Process(Context context, string command, string[] args)
         {
             if (!context.Input.CheckArguments(command, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0])) return false;
-            context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
-            return true;
+            if (!context.Input.CheckOrganization(true)) return false;
+            string message = string.Join(" ", args, 0, args.Length - 0);
+            context.Input.Send(new MessageTarget(MessageType.Channel, context.Organization), message);
         }
 
-        public KickCommand()
+        public OrganizationCommand()
             : base(
-                "Private channel kick", // Name
-                new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
-                new string[] { "kick Vhab" }, // Examples
+                "Organization message", // Name
+                new string[] { "organization", "org", "o" }, // Triggers
+                new string[] { "organization [message]" }, // Usage
+                new string[] { "organization Hey everyone!", "o Hey everyone!" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The organization command allows you to send a message to your organization's private channel.\n" +
+                "This message can only be seen by you and your fellow organization members."
             )
         { }
     }

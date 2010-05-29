@@ -27,13 +27,17 @@ namespace Vha.Chat
     public class Input
     {
         #region Input sanity commands
-        public bool CheckArguments(string command, int count);
+        public bool CheckArguments(string command, int count, bool output);
 
         public bool CheckConnection(bool output);
+
+        public bool CheckOrganization(bool output);
 
         public bool CheckUser(string user, bool output);
 
         public bool CheckChannel(string channel, bool output);
+
+        public bool CheckPrivateChannel(string channel, bool output);
         #endregion
 
         #region Commands for sending message or command input

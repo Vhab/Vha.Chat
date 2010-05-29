@@ -155,6 +155,16 @@ namespace Vha.Chat
                 return this._character;
             }
         }
+
+        public string Organization
+        {
+            get
+            {
+                if (this.State != ContextState.Connected)
+                    throw new InvalidOperationException("Context.Organization is not available while in state " + this.State);
+                return this._organization;
+            }
+        }
         #endregion
 
         #region 'Preperation' and 'state' methods
@@ -242,6 +252,7 @@ namespace Vha.Chat
         private string _dimension = null;
         private string _account = null;
         private string _character = null;
+        private string _organization = null;
         private ContextState _state = ContextState.Disconnected;
 
         private Dictionary<string, Channel> _channels;

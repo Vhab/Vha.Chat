@@ -25,15 +25,15 @@ namespace Vha.Chat.Events
 {
     public class MessageEventArgs
     {
-        public readonly MessageTarget Target;
+        public readonly MessageSource Source;
         public readonly MessageClass Class;
         public readonly string Text;
 
-        public MessageEventArgs(MessageTarget target, MessageClass messageClass, string text)
+        public MessageEventArgs(MessageSource source, MessageClass messageClass, string text)
         {
-            if (target == null)
+            if (source == null)
                 throw new ArgumentNullException();
-            this.Target = target;
+            this.Source = source;
             this.Class = messageClass;
             this.Text = text;
         }
@@ -41,7 +41,7 @@ namespace Vha.Chat.Events
         public bool Equals(MessageEventArgs message)
         {
             if (message == null) return false;
-            if (this.Target != message.Target) return false;
+            if (this.Source != message.Source) return false;
             if (this.Class != message.Class) return false;
             if (this.Text != message.Text) return false;
             return true;

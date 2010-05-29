@@ -20,38 +20,26 @@
 using System;
 using System.Text;
 
-namespace Vha.Chat
+namespace Vha.Chat.Commands
 {
-    public class MessageTarget
+    public class LeaveCommand : Command
     {
-        public readonly MessageType Type;
-        public readonly string Target;
-
-        public MessageTarget()
+        public override bool Process(Context context, string command, string[] args)
         {
-            this.Type = MessageType.None;
-            this.Target = null;
-        }
-
-        public MessageTarget(MessageType type, string target)
-        {
-            this.Type = type;
-            this.Target = target;
-        }
-
-        public override string ToString()
-        {
-            if (this.Type == MessageType.None)
-                return "NONE";
-            return this.Target;
-        }
-
-        public bool Equals(MessageTarget target)
-        {
-            if (target == null) return false;
-            if (this.Type != target.Type) return false;
-            if (this.Target != target.Target) return false;
+            if (!context.Input.CheckArguments(command, 1)) return false;
+            if (!context.Input.CheckPrivateChannel(args[0])) return false;
+            context.Chat.SendPrivateChannelLeave(args[0]);
             return true;
         }
+
+        public LeaveCommand()
+            : base(
+                "Leave private channel", // Name
+                new string[] { "leave" }, // Triggers
+                new string[] { "leave [channel]" }, // Usage
+                new string[] { "leave Helpbot" }, // Examples
+                // Description
+                "The leave command allows you to leave a remote private channel."
+                ) { }
     }
 }

@@ -57,6 +57,7 @@
     <Compile Include="Events\UnknownPacketEventArgs.cs" />
     <Compile Include="Events\VicinityMessageEventArgs.cs" />
     <Compile Include="Friend.cs" />
+    <Compile Include="PrivateChannel.cs" />
     <Compile Include="Proxy.cs" />
     <Compile Include="Packets\AmdMuxInfoPacket.cs" />
     <Compile Include="Packets\AnonVicinityPacket.cs" />

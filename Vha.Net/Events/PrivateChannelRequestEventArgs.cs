@@ -61,5 +61,13 @@ namespace Vha.Net.Events
             get { return this._join; }
             set { this._join = value; }
         }
+        /// <summary>
+        /// Returns the combined private channel data
+        /// </summary>
+        /// <returns></returns>
+        public PrivateChannel GetPrivateChannel()
+        {
+            return new PrivateChannel(this._characterID, this._character, false);
+        }
     }
 }

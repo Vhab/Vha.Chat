@@ -202,18 +202,36 @@ namespace Vha.Chat
         /// <returns>true if the given user is a friend, false if not</returns>
         public bool HasFriend(string user);
         /// <summary>
-        /// Returns information about the given friend
+        /// Returns information about a friend by name
         /// </summary>
         /// <param name="user">The name of the user (case-insensitive)</param>
         /// <returns>An isntance of Friend or null on failure</returns>
         public Friend GetFriend(string user);
         /// <summary>
+        /// Whether this context contains the given private channel
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public bool HasPrivateChannel(string channel);
+        /// <summary>
+        /// Returns information about a private channel by name
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public PrivateChannel GetPrivateChannel(string channel);
+        /// <summary>
         /// Write output to one of the listening output targets
         /// </summary>
-        /// <param name="target">Describes the original/target of the message</param>
+        /// <param name="source">Describes the origin/target of the message</param>
         /// <param name="messageClass">Describes the class of the message</param>
         /// <param name="message">The message itself</param>
-        public void Write(MessageTarget target, MessageClass messageClass, string message);
+        public void Write(MessageSource source, MessageClass messageClass, string message);
+        /// <summary>
+        /// Write output to one of the listening output targets
+        /// </summary>
+        /// <param name="messageClass">Describes the class of the message</param>
+        /// <param name="message">The message itself</param>
+        public void Write(MessageClass messageClass, string message);
         #endregion
 
         #region Internal

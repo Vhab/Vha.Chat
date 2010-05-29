@@ -81,9 +81,22 @@ namespace Vha.Chat
 
     public enum MessageType
     {
+        /// <summary>
+        /// The message has no particular origin.
+        /// This often indicates an internal status or error message.
+        /// </summary>
         None,
+        /// <summary>
+        /// Indicates a private message
+        /// </summary>
         Character,
+        /// <summary>
+        /// Indicates a public message in a public channel
+        /// </summary>
         Channel,
+        /// <summary>
+        /// Indicates a public message in a private channel
+        /// </summary>
         PrivateChannel
     }
 

@@ -20,38 +20,27 @@
 using System;
 using System.Text;
 
-namespace Vha.Chat
+namespace Vha.Chat.Commands
 {
-    public class MessageTarget
+    public class KickAllCommand : Command
     {
-        public readonly MessageType Type;
-        public readonly string Target;
-
-        public MessageTarget()
+        public override bool Process(Context context, string command, string[] args)
         {
-            this.Type = MessageType.None;
-            this.Target = null;
-        }
-
-        public MessageTarget(MessageType type, string target)
-        {
-            this.Type = type;
-            this.Target = target;
-        }
-
-        public override string ToString()
-        {
-            if (this.Type == MessageType.None)
-                return "NONE";
-            return this.Target;
-        }
-
-        public bool Equals(MessageTarget target)
-        {
-            if (target == null) return false;
-            if (this.Type != target.Type) return false;
-            if (this.Target != target.Target) return false;
+            if (!context.Input.CheckConnection()) return false;
+            context.Chat.SendPrivateChannelKickAll();
+            context.Write(MessageClass.PG, "Kicking all users from your private channel");
             return true;
         }
+
+        public KickAllCommand()
+            : base(
+                "Private channel mass kick", // Name
+                new string[] { "kickall" }, // Triggers
+                new string[] { "kickall" }, // Usage
+                new string[] { "kickall" }, // Examples
+                // Description
+                "The kickall command allows you to kick all users from your private channel."
+                )
+        { }
     }
 }

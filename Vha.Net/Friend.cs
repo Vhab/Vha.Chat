@@ -44,5 +44,14 @@ namespace Vha.Net
         public bool Online { get { return this._online; } }
         public bool Temporary { get { return this._temporary; } }
         public override string ToString() { return this._name; }
+
+        public bool Equals(Friend friend)
+        {
+            if (this.ID != friend.ID) return false;
+            if (this.Name != friend.Name) return false;
+            if (this.Online != friend.Online) return false;
+            if (this.Temporary != friend.Temporary) return false;
+            return true;
+        }
     }
 }

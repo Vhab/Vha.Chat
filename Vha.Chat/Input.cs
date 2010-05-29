@@ -20,20 +20,31 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Vha.Chat.Commands;
 
 namespace Vha.Chat
 {
     public class Input
     {
+        #region Input sanity commands
+        public bool CheckArguments(string command, int count);
+
         public bool CheckConnection(bool output);
 
         public bool CheckUser(string user, bool output);
 
         public bool CheckChannel(string channel, bool output);
+        #endregion
 
+        #region Commands for sending message or command input
         public void Send(MessageTarget target, string message, bool allowCommands);
 
         public void Command(string command);
+
+        public bool Register(Command command);
+
+        public void Unregister(string name);
+        #endregion
 
         #region Internal
         internal Input(Context context)

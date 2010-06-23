@@ -237,9 +237,12 @@ namespace Vha.Chat
             this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
             this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
             this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(_chat_ChannelJoinEvent);
+            // - Messages
             this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(_chat_PrivateMessageEvent);
             this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);
             this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
+            this._chat.SystemMessageEvent += new SystemMessageEventHandler(_chat_SystemMessageEvent);
+            this._chat.SimpleMessageEvent += new SimpleMessageEventHandler(_chat_SimpleMessageEvent);
 
             // Store values
             this._account = account.ToLower();
@@ -520,6 +523,37 @@ namespace Vha.Chat
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.Character, null, e.Character);
             this.Write(source, MessageClass.PM, message);
+        }
+
+        void _chat_SystemMessageEvent(Vha.Net.Chat chat, SystemMessageEventArgs e)
+        {
+            // Apply ignore filter to "received offline message from" messages
+            if (e.MessageID == (uint)SystemMessageType.IncommingOfflineMessage)
+            {
+                string character = (string)e.Arguments[(int)IncomingOfflineMessageArgs.Name];
+                // Check ignored users list
+                if (this.Ignore.IsIgnored(character))
+                    return;
+            }
+            // Descramble message
+            MDB.Reader reader = new MDB.Reader();
+            MDB.Entry entry = reader.SpeedRead((int)e.CategoryID, (int)e.MessageID);
+            // Failed to get the entry
+            if (entry == null)
+            {
+                this.Write(MessageClass.Error, "Unknown system message " + e.CategoryID + ":" + e.MessageID);
+                return;
+            }
+            // Dispatch message
+            string template = MDB.Parser.PrintfToFormatString(entry.Message);
+            string message = string.Format(template, e.Arguments);
+            this.Write(MessageClass.System, message);
+        }
+
+        void _chat_SimpleMessageEvent(Vha.Net.Chat chat, SimpleMessageEventArgs e)
+        {
+            // Dispatch message
+            this.Write(MessageClass.System, e.Message);
         }
         #endregion
         #endregion // Internal

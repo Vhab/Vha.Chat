@@ -88,6 +88,6 @@ namespace Vha.Net.Events
         /// <summary>
         /// Returns combined channel data
         /// </summary>
-        public Channel GetChannel() { return new Channel(this._id, this._name, this._type); }
+        public Channel GetChannel() { return new Channel(this._id, this._name, this._type, this.Muted); }
     }
 }

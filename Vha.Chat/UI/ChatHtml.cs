@@ -42,7 +42,6 @@ namespace Vha.Chat.UI
         }
 
         protected ChatForm _form;
-        protected ChatInput _inputUtil;
         protected Dictionary<string, string> _texts;
         protected int _textsIndex = 0;
         protected Regex _textsRegex = null;
@@ -50,10 +49,9 @@ namespace Vha.Chat.UI
         protected Regex _colorRegex = null;
         protected Regex _fontRegex = null;
 
-        public ChatHtml(ChatForm form, ChatInput input)
+        public ChatHtml(ChatForm form)
         {
             this._form = form;
-            this._inputUtil = input;
             this._texts = new Dictionary<string, string>();
         }
 

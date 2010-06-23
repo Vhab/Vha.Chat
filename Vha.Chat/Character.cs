@@ -27,13 +27,23 @@ namespace Vha.Chat
     {
         public readonly string Name;
         public readonly UInt32 ID;
+        public readonly UInt32 Level;
         public readonly bool Online;
 
-        public Character(string name, UInt32 id, bool online)
+        public Character(string name, UInt32 id, UInt32 level, bool online)
         {
             this.Name = name;
             this.ID = id;
+            this.Level = level;
             this.Online = online;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder s = new StringBuilder(this.Name);
+            if (this.Online)
+                s.Append(" (Online)");
+            return s.ToString();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string command, string[] args)
         {
-            if (!context.Input.CheckArguments(command, 1, true)) return false;
+            if (!context.Input.CheckArguments(command, args.Length, 1, true)) return false;
             string message = string.Join(" ", args, 0, args.Length);
             context.Write(MessageClass.Internal, message);
             return true;

@@ -48,6 +48,14 @@ namespace Vha.Chat
                 .ToArray();
         }
 
+        public Dimension GetDimension(string name)
+        {
+            foreach (Dimension dim in this.Dimensions)
+                if (dim.Name == name)
+                    return dim;
+            return null;
+        }
+
         private Dimension _convertDimension(ConfigurationV1Dimension dimension)
         {
             return new Dimension(dimension.Name, dimension.Address, dimension.Port);

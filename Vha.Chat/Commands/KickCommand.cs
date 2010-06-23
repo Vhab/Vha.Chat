@@ -26,7 +26,7 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string command, string[] args)
         {
-            if (!context.Input.CheckArguments(command, 1, true)) return false;
+            if (!context.Input.CheckArguments(command, args.Length, 1, true)) return false;
             if (!context.Input.CheckUser(args[0])) return false;
             context.Chat.SendPrivateChannelKick(args[0]);
             context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");

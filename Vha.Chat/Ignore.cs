@@ -17,6 +17,8 @@
 * USA
 */
 
+#define SOMETHING
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,6 +27,21 @@ using System.IO;
 
 namespace Vha.Chat
 {
+#if SOMETHING
+    // Placeholder till I have the chance to port the Ignore system
+    public class Ignore
+    {
+        public bool IsIgnored(string username)
+        {
+            return false;
+        }
+
+        internal Ignore(Context context)
+        {
+
+        }
+    }
+#else
     public class Ignore
     {
 
@@ -417,4 +434,5 @@ namespace Vha.Chat
         }
         #endregion
     }
+#endif
 }

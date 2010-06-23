@@ -26,7 +26,7 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string command, string[] args)
         {
-            if (!context.Input.CheckArguments(command, 2, true)) return false;
+            if (!context.Input.CheckArguments(command, args.Length, 2, true)) return false;
             if (args[0].ToLower() == "add")
             {
                 if (!context.Input.CheckUser(args[1])) return false;

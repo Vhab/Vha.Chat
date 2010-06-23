@@ -40,8 +40,6 @@ namespace Vha.Chat.UI
         protected ChatTreeNode _privateChannels = new ChatTreeNode(ChatInputType.PrivateChannel, "Private Channels");
         protected ChatTreeNode _guests = new ChatTreeNode(ChatInputType.Character, "Guests");
 
-        protected ChatInput _inputUtil;
-        protected ChatOutput _outputUtil;
         protected ChatHtml _htmlUtil;
         protected Net.Chat _chat;
 
@@ -125,8 +123,8 @@ namespace Vha.Chat.UI
             this._outputBox.Document.InvokeScript("scrollToBottom");
         }
 
-        public delegate void SetTargetDelegate(ChatInputType type, string target);
-        public void SetTarget(ChatInputType type, string target)
+        public delegate void SetTargetDelegate(MessageType type, string target);
+        public void SetTarget(MessageType type, string target)
         {
             if (this._target.InvokeRequired)
             {

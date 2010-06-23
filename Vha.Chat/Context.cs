@@ -21,7 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Vha.Net;
+using Vha.Net.Events;
 using Vha.Chat.Events;
+using Vha.Chat.Commands;
 
 namespace Vha.Chat
 {
@@ -34,23 +36,23 @@ namespace Vha.Chat
         /// <summary>
         /// Returns the initial read-only application configuration
         /// </summary>
-        public Configuration Configuration { get { return null; } }
+        public Configuration Configuration { get { return this._configuration; } }
         /// <summary>
         /// Returns the user customizable options
         /// </summary>
-        public Options Options { get { return null; } }
+        public Options Options { get { return this._options; } }
         /// <summary>
         /// Returns the input processing toolset
         /// </summary>
-        public Input Input { get { return null; } }
+        public Input Input { get { return this._input; } }
         /// <summary>
         /// Returns the toolset to manage the users on the ignore list
         /// </summary>
-        public Ignore Ignore { get { return null; } }
+        public Ignore Ignore { get { return this._ignore; } }
         /// <summary>
         /// Returns direct access to the chat instance
         /// </summary>
-        public Net.Chat Chat { get { return null; } }
+        public Net.Chat Chat { get { return this._chat; } }
         #endregion
 
         #region Events
@@ -165,6 +167,24 @@ namespace Vha.Chat
                 return this._organization;
             }
         }
+
+        public UInt32 OrganizationId
+        {
+            get
+            {
+                if (this.State != ContextState.Connected)
+                    throw new InvalidOperationException("Context.OrganizationId is not available while in state " + this.State);
+                return this._organizationId;
+            }
+        }
+
+        public bool HasOrganization
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(this.Organization);
+            }
+        }
         #endregion
 
         #region 'Preperation' and 'state' methods
@@ -177,15 +197,58 @@ namespace Vha.Chat
         /// <param name="password"></param>
         public void Connect(string dimension, string account, string password)
         {
-            // check state
-            // create chat
-            // Set settings
+            // Check state
+            if (this.State != ContextState.Disconnected)
+            {
+                if (this.ErrorEvent != null)
+                    this.ErrorEvent(this, new ErrorEventArgs(
+                        ErrorType.Login,
+                        "Unexpected call to Context.Connect while in state " + this.State.ToString()));
+                return;
+            }
+            // Obtain dimension information
+            Dimension dim = this.Configuration.GetDimension(dimension);
+            if (dim == null)
+            {
+                if (this.ErrorEvent != null)
+                    this.ErrorEvent(this, new ErrorEventArgs(
+                        ErrorType.Login,
+                        "Attempting to connect to invalid dimension: '" + dimension + "'"));
+                return;
+            }
+
+            // Create chat connection
+            this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password);
+            // Set initial settings
             this._chat.AutoReconnect = false;
             this._chat.IgnoreCharacterLoggedIn = true;
             this._chat.UseThreadPool = false;
-            // connect async
-            // hook events (including exceptions)
+            this._chat.Tag = this;
+
+            // Hook events (including exceptions)
+            // - State changes and more
+            this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+            this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
+            this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
+            // - Friends
+            this._chat.FriendStatusEvent += new FriendStatusEventHandler(_chat_FriendStatusEvent);
+            this._chat.FriendRemovedEvent += new FriendRemovedEventHandler(_chat_FriendRemovedEvent);
+            // - Channels
+            this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
+            this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
+            this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(_chat_ChannelJoinEvent);
+            this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(_chat_PrivateMessageEvent);
+            this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);
+            this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
+
+            // Store values
+            this._account = account.ToLower();
+            this._dimension = dim.Name;
+
+            // Connect async
+            this._chat.Connect(true);
         }
+
         /// <summary>
         /// Disconnect from the chat server.
         /// </summary>
@@ -205,6 +268,12 @@ namespace Vha.Chat
         /// <param name="channel">The full channel name (case-insensitive)</param>
         /// <returns>An instance of Channel or null on failure</returns>
         public Channel GetChannel(string channel);
+        /// <summary>
+        /// Returns an appropriate MessageClass for the given channel
+        /// </summary>
+        /// <param name="channel">The full channel name (case-insensitive)</param>
+        /// <returns>The appropriate class for the channel</returns>
+        public MessageClass GetChannelClass(string channel);
         /// <summary>
         /// Whether this context contains the given user as friend
         /// </summary>
@@ -247,12 +316,14 @@ namespace Vha.Chat
         #region Internal
         private Configuration _configuration;
         private Options _options;
-        private Input _input;
+        private Input _input = null;
+        private Ignore _ignore = null;
         private Net.Chat _chat = null;
         private string _dimension = null;
         private string _account = null;
         private string _character = null;
         private string _organization = null;
+        private UInt32 _organizationId = 0;
         private ContextState _state = ContextState.Disconnected;
 
         private Dictionary<string, Channel> _channels;
@@ -272,11 +343,184 @@ namespace Vha.Chat
             while (options.CanUpgrade) options = options.Upgrade();
             this._options = new Options(options);
 
-            // 
+            // Create input
+            this._input = new Input(this, "/");
+            this.Input.RegisterCommand(new CCCommand());
+            this.Input.RegisterCommand(new FriendCommand());
+            this.Input.RegisterCommand(new HelpCommand());
+            this.Input.RegisterCommand(new IgnoreCommand());
+            this.Input.RegisterCommand(new InviteCommand());
+            this.Input.RegisterCommand(new KickAllCommand());
+            this.Input.RegisterCommand(new KickCommand());
+            this.Input.RegisterCommand(new LeaveCommand());
+            this.Input.RegisterCommand(new MuteCommand());
+            this.Input.RegisterCommand(new OrganizationCommand());
+            this.Input.RegisterCommand(new TellCommand());
+            this.Input.RegisterCommand(new TextCommand());
+            this.Input.RegisterCommand(new UnignoreCommand());
+            this.Input.RegisterCommand(new UnmuteCommand());
+            this.Input.RegisterCommand(new WhoisCommand());
         }
 
         #region Chat callbacks
+        void _chat_LoginCharlistEvent(Vha.Net.Chat chat, LoginChararacterListEventArgs e)
+        {
+            // Create event arguments
+            List<Character> characters = new List<string>();
+            Dictionary<Character, LoginCharacter> charactersMap = new Dictionary<Character, LoginCharacter>();
+            foreach (LoginCharacter c in e.CharacterList)
+            {
+                Character character = new Character(c.Name, c.ID, c.Level, c.IsOnline);
+                characters.Add(character);
+                charactersMap.Add(character, c);
+            }
+            SelectCharacterEventArgs args = new SelectCharacterEventArgs(characters.ToArray());
+            // Fire event
+            if (this.SelectCharacterEvent != null)
+                this.SelectCharacterEvent(this, args);
+            // Login
+            if (args.Character != null && charactersMap.ContainsKey(args.Character))
+            {
+                this._character = args.Character.Name;
+                this._chat.SendLoginCharacter(charactersMap[args.Character]);
+            }
+            else
+            {
+                // If no character was selected, there's no reason to remain connected
+                this._chat.Disconnect(true);
+            }
+        }
 
+        void _chat_LoginErrorEvent(Vha.Net.Chat chat, LoginErrorEventArgs e)
+        {
+            // Notify listeners of the error
+            if (this.ErrorEvent != null)
+                this.ErrorEvent(this, new ErrorEventArgs(ErrorType.Login, e.Error));
+        }
+
+        void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
+        {
+            // Translate state
+            ContextState state = this._state;
+            switch (e.State)
+            {
+                case ChatState.CharacterSelect:
+                case ChatState.Connecting:
+                case ChatState.Login:
+                    state = ContextState.Connecting;
+                    break;
+                case ChatState.Connected:
+                    state = ContextState.Connected;
+                    break;
+                case ChatState.Disconnected:
+                case ChatState.Error:
+                    state = ContextState.Disconnected;
+                    break;
+                case ChatState.Reconnecting:
+                    state = ContextState.Reconnecting;
+                    break;
+            }
+            if (this._state == state) return;
+            // Handle state change
+            switch (state)
+            {
+                case ContextState.Connecting:
+                    // Nothing in particular here :)
+                    break;
+                case ContextState.CharacterSelection:
+                    this._ignore = new Ignore(this);
+                    break;
+                case ContextState.Connected:
+                    break;
+                case ContextState.Reconnecting:
+                    this._organization = null;
+                    break;
+                case ContextState.Disconnected:
+                    this._chat.ClearEvents();
+                    this._chat = null;
+                    this._dimension = null;
+                    this._account = null;
+                    this._character = null;
+                    this._organization = null;
+                    this._organizationId = 0;
+                    this._friends.Clear();
+                    this._channels.Clear();
+                    this._ignore = null;
+                    break;
+            }
+            // Notify state change
+            this._state = state;
+            if (this.StateEvent != null)
+                this.StateEvent(this, this._state);
+        }
+
+        void _chat_ChannelJoinEvent(Vha.Net.Chat chat, ChannelJoinEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _chat_PrivateChannelStatusEvent(Vha.Net.Chat chat, PrivateChannelStatusEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _chat_PrivateChannelRequestEvent(Vha.Net.Chat chat, PrivateChannelRequestEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _chat_FriendRemovedEvent(Vha.Net.Chat chat, CharacterIDEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _chat_FriendStatusEvent(Vha.Net.Chat chat, FriendStatusEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _chat_PrivateChannelMessageEvent(Vha.Net.Chat chat, PrivateChannelMessageEventArgs e)
+        {
+            // Check for ignores
+            if (this.Ignore.IsIgnored(e.Character))
+                return;
+            // Dispatch message
+            MessageSource source = new MessageSource(MessageType.PrivateChannel, e.Channel, e.Character);
+            this.Write(source, MessageClass.PG, message);
+        }
+
+        void _chat_ChannelMessageEvent(Vha.Net.Chat chat, ChannelMessageEventArgs e)
+        {
+            // Check if channel is muted
+            if (this.GetChannel(e.Channel).Muted)
+                return;
+            // Check for ignores
+            if (this.Ignore.IsIgnored(e.Character))
+                return;
+            // Descramble
+            string message = e.Message;
+            if (e.Message.StartsWith("~"))
+            {
+                MDB.Message parsedMessage = null;
+                try { parsedMessage = MDB.Parser.Decode(e.Message); }
+                catch { }
+                if (parsedMessage != null && !string.IsNullOrEmpty(parsedMessage.Value))
+                    message = parsedMessage.Value;
+            }
+            // Dispatch message
+            MessageSource source = new MessageSource(MessageType.Channel, e.Channel, e.Character);
+            this.Write(source, this.GetChannelClass(e.Channel), message);
+        }
+
+        void _chat_PrivateMessageEvent(Vha.Net.Chat chat, PrivateMessageEventArgs e)
+        {
+            // Check for ignores
+            if (this.Ignore.IsIgnored(e.Character))
+                return;
+            // Dispatch message
+            MessageSource source = new MessageSource(MessageType.Character, null, e.Character);
+            this.Write(source, MessageClass.PM, message);
+        }
         #endregion
         #endregion // Internal
     }

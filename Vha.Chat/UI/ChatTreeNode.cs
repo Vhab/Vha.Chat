@@ -27,9 +27,10 @@ namespace Vha.Chat.UI
 {
     public class ChatTreeNode : TreeNode
     {
-        protected readonly ChatInputType _type;
+        protected readonly MessageType _type;
 
-        public ChatTreeNode(ChatInputType type, string text) : base(text)
+        public ChatTreeNode(MessageType type, string text)
+            : base(text)
         {
             this._type = type;
         }
@@ -84,6 +85,6 @@ namespace Vha.Chat.UI
             return null;
         }
 
-        public ChatInputType Type { get { return this._type; } }
+        public MessageType Type { get { return this._type; } }
     }
 }

@@ -29,17 +29,20 @@ namespace Vha.Net
         private readonly BigInteger _id = 0;
         private readonly String _name = null;
         private readonly ChannelType _type = ChannelType.Unknown;
+        private readonly bool _muted = false;
 
-        public Channel(BigInteger id, String name, ChannelType type)
+        public Channel(BigInteger id, String name, ChannelType type, bool muted)
         {
             this._id = id;
             this._name = name;
             this._type = type;
+            this._muted = muted;
         }
 
         public BigInteger ID { get { return this._id; } }
         public String Name { get { return this._name; } }
         public ChannelType Type { get { return this._type; } }
+        public bool Muted { get { return this._muted; } }
         public override string ToString() { return this._name; }
 
         public bool Equals(Channel channel)
@@ -47,6 +50,7 @@ namespace Vha.Net
             if (this.ID != channel.ID) return false;
             if (this.Name != channel.Name) return false;
             if (this.Type != channel.Type) return false;
+            if (this.Muted != channel.Muted) return false;
             return true;
         }
     }

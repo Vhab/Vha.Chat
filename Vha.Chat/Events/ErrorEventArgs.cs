@@ -34,5 +34,15 @@ namespace Vha.Chat.Events
         /// A message describing the error that occured
         /// </summary>
         public readonly string Message;
+        /// <summary>
+        /// Initializes a new ErrorEventArgs
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="message"></param>
+        public ErrorEventArgs(ErrorType type, string message)
+        {
+            this.Type = type;
+            this.Message = message;
+        }
     }
 }

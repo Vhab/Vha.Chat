@@ -61,7 +61,7 @@ namespace Vha.Net
         public event PrivateChannelRequestEventHandler PrivateChannelRequestEvent;
         public event NameLookupEventHandler NameLookupEvent;
         public event ForwardEventHandler ForwardEvent;
-        public event ChannelJoinEventHandler ChannelJoinEvent;
+        public event ChannelStatusEventHandler ChannelStatusEvent;
         public event ChannelMessageEventHandler ChannelMessageEvent;
         public event SystemMessageEventHandler SystemMessageEvent;
         public event SimpleMessageEventHandler SimpleMessageEvent;
@@ -421,7 +421,7 @@ namespace Vha.Net
             this.PrivateChannelRequestEvent = null;
             this.NameLookupEvent = null;
             this.ForwardEvent = null;
-            this.ChannelJoinEvent = null;
+            this.ChannelStatusEvent = null;
             this.ChannelMessageEvent = null;
             this.SystemMessageEvent = null;
             this.SimpleMessageEvent = null;
@@ -785,15 +785,15 @@ namespace Vha.Net
                             ((FriendStatusPacket)packet).Temporary
                             ));
                         break;
-                    case Packet.Type.CHANNEL_JOIN:
-                        packet = new ChannelJoinPacket(packetData.type, packetData.data);
-                        OnChannelJoinEvent(
-                            new ChannelJoinEventArgs(
-                            ((ChannelJoinPacket)packet).ID,
-                            ((ChannelJoinPacket)packet).Name,
-                            ((ChannelJoinPacket)packet).Flags,
-                            ((ChannelJoinPacket)packet).Muted,
-                            ((ChannelJoinPacket)packet).ChannelType
+                    case Packet.Type.CHANNEL_STATUS:
+                        packet = new ChannelStatusPacket(packetData.type, packetData.data);
+                        OnChannelStatusEvent(
+                            new ChannelStatusEventArgs(
+                            ((ChannelStatusPacket)packet).ID,
+                            ((ChannelStatusPacket)packet).Name,
+                            ((ChannelStatusPacket)packet).Flags,
+                            ((ChannelStatusPacket)packet).Muted,
+                            ((ChannelStatusPacket)packet).ChannelType
                             ));
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN:
@@ -970,7 +970,7 @@ namespace Vha.Net
                 this.PrivateChannelStatusEvent(this, e);
         }
 
-        protected virtual void OnChannelJoinEvent(ChannelJoinEventArgs e)
+        protected virtual void OnChannelStatusEvent(ChannelStatusEventArgs e)
         {
             if (this.State != ChatState.Connected)
                 this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Connected));
@@ -989,8 +989,8 @@ namespace Vha.Net
                 this.Debug("Registered organization: " + e.Name + " (ID:" + e.ID + ")", "[Bot]");
             }
 
-            if (this.ChannelJoinEvent != null)
-                this.ChannelJoinEvent(this, e);
+            if (this.ChannelStatusEvent != null)
+                this.ChannelStatusEvent(this, e);
         }
 
         protected virtual void OnFriendStatusEvent(FriendStatusEventArgs e)

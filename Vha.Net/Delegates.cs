@@ -42,7 +42,7 @@ namespace Vha.Net
 
     public delegate void VicinityMessageEventHandler(Chat chat, VicinityMessageEventArgs e);
     
-    public delegate void ChannelJoinEventHandler(Chat chat, ChannelJoinEventArgs e);
+    public delegate void ChannelStatusEventHandler(Chat chat, ChannelStatusEventArgs e);
     public delegate void ChannelMessageEventHandler(Chat chat, ChannelMessageEventArgs e);
     
     public delegate void LoginOKEventHandler(Chat chat, EventArgs e);

@@ -240,7 +240,7 @@ namespace Vha.Chat
                 // - Channels
                 this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
                 this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
-                this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(_chat_ChannelJoinEvent);
+                this._chat.ChannelStatusEvent += new ChannelStatusEventHandler(_chat_ChannelStatusEvent);
                 // - Messages
                 this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(_chat_PrivateMessageEvent);
                 this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);
@@ -551,7 +551,7 @@ namespace Vha.Chat
                 this.StateEvent(this, this._state);
         }
 
-        void _chat_ChannelJoinEvent(Vha.Net.Chat chat, ChannelJoinEventArgs e)
+        void _chat_ChannelStatusEvent(Vha.Net.Chat chat, ChannelStatusEventArgs e)
         {
             throw new NotImplementedException();
         }

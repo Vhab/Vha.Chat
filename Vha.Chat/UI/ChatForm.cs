@@ -55,7 +55,7 @@ namespace Vha.Chat.UI
             this._chat = chat;
             this._chat.FriendStatusEvent += new FriendStatusEventHandler(_chat_FriendStatusEvent);
             this._chat.FriendRemovedEvent += new FriendRemovedEventHandler(_chat_FriendRemovedEvent);
-            this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(_chat_ChannelJoinEvent);
+            this._chat.ChannelStatusEvent += new ChannelStatusEventHandler(_chat_ChannelJoinEvent);
             this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
             this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
             this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
@@ -149,11 +149,11 @@ namespace Vha.Chat.UI
             this._target.SelectedIndex = index;
         }
 
-        private void _chat_ChannelJoinEvent(Vha.Net.Chat chat, ChannelJoinEventArgs e)
+        private void _chat_ChannelJoinEvent(Vha.Net.Chat chat, ChannelStatusEventArgs e)
         {
             if (this._target.InvokeRequired)
             {
-                this._target.BeginInvoke(new ChannelJoinEventHandler(_chat_ChannelJoinEvent), new object[] { chat, e });
+                this._target.BeginInvoke(new ChannelStatusEventHandler(_chat_ChannelJoinEvent), new object[] { chat, e });
                 return;
             }
             TreeNode node = this._channels.GetNode(e.Name);

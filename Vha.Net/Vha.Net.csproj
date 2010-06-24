@@ -37,7 +37,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Events\AmdMuxInfoEventArgs.cs" />
     <Compile Include="Events\AnonVicinityEventArgs.cs" />
-    <Compile Include="Events\ChannelJoinEventArgs.cs" />
+    <Compile Include="Events\ChannelStatusEventArgs.cs" />
     <Compile Include="Events\ChannelMessageEventArgs.cs" />
     <Compile Include="Events\CharacterIDEventArgs.cs" />
     <Compile Include="Events\DebugEventArgs.cs" />
@@ -71,7 +71,7 @@
     <Compile Include="Packets\EmptyPacket.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="Packets\ForwardPacket.cs" />
-    <Compile Include="Packets\ChannelJoinPacket.cs" />
+    <Compile Include="Packets\ChannelStatusPacket.cs" />
     <Compile Include="Packets\ChannelMessagePacket.cs" />
     <Compile Include="LoginCharacter.cs" />
     <Compile Include="Packets\LoginCharacterListPacket.cs" />

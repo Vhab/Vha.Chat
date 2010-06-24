@@ -55,8 +55,13 @@
     <Compile Include="Commands\UnignoreCommand.cs" />
     <Compile Include="Commands\UnmuteCommand.cs" />
     <Compile Include="Commands\WhoisCommand.cs" />
+    <Compile Include="Events\ChannelEventArgs.cs" />
     <Compile Include="Events\ErrorEventArgs.cs" />
+    <Compile Include="Events\FriendEventArgs.cs" />
+    <Compile Include="Events\PrivateChannelEventArgs.cs" />
+    <Compile Include="Events\PrivateChannelInviteEventArgs.cs" />
     <Compile Include="Events\SelectCharacterEventArgs.cs" />
+    <Compile Include="Events\StateEventArgs.cs" />
     <Compile Include="MessageSource.cs" />
     <Compile Include="UI\AboutForm.cs">
       <SubType>Form</SubType>

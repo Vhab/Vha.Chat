@@ -60,7 +60,7 @@ namespace Vha.Chat
         /// <summary>
         /// Fires when the internal state of the Context changed
         /// </summary>
-        public event Handler<ContextState> StateEvent;
+        public event Handler<StateEventArgs> StateEvent;
         /// <summary>
         /// Fires when the user is required to select a character
         /// </summary>
@@ -76,43 +76,43 @@ namespace Vha.Chat
         /// <summary>
         /// Fires when a friend was first seen or was just added to the friends list
         /// </summary>
-        public event Handler<Friend> FriendAddedEvent;
+        public event Handler<FriendEventArgs> FriendAddedEvent;
         /// <summary>
         /// Fires when a user is removed from the friends list
         /// </summary>
-        public event Handler<Friend> FriendRemovedEvent;
+        public event Handler<FriendEventArgs> FriendRemovedEvent;
         /// <summary>
         /// Fires when a friend who is already on the friends list changes status
         /// </summary>
-        public event Handler<Friend> FriendUpdatedEvent;
+        public event Handler<FriendEventArgs> FriendUpdatedEvent;
         /// <summary>
         /// Fires when a channel is seen for the first time
         /// </summary>
-        public event Handler<Channel> ChannelAddedEvent;
+        public event Handler<ChannelEventArgs> ChannelJoinEvent;
         /// <summary>
         /// Fires when an already known channel changes status
         /// </summary>
-        public event Handler<Channel> ChannelUpdatedEvent;
+        public event Handler<ChannelEventArgs> ChannelUpdatedEvent;
         /// <summary>
         /// Fires when this client joins a remote private channel
         /// </summary>
-        public event Handler PrivateChannelJoinEvent;
+        public event Handler<PrivateChannelEventArgs> PrivateChannelJoinEvent;
         /// <summary>
         /// Fires when this client leaves a remote private channel
         /// </summary>
-        public event Handler PrivateChannelLeaveEvent;
+        public event Handler<PrivateChannelEventArgs> PrivateChannelLeaveEvent;
         /// <summary>
         /// Fires when this client is invited to join a remote private channel
         /// </summary>
-        public event Handler PrivateChannelInviteEvent;
+        public event Handler<PrivateChannelInviteEventArgs> PrivateChannelInviteEvent;
         /// <summary>
         /// Fires when a user joins our local private channel
         /// </summary>
-        public event Handler UserJoinEvent;
+        public event Handler<PrivateChannelEventArgs> UserJoinEvent;
         /// <summary>
         /// Fires when a user leaves our local private channel
         /// </summary>
-        public event Handler UserLeaveEvent;
+        public event Handler<PrivateChannelEventArgs> UserLeaveEvent;
         #endregion
 
         #region Attributes
@@ -373,6 +373,14 @@ namespace Vha.Chat
                 return this._privateChannels[channel];
             }
         }
+        public bool HasGuest(string user)
+        {
+            user = Format.UppercaseFirst(user);
+            lock (this._guests)
+            {
+                return this._guests.Contains(user);
+            }
+        }
         /// <summary>
         /// Write output to one of the listening output targets
         /// </summary>
@@ -416,6 +424,7 @@ namespace Vha.Chat
         private Dictionary<string, Channel> _channels;
         private Dictionary<string, Friend> _friends;
         private Dictionary<string, PrivateChannel> _privateChannels;
+        private List<string> _guests;
 
         internal Context()
         {
@@ -435,6 +444,7 @@ namespace Vha.Chat
             this._channels = new Dictionary<string, Channel>();
             this._friends = new Dictionary<string, Friend>();
             this._privateChannels = new Dictionary<string, PrivateChannel>();
+            this._guests = new List<string>();
 
             // Create input
             this._input = new Input(this, "/");
@@ -493,10 +503,11 @@ namespace Vha.Chat
 
         void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
         {
+            ContextState state = this._state;
+            ContextState previousState = this._state;
             lock (this)
             {
                 // Translate state
-                ContextState state = this._state;
                 switch (e.State)
                 {
                     case ChatState.CharacterSelect:
@@ -516,7 +527,9 @@ namespace Vha.Chat
                         state = ContextState.Reconnecting;
                         break;
                 }
-                if (this._state == state) return;
+                // No state change? We stopped caring!
+                if (previousState == state)
+                    return;
                 // Handle state change
                 switch (state)
                 {
@@ -541,45 +554,145 @@ namespace Vha.Chat
                         this._organizationId = 0;
                         this._friends.Clear();
                         this._channels.Clear();
+                        this._privateChannels.Clear();
+                        this._guests.Clear();
                         this._ignore = null;
                         break;
                 }
-                // Notify state change
-                this._state = state;
             }
+            // Notify state change
+            this._state = state;
             if (this.StateEvent != null)
-                this.StateEvent(this, this._state);
+                this.StateEvent(this, new StateEventArgs(state, previousState));
         }
 
         void _chat_ChannelStatusEvent(Vha.Net.Chat chat, ChannelStatusEventArgs e)
         {
-            throw new NotImplementedException();
+            Channel channel = e.GetChannel();
+            bool joined, updated;
+            lock (this._channels)
+            {
+                joined = !this._channels.ContainsKey(e.Name);
+                if (joined) this._channels.Add(channel.Name, channel);
+                updated = this._channels[channel.Name] != channel;
+                this._channels[channel.Name] = channel;
+            }
+            if (this.ChannelJoinEvent != null && joined)
+                this.ChannelJoinEvent(this, new ChannelEventArgs(channel, true));
+            if (this.ChannelUpdatedEvent != null && updated)
+                this.ChannelUpdatedEvent(this, new ChannelEventArgs(channel, false));
         }
 
         void _chat_PrivateChannelStatusEvent(Vha.Net.Chat chat, PrivateChannelStatusEventArgs e)
         {
-            throw new NotImplementedException();
+            PrivateChannel channel = e.GetPrivateChannel();
+            // Handle locally
+            if (e.Local)
+            {
+                bool joined = false;
+                bool left = false;
+                lock (this._guests)
+                {
+                    if (this._guests.Contains(e.Character) && !e.Join)
+                    {
+                        left = true;
+                        this._guests.Remove(e.Character);
+                    }
+                    else if (!this._guests.Contains(e.Character) && e.Join)
+                    {
+                        joined = true;
+                        this._guests.Add(e.Character);
+                    }
+                }
+                // Dispatch events
+                if (this.UserJoinEvent != null && joined)
+                    this.UserJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, true));
+                if (this.UserLeaveEvent != null && left)
+                    this.UserLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, true));
+            }
+            // Handle remote
+            else
+            {
+                bool joined = false;
+                bool left = false;
+                lock (this._privateChannels)
+                {
+                    if (this._privateChannels.ContainsKey(e.Channel) && !e.Join)
+                    {
+                        left = true;
+                        this._privateChannels.Remove(e.Channel);
+                    }
+                    else if (!this._privateChannels.ContainsKey(e.Channel) && e.Join)
+                    {
+                        joined = true;
+                        this._privateChannels.Add(e.Channel, channel);
+                    }
+                }
+                // Dispatch events
+                if (this.PrivateChannelJoinEvent != null && joined)
+                    this.PrivateChannelJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, false));
+                if (this.PrivateChannelLeaveEvent != null && left)
+                    this.PrivateChannelLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, false));
+            }
         }
 
         void _chat_PrivateChannelRequestEvent(Vha.Net.Chat chat, PrivateChannelRequestEventArgs e)
         {
-            throw new NotImplementedException();
+            PrivateChannel channel = e.GetPrivateChannel();
+            bool error = false;
+            lock (this._privateChannels)
+            {
+                error = this._privateChannels.ContainsKey(e.Character);
+            }
+            if (error)
+            {
+                this.Write(MessageClass.Error, "Unexpected invite to private channel from: " + e.Character);
+                return;
+            }
+            PrivateChannelInviteEventArgs args = new PrivateChannelInviteEventArgs(channel, false);
+            if (this.PrivateChannelInviteEvent != null)
+                this.PrivateChannelInviteEvent(this, args);
+            e.Accept = args.Accept;
         }
 
         void _chat_FriendRemovedEvent(Vha.Net.Chat chat, CharacterIDEventArgs e)
         {
-            throw new NotImplementedException();
+            Friend friend = null;
+            bool removed = false;
+            lock (this._friends)
+            {
+                if (this._friends.ContainsKey(e.Character))
+                {
+                    removed = true;
+                    friend = this._friends[e.Character];
+                    this._friends.Remove(e.Character);
+                }
+            }
+            if (this.FriendRemovedEvent != null && removed)
+                this.FriendRemovedEvent(this, new FriendEventArgs(friend, false));
         }
 
         void _chat_FriendStatusEvent(Vha.Net.Chat chat, FriendStatusEventArgs e)
         {
-            throw new NotImplementedException();
+            Friend friend = e.GetFriend();
+            bool added, updated;
+            lock (this._friends)
+            {
+                added = !this._friends.ContainsKey(e.Character);
+                if (added) this._friends.Add(e.Character, friend);
+                updated = this._friends[e.Character] != friend;
+                this._friends[e.Character] = friend;
+            }
+            if (this.FriendAddedEvent != null && added)
+                this.FriendAddedEvent(this, new FriendEventArgs(friend, true));
+            if (this.FriendUpdatedEvent != null && updated)
+                this.FriendUpdatedEvent(this, new FriendEventArgs(friend, false));
         }
 
         void _chat_PrivateChannelMessageEvent(Vha.Net.Chat chat, PrivateChannelMessageEventArgs e)
         {
             // Check for ignores
-            if (this.Ignore.IsIgnored(e.Character))
+            if (this.Ignore.Contains(e.Character))
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.PrivateChannel, e.Channel, e.Character);
@@ -592,7 +705,7 @@ namespace Vha.Chat
             if (this.GetChannel(e.Channel).Muted)
                 return;
             // Check for ignores
-            if (this.Ignore.IsIgnored(e.Character))
+            if (this.Ignore.Contains(e.Character))
                 return;
             // Descramble
             string message = e.Message;
@@ -612,7 +725,7 @@ namespace Vha.Chat
         void _chat_PrivateMessageEvent(Vha.Net.Chat chat, PrivateMessageEventArgs e)
         {
             // Check for ignores
-            if (this.Ignore.IsIgnored(e.Character))
+            if (this.Ignore.Contains(e.Character))
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.Character, null, e.Character);
@@ -626,7 +739,7 @@ namespace Vha.Chat
             {
                 string character = (string)e.Arguments[(int)IncomingOfflineMessageArgs.Name];
                 // Check ignored users list
-                if (this.Ignore.IsIgnored(character))
+                if (this.Ignore.Contains(character))
                     return;
             }
             // Descramble message

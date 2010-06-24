@@ -66,7 +66,7 @@ namespace Vha.Chat.UI
                 this._account.Items.Add(acc);
 
             // Hook events
-            this._context.StateEvent += new Handler<ContextState>(_context_StateEvent);
+            this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);
             this._context.SelectCharacterEvent += new Handler<SelectCharacterEventArgs>(_context_SelectCharacterEvent);
             this._context.ErrorEvent += new Handler<ErrorEventArgs>(_context_ErrorEvent);
         }
@@ -74,7 +74,7 @@ namespace Vha.Chat.UI
         private void AuthenticationForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             // Unhook events
-            this._context.StateEvent -= new Handler<ContextState>(_context_StateEvent);
+            this._context.StateEvent -= new Handler<StateEventArgs>(_context_StateEvent);
             this._context.SelectCharacterEvent -= new Handler<SelectCharacterEventArgs>(_context_SelectCharacterEvent);
             this._context.ErrorEvent -= new Handler<ErrorEventArgs>(_context_ErrorEvent);
         }
@@ -151,18 +151,18 @@ namespace Vha.Chat.UI
             }
         }
 
-        private void _context_StateEvent(Context context, ContextState args)
+        private void _context_StateEvent(Context context, StateEventArgs args)
         {
             // Run this method locally
             if (this.InvokeRequired)
             {
                 this.Invoke(
-                    new Handler<ContextState>(_context_StateEvent),
+                    new Handler<StateEventArgs>(_context_StateEvent),
                     new object[] { context, args });
                 return;
             }
             // Handle state change
-            switch (args)
+            switch (args.State)
             {
                 case ContextState.Connecting:
                     if (this._status != null)

@@ -31,18 +31,18 @@ namespace Vha.Net.Events
     {
         private readonly UInt32 _characterID = 0;
         private readonly string _character;
-        private bool _join = false;
+        private bool _accept = false;
 
         /// <summary>
         /// Constructor for private channel requests
         /// </summary>
         /// <param name="characterID">the character id</param>
         /// <param name="join">whether asked to join or leave</param>
-        public PrivateChannelRequestEventArgs(UInt32 characterID, string character, bool join)
+        public PrivateChannelRequestEventArgs(UInt32 characterID, string character, bool accept)
         {
             this._characterID = characterID;
             this._character = character;
-            this._join = join;
+            this._accept = accept;
         }
 
         /// <summary>
@@ -56,10 +56,10 @@ namespace Vha.Net.Events
         /// <summary>
         /// Whether we accept or decline the join
         /// </summary>
-        public bool Join
+        public bool Accept
         {
-            get { return this._join; }
-            set { this._join = value; }
+            get { return this._accept; }
+            set { this._accept = value; }
         }
         /// <summary>
         /// Returns the combined private channel data

@@ -31,7 +31,7 @@ namespace Vha.Chat
     // Placeholder till I have the chance to port the Ignore system
     public class Ignore
     {
-        public bool IsIgnored(string username)
+        public bool Contains(string user)
         {
             return false;
         }

@@ -27,19 +27,22 @@ namespace Vha.Chat
         public readonly MessageType Type;
         public readonly string Channel;
         public readonly string Character;
+        public readonly bool Outgoing;
 
         public MessageSource()
         {
             this.Type = MessageType.None;
             this.Channel = null;
             this.Character = null;
+            this.Outgoing = false;
         }
 
-        public MessageSource(MessageType type, string channel, string character)
+        public MessageSource(MessageType type, string channel, string character, bool outgoing)
         {
             this.Type = type;
             this.Channel = channel;
             this.Character = character;
+            this.Outgoing = outgoing;
         }
 
         public override string ToString()
@@ -57,6 +60,7 @@ namespace Vha.Chat
             if (this.Type != source.Type) return false;
             if (this.Channel != source.Channel) return false;
             if (this.Character != source.Character) return false;
+            if (this.Outgoing != source.Outgoing) return false;
             return true;
         }
 

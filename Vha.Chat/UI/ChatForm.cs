@@ -29,19 +29,20 @@ using Vha.Net;
 using Vha.Net.Events;
 using Vha.Common;
 using Vha.Chat;
+using Vha.Chat.Events;
 
 namespace Vha.Chat.UI
 {
     public partial class ChatForm : Form
     {
-        protected ChatTreeNode _online = new ChatTreeNode(ChatInputType.Character, "Online");
-        protected ChatTreeNode _offline = new ChatTreeNode(ChatInputType.Character, "Offline");
-        protected ChatTreeNode _channels = new ChatTreeNode(ChatInputType.Channel, "Channels");
-        protected ChatTreeNode _privateChannels = new ChatTreeNode(ChatInputType.PrivateChannel, "Private Channels");
-        protected ChatTreeNode _guests = new ChatTreeNode(ChatInputType.Character, "Guests");
+        protected ChatTreeNode _online = new ChatTreeNode(MessageType.Character, "Online");
+        protected ChatTreeNode _offline = new ChatTreeNode(MessageType.Character, "Offline");
+        protected ChatTreeNode _channels = new ChatTreeNode(MessageType.Channel, "Channels");
+        protected ChatTreeNode _privateChannels = new ChatTreeNode(MessageType.PrivateChannel, "Private Channels");
+        protected ChatTreeNode _guests = new ChatTreeNode(MessageType.Character, "Guests");
 
         protected ChatHtml _htmlUtil;
-        protected Net.Chat _chat;
+        protected Context _context;
 
         protected List<string> _history = new List<string>();
         protected int _historyIndex = 0;
@@ -52,70 +53,119 @@ namespace Vha.Chat.UI
         {
             InitializeComponent();
 
-            this._chat = chat;
-            this._chat.FriendStatusEvent += new FriendStatusEventHandler(_chat_FriendStatusEvent);
-            this._chat.FriendRemovedEvent += new FriendRemovedEventHandler(_chat_FriendRemovedEvent);
-            this._chat.ChannelStatusEvent += new ChannelStatusEventHandler(_chat_ChannelJoinEvent);
-            this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
-            this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
-            this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
-            this._chat.LoginOKEvent += new LoginOKEventHandler(_chat_LoginOKEvent);
-
+            this._context = context;
+            this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);
+            this._context.MessageEvent += new Handler<MessageEventArgs>(_context_MessageEvent);
+            this._context.ChannelJoinEvent += new Handler<ChannelEventArgs>(_context_ChannelJoinEvent);
+            this._context.ChannelUpdatedEvent += new Handler<ChannelEventArgs>(_context_ChannelUpdatedEvent);
+            this._context.PrivateChannelInviteEvent += new Handler<PrivateChannelInviteEventArgs>(_context_PrivateChannelInviteEvent);
+            this._context.PrivateChannelJoinEvent += new Handler<PrivateChannelEventArgs>(_context_PrivateChannelJoinEvent);
+            this._context.PrivateChannelLeaveEvent += new Handler<PrivateChannelEventArgs>(_context_PrivateChannelLeaveEvent);
+            this._context.UserJoinEvent += new Handler<PrivateChannelEventArgs>(_context_UserJoinEvent);
+            this._context.UserLeaveEvent += new Handler<PrivateChannelEventArgs>(_context_UserLeaveEvent);
+            this._context.FriendAddedEvent += new Handler<FriendEventArgs>(_context_FriendAddedEvent);
+            this._context.FriendRemovedEvent += new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
+            this._context.FriendUpdatedEvent += new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
+            
             this._tree.Nodes.Add(this._online);
             this._tree.Nodes.Add(this._offline);
             this._tree.Nodes.Add(this._channels);
             this._tree.Nodes.Add(this._privateChannels);
             this._tree.Nodes.Add(this._guests);
 
-            this._inputUtil = new ChatInput(this, this._chat);
-            this._htmlUtil = new ChatHtml(this, this._inputUtil);
-            this._outputUtil = new ChatOutput(this, this._htmlUtil, this._chat);
+            this._htmlUtil = new ChatHtml(this._context, this);
 
             // Disable options button
             this._options.Visible = false;
-            //Update buttons to reflect the state of chat.
-            switch (chat.State)
+            // Update buttons to reflect the state of chat.
+            switch (this._context.State)
             {
-                case ChatState.Connected:
-                case ChatState.Connecting:
-                case ChatState.Reconnecting:
-                case ChatState.Login:
-                case ChatState.CharacterSelect:
-                    this._connect.Visible = this._connect.Enabled = false;
-                    this._disconnect.Visible = this._disconnect.Enabled = true;
-                    break;
-                case ChatState.Disconnected:
-                case ChatState.Error:
+                case ContextState.Disconnected:
                     this._connect.Visible = this._connect.Enabled = true;
                     this._disconnect.Visible = this._disconnect.Enabled = false;
+                    break;
+                default:
+                    this._connect.Visible = this._connect.Enabled = false;
+                    this._disconnect.Visible = this._disconnect.Enabled = true;
                     break;
             }
         }
 
-        public void AppendLine(string type, string line)
+        public delegate void SetTargetDelegate(MessageTarget target);
+        public void SetTarget(MessageTarget target)
         {
-            string html = string.Format(
-                "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
-                DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, type, line);
-            AppendLine(html);
+            if (this._target.InvokeRequired)
+            {
+                this._target.BeginInvoke(new SetTargetDelegate(SetTarget), new object[] { target });
+                return;
+            }
+            // Focus input
+            this._inputBox.Focus();
+            this._inputBox.Select(this._inputBox.Text.Length, 0);
+            // Check if the target already exists in our list
+            foreach (object t in this._target.Items)
+            {
+                MessageTarget ct = (MessageTarget)t;
+                if (!ct.Equals(target)) continue;
+                this._target.SelectedItem = t;
+                return;
+            }
+            // Add new target
+            int index = this._target.Items.Add(target);
+            this._target.SelectedIndex = index;
         }
-        public delegate void AppendLineDelegate(string html);
-        private void AppendLine(string html)
+
+        #region Context callbacks
+        void _context_StateEvent(Context context, StateEventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _context_MessageEvent(Context context, MessageEventArgs args)
         {
             if (this.InvokeRequired)
             {
-                this.BeginInvoke(new AppendLineDelegate(AppendLine), new object[] { html });
+                this.BeginInvoke(
+                    new Handler<MessageEventArgs>(_context_MessageEvent),
+                    new object[] { context, args });
                 return;
             }
+            // Create message
+            string line = args.Message;
+            switch (args.Source.Type)
+            {
+                case MessageType.Channel:
+                    line = string.Format(
+                        "[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
+                        args.Source.Channel, args.Source.Character, args.Message);
+                    break;
+                case MessageType.Character:
+                    line = string.Format(
+                        "{2}[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: {1}",
+                        args.Source.Character, args.Message,
+                        args.Source.Outgoing ? "To " : "");
+                    break;
+                case MessageType.PrivateChannel:
+                    line = string.Format(
+                        "[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
+                        args.Source.Channel, args.Source.Character, args.Message);
+                    break;
+            }
+            // Format message
+            string html = string.Format(
+                "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
+                DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second,
+                args.Class.ToString(), line);
+            
             // Queue messages if the browser isn't ready yet
             if (this._outputBox.Document == null || this._outputBox.Document.Body == null)
             {
                 this._lines.Enqueue(html);
                 return;
             }
-            this._htmlUtil.AppendHtml(this._outputBox.Document, Program.Configuration.TextStyle, html, true);
+            this._htmlUtil.AppendHtml(this._outputBox.Document, this._context.Options.TextStyle, html, true);
             // Clean up old messages
-            while (this._outputBox.Document.Body.Children.Count > Program.Configuration.MaximumMessages)
+            while (this._outputBox.Document.Body.Children.Count > this._context.Options.MaximumMessages)
             {
                 this._outputBox.Document.Body.FirstChild.OuterHtml = "";
             }
@@ -123,97 +173,164 @@ namespace Vha.Chat.UI
             this._outputBox.Document.InvokeScript("scrollToBottom");
         }
 
-        public delegate void SetTargetDelegate(MessageType type, string target);
-        public void SetTarget(MessageType type, string target)
+        void _context_UserLeaveEvent(Context context, PrivateChannelEventArgs args)
         {
-            if (this._target.InvokeRequired)
+            if (this.InvokeRequired)
             {
-                this._target.BeginInvoke(new SetTargetDelegate(SetTarget), new object[] { type, target });
+                this.BeginInvoke(
+                    new Handler<PrivateChannelEventArgs>(_context_UserLeaveEvent),
+                    new object[] { context, args });
                 return;
             }
-            // Focus input
-            this._inputBox.Focus();
-            this._inputBox.Select(this._inputBox.Text.Length, 0);
-            // Create target
-            ChatTarget chatTarget = new ChatTarget(type, target);
-            // Check if the target already exists in our list
-            foreach (object t in this._target.Items)
-            {
-                ChatTarget ct = (ChatTarget)t;
-                if (!ct.Equals(chatTarget)) continue;
-                this._target.SelectedItem = t;
-                return;
-            }
-            // Add new target
-            int index = this._target.Items.Add(chatTarget);
-            this._target.SelectedIndex = index;
+            throw new NotImplementedException();
         }
 
-        private void _chat_ChannelJoinEvent(Vha.Net.Chat chat, ChannelStatusEventArgs e)
+        void _context_UserJoinEvent(Context context, PrivateChannelEventArgs args)
         {
-            if (this._target.InvokeRequired)
+            if (this.InvokeRequired)
             {
-                this._target.BeginInvoke(new ChannelStatusEventHandler(_chat_ChannelJoinEvent), new object[] { chat, e });
+                this.BeginInvoke(
+                    new Handler<PrivateChannelEventArgs>(_context_UserJoinEvent),
+                    new object[] { context, args });
                 return;
             }
-            TreeNode node = this._channels.GetNode(e.Name);
-            if (node != null)
+            throw new NotImplementedException();
+        }
+
+        void _context_PrivateChannelLeaveEvent(Context context, PrivateChannelEventArgs args)
+        {
+            if (this.InvokeRequired)
             {
-                if (e.Muted) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
-                else node.ImageKey = node.SelectedImageKey = "Channel";
+                this.BeginInvoke(
+                    new Handler<PrivateChannelEventArgs>(_context_PrivateChannelLeaveEvent),
+                    new object[] { context, args });
+                return;
             }
-            else
+            throw new NotImplementedException();
+        }
+
+        void _context_PrivateChannelJoinEvent(Context context, PrivateChannelEventArgs args)
+        {
+            if (this.InvokeRequired)
             {
-                if (e.Muted) this._channels.AddNode(e.Name, "ChannelDisabled");
-                else this._channels.AddNode(e.Name, "Channel");
+                this.BeginInvoke(
+                    new Handler<PrivateChannelEventArgs>(_context_PrivateChannelJoinEvent),
+                    new object[] { context, args });
+                return;
             }
+            throw new NotImplementedException();
+        }
+
+        void _context_PrivateChannelInviteEvent(Context context, PrivateChannelInviteEventArgs args)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<PrivateChannelInviteEventArgs>(_context_PrivateChannelInviteEvent),
+                    new object[] { context, args });
+                return;
+            }
+            // Show dialog
+            DialogResult result = MessageBox.Show(
+                "You have been invited to " + args.Channel.Name + "'s private channel. Do you wish to join?",
+                "Private Channel Invite",
+                MessageBoxButtons.YesNo);
+            // Join channel if accepted
+            if (result == DialogResult.Yes)
+            {
+                args.Accept = true;
+            }
+        }
+
+        void _context_ChannelJoinEvent(Context context, ChannelEventArgs args)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<ChannelEventArgs>(_context_ChannelJoinEvent),
+                    new object[] { context, args });
+                return;
+            }
+            if (args.Channel.Muted) this._channels.AddNode(args.Channel.Name, "ChannelDisabled");
+            else this._channels.AddNode(args.Channel.Name, "Channel");
             if (this._channels.Nodes.Count == 1)
                 this._channels.Expand();
         }
 
-        private void _chat_FriendStatusEvent(Vha.Net.Chat chat, FriendStatusEventArgs e)
+        void _context_ChannelUpdatedEvent(Context context, ChannelEventArgs args)
         {
-            // Ignore temporary buddies
-            if (e.Temporary) return;
-            // Use invoke if needed
-            if (this._target.InvokeRequired)
+            if (this.InvokeRequired)
             {
-                this._target.BeginInvoke(new FriendStatusEventHandler(_chat_FriendStatusEvent), new object[] { chat, e });
+                this.BeginInvoke(
+                    new Handler<ChannelEventArgs>(_context_ChannelUpdatedEvent),
+                    new object[] { context, args });
                 return;
             }
-            // Add buddy to list
-            if (e.Online)
+            TreeNode node = this._channels.GetNode(args.Channel.Name);
+            if (args.Channel.Muted) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
+            else node.ImageKey = node.SelectedImageKey = "Channel";
+        }
+
+        void _context_FriendAddedEvent(Context context, FriendEventArgs args)
+        {
+            if (this.InvokeRequired)
             {
-                if (this._online.ContainsNode(e.Character)) return;
-                if (this._offline.ContainsNode(e.Character))
-                    this._offline.RemoveNode(e.Character);
-                this._online.AddNode(e.Character, "CharacterOnline");
+                this.BeginInvoke(
+                    new Handler<FriendEventArgs>(_context_FriendAddedEvent),
+                    new object[] { context, args });
+                return;
+            }
+            if (args.Friend.Online)
+            {
+                this._online.AddNode(args.Friend.Name, "CharacterOnline");
                 if (this._online.Nodes.Count == 1)
                     this._online.Expand();
             }
             else
             {
-                if (this._offline.ContainsNode(e.Character)) return;
-                if (this._online.ContainsNode(e.Character))
-                    this._online.RemoveNode(e.Character);
-                this._offline.AddNode(e.Character, "CharacterOffline");
+                this._offline.AddNode(args.Friend.Name, "CharacterOffline");
             }
         }
 
-        private void _chat_FriendRemovedEvent(Vha.Net.Chat chat, CharacterIDEventArgs e)
+        void _context_FriendRemovedEvent(Context context, FriendEventArgs args)
         {
-            // Use invoke if needed
-            if (this._target.InvokeRequired)
+            if (this.InvokeRequired)
             {
-                this._target.BeginInvoke(new FriendRemovedEventHandler(_chat_FriendRemovedEvent), new object[] { chat, e });
+                this.BeginInvoke(
+                    new Handler<FriendEventArgs>(_context_FriendRemovedEvent),
+                    new object[] { context, args });
                 return;
             }
-            // Remove friend
-            if (this._online.ContainsNode(e.Character))
-                this._online.RemoveNode(e.Character);
-            if (this._offline.ContainsNode(e.Character))
-                this._offline.RemoveNode(e.Character);
+            if (args.Friend.Online)
+                this._offline.RemoveNode(args.Friend.Name);
+            else
+                this._online.RemoveNode(args.Friend.Name);
         }
+
+
+        void _context_FriendUpdatedEvent(Context context, FriendEventArgs args)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<FriendEventArgs>(_context_FriendUpdatedEvent),
+                    new object[] { context, args });
+                return;
+            }
+            if (args.Friend.Online)
+            {
+                this._offline.RemoveNode(args.Friend.Name);
+                this._online.AddNode(args.Friend.Name, "CharacterOnline");
+                if (this._online.Nodes.Count == 1)
+                    this._online.Expand();
+            }
+            else
+            {
+                this._online.RemoveNode(args.Friend.Name);
+                this._offline.AddNode(args.Friend.Name, "CharacterOffline");
+            }
+        }
+        #endregion
 
         private void _chat_PrivateChannelStatusEvent(Vha.Net.Chat chat, PrivateChannelStatusEventArgs e)
         {
@@ -261,34 +378,6 @@ namespace Vha.Chat.UI
             }
         }
 
-        void _chat_PrivateChannelRequestEvent(Vha.Net.Chat chat, PrivateChannelRequestEventArgs e)
-        {
-            // Invoke on form thread
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent), new object[] { chat, e });
-                return;
-            }
-            // Check if the person sending the invite is on ignore.
-            if (Program.Ignores != null)
-                if (Program.Ignores.Contains(e.CharacterID, e.Character))
-                {
-                    e.Join = false;
-                    return;
-                }
-
-            // Show dialog
-            DialogResult result = MessageBox.Show(
-                "You have been invited to " + e.Character + "'s private channel. Do you wish to join?",
-                "Private Channel Invite",
-                MessageBoxButtons.YesNo);
-            // Join channel if accepted
-            if (result == DialogResult.Yes)
-            {
-                e.Join = true;
-            }
-        }
-
         private void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
         {
             // Invoke
@@ -324,42 +413,6 @@ namespace Vha.Chat.UI
                 // Update buttons
                 this._connect.Enabled = this._connect.Visible = false;
                 this._disconnect.Enabled = this._disconnect.Visible = true;
-            }
-        }
-
-        /// <summary>
-        /// This checks if used dimension+account+character is the same as the stored values. If not, store.
-        /// </summary>
-        /// <param name="chat"></param>
-        /// <param name="e"></param>
-        private void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)
-        {
-            // Has 'last connected with' values been changed?
-            Dimension s = Program.Servers.Get(chat.Server, chat.Port);
-            string Server;
-            if (s == null) Server = "unknown";
-            else Server = s.Name;
-
-            ConfigAccount oldamap = null;
-            foreach (ConfigAccount amap in Program.Configuration.Accounts)
-                if (amap.Account == chat.Account)
-                    oldamap = amap;
-            ConfigAccount myamap = oldamap;
-            if (Program.Configuration.Account != chat.Account
-                || myamap == null
-                || myamap.Character != chat.Character
-                || Program.Configuration.Dimension != Server)
-            {
-                // Add changes to config.
-                Program.Configuration.Account = chat.Account;
-                // Last selected character, per account.
-                if (myamap == null) myamap = new ConfigAccount();
-                myamap.Account = chat.Account;
-                myamap.Character = chat.Character;
-                if (oldamap != null) Program.Configuration.Accounts.Remove(oldamap);
-                Program.Configuration.Accounts.Add(myamap);
-                Program.Configuration.Dimension = Server;
-                Vha.Common.XML<Config>.ToFile(Program.ConfigurationFile, Program.Configuration);
             }
         }
 
@@ -405,23 +458,23 @@ namespace Vha.Chat.UI
                 // History
                 if (this._history.Count == 0 || this._history[0] != this._inputBox.Text)
                     this._history.Insert(0, this._inputBox.Text);
-                while (this._history.Count > Program.Configuration.MaximumHistory)
+                while (this._history.Count > this._context.Options.MaximumHistory)
                     this._history.RemoveAt(this._history.Count - 1);
                 this._historyIndex = 0;
                 // Handle the input
-                if (this._inputBox.Text.StartsWith("/"))
+                if (this._inputBox.Text.StartsWith(this._context.Input.Prefix))
                 {
-                    this._inputUtil.Command(this._inputBox.Text);
+                    this._context.Input.Command(this._inputBox.Text);
                     this._inputBox.Text = "";
                     return;
                 }
                 if (this._target.SelectedItem == null)
                 {
-                    AppendLine("Error", "No channel selected");
+                    this._context.Write(MessageClass.Error, "No channel selected");
                     return;
                 }
-                ChatTarget target = (ChatTarget)this._target.SelectedItem;
-                this._inputUtil.Send(target.Type, target.Target, this._inputBox.Text);
+                MessageTarget target = (MessageTarget)this._target.SelectedItem;
+                this._context.Input.Send(target, this._inputBox.Text, false);
                 this._inputBox.Text = "";
             }
         }
@@ -447,12 +500,12 @@ namespace Vha.Chat.UI
             string color = this.ForeColor.R.ToString("X") + this.ForeColor.G.ToString("X") + this.ForeColor.B.ToString("X");
             this._outputBox.Document.Body.Style = "color: #" + color + ";";
             // Welcome message
-            this.AppendLine("Internal", "Type /help to view all available commands");
+            this._context.Write(MessageClass.Internal, "Type /help to view all available commands");
             // Clear queue
             while (this._lines.Count > 0)
             {
                 string html = this._lines.Dequeue();
-                this.AppendLine(html);
+                this._htmlUtil.AppendHtml(this._outputBox.Document, this._context.Options.TextStyle, html, true);
             }
         }
 
@@ -465,7 +518,7 @@ namespace Vha.Chat.UI
             ChatTreeNode branch = (ChatTreeNode)this._tree.SelectedNode.Parent;
             string target = this._tree.SelectedNode.Text;
             // Set the target
-            this.SetTarget(branch.Type, target);
+            this.SetTarget(new MessageTarget(branch.Type, target));
         }
 
         private void _tree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -484,7 +537,7 @@ namespace Vha.Chat.UI
             {
                 // Online character menu
                 this._characterMenu.Tag = target;
-                if (this._guests.ContainsNode(target))
+                if (this._context.HasGuest(target))
                 {
                     this._characterMenu_Invite.Enabled = false;
                 }
@@ -505,7 +558,7 @@ namespace Vha.Chat.UI
             {
                 this._channelMenu.Tag = target;
                 // Disable irrelevant buttons
-                if (e.Node.ImageKey == "ChannelDisabled")
+                if (this._context.GetChannel(target).Muted)
                 {
                     this._channelMenu_Mute.Enabled = false;
                     this._channelMenu_Unmute.Enabled = true;
@@ -521,7 +574,7 @@ namespace Vha.Chat.UI
             {
                 this._privateChannelMenu.Tag = target;
                 // Can't leave the channel if it's our own channel
-                if (target == this._chat.Character)
+                if (target == this._context.Character)
                 {
                     this._privateChannelMenu_Leave.Enabled = false;
                 }
@@ -541,13 +594,14 @@ namespace Vha.Chat.UI
 
         private void _about_Click(object sender, EventArgs e)
         {
-            this._inputUtil.Command("about");
+            AboutForm form = new AboutForm();
+            form.ShowDialog();
         }
 
         private void _connect_Click(object sender, EventArgs e)
         {
             // Return to authorization window
-            Program.ApplicationContext.MainForm = new AuthenticationForm();
+            Program.ApplicationContext.MainForm = new AuthenticationForm(this._context);
             // Close this window before showing auth window
             this.Close();
             Program.ApplicationContext.MainForm.Show();
@@ -555,7 +609,7 @@ namespace Vha.Chat.UI
 
         private void _disconnect_Click(object sender, EventArgs e)
         {
-            this._chat.Disconnect();
+            this._context.Disconnect();
             // Disable form
             this._disconnect.Enabled = false;
             this._connect.Enabled = true;
@@ -570,55 +624,55 @@ namespace Vha.Chat.UI
         private void _channelMenu_TalkTo_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            SetTarget(ChatInputType.Channel, (string)this._channelMenu.Tag);
+            SetTarget(new MessageTarget(MessageType.Channel, (string)this._channelMenu.Tag));
         }
 
         private void _channelMenu_Mute_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            this._inputUtil.Command("mute " + (string)this._channelMenu.Tag);
+            this._context.Input.Command("mute " + (string)this._channelMenu.Tag);
         }
 
         private void _channelMenu_Unmute_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            this._inputUtil.Command("unmute " + (string)this._channelMenu.Tag);
+            this._context.Input.Command("unmute " + (string)this._channelMenu.Tag);
         }
 
         private void _privateChannelMenu_TalkTo_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
-            SetTarget(ChatInputType.PrivateChannel, (string)this._privateChannelMenu.Tag);
+            SetTarget(new MessageTarget(MessageType.PrivateChannel, (string)this._privateChannelMenu.Tag));
         }
 
         private void _privateChannelMenu_Leave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
-            this._inputUtil.Command("leave " + (string)this._privateChannelMenu.Tag);
+            this._context.Input.Command("leave " + (string)this._privateChannelMenu.Tag);
         }
 
         private void _characterMenu_TalkTo_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            SetTarget(ChatInputType.Character, (string)this._characterMenu.Tag);
+            SetTarget(new MessageTarget(MessageType.Character, (string)this._characterMenu.Tag));
         }
 
         private void _characterMenu_Remove_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            this._inputUtil.Command("rembuddy " + (string)this._characterMenu.Tag);
+            this._context.Input.Command("friend remove " + (string)this._characterMenu.Tag);
         }
 
         private void _characterMenu_Invite_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            this._inputUtil.Command("invite " + (string)this._characterMenu.Tag);
+            this._context.Input.Command("invite " + (string)this._characterMenu.Tag);
         }
 
         private void _guestsMenu_Kick_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty((string)this._guestsMenu.Tag)) return;
-            this._inputUtil.Command("kick " + (string)this._guestsMenu.Tag);
+            this._context.Input.Command("kick " + (string)this._guestsMenu.Tag);
         }
     }
 }

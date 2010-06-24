@@ -302,7 +302,7 @@ namespace Vha.Chat.UI
                     PrivateChannelLink(argument);
                     break;
                 default:
-                    this._form.AppendLine("Error", "Unknown link type: " + type);
+                    this._context.Write(MessageClass.Error, "Unknown link type: " + type);
                     break;
             }
         }
@@ -311,7 +311,7 @@ namespace Vha.Chat.UI
         {
             if (!this._texts.ContainsKey(text))
             {
-                this._form.AppendLine("Error", "Unable to locate text with id " + text);
+                this._context.Write(MessageClass.Error, "Unable to locate text with id " + text);
                 return;
             }
             InfoForm form = new InfoForm(this, this._texts[text]);
@@ -329,7 +329,7 @@ namespace Vha.Chat.UI
             string[] parts = item.Split(new char[] {'/'});
             if (parts.Length < 3)
             {
-                this._form.AppendLine("Error", "Invalid itemref link: " + item);
+                this._context.Write(MessageClass.Error, "Invalid itemref link: " + item);
                 return;
             }
             Form form = new BrowserForm(string.Format(url, parts[0], parts[1], parts[2]));
@@ -338,17 +338,17 @@ namespace Vha.Chat.UI
 
         protected void CharacterLink(string character)
         {
-            this._form.SetTarget(MessageType.Character, character);
+            this._form.SetTarget(new MessageTarget(MessageType.Character, character));
         }
 
         protected void ChannelLink(string channel)
         {
-            this._form.SetTarget(MessageType.Channel, channel);
+            this._form.SetTarget(new MessageTarget(MessageType.Channel, channel));
         }
 
         protected void PrivateChannelLink(string channel)
         {
-            this._form.SetTarget(MessageType.PrivateChannel, channel);
+            this._form.SetTarget(new MessageTarget(MessageType.PrivateChannel, channel));
         }
     }
 }

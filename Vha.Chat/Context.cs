@@ -486,6 +486,12 @@ namespace Vha.Chat
             {
                 this._character = args.Character.Name;
                 this._chat.SendLoginCharacter(charactersMap[args.Character]);
+                // Mark as 'recently used'
+                OptionsAccount acc = this.Options.GetAccount(this.Account, true);
+                acc.Name = this.Options.LastAccount = this._account;
+                acc.Dimension = this.Options.LastDimension = this._dimension;
+                acc.Character = this._character;
+                this.Options.Save();
             }
             else
             {
@@ -574,7 +580,7 @@ namespace Vha.Chat
             {
                 joined = !this._channels.ContainsKey(e.Name);
                 if (joined) this._channels.Add(channel.Name, channel);
-                updated = this._channels[channel.Name] != channel;
+                updated = !this._channels[channel.Name].Equals(channel);
                 this._channels[channel.Name] = channel;
             }
             if (this.ChannelJoinEvent != null && joined)
@@ -638,6 +644,10 @@ namespace Vha.Chat
 
         void _chat_PrivateChannelRequestEvent(Vha.Net.Chat chat, PrivateChannelRequestEventArgs e)
         {
+            // Check for ignores
+            if (this.Ignore.Contains(e.Character))
+                return;
+            // Some sensible checks
             PrivateChannel channel = e.GetPrivateChannel();
             bool error = false;
             lock (this._privateChannels)
@@ -649,6 +659,7 @@ namespace Vha.Chat
                 this.Write(MessageClass.Error, "Unexpected invite to private channel from: " + e.Character);
                 return;
             }
+            // Dispatch invite event
             PrivateChannelInviteEventArgs args = new PrivateChannelInviteEventArgs(channel, false);
             if (this.PrivateChannelInviteEvent != null)
                 this.PrivateChannelInviteEvent(this, args);
@@ -674,13 +685,16 @@ namespace Vha.Chat
 
         void _chat_FriendStatusEvent(Vha.Net.Chat chat, FriendStatusEventArgs e)
         {
+            // Ignore temporary friends
+            if (e.Temporary) return;
+            // Handle friend update
             Friend friend = e.GetFriend();
             bool added, updated;
             lock (this._friends)
             {
                 added = !this._friends.ContainsKey(e.Character);
                 if (added) this._friends.Add(e.Character, friend);
-                updated = this._friends[e.Character] != friend;
+                updated = !this._friends[e.Character].Equals(friend);
                 this._friends[e.Character] = friend;
             }
             if (this.FriendAddedEvent != null && added)
@@ -695,7 +709,7 @@ namespace Vha.Chat
             if (this.Ignore.Contains(e.Character))
                 return;
             // Dispatch message
-            MessageSource source = new MessageSource(MessageType.PrivateChannel, e.Channel, e.Character);
+            MessageSource source = new MessageSource(MessageType.PrivateChannel, e.Channel, e.Character, e.Character == this.Character);
             this.Write(source, MessageClass.PG, e.Message);
         }
 
@@ -718,7 +732,7 @@ namespace Vha.Chat
                     message = parsedMessage.Value;
             }
             // Dispatch message
-            MessageSource source = new MessageSource(MessageType.Channel, e.Channel, e.Character);
+            MessageSource source = new MessageSource(MessageType.Channel, e.Channel, e.Character, e.Character == this.Character);
             this.Write(source, this.GetChannelClass(e.Channel), message);
         }
 
@@ -728,7 +742,7 @@ namespace Vha.Chat
             if (this.Ignore.Contains(e.Character))
                 return;
             // Dispatch message
-            MessageSource source = new MessageSource(MessageType.Character, null, e.Character);
+            MessageSource source = new MessageSource(MessageType.Character, null, e.Character, e.Outgoing);
             this.Write(source, MessageClass.PM, e.Message);
         }
 

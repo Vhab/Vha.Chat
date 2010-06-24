@@ -1046,7 +1046,7 @@ namespace Vha.Net
         {
             if (this.PrivateChannelRequestEvent != null)
                 this.PrivateChannelRequestEvent(this, e);
-            this.SendPacket(new PrivateChannelStatusPacket(e.CharacterID, e.Join));
+            this.SendPacket(new PrivateChannelStatusPacket(e.CharacterID, e.Accept));
         }
 
         protected virtual void OnClientUnknownEvent(CharacterIDEventArgs e)

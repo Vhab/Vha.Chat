@@ -24,9 +24,9 @@ using Vha.Common;
 
 namespace Vha.Net.Packets
 {
-    internal class ChannelJoinPacket : Packet
+    internal class ChannelStatusPacket : Packet
     {
-        internal ChannelJoinPacket(Packet.Type type, byte[] data) : base(type, data) { }
+        internal ChannelStatusPacket(Packet.Type type, byte[] data) : base(type, data) { }
         override protected void BytesToData(byte[] data)
         {
             if (data == null || data.Length < 10) { return; }

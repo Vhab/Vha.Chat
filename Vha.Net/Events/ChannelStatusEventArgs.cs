@@ -26,9 +26,9 @@ using Vha.Common;
 namespace Vha.Net.Events
 {
     /// <summary>
-    /// Holds event args for channel join messages.
+    /// Holds event args for channel status messages.
     /// </summary>
-    public class ChannelJoinEventArgs : EventArgs
+    public class ChannelStatusEventArgs : EventArgs
     {
         private readonly BigInteger _id = 0;
         private readonly String _name = null;
@@ -44,7 +44,7 @@ namespace Vha.Net.Events
         /// <param name="name">channel name</param>
         /// <param name="mute">whether the channel is muted or not</param>
         /// <param name="channelType">channel type</param>
-        public ChannelJoinEventArgs(BigInteger id, String name, UInt16 flags, bool mute, byte channelType)
+        public ChannelStatusEventArgs(BigInteger id, String name, UInt16 flags, bool mute, byte channelType)
         {
             this._id = id;
             this._name = name;

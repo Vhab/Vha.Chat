@@ -26,7 +26,7 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckConnection()) return false;
+            if (!context.Input.CheckConnection(true)) return false;
             context.Chat.SendPrivateChannelKickAll();
             context.Write(MessageClass.PG, "Kicking all users from your private channel");
             return true;

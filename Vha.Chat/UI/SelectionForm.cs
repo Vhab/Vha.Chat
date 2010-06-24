@@ -40,7 +40,7 @@ namespace Vha.Chat.UI
             InitializeComponent();
             List<Character> list = new List<Character>(characters);
             list.Sort();
-            foreach (LoginCharacter character in list)
+            foreach (Character character in list)
             {
                 this._characters.Items.Add(character);
             }
@@ -49,7 +49,7 @@ namespace Vha.Chat.UI
             this._characters.SelectedIndex = 0;
             foreach (OptionsAccount account in context.Options.Accounts)
             {
-                if (account.Account == context.Account)
+                if (account.Name == context.Account)
                 {
                     // Check if the last used dimension matches
                     if (account.Dimension != context.Dimension)

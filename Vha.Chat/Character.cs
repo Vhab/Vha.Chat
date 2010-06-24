@@ -27,10 +27,10 @@ namespace Vha.Chat
     {
         public readonly string Name;
         public readonly UInt32 ID;
-        public readonly UInt32 Level;
+        public readonly int Level;
         public readonly bool Online;
 
-        public Character(string name, UInt32 id, UInt32 level, bool online)
+        public Character(string name, UInt32 id, int level, bool online)
         {
             this.Name = name;
             this.ID = id;

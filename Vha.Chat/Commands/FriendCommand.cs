@@ -29,17 +29,20 @@ namespace Vha.Chat.Commands
             if (!context.Input.CheckArguments(trigger, args.Length, 2, true)) return false;
             if (args[0].ToLower() == "add")
             {
-                if (!context.Input.CheckUser(args[1])) return false;
+                if (!context.Input.CheckUser(args[1], true)) return false;
                 context.Chat.SendFriendAdd(args[1]);
+                return true;
             }
             else if (args[0].ToLower() == "remove")
             {
-                if (!context.Input.CheckUser(args[1])) return false;
+                if (!context.Input.CheckUser(args[1], true)) return false;
                 context.Chat.SendFriendRemove(args[1]);
+                return true;
             }
             else
             {
                 context.Write(MessageClass.Error, "Expecting either 'add' or 'remove' as first argument for this command");
+                return false;
             }
         }
 

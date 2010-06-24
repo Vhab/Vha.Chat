@@ -48,7 +48,7 @@ namespace Vha.Chat.UI
 
         protected Queue<string> _lines = new Queue<string>();
 
-        public ChatForm(Net.Chat chat)
+        public ChatForm(Context context)
         {
             InitializeComponent();
 
@@ -547,10 +547,10 @@ namespace Vha.Chat.UI
         private void _connect_Click(object sender, EventArgs e)
         {
             // Return to authorization window
-            Program.Application.MainForm = new AuthenticationForm();
+            Program.ApplicationContext.MainForm = new AuthenticationForm();
             // Close this window before showing auth window
             this.Close();
-            Program.Application.MainForm.Show();
+            Program.ApplicationContext.MainForm.Show();
         }
 
         private void _disconnect_Click(object sender, EventArgs e)

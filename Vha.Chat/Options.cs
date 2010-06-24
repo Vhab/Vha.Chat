@@ -70,36 +70,70 @@ namespace Vha.Chat
             set { this._options.LastAccount = value; this.Touch(); }
         }
 
-        public OptionsWindow GetWindow(string name) { return GetForm(name, false); }
+        public OptionsWindow[] Windows
+        {
+            get
+            {
+                List<OptionsWindow> windows = new List<OptionsWindow>();
+                lock (this._options.Windows)
+                {
+                    foreach (OptionsV1Window window in this._options.Windows)
+                        windows.Add(new OptionsWindow(this, window));
+                }
+                return windows.ToArray();
+            }
+        }
+
+        public OptionsWindow GetWindow(string name) { return this.GetWindow(name, false); }
         public OptionsWindow GetWindow(string name, bool create)
         {
-            foreach (OptionsV1Window window in this._options.Windows)
-                if (window.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))
-                    return new OptionsWindow(this, window);
-            if (create)
+            lock (this._options.Windows)
             {
-                this.Touch();
-                OptionsV1Window window = new OptionsV1Window();
-                window.Name = name;
-                this._options.Windows.Add(window);
-                return new OptionsWindow(this, window);
+                foreach (OptionsV1Window window in this._options.Windows)
+                    if (window.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))
+                        return new OptionsWindow(this, window);
+                if (create)
+                {
+                    this.Touch();
+                    OptionsV1Window window = new OptionsV1Window();
+                    window.Name = name;
+                    this._options.Windows.Add(window);
+                    return new OptionsWindow(this, window);
+                }
             }
             return null;
         }
 
-        public OptionsAccount GetAccount(string name) { return GetAccount(name, false); }
+        public OptionsAccount[] Accounts
+        {
+            get
+            {
+                List<OptionsAccount> accounts = new List<OptionsAccount>();
+                lock (this._options.Accounts)
+                {
+                    foreach (OptionsV1Account account in this._options.Accounts)
+                        accounts.Add(new OptionsAccount(this, account));
+                }
+                return accounts.ToArray();
+            }
+        }
+
+        public OptionsAccount GetAccount(string name) { return this.GetAccount(name, false); }
         public OptionsAccount GetAccount(string name, bool create)
         {
-            foreach (OptionsV1Account account in this._options.Accounts)
-                if (account.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))
-                    return new OptionsAccount(this, account);
-            if (create)
+            lock (this._options.Accounts)
             {
-                this.Touch();
-                OptionsV1Account account = new OptionsAccount();
-                account.Name = name;
-                this._options.Accounts.Add(account);
-                return new OptionsAccount(this, account);
+                foreach (OptionsV1Account account in this._options.Accounts)
+                    if (account.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))
+                        return new OptionsAccount(this, account);
+                if (create)
+                {
+                    this.Touch();
+                    OptionsV1Account account = new OptionsV1Account();
+                    account.Name = name;
+                    this._options.Accounts.Add(account);
+                    return new OptionsAccount(this, account);
+                }
             }
             return null;
         }
@@ -246,7 +280,7 @@ namespace Vha.Chat
         }
 
         #region Internal
-        internal OptionsWindow(OptionsV1Window window)
+        internal OptionsWindow(Options parent, OptionsV1Window window)
         {
             if (parent == null) throw new ArgumentNullException("parent");
             if (window == null) throw new ArgumentNullException("window");

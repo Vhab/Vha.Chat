@@ -52,15 +52,15 @@ namespace Vha.Chat.UI
                 this._server.Items.Add(dimension);
                 if (this._server.Items.Count == 1)
                     this._server.SelectedIndex = 0; // Make sure we always select the first one, so that if we don't find the last used server, at least some server is selected.
-                else if (dimension.Name == this._context.Options.Dimension)
+                else if (dimension.Name == this._context.Options.LastDimension)
                     this._server.SelectedIndex = this._server.Items.Count - 1; // this works because count starts at 1 and index starts at 0.
             }
 
             // Add accounts (sorted alphabetically)
-            this._account.Text = this._context.Options.Account;
+            this._account.Text = this._context.Options.LastAccount;
             List<string> accounts = new List<string>();
-            foreach (ConfigAccount acc in this._context.Options.Accounts)
-                accounts.Add(acc.Account);
+            foreach (OptionsAccount acc in this._context.Options.Accounts)
+                accounts.Add(acc.Name);
             accounts.Sort();
             foreach (string acc in accounts)
                 this._account.Items.Add(acc);
@@ -127,7 +127,7 @@ namespace Vha.Chat.UI
                 return;
             }
             // Early out
-            if (e.CharacterList.Length == 0)
+            if (args.Characters.Length == 0)
                 return;
             if (this._status == null)
                 return;
@@ -181,9 +181,9 @@ namespace Vha.Chat.UI
                     }
                     // Display main form
                     this.Hide();
-                    Program.Application.MainForm = new ChatForm(context);
+                    Program.ApplicationContext.MainForm = new ChatForm(context);
                     this.Close();
-                    Program.Application.MainForm.Show();
+                    Program.ApplicationContext.MainForm.Show();
                     break;
                 case ContextState.Disconnected:
                     // Likely already showing an error message, let's not do anything

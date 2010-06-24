@@ -33,7 +33,7 @@ namespace Vha.Chat.Commands
                 context.Write(MessageClass.Error, "Helpbot is not available on this dimension");
                 return false;
             }
-            context.Input.Send(new MessageTarget(MessageType.Character, "Helpbot"), "whois " + args[0]);
+            context.Input.Send(new MessageTarget(MessageType.Character, "Helpbot"), "whois " + args[0], false);
             return true;
         }
 

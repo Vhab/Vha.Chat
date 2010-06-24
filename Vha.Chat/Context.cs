@@ -24,6 +24,7 @@ using Vha.Net;
 using Vha.Net.Events;
 using Vha.Chat.Events;
 using Vha.Chat.Commands;
+using Vha.Common;
 
 namespace Vha.Chat
 {
@@ -115,7 +116,14 @@ namespace Vha.Chat
         #endregion
 
         #region Attributes
-        public ContextState State { get { return this._state; } }
+        public ContextState State
+        {
+            get
+            {
+                // All state changing operations lock 'this'
+                lock (this) return this._state;
+            }
+        }
         /// <summary>
         /// Returns the current dimension.
         /// Will throw an error if the current state is Disconnected.
@@ -197,59 +205,56 @@ namespace Vha.Chat
         /// <param name="password"></param>
         public void Connect(string dimension, string account, string password)
         {
-            // Check state
-            if (this.State != ContextState.Disconnected)
+            lock (this)
             {
-                if (this.ErrorEvent != null)
-                    this.ErrorEvent(this, new ErrorEventArgs(
-                        ErrorType.Login,
-                        "Unexpected call to Context.Connect while in state " + this.State.ToString()));
-                return;
+                // Check state
+                if (this.State != ContextState.Disconnected)
+                    throw new InvalidOperationException("Not expecting a call to Context.Connect");
+                // Obtain dimension information
+                Dimension dim = this.Configuration.GetDimension(dimension);
+                if (dim == null)
+                {
+                    if (this.ErrorEvent != null)
+                        this.ErrorEvent(this, new ErrorEventArgs(
+                            ErrorType.Login,
+                            "Attempting to connect to invalid dimension: '" + dimension + "'"));
+                    return;
+                }
+
+                // Create chat connection
+                this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password);
+                // Set initial settings
+                this._chat.AutoReconnect = false;
+                this._chat.IgnoreCharacterLoggedIn = true;
+                this._chat.UseThreadPool = false;
+                this._chat.Tag = this;
+
+                // Hook events (including exceptions)
+                // - State changes and more
+                this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+                this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
+                this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
+                // - Friends
+                this._chat.FriendStatusEvent += new FriendStatusEventHandler(_chat_FriendStatusEvent);
+                this._chat.FriendRemovedEvent += new FriendRemovedEventHandler(_chat_FriendRemovedEvent);
+                // - Channels
+                this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
+                this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
+                this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(_chat_ChannelJoinEvent);
+                // - Messages
+                this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(_chat_PrivateMessageEvent);
+                this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);
+                this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
+                this._chat.SystemMessageEvent += new SystemMessageEventHandler(_chat_SystemMessageEvent);
+                this._chat.SimpleMessageEvent += new SimpleMessageEventHandler(_chat_SimpleMessageEvent);
+
+                // Store values
+                this._account = account.ToLower();
+                this._dimension = dim.Name;
+
+                // Connect async
+                this._chat.Connect(true);
             }
-            // Obtain dimension information
-            Dimension dim = this.Configuration.GetDimension(dimension);
-            if (dim == null)
-            {
-                if (this.ErrorEvent != null)
-                    this.ErrorEvent(this, new ErrorEventArgs(
-                        ErrorType.Login,
-                        "Attempting to connect to invalid dimension: '" + dimension + "'"));
-                return;
-            }
-
-            // Create chat connection
-            this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password);
-            // Set initial settings
-            this._chat.AutoReconnect = false;
-            this._chat.IgnoreCharacterLoggedIn = true;
-            this._chat.UseThreadPool = false;
-            this._chat.Tag = this;
-
-            // Hook events (including exceptions)
-            // - State changes and more
-            this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
-            this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
-            this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
-            // - Friends
-            this._chat.FriendStatusEvent += new FriendStatusEventHandler(_chat_FriendStatusEvent);
-            this._chat.FriendRemovedEvent += new FriendRemovedEventHandler(_chat_FriendRemovedEvent);
-            // - Channels
-            this._chat.PrivateChannelRequestEvent += new PrivateChannelRequestEventHandler(_chat_PrivateChannelRequestEvent);
-            this._chat.PrivateChannelStatusEvent += new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent);
-            this._chat.ChannelJoinEvent += new ChannelJoinEventHandler(_chat_ChannelJoinEvent);
-            // - Messages
-            this._chat.PrivateMessageEvent += new PrivateMessageEventHandler(_chat_PrivateMessageEvent);
-            this._chat.ChannelMessageEvent += new ChannelMessageEventHandler(_chat_ChannelMessageEvent);
-            this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
-            this._chat.SystemMessageEvent += new SystemMessageEventHandler(_chat_SystemMessageEvent);
-            this._chat.SimpleMessageEvent += new SimpleMessageEventHandler(_chat_SimpleMessageEvent);
-
-            // Store values
-            this._account = account.ToLower();
-            this._dimension = dim.Name;
-
-            // Connect async
-            this._chat.Connect(true);
         }
 
         /// <summary>
@@ -257,7 +262,16 @@ namespace Vha.Chat
         /// </summary>
         public void Disconnect()
         {
-
+            lock (this)
+            {
+                if (this.State == ContextState.Disconnected)
+                    throw new InvalidOperationException("Not expecting a call to Context.Disconnect");
+                if (!this._disconnecting)
+                {
+                    this._chat.Disconnect(true);
+                    this._disconnecting = true;
+                }
+            }
         }
         #endregion
 
@@ -267,56 +281,122 @@ namespace Vha.Chat
         /// </summary>
         /// <param name="channel">The full channel name (case-insensitive)</param>
         /// <returns>true if the given channel is known, false if not</returns>
-        public bool HasChannel(string channel);
+        public bool HasChannel(string channel)
+        {
+            lock (this._channels)
+            {
+                return this._channels.ContainsKey(channel.ToLower());
+            }
+        }
         /// <summary>
         /// Returns information about a channel by name
         /// </summary>
         /// <param name="channel">The full channel name (case-insensitive)</param>
         /// <returns>An instance of Channel or null on failure</returns>
-        public Channel GetChannel(string channel);
+        public Channel GetChannel(string channel)
+        {
+            channel = channel.ToLower();
+            lock (this._channels)
+            {
+                if (!this._channels.ContainsKey(channel))
+                    return null;
+                return this._channels[channel];
+            }
+        }
         /// <summary>
         /// Returns an appropriate MessageClass for the given channel
         /// </summary>
         /// <param name="channel">The full channel name (case-insensitive)</param>
-        /// <returns>The appropriate class for the channel</returns>
-        public MessageClass GetChannelClass(string channel);
+        /// <returns>The appropriate class for the channel or None on failure</returns>
+        public MessageClass GetChannelClass(string channel)
+        {
+            Channel c = this.GetChannel(channel);
+            if (c == null) return MessageClass.None;
+            string type = c.Type.ToString();
+            MessageClass messageClass = (MessageClass)Enum.Parse(typeof(MessageClass), type, true);
+            if (!Enum.IsDefined(typeof(MessageClass), messageClass)) return MessageClass.None;
+            return messageClass;
+        }
         /// <summary>
         /// Whether this context contains the given user as friend
         /// </summary>
         /// <param name="friend">The name of the user (case-insensitive)</param>
         /// <returns>true if the given user is a friend, false if not</returns>
-        public bool HasFriend(string user);
+        public bool HasFriend(string user)
+        {
+            user = Format.UppercaseFirst(user);
+            lock (this._friends)
+            {
+                return this._friends.ContainsKey(user);
+            }
+        }
         /// <summary>
         /// Returns information about a friend by name
         /// </summary>
         /// <param name="user">The name of the user (case-insensitive)</param>
         /// <returns>An isntance of Friend or null on failure</returns>
-        public Friend GetFriend(string user);
+        public Friend GetFriend(string user)
+        {
+            user = Format.UppercaseFirst(user);
+            lock (this._friends)
+            {
+                if (!this._friends.ContainsKey(user))
+                    return null;
+                return this._friends[user];
+            }
+        }
         /// <summary>
         /// Whether this context contains the given private channel
         /// </summary>
         /// <param name="channel"></param>
         /// <returns></returns>
-        public bool HasPrivateChannel(string channel);
+        public bool HasPrivateChannel(string channel)
+        {
+            channel = Format.UppercaseFirst(channel);
+            lock (this._privateChannels)
+            {
+                return this._privateChannels.ContainsKey(channel);
+            }
+        }
         /// <summary>
         /// Returns information about a private channel by name
         /// </summary>
         /// <param name="channel"></param>
         /// <returns></returns>
-        public PrivateChannel GetPrivateChannel(string channel);
+        public PrivateChannel GetPrivateChannel(string channel)
+        {
+            channel = Format.UppercaseFirst(channel);
+            lock (this._privateChannels)
+            {
+                if (!this._privateChannels.ContainsKey(channel))
+                    return null;
+                return this._privateChannels[channel];
+            }
+        }
         /// <summary>
         /// Write output to one of the listening output targets
         /// </summary>
         /// <param name="source">Describes the origin/target of the message</param>
         /// <param name="messageClass">Describes the class of the message</param>
         /// <param name="message">The message itself</param>
-        public void Write(MessageSource source, MessageClass messageClass, string message);
+        public void Write(MessageSource source, MessageClass messageClass, string message)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            MessageEventArgs args = new MessageEventArgs(source, messageClass, message);
+            if (this.MessageEvent != null)
+                this.MessageEvent(this, args);
+        }
         /// <summary>
         /// Write output to one of the listening output targets
         /// </summary>
         /// <param name="messageClass">Describes the class of the message</param>
         /// <param name="message">The message itself</param>
-        public void Write(MessageClass messageClass, string message);
+        public void Write(MessageClass messageClass, string message)
+        {
+            MessageSource source = new MessageSource();
+            Write(source, messageClass, message);
+        }
         #endregion
 
         #region Internal
@@ -331,23 +411,30 @@ namespace Vha.Chat
         private string _organization = null;
         private UInt32 _organizationId = 0;
         private ContextState _state = ContextState.Disconnected;
+        private bool _disconnecting = false;
 
         private Dictionary<string, Channel> _channels;
         private Dictionary<string, Friend> _friends;
+        private Dictionary<string, PrivateChannel> _privateChannels;
 
         internal Context()
         {
             // Read initial configuration
-            Base configuration = Base.Load("Configuration.xml");
+            Data.Base configuration = Data.Base.Load("Configuration.xml");
             if (configuration == null) configuration = new Data.ConfigurationV1();
             while (configuration.CanUpgrade) configuration = configuration.Upgrade();
             this._configuration = new Configuration(configuration);
 
             // Read options
-            Base options = Base.Load(this.Configuration.OptionsPath + this.Configuration.OptionsFile);
+            Data.Base options = Data.Base.Load(this.Configuration.OptionsPath + this.Configuration.OptionsFile);
             if (options == null) options = new Data.OptionsV1();
             while (options.CanUpgrade) options = options.Upgrade();
-            this._options = new Options(options);
+            this._options = new Options(this, options);
+
+            // Initialize objects
+            this._channels = new Dictionary<string, Channel>();
+            this._friends = new Dictionary<string, Friend>();
+            this._privateChannels = new Dictionary<string, PrivateChannel>();
 
             // Create input
             this._input = new Input(this, "/");
@@ -372,7 +459,7 @@ namespace Vha.Chat
         void _chat_LoginCharlistEvent(Vha.Net.Chat chat, LoginChararacterListEventArgs e)
         {
             // Create event arguments
-            List<Character> characters = new List<string>();
+            List<Character> characters = new List<Character>();
             Dictionary<Character, LoginCharacter> charactersMap = new Dictionary<Character, LoginCharacter>();
             foreach (LoginCharacter c in e.CharacterList)
             {
@@ -406,56 +493,60 @@ namespace Vha.Chat
 
         void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
         {
-            // Translate state
-            ContextState state = this._state;
-            switch (e.State)
+            lock (this)
             {
-                case ChatState.CharacterSelect:
-                case ChatState.Connecting:
-                case ChatState.Login:
-                    state = ContextState.Connecting;
-                    break;
-                case ChatState.Connected:
-                    state = ContextState.Connected;
-                    break;
-                case ChatState.Disconnected:
-                case ChatState.Error:
-                    state = ContextState.Disconnected;
-                    break;
-                case ChatState.Reconnecting:
-                    state = ContextState.Reconnecting;
-                    break;
+                // Translate state
+                ContextState state = this._state;
+                switch (e.State)
+                {
+                    case ChatState.CharacterSelect:
+                    case ChatState.Connecting:
+                    case ChatState.Login:
+                        state = ContextState.Connecting;
+                        break;
+                    case ChatState.Connected:
+                        state = ContextState.Connected;
+                        break;
+                    case ChatState.Disconnected:
+                    case ChatState.Error:
+                        state = ContextState.Disconnected;
+                        this._disconnecting = false;
+                        break;
+                    case ChatState.Reconnecting:
+                        state = ContextState.Reconnecting;
+                        break;
+                }
+                if (this._state == state) return;
+                // Handle state change
+                switch (state)
+                {
+                    case ContextState.Connecting:
+                        // Nothing in particular here :)
+                        break;
+                    case ContextState.CharacterSelection:
+                        this._ignore = new Ignore(this);
+                        break;
+                    case ContextState.Connected:
+                        break;
+                    case ContextState.Reconnecting:
+                        this._organization = null;
+                        break;
+                    case ContextState.Disconnected:
+                        this._chat.ClearEvents();
+                        this._chat = null;
+                        this._dimension = null;
+                        this._account = null;
+                        this._character = null;
+                        this._organization = null;
+                        this._organizationId = 0;
+                        this._friends.Clear();
+                        this._channels.Clear();
+                        this._ignore = null;
+                        break;
+                }
+                // Notify state change
+                this._state = state;
             }
-            if (this._state == state) return;
-            // Handle state change
-            switch (state)
-            {
-                case ContextState.Connecting:
-                    // Nothing in particular here :)
-                    break;
-                case ContextState.CharacterSelection:
-                    this._ignore = new Ignore(this);
-                    break;
-                case ContextState.Connected:
-                    break;
-                case ContextState.Reconnecting:
-                    this._organization = null;
-                    break;
-                case ContextState.Disconnected:
-                    this._chat.ClearEvents();
-                    this._chat = null;
-                    this._dimension = null;
-                    this._account = null;
-                    this._character = null;
-                    this._organization = null;
-                    this._organizationId = 0;
-                    this._friends.Clear();
-                    this._channels.Clear();
-                    this._ignore = null;
-                    break;
-            }
-            // Notify state change
-            this._state = state;
             if (this.StateEvent != null)
                 this.StateEvent(this, this._state);
         }
@@ -492,7 +583,7 @@ namespace Vha.Chat
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.PrivateChannel, e.Channel, e.Character);
-            this.Write(source, MessageClass.PG, message);
+            this.Write(source, MessageClass.PG, e.Message);
         }
 
         void _chat_ChannelMessageEvent(Vha.Net.Chat chat, ChannelMessageEventArgs e)
@@ -525,7 +616,7 @@ namespace Vha.Chat
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.Character, null, e.Character);
-            this.Write(source, MessageClass.PM, message);
+            this.Write(source, MessageClass.PM, e.Message);
         }
 
         void _chat_SystemMessageEvent(Vha.Net.Chat chat, SystemMessageEventArgs e)

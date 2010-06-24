@@ -28,7 +28,7 @@ namespace Vha.Chat.Commands
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             string channel = string.Join(" ", args, 1, args.Length - 1);
-            if (!context.Input.CheckChannel(channel)) return false;
+            if (!context.Input.CheckChannel(channel, true)) return false;
             context.Chat.SendChannelMute(channel, false);
             return true;
         }

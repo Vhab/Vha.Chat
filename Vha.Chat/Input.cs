@@ -110,7 +110,7 @@ namespace Vha.Chat
         public bool Send(MessageTarget target, string message, bool allowCommands)
         {
             if (target == null)
-                throw ArgumentNullException("target");
+                throw new ArgumentNullException("target");
             // Check for empty messages
             if (message.Trim().Length == 0)
             {
@@ -157,40 +157,36 @@ namespace Vha.Chat
             string trigger = args[0].ToLower();
             args.RemoveAt(0);
             // Check if the trigger exists
-            Command c = null;
-            lock (this)
+            Command c = this.GetCommandByTrigger(trigger);
+            if (c == null)
             {
-                if (!this.HasTrigger(trigger))
-                {
-                    string error = string.Format(
-                        "Unknown command '{1}{0}'. Use '{1}help' for more information",
-                        trigger, this.Prefix);
-                    this._context.Write(MessageClass.Error, error);
-                    return false;
-                }
-                Command c = this.GetCommandByTrigger(trigger);
+                string error = string.Format(
+                    "Unknown command '{1}{0}'. Use '{1}help' for more information",
+                    trigger, this.Prefix);
+                this._context.Write(MessageClass.Error, error);
+                return false;
             }
             // Trigger the command
-            return c.Process(this._context, trigger, message, args);
+            return c.Process(this._context, trigger, message, args.ToArray());
         }
 
         public bool RegisterCommand(Command command)
         {
             // Check if we can safely register this command
             if (command == null)
-                throw ArgumentNullException();
+                throw new ArgumentNullException();
             lock (this)
             {
                 if (this.HasCommand(command.Name))
-                    throw ArgumentException("Duplicate command name: " + command.Name);
+                    throw new ArgumentException("Duplicate command name: " + command.Name);
                 foreach (string trigger in command.Triggers)
                 {
-                    if (HasTrigger(trigger))
+                    if (this.HasTrigger(trigger))
                     {
                         string error = string.Format(
                             "Duplicate trigger '{0}' while registering command '{1}'. Trigger is already part of '{2}'",
                             trigger, command.Name, this.GetCommandByTrigger(trigger).Name);
-                        throw ArgumentException(error);
+                        throw new ArgumentException(error);
                     }
                 }
                 // Register command
@@ -199,6 +195,7 @@ namespace Vha.Chat
                 {
                     this._triggers.Add(trigger.ToLower(), command);
                 }
+                return true;
             }
         }
 
@@ -206,9 +203,9 @@ namespace Vha.Chat
         {
             lock (this)
             {
-                if (!this.HasCommand(name))
-                    throw ArgumentException("Unknown command: " + name);
-                Command command = GetCommand(name);
+                if (!this._commands.ContainsKey(name))
+                    throw new ArgumentException("Unknown command: " + name);
+                Command command = this._commands[name];
                 foreach (string trigger in command.Triggers)
                     this._triggers.Remove(trigger.ToLower());
                 this._commands.Remove(name);
@@ -227,8 +224,8 @@ namespace Vha.Chat
         {
             lock (this)
             {
-                if (!this.HasCommand(name))
-                    throw ArgumentException("Unknown command: " + name);
+                if (!this._commands.ContainsKey(name))
+                    return null;
                 return this._commands[name];
             }
         }
@@ -246,8 +243,8 @@ namespace Vha.Chat
             string trig = trigger.ToLower();
             lock (this)
             {
-                if (!this.HasTrigger(trig))
-                    throw ArgumentException("Unknown trigger: " + trig);
+                if (!this._triggers.ContainsKey(trig))
+                    return null;
                 return this._triggers[trig];
             }
         }

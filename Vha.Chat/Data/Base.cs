@@ -60,7 +60,7 @@ namespace Vha.Chat.Data
                 string type = name + "_" + version;
                 // Load file as known type
                 stream.Seek(0, SeekOrigin.Begin);
-                Base data;
+                Base data = null;
                 switch (type)
                 {
                     case "Options_1":

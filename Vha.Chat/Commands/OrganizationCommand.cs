@@ -28,7 +28,8 @@ namespace Vha.Chat.Commands
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckOrganization(true)) return false;
-            context.Input.Send(new MessageTarget(MessageType.Channel, context.Organization), message);
+            context.Input.Send(new MessageTarget(MessageType.Channel, context.Organization), message, false);
+            return true;
         }
 
         public OrganizationCommand()

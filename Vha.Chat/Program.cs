@@ -32,7 +32,7 @@ namespace Vha.Chat
         /// <summary>
         /// Returns the main ApplicationContext to control the main form
         /// </summary>
-        public static ApplicationContext Application;
+        public static ApplicationContext ApplicationContext;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -48,9 +48,9 @@ namespace Vha.Chat
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
 #endif
             // Start application
-            Application = new ApplicationContext();
-            Application.MainForm = new AuthenticationForm(context);
-            Application.Run(Application);
+            ApplicationContext = new ApplicationContext();
+            ApplicationContext.MainForm = new AuthenticationForm(context);
+            Application.Run(ApplicationContext);
         }
 
 #if !DEBUG

@@ -41,6 +41,7 @@ namespace Vha.Chat.UI
             get { return Properties.Resources.Chat; }
         }
 
+        protected Context _context;
         protected ChatForm _form;
         protected Dictionary<string, string> _texts;
         protected int _textsIndex = 0;
@@ -49,8 +50,9 @@ namespace Vha.Chat.UI
         protected Regex _colorRegex = null;
         protected Regex _fontRegex = null;
 
-        public ChatHtml(ChatForm form)
+        public ChatHtml(Context context, ChatForm form)
         {
+            this._context = context;
             this._form = form;
             this._texts = new Dictionary<string, string>();
         }
@@ -210,7 +212,7 @@ namespace Vha.Chat.UI
             {
                 // Store text
                 this._textsIndex++;
-                if (this._textsIndex > Program.Configuration.MaximumTexts) this._textsIndex = 0;
+                if (this._textsIndex > this._context.Options.MaximumTexts) this._textsIndex = 0;
                 this._texts[this._textsIndex.ToString()] = match.Groups[2].Value;
                 // Replace link
                 string seperator = match.Groups[1].Value;
@@ -318,7 +320,7 @@ namespace Vha.Chat.UI
         
         protected void ChatCmdLink(string command)
         {
-            this._inputUtil.Command(command);
+            this._context.Input.Command(command);
         }
 
         protected void ItemRefLink(string item)
@@ -336,17 +338,17 @@ namespace Vha.Chat.UI
 
         protected void CharacterLink(string character)
         {
-            this._form.SetTarget(ChatInputType.Character, character);
+            this._form.SetTarget(MessageType.Character, character);
         }
 
         protected void ChannelLink(string channel)
         {
-            this._form.SetTarget(ChatInputType.Channel, channel);
+            this._form.SetTarget(MessageType.Channel, channel);
         }
 
         protected void PrivateChannelLink(string channel)
         {
-            this._form.SetTarget(ChatInputType.PrivateChannel, channel);
+            this._form.SetTarget(MessageType.PrivateChannel, channel);
         }
     }
 }

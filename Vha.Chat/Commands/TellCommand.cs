@@ -27,9 +27,10 @@ namespace Vha.Chat.Commands
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 2, true)) return false;
-            if (!context.Input.CheckUser(args[0])) return false;
+            if (!context.Input.CheckUser(args[0], true)) return false;
             string m = string.Join(" ", args, 1, args.Length - 1);
-            context.Input.Send(new MessageTarget(MessageType.Character, args[0]), m);
+            context.Input.Send(new MessageTarget(MessageType.Character, args[0]), m, false);
+            return true;
         }
 
         public TellCommand()

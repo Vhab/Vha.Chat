@@ -59,7 +59,7 @@ namespace Vha.Chat.Commands
         /// <param name="command">The command that triggered this callback</param>
         /// <param name="arguments">The arguments passed to the command</param>
         /// <returns>True for success, false for failure</returns>
-        public abstract bool Process(Context context, string command, string[] args);
+        public abstract bool Process(Context context, string trigger, string message, string[] args);
 
         /// <summary>
         /// Initializes a new command.

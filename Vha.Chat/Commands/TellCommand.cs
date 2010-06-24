@@ -24,12 +24,12 @@ namespace Vha.Chat.Commands
 {
     public class TellCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckArguments(command, args.Length, 2, true)) return false;
+            if (!context.Input.CheckArguments(trigger, args.Length, 2, true)) return false;
             if (!context.Input.CheckUser(args[0])) return false;
-            string message = string.Join(" ", args, 1, args.Length - 1);
-            context.Input.Send(new MessageTarget(MessageType.Character, args[0]), message);
+            string m = string.Join(" ", args, 1, args.Length - 1);
+            context.Input.Send(new MessageTarget(MessageType.Character, args[0]), m);
         }
 
         public TellCommand()

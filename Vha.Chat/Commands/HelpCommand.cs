@@ -24,7 +24,7 @@ namespace Vha.Chat.Commands
 {
     public class HelpCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
             context.Write(MessageClass.Internal, "TODO: implement help command");
             return true;

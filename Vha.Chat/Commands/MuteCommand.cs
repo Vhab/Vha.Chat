@@ -24,9 +24,9 @@ namespace Vha.Chat.Commands
 {
     public class MuteCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckArguments(command, args.Length, 1, true)) return false;
+            if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             string channel = string.Join(" ", args, 1, args.Length - 1);
             if (!context.Input.CheckChannel(channel)) return false;
             context.Chat.SendChannelMute(channel, true);

@@ -24,9 +24,9 @@ namespace Vha.Chat.Commands
 {
     public class FriendCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckArguments(command, args.Length, 2, true)) return false;
+            if (!context.Input.CheckArguments(trigger, args.Length, 2, true)) return false;
             if (args[0].ToLower() == "add")
             {
                 if (!context.Input.CheckUser(args[1])) return false;

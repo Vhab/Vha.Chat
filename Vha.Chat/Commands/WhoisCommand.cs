@@ -24,11 +24,17 @@ namespace Vha.Chat.Commands
 {
     public class WhoisCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckArguments(command, args.Length, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0])) return false;
+            if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
+            if (!context.Input.CheckUser(args[0], true)) return false;
+            if (!context.Input.CheckUser("Helpbot", false))
+            {
+                context.Write(MessageClass.Error, "Helpbot is not available on this dimension");
+                return false;
+            }
             context.Input.Send(new MessageTarget(MessageType.Character, "Helpbot"), "whois " + args[0]);
+            return true;
         }
 
         public WhoisCommand()

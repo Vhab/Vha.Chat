@@ -255,7 +255,10 @@ namespace Vha.Chat
         /// <summary>
         /// Disconnect from the chat server.
         /// </summary>
-        public void Disconnect();
+        public void Disconnect()
+        {
+
+        }
         #endregion
 
         #region 'Showtime' methods

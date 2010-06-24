@@ -24,11 +24,10 @@ namespace Vha.Chat.Commands
 {
     public class OrganizationCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckArguments(command, args.Length, 1, true)) return false;
+            if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckOrganization(true)) return false;
-            string message = string.Join(" ", args, 0, args.Length - 0);
             context.Input.Send(new MessageTarget(MessageType.Channel, context.Organization), message);
         }
 

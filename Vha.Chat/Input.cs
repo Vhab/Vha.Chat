@@ -30,27 +30,27 @@ namespace Vha.Chat
         public string Prefix { get { return this._prefix; } }
 
         #region Input sanity commands
-        public bool CheckArguments(string command, int count, int minimum, bool output)
+        public bool CheckArguments(string trigger, int count, int minimum, bool output)
         {
             if (count >= minimum) return true;
             if (output)
             {
                 string message = "";
-                Command c = this.GetCommand(command);
-                if (c == null)
+                if (this.HasTrigger(trigger))
                 {
                     // Generic response
                     this._context.Write(MessageClass.Error, "Expecting at least " + count + " arguments");
                 }
                 else
                 {
+                    Command c = this.GetCommandByTrigger(trigger);
                     // Command specific response
                     message = "Expected usage: ";
                     foreach (string usage in c.Usage)
                         message += "\n" + this.Prefix + usage;
                     this._context.Write(MessageClass.Error, message);
                 }
-                message = string.Format("Use '{0}help {1}' for more information", this.Prefix, command);
+                message = string.Format("Use '{0}help {1}' for more information", this.Prefix, trigger);
                 this._context.Write(MessageClass.Error, message);
             }
             return false;
@@ -107,17 +107,151 @@ namespace Vha.Chat
         #endregion
 
         #region Commands for sending message or command input
-        public void Send(MessageTarget target, string message, bool allowCommands);
+        public bool Send(MessageTarget target, string message, bool allowCommands)
+        {
+            if (target == null)
+                throw ArgumentNullException("target");
+            // Check for empty messages
+            if (message.Trim().Length == 0)
+            {
+                this._context.Write(MessageClass.Error, "Can't send an empty message");
+                return false;
+            }
+            // Check for commands
+            if (message.StartsWith(this.Prefix) && allowCommands)
+            {
+                return this.Command(message);
+            }
+            // Handle sending
+            switch (target.Type)
+            {
+                case MessageType.Character:
+                    if (!this.CheckUser(target.Target, true)) return false;
+                    this._context.Chat.SendPrivateMessage(target.Target, message);
+                    break;
+                case MessageType.Channel:
+                    if (!this.CheckChannel(target.Target, true)) return false;
+                    this._context.Chat.SendChannelMessage(target.Target, message);
+                    break;
+                case MessageType.PrivateChannel:
+                    if (!this.CheckPrivateChannel(target.Target, true)) return false;
+                    this._context.Chat.SendPrivateChannelMessage(target.Target, message);
+                    break;
+                case MessageType.None:
+                    this._context.Write(MessageClass.Text, message);
+                    break;
+            }
+            return true;
+        }
 
-        public void Command(string command);
+        public bool Command(string command)
+        {
+            // Clean up the command
+            command = command.TrimEnd();
+            if (command.Length == 0) return false;
+            if (command.StartsWith(this.Prefix))
+                command = command.Substring(1);
+            // Break up the command
+            List<string> args = new List<string>(command.Split(' '));
+            string message = command.Substring(args[0].Length + 1);
+            string trigger = args[0].ToLower();
+            args.RemoveAt(0);
+            // Check if the trigger exists
+            Command c = null;
+            lock (this)
+            {
+                if (!this.HasTrigger(trigger))
+                {
+                    string error = string.Format(
+                        "Unknown command '{1}{0}'. Use '{1}help' for more information",
+                        trigger, this.Prefix);
+                    this._context.Write(MessageClass.Error, error);
+                    return false;
+                }
+                Command c = this.GetCommandByTrigger(trigger);
+            }
+            // Trigger the command
+            return c.Process(this._context, trigger, message, args);
+        }
 
-        public bool RegisterCommand(Command command);
+        public bool RegisterCommand(Command command)
+        {
+            // Check if we can safely register this command
+            if (command == null)
+                throw ArgumentNullException();
+            lock (this)
+            {
+                if (this.HasCommand(command.Name))
+                    throw ArgumentException("Duplicate command name: " + command.Name);
+                foreach (string trigger in command.Triggers)
+                {
+                    if (HasTrigger(trigger))
+                    {
+                        string error = string.Format(
+                            "Duplicate trigger '{0}' while registering command '{1}'. Trigger is already part of '{2}'",
+                            trigger, command.Name, this.GetCommandByTrigger(trigger).Name);
+                        throw ArgumentException(error);
+                    }
+                }
+                // Register command
+                this._commands.Add(command.Name, command);
+                foreach (string trigger in command.Triggers)
+                {
+                    this._triggers.Add(trigger.ToLower(), command);
+                }
+            }
+        }
 
-        public void UnregisterCommand(string name);
+        public void UnregisterCommand(string name)
+        {
+            lock (this)
+            {
+                if (!this.HasCommand(name))
+                    throw ArgumentException("Unknown command: " + name);
+                Command command = GetCommand(name);
+                foreach (string trigger in command.Triggers)
+                    this._triggers.Remove(trigger.ToLower());
+                this._commands.Remove(name);
+            }
+        }
 
-        public bool HasCommand(string command);
+        public bool HasCommand(string name)
+        {
+            lock (this)
+            {
+                return this._commands.ContainsKey(name);
+            }
+        }
 
-        public Command GetCommand(string command);
+        public Command GetCommand(string name)
+        {
+            lock (this)
+            {
+                if (!this.HasCommand(name))
+                    throw ArgumentException("Unknown command: " + name);
+                return this._commands[name];
+            }
+        }
+
+        public bool HasTrigger(string trigger)
+        {
+            lock (this)
+            {
+                return this._triggers.ContainsKey(trigger.ToLower());
+            }
+        }
+
+        public Command GetCommandByTrigger(string trigger)
+        {
+            string trig = trigger.ToLower();
+            lock (this)
+            {
+                if (!this.HasTrigger(trig))
+                    throw ArgumentException("Unknown trigger: " + trig);
+                return this._triggers[trig];
+            }
+        }
+
         #endregion
 
         #region Internal
@@ -125,10 +259,14 @@ namespace Vha.Chat
         {
             this._context = context;
             this._prefix = prefix;
+            this._commands = new Dictionary<string, Command>();
+            this._triggers = new Dictionary<string, Command>();
         }
 
         private Context _context;
         private string _prefix;
+        private Dictionary<string, Command> _commands;
+        private Dictionary<string, Command> _triggers;
         #endregion
     }
 }

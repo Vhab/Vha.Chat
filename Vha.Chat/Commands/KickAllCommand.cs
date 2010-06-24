@@ -24,7 +24,7 @@ namespace Vha.Chat.Commands
 {
     public class KickAllCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
             if (!context.Input.CheckConnection()) return false;
             context.Chat.SendPrivateChannelKickAll();

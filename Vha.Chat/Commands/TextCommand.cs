@@ -24,9 +24,9 @@ namespace Vha.Chat.Commands
 {
     public class TextCommand : Command
     {
-        public override bool Process(Context context, string command, string[] args)
+        public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckArguments(command, args.Length, 1, true)) return false;
+            if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             string message = string.Join(" ", args, 0, args.Length);
             context.Write(MessageClass.Internal, message);
             return true;
@@ -35,7 +35,7 @@ namespace Vha.Chat.Commands
         public TextCommand()
             : base(
                 "Print text", // Name
-                new string[] { "text" }, // Triggers
+                new string[] { "text", "echo" }, // Triggers
                 new string[] { "text [text]" }, // Usage
                 new string[] { "text Ping? Pong!" }, // Examples
                 // Description

@@ -40,7 +40,7 @@ namespace Vha.Chat.Commands
                 new string[] { "ignore Vhab" }, // Examples
                 // Description
                 "The ignore command allows you to prevent users from sending messages to you.\n" +
-                "Once a user has been put on ignore, he/she no longer is able to contact you in any way through the chat server."
+                "Once a user has been put on ignore, (s)he no longer is able to contact you in any way through the chat server."
             )
         { }
     }

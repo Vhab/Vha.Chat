@@ -30,6 +30,18 @@ namespace Vha.Chat
     /// </summary>
     public class Options
     {
+        /// <summary>
+        /// Triggered when a setting is modified.
+        /// Be advised this event can be triggered quite often and multiple times after each other.
+        /// Only use this when you absolutely need to.
+        /// </summary>
+        public event Handler<Options> ModifiedEvent;
+        /// <summary>
+        /// Triggered when the current set of options are saved to disk.
+        /// Also triggered when the options are changed (thus saved) from an outside application.
+        /// </summary>
+        public event Handler<Options> SavedEvent;
+
         public int MaximumMessages
         {
             get { return this._options.MaximumMessages; }
@@ -75,7 +87,7 @@ namespace Vha.Chat
             get
             {
                 List<OptionsWindow> windows = new List<OptionsWindow>();
-                lock (this._options.Windows)
+                lock (this)
                 {
                     foreach (OptionsV1Window window in this._options.Windows)
                         windows.Add(new OptionsWindow(this, window));
@@ -87,7 +99,7 @@ namespace Vha.Chat
         public OptionsWindow GetWindow(string name) { return this.GetWindow(name, false); }
         public OptionsWindow GetWindow(string name, bool create)
         {
-            lock (this._options.Windows)
+            lock (this)
             {
                 foreach (OptionsV1Window window in this._options.Windows)
                     if (window.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))
@@ -109,7 +121,7 @@ namespace Vha.Chat
             get
             {
                 List<OptionsAccount> accounts = new List<OptionsAccount>();
-                lock (this._options.Accounts)
+                lock (this)
                 {
                     foreach (OptionsV1Account account in this._options.Accounts)
                         accounts.Add(new OptionsAccount(this, account));
@@ -121,7 +133,7 @@ namespace Vha.Chat
         public OptionsAccount GetAccount(string name) { return this.GetAccount(name, false); }
         public OptionsAccount GetAccount(string name, bool create)
         {
-            lock (this._options.Accounts)
+            lock (this)
             {
                 foreach (OptionsV1Account account in this._options.Accounts)
                     if (account.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))
@@ -146,6 +158,8 @@ namespace Vha.Chat
         public void Touch()
         {
             this._modified = true;
+            if (this.ModifiedEvent != null)
+                this.ModifiedEvent(this._context, this);
         }
 
         public void Save()
@@ -157,6 +171,8 @@ namespace Vha.Chat
                   this._context.Configuration.OptionsFile);
                 this._modified = false;
             }
+            if (this.SavedEvent != null)
+                this.SavedEvent(this._context, this);
         }
 
         #region Internal

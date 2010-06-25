@@ -49,7 +49,7 @@ namespace Vha.Chat
         /// <summary>
         /// Returns the toolset to manage the users on the ignore list
         /// </summary>
-        public Ignore Ignore { get { return this._ignore; } }
+        public Ignores Ignores { get { return this._ignores; } }
         /// <summary>
         /// Returns direct access to the chat instance
         /// </summary>
@@ -423,7 +423,7 @@ namespace Vha.Chat
         private Configuration _configuration;
         private Options _options;
         private Input _input = null;
-        private Ignore _ignore = null;
+        private Ignores _ignores = null;
         private Net.Chat _chat = null;
         private string _dimension = null;
         private string _account = null;
@@ -457,7 +457,7 @@ namespace Vha.Chat
             this._friends = new Dictionary<string, Friend>();
             this._privateChannels = new Dictionary<string, PrivateChannel>();
             this._guests = new List<string>();
-            this._ignore = new Ignore(this);
+            this._ignores = new Ignores(this);
 
             // Create input
             this._input = new Input(this, "/");
@@ -481,43 +481,47 @@ namespace Vha.Chat
         #region Chat callbacks
         void _chat_LoginCharlistEvent(Vha.Net.Chat chat, LoginChararacterListEventArgs e)
         {
-            // Create event arguments
-            List<Character> characters = new List<Character>();
-            Dictionary<Character, LoginCharacter> charactersMap = new Dictionary<Character, LoginCharacter>();
-            foreach (LoginCharacter c in e.CharacterList)
+            // Only fire the character selection event when no character has been pre-selected
+            if (string.IsNullOrEmpty(chat.Character))
             {
-                Character character = new Character(c.Name, c.ID, c.Level, c.IsOnline);
-                characters.Add(character);
-                charactersMap.Add(character, c);
-            }
-            SelectCharacterEventArgs args = new SelectCharacterEventArgs(characters.ToArray());
-            // Fire event
-            if (this.SelectCharacterEvent != null)
-                this.SelectCharacterEvent(this, args);
-            // Login
-            if (args.Character != null && charactersMap.ContainsKey(args.Character))
-            {
-                this._character = args.Character.Name;
-                this._chat.SendLoginCharacter(charactersMap[args.Character]);
-                
-                // Mark as 'recently used'
-                OptionsAccount acc = this.Options.GetAccount(this.Account, true);
-                acc.Name = this.Options.LastAccount = this._account;
-                acc.Dimension = this.Options.LastDimension = this._dimension;
-                acc.Character = this._character;
-                this.Options.Save();
+                // Create event arguments
+                List<Character> characters = new List<Character>();
+                Dictionary<Character, LoginCharacter> charactersMap = new Dictionary<Character, LoginCharacter>();
+                foreach (LoginCharacter c in e.CharacterList)
+                {
+                    Character character = new Character(c.Name, c.ID, c.Level, c.IsOnline);
+                    characters.Add(character);
+                    charactersMap.Add(character, c);
+                }
+                SelectCharacterEventArgs args = new SelectCharacterEventArgs(characters.ToArray());
+                // Fire event
+                if (this.SelectCharacterEvent != null)
+                    this.SelectCharacterEvent(this, args);
+                // Login
+                if (args.Character != null && charactersMap.ContainsKey(args.Character))
+                {
+                    this._character = args.Character.Name;
+                    this._chat.SendLoginCharacter(charactersMap[args.Character]);
 
-                // Dispatch state change event
-                ContextState previousState = this._state;
-                this._state = ContextState.CharacterSelection;
-                if (this.StateEvent != null)
-                    this.StateEvent(this, new StateEventArgs(this._state, previousState));
+                    // Mark as 'recently used'
+                    OptionsAccount acc = this.Options.GetAccount(this.Account, true);
+                    acc.Name = this.Options.LastAccount = this._account;
+                    acc.Dimension = this.Options.LastDimension = this._dimension;
+                    acc.Character = this._character;
+                    this.Options.Save();
+                }
+                else
+                {
+                    // If no character was selected, there's no reason to remain connected
+                    this._chat.Disconnect(true);
+                    return;
+                }
             }
-            else
-            {
-                // If no character was selected, there's no reason to remain connected
-                this._chat.Disconnect(true);
-            }
+            // Dispatch state change event
+            ContextState previousState = this._state;
+            this._state = ContextState.CharacterSelection;
+            if (this.StateEvent != null)
+                this.StateEvent(this, new StateEventArgs(this._state, previousState));
         }
 
         void _chat_LoginErrorEvent(Vha.Net.Chat chat, LoginErrorEventArgs e)
@@ -535,6 +539,8 @@ namespace Vha.Chat
             // Update state
             ContextState previousState = this._state;
             this._state = ContextState.Connected;
+            // This tastes like more
+            this._chat.AutoReconnect = true;
             // Notify state change
             if (this.StateEvent != null)
                 this.StateEvent(this, new StateEventArgs(this._state, previousState));
@@ -572,23 +578,23 @@ namespace Vha.Chat
                 // Handle state change
                 switch (state)
                 {
-                    case ContextState.Reconnecting:
-                        this._organization = null;
-                        this._organizationId = 0;
-                        break;
                     case ContextState.Disconnected:
+                        this._chat.AutoReconnect = false;
                         this._chat.ClearEvents();
                         this._chat = null;
                         this._dimension = null;
                         this._account = null;
                         this._character = null;
+                        this._ignores = null;
+                        // Fall through to the next case
+                        goto case ContextState.Reconnecting;
+                    case ContextState.Reconnecting:
                         this._organization = null;
                         this._organizationId = 0;
                         this._friends.Clear();
                         this._channels.Clear();
                         this._privateChannels.Clear();
                         this._guests.Clear();
-                        this._ignore = null;
                         break;
                 }
             }
@@ -680,7 +686,7 @@ namespace Vha.Chat
         void _chat_PrivateChannelRequestEvent(Vha.Net.Chat chat, PrivateChannelRequestEventArgs e)
         {
             // Check for ignores
-            if (this.Ignore.Contains(e.Character))
+            if (this.Ignores.Contains(e.Character))
                 return;
             // Some sensible checks
             PrivateChannel channel = e.GetPrivateChannel();
@@ -741,7 +747,7 @@ namespace Vha.Chat
         void _chat_PrivateChannelMessageEvent(Vha.Net.Chat chat, PrivateChannelMessageEventArgs e)
         {
             // Check for ignores
-            if (this.Ignore.Contains(e.Character))
+            if (this.Ignores.Contains(e.Character))
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.PrivateChannel, e.Channel, e.Character, e.Character == this.Character);
@@ -754,7 +760,7 @@ namespace Vha.Chat
             if (this.GetChannel(e.Channel).Muted)
                 return;
             // Check for ignores
-            if (this.Ignore.Contains(e.Character))
+            if (this.Ignores.Contains(e.Character))
                 return;
             // Descramble
             string message = e.Message;
@@ -774,7 +780,7 @@ namespace Vha.Chat
         void _chat_PrivateMessageEvent(Vha.Net.Chat chat, PrivateMessageEventArgs e)
         {
             // Check for ignores
-            if (this.Ignore.Contains(e.Character))
+            if (this.Ignores.Contains(e.Character))
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.Character, null, e.Character, e.Outgoing);
@@ -788,7 +794,7 @@ namespace Vha.Chat
             {
                 string character = (string)e.Arguments[(int)IncomingOfflineMessageArgs.Name];
                 // Check ignored users list
-                if (this.Ignore.Contains(character))
+                if (this.Ignores.Contains(character))
                     return;
             }
             // Descramble message

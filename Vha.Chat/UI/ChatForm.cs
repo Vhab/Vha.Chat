@@ -75,8 +75,6 @@ namespace Vha.Chat.UI
 
             this._htmlUtil = new ChatHtml(this._context, this);
 
-            // Disable options button
-            this._options.Visible = false;
             // Update buttons to reflect the state of chat.
             switch (this._context.State)
             {
@@ -89,6 +87,22 @@ namespace Vha.Chat.UI
                     this._disconnect.Visible = this._disconnect.Enabled = true;
                     break;
             }
+        }
+
+        private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            this._context.StateEvent -= new Handler<StateEventArgs>(_context_StateEvent);
+            this._context.MessageEvent -= new Handler<MessageEventArgs>(_context_MessageEvent);
+            this._context.ChannelJoinEvent -= new Handler<ChannelEventArgs>(_context_ChannelJoinEvent);
+            this._context.ChannelUpdatedEvent -= new Handler<ChannelEventArgs>(_context_ChannelUpdatedEvent);
+            this._context.PrivateChannelInviteEvent -= new Handler<PrivateChannelInviteEventArgs>(_context_PrivateChannelInviteEvent);
+            this._context.PrivateChannelJoinEvent -= new Handler<PrivateChannelEventArgs>(_context_PrivateChannelJoinEvent);
+            this._context.PrivateChannelLeaveEvent -= new Handler<PrivateChannelEventArgs>(_context_PrivateChannelLeaveEvent);
+            this._context.UserJoinEvent -= new Handler<PrivateChannelEventArgs>(_context_UserJoinEvent);
+            this._context.UserLeaveEvent -= new Handler<PrivateChannelEventArgs>(_context_UserLeaveEvent);
+            this._context.FriendAddedEvent -= new Handler<FriendEventArgs>(_context_FriendAddedEvent);
+            this._context.FriendRemovedEvent -= new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
+            this._context.FriendUpdatedEvent -= new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
         }
 
         public delegate void SetTargetDelegate(MessageTarget target);
@@ -154,6 +168,8 @@ namespace Vha.Chat.UI
                 this._connect.Enabled = this._connect.Visible = false;
                 this._disconnect.Enabled = this._disconnect.Visible = true;
             }
+            // Notify state change
+            context.Write(MessageClass.Internal, "State changed to: " + args.State.ToString());
         }
 
         void _context_MessageEvent(Context context, MessageEventArgs args)

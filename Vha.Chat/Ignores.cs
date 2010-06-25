@@ -29,14 +29,14 @@ namespace Vha.Chat
 {
 #if SOMETHING
     // Placeholder till I have the chance to port the Ignore system
-    public class Ignore
+    public class Ignores
     {
         public bool Contains(string user)
         {
             return false;
         }
 
-        internal Ignore(Context context)
+        internal Ignores(Context context)
         {
 
         }

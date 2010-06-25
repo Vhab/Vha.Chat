@@ -53,7 +53,7 @@ namespace Vha.Chat.Commands
                 new string[] { "friend add [username]", "friend remove [username]" }, // Usage
                 new string[] { "friend add Vhab", "friend remove Helpbot" }, // Examples
                 // Description
-                "The friend commands allows you to add and remove users from your friendslist." +
+                "The friend commands allows you to add and remove users from your friendslist.\n" +
                 "Adding users to your friendslist allows you to see whether they're currently online or offline."
             )
         { }

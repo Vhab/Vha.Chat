@@ -26,6 +26,34 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
+            // Command specific help
+            if (args.Length > 0)
+            {
+                // Check if the trigger exists
+                string trig = args[0].ToLower();
+                Command command = context.Input.GetCommandByTrigger(trig);
+                if (command == null)
+                {
+                    context.Write(MessageClass.Internal, string.Format(
+                        "Unknown command: {0}. Use '{1}help' for more information",
+                        trig, context.Input.Prefix));
+                    return false;
+                }
+                // Display help
+                string help = string.Format(
+                    "\n<u>{0}</u>\n{1}\n\n" +
+                    "Triggers: {2}\n\n" +
+                    "Usage:\n- {3}\n\n" +
+                    "Examples:\n - {4}",
+                    command.Name, command.Description,
+                    string.Join(", ", command.Triggers),
+                    string.Join("\n- ", command.Usage),
+                    string.Join("\n- ", command.Examples)
+                    );
+                context.Write(MessageClass.Internal, help);
+                return true;
+            }
+            // General help
             context.Write(MessageClass.Internal, "TODO: implement help command");
             return true;
         }

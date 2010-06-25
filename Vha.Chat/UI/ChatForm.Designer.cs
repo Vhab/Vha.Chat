@@ -328,6 +328,7 @@ namespace Vha.Chat.UI
             this.Name = "ChatForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ChatForm_FormClosed);
             this._buttons.ResumeLayout(false);
             this._buttons.PerformLayout();
             this._channelMenu.ResumeLayout(false);

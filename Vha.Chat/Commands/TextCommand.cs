@@ -38,7 +38,7 @@ namespace Vha.Chat.Commands
                 new string[] { "text [text]" }, // Usage
                 new string[] { "text Ping? Pong!" }, // Examples
                 // Description
-                "The text command allows you to print text directly to the output window." +
+                "The text command allows you to print text directly to the output window.\n" +
                 "These messages will only appear locally and will not be sent accross the chat server."
             )
         { }

@@ -24,12 +24,13 @@ using System.Xml.Serialization;
 
 namespace Vha.Chat.Data
 {
+    [XmlRoot("Root")]
     public class OptionsV1 : Base
     {
         public int MaximumMessages = 250;
         public int MaximumTexts = 50;
         public int MaximumHistory = 20;
-        public UI.ChatHtmlStyle TextStyle = UI.ChatHtmlStyle.Default;
+        public UI.ChatHtmlStyle TextStyle = UI.ChatHtmlStyle.Strip;
 
         public OptionsV1Proxy Proxy = null;
 

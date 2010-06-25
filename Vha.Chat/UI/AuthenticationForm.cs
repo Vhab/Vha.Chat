@@ -169,10 +169,6 @@ namespace Vha.Chat.UI
                         this._status.SetMessage("Connecting...");
                     break;
                 case ContextState.CharacterSelection:
-                    if (this._status != null)
-                        this._status.SetMessage("Selecting character...");
-                    break;
-                case ContextState.Connected:
                     // Hide status form
                     if (this._status != null)
                     {

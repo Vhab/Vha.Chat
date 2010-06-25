@@ -24,7 +24,7 @@ using System.Text;
 
 namespace Vha.Net
 {
-    public class PrivateChannel
+    public class PrivateChannel : IComparable<PrivateChannel>
     {
         private readonly UInt32 _id = 0;
         private readonly String _name = null;
@@ -42,12 +42,19 @@ namespace Vha.Net
         public bool Local { get { return this._local; } }
         public override string ToString() { return this._name; }
 
-        public bool Equals(PrivateChannel channel)
+        public int CompareTo(PrivateChannel channel)
         {
-            if (this.ID != channel.ID) return false;
-            if (this.Name != channel.Name) return false;
-            if (this.Local != channel.Local) return false;
-            return true;
+            if (channel == null)
+                return 1;
+            if (this.ID != channel.ID)
+                return this.ID.CompareTo(channel.ID);
+            if (this.Name != channel.Name)
+                return this.Name.CompareTo(channel.Name);
+            if (this.Local != channel.Local)
+                return this.Local.CompareTo(channel.Local);
+            return 0;
         }
+
+        public bool Equals(PrivateChannel right) { return this.CompareTo(right) == 0; }
     }
 }

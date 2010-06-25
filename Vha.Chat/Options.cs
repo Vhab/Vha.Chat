@@ -233,8 +233,8 @@ namespace Vha.Chat
         }
         public string Character
         {
-            get { return this._account.Name; }
-            set { this._account.Name = value; this._parent.Touch(); }
+            get { return this._account.Character; }
+            set { this._account.Character = value; this._parent.Touch(); }
         }
 
         #region Internal

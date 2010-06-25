@@ -46,6 +46,7 @@ namespace Vha.Chat
             Application.SetCompatibleTextRenderingDefault(true);
 #if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            context.ExceptionEvent += new Handler<Exception>(UnhandledException);
 #endif
             // Start application
             ApplicationContext = new ApplicationContext();
@@ -55,14 +56,14 @@ namespace Vha.Chat
 
 #if !DEBUG
         // Exception handling
-        public static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             UnhandledException((Exception)e.ExceptionObject);
         }
 
-        public static void UnhandledException(Vha.Net.Chat chat, Exception ex)
+        private static void UnhandledException(Context context, Exception args)
         {
-            UnhandledException(ex);
+            UnhandledException(args);
         }
 
         private static void UnhandledException(Exception ex)

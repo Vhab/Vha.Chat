@@ -118,7 +118,42 @@ namespace Vha.Chat.UI
         #region Context callbacks
         void _context_StateEvent(Context context, StateEventArgs args)
         {
-            throw new NotImplementedException();
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<StateEventArgs>(_context_StateEvent),
+                    new object[] { context, args });
+                return;
+            }
+            // Update buttons when disconnect
+            if (args.State == ContextState.Disconnected)
+            {
+                this._connect.Enabled = this._connect.Visible = true;
+                this._disconnect.Enabled = this._disconnect.Visible = false;
+            }
+            // Could use some cleaning up when reconnecting
+            else if (args.State == ContextState.Reconnecting)
+            {
+                // - Clear tree sections
+                this._channels.Nodes.Clear();
+                this._online.Nodes.Clear();
+                this._offline.Nodes.Clear();
+                this._guests.Nodes.Clear();
+                this._privateChannels.Nodes.Clear();
+                // Update buttons
+                this._connect.Enabled = this._connect.Visible = false;
+                this._disconnect.Enabled = this._disconnect.Visible = true;
+            }
+            // And need this when connected
+            else if (args.State == ContextState.Connected)
+            {
+                // - Add ourselves to private channel
+                this._privateChannels.AddNode(context.Character, "Character");
+                this._privateChannels.Expand();
+                // Update buttons
+                this._connect.Enabled = this._connect.Visible = false;
+                this._disconnect.Enabled = this._disconnect.Visible = true;
+            }
         }
 
         void _context_MessageEvent(Context context, MessageEventArgs args)
@@ -182,7 +217,10 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            throw new NotImplementedException();
+            // (not sure this ever happens, but better safe than sorry)
+            if (args.Character == context.Character) return;
+            // Update list
+            this._guests.RemoveNode(args.Character);
         }
 
         void _context_UserJoinEvent(Context context, PrivateChannelEventArgs args)
@@ -194,7 +232,12 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            throw new NotImplementedException();
+            // (not sure this ever happens, but better safe than sorry)
+            if (args.Character == context.Character) return;
+            // Update list
+            this._guests.AddNode(args.Character, "Character");
+            if (this._guests.Nodes.Count == 1)
+                this._guests.Expand();
         }
 
         void _context_PrivateChannelLeaveEvent(Context context, PrivateChannelEventArgs args)
@@ -206,7 +249,10 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            throw new NotImplementedException();
+            // Ignore other characters leaving
+            if (args.Character != context.Character) return;
+            // Update list
+            this._privateChannels.RemoveNode(args.Channel.Name);
         }
 
         void _context_PrivateChannelJoinEvent(Context context, PrivateChannelEventArgs args)
@@ -218,14 +264,20 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            throw new NotImplementedException();
+
+            // Ignore other characters joining
+            if (args.Character != context.Character) return;
+            // Update list
+            this._privateChannels.AddNode(args.Channel.Name, "Character");
+            if (this._privateChannels.Nodes.Count == 1)
+                this._privateChannels.Expand();
         }
 
         void _context_PrivateChannelInviteEvent(Context context, PrivateChannelInviteEventArgs args)
         {
             if (this.InvokeRequired)
             {
-                this.BeginInvoke(
+                this.Invoke(
                     new Handler<PrivateChannelInviteEventArgs>(_context_PrivateChannelInviteEvent),
                     new object[] { context, args });
                 return;
@@ -332,90 +384,7 @@ namespace Vha.Chat.UI
         }
         #endregion
 
-        private void _chat_PrivateChannelStatusEvent(Vha.Net.Chat chat, PrivateChannelStatusEventArgs e)
-        {
-            // Use invoke if needed
-            if (this._target.InvokeRequired)
-            {
-                this._target.BeginInvoke(new PrivateChannelStatusEventHandler(_chat_PrivateChannelStatusEvent), new object[] { chat, e });
-                return;
-            }
-            // Handle our own channel
-            if (e.ChannelID == chat.ID)
-            {
-                // (not sure this ever happens, but better safe than sorry)
-                if (e.CharacterID == chat.ID) return;
-                // Update list
-                if (e.Join)
-                {
-                    if (this._guests.ContainsNode(e.Character)) return;
-                    this._guests.AddNode(e.Character, "Character");
-                    if (this._guests.Nodes.Count == 1)
-                        this._guests.Expand();
-                }
-                else
-                {
-                    if (!this._guests.ContainsNode(e.Character)) return;
-                    this._guests.RemoveNode(e.Character);
-                }
-            }
-            // Handle remote private channels
-            else
-            {
-                // Ignore other characters
-                if (e.CharacterID != chat.ID) return;
-                // Update list
-                if (e.Join)
-                {
-                    if (this._privateChannels.ContainsNode(e.Channel)) return;
-                    this._privateChannels.AddNode(e.Channel, "Character");
-                }
-                else
-                {
-                    if (!this._privateChannels.ContainsNode(e.Channel)) return;
-                    this._privateChannels.RemoveNode(e.Channel);
-                }
-            }
-        }
-
-        private void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
-        {
-            // Invoke
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(new StatusChangeEventHandler(_chat_StatusChangeEvent), new object[] { chat, e });
-                return;
-            }
-            // Update buttons when disconnect
-            if (e.State == ChatState.Disconnected)
-            {
-                this._connect.Enabled = this._connect.Visible = true;
-                this._disconnect.Enabled = this._disconnect.Visible = false;
-            }
-            // Only really care about being connected for the rest of the code
-            else if (e.State == ChatState.Reconnecting)
-            {
-                // - Clear tree sections
-                this._channels.Nodes.Clear();
-                this._online.Nodes.Clear();
-                this._offline.Nodes.Clear();
-                this._guests.Nodes.Clear();
-                this._privateChannels.Nodes.Clear();
-                // Update buttons
-                this._connect.Enabled = this._connect.Visible = false;
-                this._disconnect.Enabled = this._disconnect.Visible = true;
-            }
-            else if (e.State == ChatState.Connected)
-            {
-                // - Add ourselves to private channel
-                this._privateChannels.AddNode(this._chat.Character, "Character");
-                this._privateChannels.Expand();
-                // Update buttons
-                this._connect.Enabled = this._connect.Visible = false;
-                this._disconnect.Enabled = this._disconnect.Visible = true;
-            }
-        }
-
+        #region Form callbacks
         private void _inputBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Up)
@@ -674,5 +643,6 @@ namespace Vha.Chat.UI
             if (string.IsNullOrEmpty((string)this._guestsMenu.Tag)) return;
             this._context.Input.Command("kick " + (string)this._guestsMenu.Tag);
         }
+        #endregion
     }
 }

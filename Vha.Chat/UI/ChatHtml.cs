@@ -325,7 +325,8 @@ namespace Vha.Chat.UI
 
         protected void ItemRefLink(string item)
         {
-            string url = "http://auno.org/ao/db.php?id={0}&id2={1}&ql={2}";
+            //string url = "http://auno.org/ao/db.php?id={0}&id2={1}&ql={2}";
+            string url = "http://www.xyphos.com/ao/aodb.php?id={0}&id2={1}&ql={2}&minimode=1";
             string[] parts = item.Split(new char[] {'/'});
             if (parts.Length < 3)
             {

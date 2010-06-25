@@ -34,7 +34,7 @@ namespace Vha.Chat.Events
         /// <summary>
         /// The user who left or joined the channel
         /// </summary>
-        public readonly string User;
+        public readonly string Character;
         /// <summary>
         /// Whether the user joined the channel
         /// </summary>
@@ -44,10 +44,10 @@ namespace Vha.Chat.Events
         /// </summary>
         public readonly bool Local;
 
-        public PrivateChannelEventArgs(PrivateChannel channel, string user, bool joined, bool local)
+        public PrivateChannelEventArgs(PrivateChannel channel, string character, bool joined, bool local)
         {
             this.Channel = channel;
-            this.User = user;
+            this.Character = character;
             this.Joined = joined;
             this.Local = local;
         }

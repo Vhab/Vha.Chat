@@ -24,11 +24,12 @@ using System.Xml.Serialization;
 
 namespace Vha.Chat.Data
 {
+    [XmlRoot("Root")]
     public class ConfigurationV1 : Base
     {
-        public string OptionsPath = "%APPDATA%\\Vha.Chat\\";
+        public string OptionsPath = ".\\";
         public string OptionsFile = "Options.xml";
-        public string IgnoresPath = "%APPDATA%\\Vha.Chat\\Ignores\\";
+        public string IgnoresPath = ".\\Ignores\\";
         [XmlElement("Dimension")]
         public List<ConfigurationV1Dimension> Dimensions;
 

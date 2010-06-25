@@ -38,14 +38,14 @@ namespace Vha.Chat.UI
             this._browser.Location = new System.Drawing.Point(0, 0);
             this._browser.MinimumSize = new System.Drawing.Size(20, 20);
             this._browser.Name = "_browser";
-            this._browser.Size = new System.Drawing.Size(819, 664);
+            this._browser.Size = new System.Drawing.Size(634, 624);
             this._browser.TabIndex = 0;
             // 
             // BrowserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(819, 664);
+            this.ClientSize = new System.Drawing.Size(634, 624);
             this.Controls.Add(this._browser);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;

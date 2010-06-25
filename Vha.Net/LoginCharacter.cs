@@ -24,11 +24,12 @@ using System.Collections.Generic;
 namespace Vha.Net
 {
     public class LoginCharacter : IComparable<LoginCharacter>
-	{
-		public UInt32 ID;
-		public String Name;
-		public Int32 Level;
-		public bool IsOnline;
+    {
+        public UInt32 ID;
+        public String Name;
+        public Int32 Level;
+        public bool IsOnline;
+
         public override string ToString()
         {
             String name = this.Name;
@@ -36,9 +37,8 @@ namespace Vha.Net
                 name += " (Online)";
             return name;
         }
-        public int CompareTo(LoginCharacter other)
-        {
-            return this.ToString().CompareTo(other.ToString());
-        }
-	}
+
+        public int CompareTo(LoginCharacter character) { return this.ToString().CompareTo(character.ToString()); }
+        public bool Equals(LoginCharacter right) { return this.CompareTo(right) == 0; }
+    }
 }

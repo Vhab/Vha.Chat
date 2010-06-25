@@ -24,7 +24,7 @@ using System.Text;
 
 namespace Vha.Net
 {
-    public class Channel
+    public class Channel : IComparable<Channel>
     {
         private readonly BigInteger _id = 0;
         private readonly String _name = null;
@@ -45,13 +45,21 @@ namespace Vha.Net
         public bool Muted { get { return this._muted; } }
         public override string ToString() { return this._name; }
 
-        public bool Equals(Channel channel)
+        public int CompareTo(Channel channel)
         {
-            if (this.ID != channel.ID) return false;
-            if (this.Name != channel.Name) return false;
-            if (this.Type != channel.Type) return false;
-            if (this.Muted != channel.Muted) return false;
-            return true;
+            if (channel == null)
+                return 1;
+            if (this.ID != channel.ID)
+                return this.ID < channel.ID ? -1 : 1;
+            if (this.Name != channel.Name)
+                return this.Name.CompareTo(channel.Name);
+            if (this.Type != channel.Type)
+                return this.Type.CompareTo(channel.Type);
+            if (this.Muted != channel.Muted)
+                return this.Muted.CompareTo(this.Muted);
+            return 0;
         }
+
+        public bool Equals(Channel right) { return this.CompareTo(right) == 0; }
     }
 }

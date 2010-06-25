@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Vha.Chat
 {
-    public class MessageSource
+    public class MessageSource : IComparable<MessageSource>
     {
         public readonly MessageType Type;
         public readonly string Channel;
@@ -54,15 +54,22 @@ namespace Vha.Chat
             return this.Character + "@" + this.Channel;
         }
 
-        public bool Equals(MessageSource source)
+        public int CompareTo(MessageSource source)
         {
-            if (source == null) return false;
-            if (this.Type != source.Type) return false;
-            if (this.Channel != source.Channel) return false;
-            if (this.Character != source.Character) return false;
-            if (this.Outgoing != source.Outgoing) return false;
-            return true;
+            if (source == null)
+                return 1;
+            if (this.Type != source.Type)
+                return this.Type.CompareTo(source.Type);
+            if (this.Channel != source.Channel)
+                return this.Channel.CompareTo(source.Channel);
+            if (this.Character != source.Character)
+                return this.Character.CompareTo(source.Character);
+            if (this.Outgoing != source.Outgoing)
+                return this.Outgoing.CompareTo(source.Outgoing);
+            return 0;
         }
+
+        public bool Equals(MessageSource right) { return this.CompareTo(right) == 0; }
 
         /// <summary>
         /// Returns the target associated with this source

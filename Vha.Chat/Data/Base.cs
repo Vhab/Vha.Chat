@@ -41,6 +41,9 @@ namespace Vha.Chat.Data
 
         public static Base Load(string file)
         {
+            // Check if the file exists
+            if (!File.Exists(file))
+                return null;
             // Some setup
             XmlReader reader = null;
             Stream stream = null;
@@ -60,17 +63,20 @@ namespace Vha.Chat.Data
                 string type = name + "_" + version;
                 // Load file as known type
                 stream.Seek(0, SeekOrigin.Begin);
-                Base data = null;
+                Type dataType = null;
                 switch (type)
                 {
                     case "Options_1":
-                        data = XML<OptionsV1>.FromStream(stream, false);
+                        dataType = typeof(OptionsV1);
                         break;
                     case "Configuration_1":
-                        data = XML<ConfigurationV1>.FromStream(stream, false);
+                        dataType = typeof(ConfigurationV1);
                         break;
+                    default:
+                        return null;
                 }
-                // Check if valid data is received
+                // Read data
+                Base data = (Base)XML.FromStream(dataType, stream, false);
                 if (data == null)
                     return null;
                 // Upgrade data if needed

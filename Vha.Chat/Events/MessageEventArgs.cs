@@ -37,14 +37,5 @@ namespace Vha.Chat.Events
             this.Class = messageClass;
             this.Message = message;
         }
-
-        public bool Equals(MessageEventArgs message)
-        {
-            if (message == null) return false;
-            if (this.Source != message.Source) return false;
-            if (this.Class != message.Class) return false;
-            if (this.Message != message.Message) return false;
-            return true;
-        }
     }
 }

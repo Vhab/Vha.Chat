@@ -113,6 +113,14 @@ namespace Vha.Chat
         /// Fires when a user leaves our local private channel
         /// </summary>
         public event Handler<PrivateChannelEventArgs> UserLeaveEvent;
+#if !DEBUG
+        /// <summary>
+        /// Occures when an unexpected exception occured.
+        /// Only use this to gracefully shut down the application.
+        /// Don't make an attempt at recovering the application.
+        /// </summary>
+        public event Handler<Exception> ExceptionEvent;
+#endif
         #endregion
 
         #region Attributes
@@ -234,6 +242,10 @@ namespace Vha.Chat
                 this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
                 this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
                 this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
+                this._chat.LoginOKEvent += new LoginOKEventHandler(_chat_LoginOKEvent);
+#if !DEBUG
+                this._chat.ExceptionEvent += new ExceptionEventHandler(_chat_ExceptionEvent);
+#endif
                 // - Friends
                 this._chat.FriendStatusEvent += new FriendStatusEventHandler(_chat_FriendStatusEvent);
                 this._chat.FriendRemovedEvent += new FriendRemovedEventHandler(_chat_FriendRemovedEvent);
@@ -445,6 +457,7 @@ namespace Vha.Chat
             this._friends = new Dictionary<string, Friend>();
             this._privateChannels = new Dictionary<string, PrivateChannel>();
             this._guests = new List<string>();
+            this._ignore = new Ignore(this);
 
             // Create input
             this._input = new Input(this, "/");
@@ -486,12 +499,19 @@ namespace Vha.Chat
             {
                 this._character = args.Character.Name;
                 this._chat.SendLoginCharacter(charactersMap[args.Character]);
+                
                 // Mark as 'recently used'
                 OptionsAccount acc = this.Options.GetAccount(this.Account, true);
                 acc.Name = this.Options.LastAccount = this._account;
                 acc.Dimension = this.Options.LastDimension = this._dimension;
                 acc.Character = this._character;
                 this.Options.Save();
+
+                // Dispatch state change event
+                ContextState previousState = this._state;
+                this._state = ContextState.CharacterSelection;
+                if (this.StateEvent != null)
+                    this.StateEvent(this, new StateEventArgs(this._state, previousState));
             }
             else
             {
@@ -505,6 +525,19 @@ namespace Vha.Chat
             // Notify listeners of the error
             if (this.ErrorEvent != null)
                 this.ErrorEvent(this, new ErrorEventArgs(ErrorType.Login, e.Error));
+        }
+
+        void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)
+        {
+            // Prevent duplicate events
+            if (this._state == ContextState.Connected)
+                return;
+            // Update state
+            ContextState previousState = this._state;
+            this._state = ContextState.Connected;
+            // Notify state change
+            if (this.StateEvent != null)
+                this.StateEvent(this, new StateEventArgs(this._state, previousState));
         }
 
         void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
@@ -539,16 +572,9 @@ namespace Vha.Chat
                 // Handle state change
                 switch (state)
                 {
-                    case ContextState.Connecting:
-                        // Nothing in particular here :)
-                        break;
-                    case ContextState.CharacterSelection:
-                        this._ignore = new Ignore(this);
-                        break;
-                    case ContextState.Connected:
-                        break;
                     case ContextState.Reconnecting:
                         this._organization = null;
+                        this._organizationId = 0;
                         break;
                     case ContextState.Disconnected:
                         this._chat.ClearEvents();
@@ -569,8 +595,16 @@ namespace Vha.Chat
             // Notify state change
             this._state = state;
             if (this.StateEvent != null)
-                this.StateEvent(this, new StateEventArgs(state, previousState));
+                this.StateEvent(this, new StateEventArgs(this._state, previousState));
         }
+
+#if !DEBUG
+        void _chat_ExceptionEvent(Vha.Net.Chat chat, Exception e)
+        {
+            if (this.ExceptionEvent != null)
+                this.ExceptionEvent(this, e);
+        }
+#endif
 
         void _chat_ChannelStatusEvent(Vha.Net.Chat chat, ChannelStatusEventArgs e)
         {
@@ -578,10 +612,11 @@ namespace Vha.Chat
             bool joined, updated;
             lock (this._channels)
             {
-                joined = !this._channels.ContainsKey(e.Name);
-                if (joined) this._channels.Add(channel.Name, channel);
-                updated = !this._channels[channel.Name].Equals(channel);
-                this._channels[channel.Name] = channel;
+                string name = e.Name.ToLower();
+                joined = !this._channels.ContainsKey(name);
+                if (joined) this._channels.Add(name, channel);
+                updated = !this._channels[name].Equals(channel);
+                this._channels[name] = channel;
             }
             if (this.ChannelJoinEvent != null && joined)
                 this.ChannelJoinEvent(this, new ChannelEventArgs(channel, true));

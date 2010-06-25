@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Vha.Chat
 {
-    public class MessageTarget
+    public class MessageTarget : IComparable<MessageTarget>
     {
         public readonly MessageType Type;
         public readonly string Target;
@@ -46,12 +46,17 @@ namespace Vha.Chat
             return this.Target;
         }
 
-        public bool Equals(MessageTarget target)
+        public int CompareTo(MessageTarget target)
         {
-            if (target == null) return false;
-            if (this.Type != target.Type) return false;
-            if (this.Target != target.Target) return false;
-            return true;
+            if (target == null)
+                return 1;
+            if (this.Type != target.Type)
+                return this.Type.CompareTo(target.Type);
+            if (this.Target != target.Target)
+                return this.Target.CompareTo(target.Target);
+            return 0;
         }
+
+        public bool Equals(MessageTarget right) { return this.CompareTo(right) == 0; }
     }
 }

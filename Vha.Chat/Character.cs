@@ -23,7 +23,7 @@ using System.Text;
 
 namespace Vha.Chat
 {
-    public class Character
+    public class Character : IComparable<Character>
     {
         public readonly string Name;
         public readonly UInt32 ID;
@@ -45,5 +45,8 @@ namespace Vha.Chat
                 s.Append(" (Online)");
             return s.ToString();
         }
+
+        public int CompareTo(Character character) { return this.ToString().CompareTo(character.ToString()); }
+        public bool Equals(Character right) { return this.CompareTo(right) == 0; }
     }
 }

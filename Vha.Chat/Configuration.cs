@@ -40,7 +40,7 @@ namespace Vha.Chat
             if (data.Type != typeof(ConfigurationV1))
                 throw new ArgumentException("Invalid config data type: " + data.Type.ToString());
             ConfigurationV1 config = (ConfigurationV1)data;
-            this.OptionsPath = config.IgnoresPath;
+            this.OptionsPath = config.OptionsPath;
             this.OptionsFile = config.OptionsFile;
             this.IgnoresPath = config.IgnoresPath;
             this.Dimensions = config.Dimensions.ConvertAll<Dimension>(

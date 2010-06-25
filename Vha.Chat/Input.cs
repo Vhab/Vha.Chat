@@ -36,10 +36,11 @@ namespace Vha.Chat
             if (output)
             {
                 string message = "";
-                if (this.HasTrigger(trigger))
+                if (!this.HasTrigger(trigger))
                 {
                     // Generic response
-                    this._context.Write(MessageClass.Error, "Expecting at least " + count + " arguments");
+                    string arguments = minimum == 1 ? "argument" : "arguments";
+                    this._context.Write(MessageClass.Error, "Expecting at least " + minimum + " " + arguments);
                 }
                 else
                 {
@@ -153,7 +154,9 @@ namespace Vha.Chat
                 command = command.Substring(1);
             // Break up the command
             List<string> args = new List<string>(command.Split(' '));
-            string message = command.Substring(args[0].Length + 1);
+            string message = "";
+            if (args.Count > 1)
+                message = command.Substring(args[0].Length + 1);
             string trigger = args[0].ToLower();
             args.RemoveAt(0);
             // Check if the trigger exists

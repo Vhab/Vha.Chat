@@ -24,7 +24,7 @@ using System.Text;
 
 namespace Vha.Net
 {
-    public class Friend
+    public class Friend : IComparable<Friend>
     {
         private readonly UInt32 _id;
         private readonly String _name;
@@ -39,19 +39,27 @@ namespace Vha.Net
             this._temporary = temporary;
         }
 
-        public BigInteger ID { get { return this._id; } }
+        public UInt32 ID { get { return this._id; } }
         public String Name { get { return this._name; } }
         public bool Online { get { return this._online; } }
         public bool Temporary { get { return this._temporary; } }
         public override string ToString() { return this._name; }
 
-        public bool Equals(Friend friend)
+        public int CompareTo(Friend friend)
         {
-            if (this.ID != friend.ID) return false;
-            if (this.Name != friend.Name) return false;
-            if (this.Online != friend.Online) return false;
-            if (this.Temporary != friend.Temporary) return false;
-            return true;
+            if (friend == null)
+                return 1;
+            if (this.ID != friend.ID)
+                return this.ID.CompareTo(friend.ID);
+            if (this.Name != friend.Name)
+                return this.Name.CompareTo(friend.Name);
+            if (this.Online != friend.Online)
+                return this.Online.CompareTo(friend.Online);
+            if (this.Temporary != friend.Temporary)
+                return this.Temporary.CompareTo(friend.Temporary);
+            return 0;
         }
+
+        public bool Equals(Friend right) { return this.CompareTo(right) == 0; }
     }
 }

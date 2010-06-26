@@ -914,7 +914,7 @@ namespace Vha.Net
             this.Debug("Client:" + e.ClientID +
                 " Window:" + e.WindowID +
                 " ID:" + e.MessageID +
-                " Args:" + string.Join(",", e.Arguments) +
+                //" Args:" + e.Arguments + // TODO: figure out a decent way to display these arguments
                 " Notice:" + e.Notice, "[System]");
             if (this.SystemMessageEvent != null)
                 this.SystemMessageEvent(this, e);

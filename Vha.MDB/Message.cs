@@ -34,7 +34,6 @@ namespace Vha.MDB
         private Int32 _entryID = 0;
         private List<Argument> _arguments = new List<Argument>();
         private String _value = null;
-        private String _raw = null;
 
         public Int32 CategoryID { get { return this._categoryID; } }
         public Int32 EntryID { get { return this._entryID; } }
@@ -50,20 +49,15 @@ namespace Vha.MDB
                     throw new Exception("AoDescrambledMessage.Message can only be set once!");
             }
         }
-        public String Raw { get { return this._raw; } }
 
-        public Message(Int32 categoryID, Int32 entryID, string raw)
+        public Message(Int32 categoryID, Int32 entryID)
         {
             this._categoryID = categoryID;
             this._entryID = entryID;
-            this._raw = raw;
         }
 
         public void Append(Argument argument)
         {
-            if (this._categoryID == 0 && this._entryID == 0)
-                throw new Exception("Trying to append to an invalid AoDescrambledMessage object! CategoryID and EntryID are both 0!");
-
             this._arguments.Add(argument);
         }
     }

@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Vha.Common;
 
 namespace Vha.Net.Events
 {
@@ -40,7 +41,7 @@ namespace Vha.Net.Events
         public NameLookupEventArgs(UInt32 characterID, String name)
         {
             this._characterID = characterID;
-            this._name = name;
+            this._name = Format.UppercaseFirst(name);
         }
 
         /// <summary>

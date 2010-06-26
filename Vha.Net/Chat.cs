@@ -44,6 +44,10 @@ namespace Vha.Net
         public double SlowPacketDelay = 2200;
         public bool IgnoreCharacterLoggedIn = true;
         public bool UseThreadPool = true;
+        /// <summary>
+        /// Default timeout of method .GetUserID
+        /// </summary>
+        public int UserIDLookupTimeout = 2500;
 		public object Tag = null;
 		#endregion
 		#region Events
@@ -98,6 +102,7 @@ namespace Vha.Net
 		protected ManualResetEvent _sendThread_ResetEvent;
         protected Socket _socket;
         protected Dictionary<UInt32, String> _users;
+        protected Dictionary<String, UInt32> _usersByName;
         protected Dictionary<BigInteger, Channel> _channels;
         protected string _serverAddress;
         protected int _port;
@@ -283,6 +288,7 @@ namespace Vha.Net
                 this._sendThread = new Thread(new ThreadStart(this.RunSender));
                 this._sendThread.IsBackground = true;
                 this._users = new Dictionary<UInt32, String>();
+                this._usersByName = new Dictionary<string, uint>();
                 this._channels = new Dictionary<BigInteger, Channel>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
@@ -469,6 +475,7 @@ namespace Vha.Net
             this._lookupReset = null;
             if (this._users != null) this._users.Clear();
             this._users = null;
+            this._usersByName = null;
             if (this._channels != null) this._channels.Clear();
             this._channels = null;
             this._fastQueue = null;
@@ -1018,7 +1025,25 @@ namespace Vha.Net
         {
             lock (this._users)
             {
-                this._users[e.CharacterID] = Format.UppercaseFirst(e.Name);
+                // Handle name changes
+                if (this._users.ContainsKey(e.CharacterID))
+                {
+                    string oldName = this._users[e.CharacterID];
+                    if (this._usersByName.ContainsKey(oldName))
+                    {
+                        uint oldID = this._usersByName[oldName];
+                        if (oldID != e.CharacterID)
+                        {
+                            // Old name entry was assigned to a different UID.
+                            if (this._users.ContainsKey(oldID))
+                                this._users.Remove(oldID);
+                        }
+                        this._usersByName.Remove(oldName);
+                    }
+                }
+                // Store id
+                if (e.CharacterID > 0) this._users[e.CharacterID] = e.Name;
+                this._usersByName[e.Name] = e.CharacterID;
             }
             if (e.CharacterID > 0)
             {
@@ -1028,9 +1053,10 @@ namespace Vha.Net
             {
                 this.Debug("User doesn't exist: " + e.Name, "[Database]");
             }
+            // Notify other threads
             this._lookupReset.Set();
             this._lookupReset.Reset();
-
+            // Fire the event
             if (this.NameLookupEvent != null)
                 this.NameLookupEvent(this, e);
         }
@@ -1173,46 +1199,82 @@ namespace Vha.Net
         #endregion
 
         #region Get Commands
+        /// <summary>
+        /// Retrieve user ID associated with an user name.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>UserID</returns>
+        public UInt32 GetUserID(string user)
+        {
+            UInt32 id;
+            this.GetUserID(user, this.UserIDLookupTimeout, out id);
+            return id;
+        }
+
 		/// <summary>
 		/// Retrieve user ID associated with an user name.
 		/// </summary>
 		/// <param name="user"></param>
+        /// <param name="timeout">Timeout in ms. If set to 0, we'll only use the internal lookup table, not fetch info from server.</param>
 		/// <returns>UserID</returns>
-        public UInt32 GetUserID(string user)
+        public UInt32 GetUserID(string user, int timeout)
         {
-            bool Lookup = false;
+            UInt32 id;
+            this.GetUserID(user, timeout, out id);
+            return id;
+        }
+
+        public bool GetUserID(string user, int timeout, out UInt32 id)
+        {
+            // Default return value to 0
+            id = 0;
+            // Keep track of time so we can see when we hit the timeout
+            DateTime startTime = DateTime.Now;
+            // Some basic error handling and formatting first
             user = Format.UppercaseFirst(user);
-            for (int i = 0; i < 300; i++)
+            if (this._usersByName == null) 
+                return false;
+            // Check if we already have this user cached
+            lock (this._users)
             {
-                lock (this._users)
+                if (this._usersByName.ContainsKey(user))
                 {
-                    if (this._users.ContainsValue(user))
+                    if (this._usersByName[user] > 0)
                     {
-                        foreach (KeyValuePair<UInt32, String> kvp in this._users)
-                        {
-                            if (kvp.Value == user)
-                            {
-                                if (kvp.Key > 0)
-                                {
-                                    return kvp.Key;
-                                }
-                                else
-                                {
-                                    this._users.Remove(kvp.Key);
-                                    return 0;
-                                }
-                            }
-                        }
+                        // We found it!
+                        id = this._usersByName[user];
+                        return true;
                     }
-                    else if (Lookup == false)
+                    else
                     {
-                        this.SendNameLookup(user);
-                        Lookup = true;
+                        // If UserId is 0, remove the entry
+                        this._usersByName.Remove(user);
+                        return false;
                     }
                 }
-                Thread.Sleep(50);
             }
-            return 0;
+            // We haven't found a cached entry, should we check with the server?
+            if (timeout <= 0)
+                return false;
+
+            // Request the UserId from the server
+            int currentTimeout = timeout;
+            this.SendNameLookup(user);
+            // Wait for a reply
+            while (currentTimeout > 0)
+            {
+                // Wait for a name lookup to come in
+                this._lookupReset.WaitOne(currentTimeout);
+                // Check if we found it
+                if (this.GetUserID(user, 0, out id))
+                {
+                    return true;
+                }
+                // Let's go for another round!
+                currentTimeout = timeout - (int)(DateTime.Now - startTime).TotalMilliseconds;
+            }
+            // All failed, we never found the user
+            return false;
         }
 
 		/// <summary>

@@ -56,7 +56,7 @@ namespace Vha.Net
             if (this.Type != channel.Type)
                 return this.Type.CompareTo(channel.Type);
             if (this.Muted != channel.Muted)
-                return this.Muted.CompareTo(this.Muted);
+                return this.Muted.CompareTo(channel.Muted);
             return 0;
         }
 

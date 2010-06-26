@@ -585,7 +585,6 @@ namespace Vha.Chat
                         this._dimension = null;
                         this._account = null;
                         this._character = null;
-                        this._ignores = null;
                         // Fall through to the next case
                         goto case ContextState.Reconnecting;
                     case ContextState.Reconnecting:
@@ -789,10 +788,14 @@ namespace Vha.Chat
 
         void _chat_SystemMessageEvent(Vha.Net.Chat chat, SystemMessageEventArgs e)
         {
+            // Descramble message
+            MDB.Message message = null;
+            if (e.Arguments.Length > 0)
+                message = MDB.Parser.Decode(e.Arguments, null);
             // Apply ignore filter to "received offline message from" messages
             if (e.MessageID == (uint)SystemMessageType.IncommingOfflineMessage)
             {
-                string character = (string)e.Arguments[(int)IncomingOfflineMessageArgs.Name];
+                string character = message.Arguments[(int)IncomingOfflineMessageArgs.Name].ToString();
                 // Check ignored users list
                 if (this.Ignores.Contains(character))
                     return;
@@ -808,8 +811,8 @@ namespace Vha.Chat
             }
             // Dispatch message
             string template = MDB.Parser.PrintfToFormatString(entry.Message);
-            string message = string.Format(template, e.Arguments);
-            this.Write(MessageClass.System, message);
+            string text = (message == null) ? template : string.Format(template, message.Arguments);
+            this.Write(MessageClass.System, text);
         }
 
         void _chat_SimpleMessageEvent(Vha.Net.Chat chat, SimpleMessageEventArgs e)

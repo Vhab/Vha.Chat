@@ -64,6 +64,7 @@ namespace Vha.Chat
 
     public enum MessageClass
     {
+        Unknown,
         None,
         Internal,
         Organization,

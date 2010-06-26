@@ -286,11 +286,13 @@ namespace Vha.MDB
                 byte[] buffer = new byte[4];
 
                 // Read ID
-                stream.Read(buffer, 0, buffer.Length);
+                int bytes = stream.Read(buffer, 0, buffer.Length);
+                if (bytes == 0) return false;
                 ID = BitConverter.ToInt32(buffer, 0);
 
                 // Read Offset
-                stream.Read(buffer, 0, buffer.Length);
+                bytes = stream.Read(buffer, 0, buffer.Length);
+                if (bytes == 0) return false;
                 Offset = BitConverter.ToInt32(buffer, 0);
 
                 return true;

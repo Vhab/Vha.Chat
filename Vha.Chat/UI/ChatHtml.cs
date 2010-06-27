@@ -154,8 +154,8 @@ namespace Vha.Chat.UI
                 // Special case for fonts
                 if (current.TagName.ToLower() == "font")
                 {
-                    replacement = document.CreateElement("span");
-                    replacement.Style = "color: " + current.GetAttribute("color");
+                    // Fonts are annoying, let's not even try to fix em...
+                    continue;
                 }
                 // Default case
                 {

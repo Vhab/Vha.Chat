@@ -259,7 +259,7 @@ namespace Vha.Chat
                 this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
                 this._chat.SystemMessageEvent += new SystemMessageEventHandler(_chat_SystemMessageEvent);
                 this._chat.SimpleMessageEvent += new SimpleMessageEventHandler(_chat_SimpleMessageEvent);
-
+                this._chat.AnonVicinityEvent += new AnonVicinityEventHandler(_chat_AnonVicinityEvent);
                 // Store values
                 this._account = account.ToLower();
                 this._dimension = dim.Name;
@@ -820,6 +820,13 @@ namespace Vha.Chat
             // Dispatch message
             this.Write(MessageClass.SystemMessage, e.Message);
         }
+
+        void _chat_AnonVicinityEvent(Vha.Net.Chat chat, AnonVicinityEventArgs e)
+        {
+            // Dispatch message
+            this.Write(MessageClass.VicinityMessage, e.Message);
+        }
+
         #endregion
         #endregion // Internal
     }

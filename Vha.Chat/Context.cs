@@ -324,7 +324,7 @@ namespace Vha.Chat
         {
             Channel c = this.GetChannel(channel);
             if (c == null) return MessageClass.None;
-            string type = c.Type.ToString();
+            string type = c.Type.ToString() + "Channel";
             MessageClass messageClass = (MessageClass)Enum.Parse(typeof(MessageClass), type, true);
             if (!Enum.IsDefined(typeof(MessageClass), messageClass)) return MessageClass.None;
             return messageClass;
@@ -750,7 +750,7 @@ namespace Vha.Chat
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.PrivateChannel, e.Channel, e.Character, e.Character == this.Character);
-            this.Write(source, MessageClass.PG, e.Message);
+            this.Write(source, MessageClass.PrivateChannel, e.Message);
         }
 
         void _chat_ChannelMessageEvent(Vha.Net.Chat chat, ChannelMessageEventArgs e)
@@ -783,7 +783,7 @@ namespace Vha.Chat
                 return;
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.Character, null, e.Character, e.Outgoing);
-            this.Write(source, MessageClass.PM, e.Message);
+            this.Write(source, MessageClass.PrivateMessage, e.Message);
         }
 
         void _chat_SystemMessageEvent(Vha.Net.Chat chat, SystemMessageEventArgs e)
@@ -812,13 +812,13 @@ namespace Vha.Chat
             // Dispatch message
             string template = MDB.Parser.PrintfToFormatString(entry.Message);
             string text = (message == null) ? template : string.Format(template, message.Arguments);
-            this.Write(MessageClass.System, text);
+            this.Write(MessageClass.SystemMessage, text);
         }
 
         void _chat_SimpleMessageEvent(Vha.Net.Chat chat, SimpleMessageEventArgs e)
         {
             // Dispatch message
-            this.Write(MessageClass.System, e.Message);
+            this.Write(MessageClass.SystemMessage, e.Message);
         }
         #endregion
         #endregion // Internal

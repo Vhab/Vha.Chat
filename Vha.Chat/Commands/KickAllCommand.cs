@@ -28,7 +28,7 @@ namespace Vha.Chat.Commands
         {
             if (!context.Input.CheckConnection(true)) return false;
             context.Chat.SendPrivateChannelKickAll();
-            context.Write(MessageClass.PG, "Kicking all users from your private channel");
+            context.Write(MessageClass.PrivateChannel, "Kicking all users from your private channel");
             return true;
         }
 

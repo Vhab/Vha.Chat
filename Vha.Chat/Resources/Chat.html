@@ -38,19 +38,24 @@
         text-decoration: underline;
     }
     /* Colors */
+    /* - Internal messages */
     .None, .None a.Link { }
     .Internal, .Internal a.Link { color: #920913; }
-    .Organization, .Organization a.Link { color: #60800b; }
-    .General, .General a.Link { color: #09b20d; }
-    .Announcements, .Announcements a.Link { color: #f0007c; }
-    .Towers, .Towers a.Link { color: #b86b2c; }
-    .Shopping, .Shopping a.Link { color: #2331b8; }
-    .Vicinity, .Vicinity a.Link { color: #809209; }
+    .Error, .Error a.Link { color: #bb0000; }
     .Text, .Text a.Link { color: #aaaa0c; }
-    .PM, .PM a.Link { color: #097363; }
-    .PG, .PG a.Link { color: #4f4f4f; }
-    .Error, .Error a.Link { color: #990000; }
-    .System, .System a.Link { color: #000000; }
+    /* - External messages */
+    .SystemMessage, .SystemMessage a.Link { color: #000000; }
+    .VicinityMessage, .VicinityMessage a.Link { color: #809209; }
+    .PrivateMessage, .PrivateMessage a.Link { color: #097363; }
+    .PrivateChannel, .PrivateChannel a.Link { color: #4f4f4f; }
+    /* - Public channels */
+    .UnknownChannel, .UnknownChannel a.Link { color: #000000; }
+    .AnnouncementsChannel, .AnnouncementsChannel a.Link { color: #f0007c; }
+    .GeneralChannel, .GeneralChannel a.Link { color: #09b20d; }
+    .OrganizationChannel, .OrganizationChannel a.Link { color: #60800b; }
+    .ShoppingChannel, .ShoppingChannel a.Link { color: #2331b8; }
+    .TowersChannel, .TowersChannel a.Link { color: #b86b2c; }
+    .LeadersChannel, .LeadersChannel a.Link { color: #a938e4; }
 </style>
 <script type="text/javascript">
     function scrollToBottom()

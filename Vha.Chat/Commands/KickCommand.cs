@@ -29,7 +29,7 @@ namespace Vha.Chat.Commands
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckUser(args[0], true)) return false;
             context.Chat.SendPrivateChannelKick(args[0]);
-            context.Write(MessageClass.PG, "Kicking " + args[0] + " from your private channel");
+            context.Write(MessageClass.PrivateChannel, "Kicking " + args[0] + " from your private channel");
             return true;
         }
 

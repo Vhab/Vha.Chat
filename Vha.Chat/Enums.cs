@@ -64,20 +64,22 @@ namespace Vha.Chat
 
     public enum MessageClass
     {
-        Unknown,
-        None,
-        Internal,
-        Organization,
-        General,
-        Announcements,
-        Towers,
-        Shopping,
-        Vicinity,
-        Text,
-        PM,
-        PG,
-        Error,
-        System,
+        None, // No particular class
+        Internal, // Internal status/info messages
+        Error, // Error messages
+        Text, // Echo'd messages
+        SystemMessage,
+        VicinityMessage,
+        PrivateMessage,
+        PrivateChannel,
+        // Public channels
+        UnknownChannel,
+        AnnouncementsChannel,
+        GeneralChannel,
+        OrganizationChannel,
+        ShoppingChannel,
+        TowersChannel,
+        LeadersChannel,
     }
 
     public enum MessageType

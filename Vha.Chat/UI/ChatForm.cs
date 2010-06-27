@@ -186,9 +186,10 @@ namespace Vha.Chat.UI
             switch (args.Source.Type)
             {
                 case MessageType.Channel:
-                    line = string.Format(
-                        "[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
-                        args.Source.Channel, args.Source.Character, args.Message);
+                    line = string.Format("[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
+                    if (!string.IsNullOrEmpty(args.Source.Character))
+                        line += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
+                    line += args.Message;
                     break;
                 case MessageType.Character:
                     line = string.Format(

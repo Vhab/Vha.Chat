@@ -27,13 +27,6 @@ using Vha.Chat;
 
 namespace Vha.Chat.UI
 {
-    public enum ChatHtmlStyle
-    {
-        Default,
-        Invert,
-        Strip
-    }
-
     public class ChatHtml
     {
         public string Template
@@ -193,8 +186,8 @@ namespace Vha.Chat.UI
             }
         }
 
-        public void AppendHtml(HtmlDocument document, ChatHtmlStyle style, string html) { AppendHtml(document, style, html, false); }
-        public void AppendHtml(HtmlDocument document, ChatHtmlStyle style, string html, bool oneElement)
+        public void AppendHtml(HtmlDocument document, TextStyle style, string html) { AppendHtml(document, style, html, false); }
+        public void AppendHtml(HtmlDocument document, TextStyle style, string html, bool oneElement)
         {
             if (document.Body == null)
                 return;
@@ -220,9 +213,9 @@ namespace Vha.Chat.UI
                 html = html.Replace(match.Groups[0].Value, replacement);
             }
             // Invert or strip colors if needed
-            if (style == ChatHtmlStyle.Invert)
+            if (style == TextStyle.Invert)
                 html = InvertColors(html);
-            else if (style == ChatHtmlStyle.Strip)
+            else if (style == TextStyle.Strip)
                 html = StripColors(html);
             // Some hardcore cheating
             HtmlElement tag = document.CreateElement("div");

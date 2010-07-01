@@ -41,20 +41,26 @@ namespace Vha.Chat.Commands
                 }
                 // Display help
                 string help = string.Format(
-                    "\n<u>{0}</u>\n{1}\n\n" +
-                    "Triggers: {2}\n\n" +
-                    "Usage:\n- {3}\n\n" +
-                    "Examples:\n - {4}",
-                    command.Name, command.Description,
-                    string.Join(", ", command.Triggers),
-                    string.Join("\n- ", command.Usage),
-                    string.Join("\n- ", command.Examples)
+                    "{1}\n" +
+                    "Usage:\n- {0}{2}\n" +
+                    "Examples:\n- {0}{3}",
+                    context.Input.Prefix, command.Description,
+                    string.Join("\n- " + context.Input.Prefix, command.Usage),
+                    string.Join("\n- " + context.Input.Prefix, command.Examples)
                     );
                 context.Write(MessageClass.Internal, help);
                 return true;
             }
             // General help
-            context.Write(MessageClass.Internal, "TODO: implement help command");
+            
+            context.Write(
+                MessageClass.Internal,
+                string.Format(
+                    "The following commands are available: {1}\n" +
+                    "Use '{0}tell [command]' for more information",
+                    context.Input.Prefix,
+                    string.Join(", ", context.Input.GetTriggers())
+                ));
             return true;
         }
 

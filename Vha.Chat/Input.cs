@@ -215,6 +215,17 @@ namespace Vha.Chat
             }
         }
 
+        public Command[] GetCommands()
+        {
+            List<Command> commands = new List<Command>();
+            lock (this)
+            {
+                foreach (Command command in this._commands.Values)
+                    commands.Add(command);
+            }
+            return commands.ToArray();
+        }
+
         public bool HasCommand(string name)
         {
             lock (this)
@@ -241,6 +252,17 @@ namespace Vha.Chat
             }
         }
 
+        public string[] GetTriggers()
+        {
+            List<string> triggers = new List<string>();
+            lock (this)
+            {
+                foreach (string trigger in this._triggers.Keys)
+                    triggers.Add(trigger);
+            }
+            return triggers.ToArray();
+        }
+
         public Command GetCommandByTrigger(string trigger)
         {
             string trig = trigger.ToLower();
@@ -251,7 +273,6 @@ namespace Vha.Chat
                 return this._triggers[trig];
             }
         }
-
         #endregion
 
         #region Internal
@@ -259,14 +280,14 @@ namespace Vha.Chat
         {
             this._context = context;
             this._prefix = prefix;
-            this._commands = new Dictionary<string, Command>();
-            this._triggers = new Dictionary<string, Command>();
+            this._commands = new SortedDictionary<string, Command>();
+            this._triggers = new SortedDictionary<string, Command>();
         }
 
         private Context _context;
         private string _prefix;
-        private Dictionary<string, Command> _commands;
-        private Dictionary<string, Command> _triggers;
+        private SortedDictionary<string, Command> _commands;
+        private SortedDictionary<string, Command> _triggers;
         #endregion
     }
 }

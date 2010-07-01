@@ -30,7 +30,7 @@ namespace Vha.Chat
     {
         public readonly string OptionsPath;
         public readonly string OptionsFile;
-        public readonly string IgnoresPath;
+        public readonly string IgnoresFile;
         public readonly Dimension[] Dimensions;
 
         public Configuration(Base data)
@@ -42,7 +42,7 @@ namespace Vha.Chat
             ConfigurationV1 config = (ConfigurationV1)data;
             this.OptionsPath = config.OptionsPath;
             this.OptionsFile = config.OptionsFile;
-            this.IgnoresPath = config.IgnoresPath;
+            this.IgnoresFile = config.IgnoresFile;
             this.Dimensions = config.Dimensions.ConvertAll<Dimension>(
                 new Converter<ConfigurationV1Dimension,Dimension>(this._convertDimension))
                 .ToArray();

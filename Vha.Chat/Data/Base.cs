@@ -72,6 +72,9 @@ namespace Vha.Chat.Data
                     case "Configuration_1":
                         dataType = typeof(ConfigurationV1);
                         break;
+                    case "Ignores_1":
+                        dataType = typeof(IgnoresV1);
+                        break;
                     default:
                         return null;
                 }

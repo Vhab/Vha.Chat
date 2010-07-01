@@ -19,6 +19,7 @@
 
 using System;
 using System.Text;
+using Vha.Common;
 
 namespace Vha.Chat.Commands
 {
@@ -28,7 +29,20 @@ namespace Vha.Chat.Commands
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckUser(args[0], true)) return false;
-            context.Write(MessageClass.Internal, "TODO: implement ignore command");
+            IgnoreResult result = context.Ignores.Toggle(args[0]);
+            string character = Format.UppercaseFirst(args[0]);
+            switch (result)
+            {
+                case IgnoreResult.Added:
+                    context.Write(MessageClass.Internal, character + " has been added to your ignore list");
+                    break;
+                case IgnoreResult.Removed:
+                    context.Write(MessageClass.Internal, character + " has been removed from your ignore list");
+                    break;
+                default:
+                    context.Write(MessageClass.Error, "An error has occured while attempting to ignore " + character);
+                    break;
+            }
             return true;
         }
 

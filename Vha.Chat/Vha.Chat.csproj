@@ -55,6 +55,7 @@
     <Compile Include="Commands\UnignoreCommand.cs" />
     <Compile Include="Commands\UnmuteCommand.cs" />
     <Compile Include="Commands\WhoisCommand.cs" />
+    <Compile Include="Data\IgnoresV1.cs" />
     <Compile Include="Events\ChannelEventArgs.cs" />
     <Compile Include="Events\ErrorEventArgs.cs" />
     <Compile Include="Events\FriendEventArgs.cs" />

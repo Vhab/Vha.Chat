@@ -174,6 +174,17 @@ namespace Vha.Chat
             }
         }
 
+        public UInt32 CharacterId
+        {
+            get
+            {
+                if (this.State != ContextState.Connected &&
+                    this.State != ContextState.CharacterSelection)
+                    throw new InvalidOperationException("Context.CharacterID is not available while in state " + this.State);
+                return this._characterId;
+            }
+        }
+
         public string Organization
         {
             get
@@ -428,6 +439,7 @@ namespace Vha.Chat
         private string _dimension = null;
         private string _account = null;
         private string _character = null;
+        private UInt32 _characterId = 0;
         private string _organization = null;
         private UInt32 _organizationId = 0;
         private ContextState _state = ContextState.Disconnected;
@@ -501,6 +513,7 @@ namespace Vha.Chat
                 if (args.Character != null && charactersMap.ContainsKey(args.Character))
                 {
                     this._character = args.Character.Name;
+                    this._characterId = args.Character.ID;
                     this._chat.SendLoginCharacter(charactersMap[args.Character]);
 
                     // Mark as 'recently used'
@@ -590,6 +603,7 @@ namespace Vha.Chat
                     case ContextState.Reconnecting:
                         this._organization = null;
                         this._organizationId = 0;
+                        this._characterId = 0;
                         this._friends.Clear();
                         this._channels.Clear();
                         this._privateChannels.Clear();

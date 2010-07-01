@@ -49,7 +49,7 @@ namespace Vha.Chat.Commands
         public FriendCommand()
             : base(
                 "Adding and removing friends", // Name
-                new string[] { "friend", "f" }, // Triggers
+                new string[] { "friend" }, // Triggers
                 new string[] { "friend add [username]", "friend remove [username]" }, // Usage
                 new string[] { "friend add Vhab", "friend remove Helpbot" }, // Examples
                 // Description

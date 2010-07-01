@@ -75,7 +75,7 @@ namespace Vha.Chat.UI
                     "padding: 6px;";
             }
             // Put in some content
-            this._htmlUtil.AppendHtml(this._info.Document, ChatHtmlStyle.Default, this._html);
+            this._htmlUtil.AppendHtml(this._info.Document, TextStyle.Default, this._html);
         }
 
         private void InfoForm_Move(object sender, EventArgs e)

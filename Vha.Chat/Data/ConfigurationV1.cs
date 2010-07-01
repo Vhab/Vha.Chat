@@ -29,7 +29,7 @@ namespace Vha.Chat.Data
     {
         public string OptionsPath = ".\\";
         public string OptionsFile = "Options.xml";
-        public string IgnoresPath = ".\\Ignores\\";
+        public string IgnoresFile = "Ignores.xml";
         [XmlElement("Dimension")]
         public List<ConfigurationV1Dimension> Dimensions;
 

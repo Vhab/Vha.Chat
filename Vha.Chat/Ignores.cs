@@ -17,422 +17,250 @@
 * USA
 */
 
-#define SOMETHING
-
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
-using System.IO;
+using Vha.Chat.Data;
+using Vha.Common;
 
 namespace Vha.Chat
 {
-#if SOMETHING
     // Placeholder till I have the chance to port the Ignore system
     public class Ignores
     {
+        /// <summary>
+        /// Whether it's currently sensible to query the ignore list
+        /// </summary>
+        public bool Active
+        {
+            get
+            {
+                if (this._context.State != ContextState.Connected &&
+                this._context.State != ContextState.CharacterSelection)
+                    return false;
+                return true;
+            }
+        }
+        /// <summary>
+        /// Checks if the given user is ignored by this client.
+        /// This method will also account for any name changes as long as the character id remains the same.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public bool Contains(string user)
         {
-            return false;
-        }
-
-        internal Ignores(Context context)
-        {
-
-        }
-    }
-#else
-    public class Ignore
-    {
-
-        /*
-         * All methods *really* only need the uid field.
-         * However, since there is no way to lookup an uid into a name, we have to store the name that the user ignored,
-         * so that we can list sensible character names to the user.
-         * -- Demoder
-         */
-        #region Members
-        private Entries _entries = null;
-        private string _file = string.Empty;
-        private FileSystemWatcher _fsWatcher;
-        private IgnoreMethod _method;
-        /// <summary>
-        /// My account name
-        /// </summary>
-        private string _account;
-        public string Account { get { return this._account; } set { this._account = value; } }
-        /// <summary>
-        /// My UserID
-        /// </summary>
-        private uint _id;
-        public uint ID { get { return this._id; } set { this._id = value; } }
-        /// <summary>
-        /// Where do I store my data?
-        /// </summary>
-        public string FilePath { get { return this._file; } }
-
-        /// <summary>
-        /// Which ignore method are we using?
-        /// </summary>
-        public IgnoreMethod Method { get { return this._method; } set { this._method = value; } }
-        #endregion
-
-        #region Constructors
-        /// <summary>
-        /// Initialize an empty Ignore object.
-        /// </summary>
-        public Ignore()
-        {
-            this._entries = new Entries();
-            this._file = "";
-            this._method = IgnoreMethod.None;
-        }
-
-        /// <summary>
-        /// Initialize a new Ignore object, the simple way
-        /// </summary>
-        /// <param name="file">Path to xml file representing this ignore list</param>
-        /// <param name="method">Which method to use when checking/removing ignore entries?</param>
-        public Ignore(string file, IgnoreMethod method, string myAcc, uint myID)
-        {
-            this._account = myAcc;
-            this._id = myID;
-            if (!File.Exists(file)) //File doesn't exist, create it.
-            {
-                this._entries = new Entries();
-                try
-                {
-                    File.Create(file);
-                }
-                catch { this._method = IgnoreMethod.None; return; }
-            }
-            else //File exists, load it.
-            {
-                this._entries = Common.XML<Entries>.FromFile(file);
-            }
-            if (this._entries == null) this._entries = new Entries();
-            this._file = file;
-            InitFSWatcher();
-            this._method = method;
-        }
-        #endregion
-
-        #region Methods
-        /// <summary>
-        /// Initialize the filesystem watcher.
-        /// </summary>
-        private void InitFSWatcher()
-        {
-            //Locate directory part of path.
-            int loc = this._file.LastIndexOfAny("/\\".ToCharArray()); //Find the last occurance of either / or \
-            string dir = this._file.Substring(0, loc); //0 to char before last / or \
-            string file = this._file.Substring(loc + 1); //Last / or \ plus one.
-            this._fsWatcher = new FileSystemWatcher(dir, file);
-            this._fsWatcher.Changed += new FileSystemEventHandler(_onfsEventHandler);
-            this._fsWatcher.EnableRaisingEvents = true;
-        }
-
-        /// <summary>
-        /// Saves the ignore list to the file path associated with this instance
-        /// </summary>
-        /// <returns></returns>
-        public bool Save()
-        {
-            lock (this._file)
-            {
-                if (string.IsNullOrEmpty(this._file)) return false;
-                return this.Save(this._file, false);
-            }
-        }
-        /// <summary>
-        /// Saves the ignore list to file, updates internal record of file location to provided path
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public bool Save(string path) { return this.Save(path, true); }
-
-
-        /// <summary>
-        /// Saves the ignore list to file
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="UpdateFilePath">Should we update the default file path?</param>
-        /// <returns></returns>
-        public bool Save(string path, bool UpdateFilePath)
-        {
-            //Fixme: Implement some way of *ensuring* changes are written out.
-            //This is probably best added in the add/remove methods, or we'd end up overwriting things.
-            if (string.IsNullOrEmpty(path)) return false;
-            if (UpdateFilePath) //Should we update the file path?
-                lock (this._file)
-                {
-                    this._file = path;
-                    this.InitFSWatcher();
-                }
-            lock (this._entries)
-            {
-                //Check if the given file is marked as read only.
-                FileInfo fi = new FileInfo(path);
-                if (fi.IsReadOnly) return false;
-                this._fsWatcher.EnableRaisingEvents = false;
-                bool success = Common.XML<Entries>.ToFile(path, this._entries);
-                this._fsWatcher.EnableRaisingEvents = true;
-                return success;
-            }
-        }
-
-        /// <summary>
-        /// If already ignored, unignore. If not ignored, ignore. Returns: true if user becomes ignored, false otherwise.
-        /// </summary>
-        /// <param name="uid">UserID to ignore</param>
-        /// <returns>true when ignoring, false when unignoring.</returns>
-        public IgnoreResult Toggle(uint uid, string name)
-        {
-            if (uid == uint.MinValue || uid == uint.MaxValue) return IgnoreResult.Error;
-            name = name.Substring(0, 1).ToUpper() + name.Substring(1).ToLower();
-            if (this.Contains(uid, name))
-            {
-                this.Remove(uid, name);
-                return IgnoreResult.Removed;
-            }
-            else
-            {
-                this.Add(uid, name);
-                return IgnoreResult.Added;
-            }
-        }
-
-        /// <summary>
-        /// Retrieve an uint[] containing all ignored uids
-        /// </summary>
-        /// <returns></returns>
-        public uint[] ToIDArray()
-        {
-            lock (this._entries)
-            {
-                List<uint> output = new List<uint>();
-                foreach (Entry ie in this._entries.Items)
-                {
-                    output.Add(ie.ID);
-                }
-                output.Sort(delegate(uint A, uint B) { return A.CompareTo(B); });
-                return output.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// Retrieve a string[] containing all ignored unames
-        /// </summary>
-        /// <returns></returns>
-        public string[] ToNameArray()
-        {
-            lock (this._entries)
-            {
-                List<string> output = new List<string>();
-                foreach (Entry ie in this._entries.Items)
-                {
-                    output.Add(ie.Name);
-                }
-                output.Sort(delegate(string A, string B) { return A.CompareTo(B); });
-                return output.ToArray();
-            }
-        }
-
-        #region FS watch stuff
-        /// <summary>
-        /// Handles reports of changes to the file we are using.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="e"></param>
-        private void _onfsEventHandler(object obj, FileSystemEventArgs e)
-        {
-            if (e.ChangeType == WatcherChangeTypes.Changed)
-            {
-                this._entries = Common.XML<Entries>.FromFile(this._file);
-            }
-        }
-        #endregion
-
-        #endregion
-
-        /// <summary>
-        /// Find out if a given uid is ignored.
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public bool Contains(uint uid, string name)
-        {
-            if (uid == uint.MinValue || uid == uint.MaxValue) return false;
-            lock (this._entries)
-            {
-                name = name.Substring(0, 1).ToUpper() + name.Substring(1).ToLower();
-                bool changed;
-                do
-                {
-                    changed = false;
-                    foreach (Entry ie in _entries.Items)
-                    {
-                        if (this.MatchCurrentIgnoreMethod(ie))
-                        {
-                            //If entries are found where uid!=name, remove.
-                            if (ie.ID == uid && ie.Name != name)
-                            { //UID is in list, but with the wrong name. Update the name.
-                                this._entries.Items.Remove(ie);
-                                this.Add(uid, name);
-                                return true;
-                            }
-                            else if (ie.ID != uid && ie.Name == name)
-                            {
-                                this._entries.Items.Remove(ie);
-                                changed = true;
-                                break;
-                            }
-                            else if (uid == ie.ID) { return true; }
-                        }
-                    }
-                } while (changed);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Ignore a given user. Always returns true.
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <param name="name"></param>
-        /// <returns>always true</returns>
-        public bool Add(uint uid, string name)
-        {
-            if (uid == uint.MinValue || uid == uint.MaxValue) return false;
+            if (!this.Active) return false;
+            // Find the character id
+            user = Format.UppercaseFirst(user);
+            UInt32 userId = this._context.Chat.GetUserID(user);
+            // We can't ignore ourselves
+            if (userId == this._context.CharacterId) return false;
+            // I don't think we're ignoring characters who don't exist
+            if (userId == 0) return false;
             lock (this)
             {
-                name = name.Substring(0, 1).ToUpper() + name.Substring(1).ToLower();
-                Entry tmp = new Entry(this._account, this._id, uid, name);
-                if (this._entries.Items.Contains(tmp)) this.Remove(uid, name); //Remove any previous matches.
-                this._entries.Items.Add(tmp);
-                if (!string.IsNullOrEmpty(this._file)) this.Save();
+                if (!this._ignored.ContainsKey(userId))
+                    return false;
+                // Check for name change
+                if (this._ignored[userId] != user)
+                    this.Add(user);
                 return true;
             }
         }
 
-        /// <summary>
-        /// Unignore a given user. Always returns false
-        /// </summary>
-        /// <param name="uid"></param>
-        /// <param name="name"></param>
-        /// <returns>false </returns>
-        public bool Remove(uint uid, string name)
+        public void Add(string user)
         {
-            if (uid == uint.MinValue || uid == uint.MaxValue) return false;
+            if (!this.Active)
+                throw new InvalidOperationException("The ignore list cannot be modified in the current state");
+            // Find the character id
+            user = Format.UppercaseFirst(user);
+            UInt32 userId = this._context.Chat.GetUserID(user);
+            // Can't ignore that which does not exist
+            if (userId == 0) return;
+            // And now, the action!
             lock (this)
             {
-                //Remove all entries where (uid == uid || name==name).
-                name = name.Substring(0, 1).ToUpper() + name.Substring(1).ToLower();
+                // Remove previous conflicting entries
                 bool changed;
                 do
                 {
                     changed = false;
-                    foreach (Entry ie in this._entries.Items)
+                    foreach (IgnoresV1Entry entry in this._data.Entries)
                     {
-                        if (this.MatchCurrentIgnoreMethod(ie))
-                        {
-                            if (ie.ID == uid || ie.Name == name)
-                            {
-                                this._entries.Items.Remove(ie);
-                                changed = true;
-                                break;
-                            }
-                        }
+                        if (entry.Dimension != this._context.Dimension)
+                            continue;
+                        if (entry.Account != this._context.Account)
+                            continue;
+                        if (entry.ID != this._context.CharacterId)
+                            continue;
+                        if (entry.CharacterID != userId)
+                            continue;
+                        changed = true;
+                        this._data.Entries.Remove(entry);
+                        break;
                     }
-                } while (changed);
-
-                if (!string.IsNullOrEmpty(this._file)) this.Save();
-                return false;
+                }
+                while (changed);
+                // Add new entry
+                IgnoresV1Entry newEntry = new IgnoresV1Entry();
+                newEntry.Dimension = this._context.Dimension;
+                newEntry.Account = this._context.Account;
+                newEntry.ID = this._context.CharacterId;
+                newEntry.Character = user;
+                newEntry.CharacterID = userId;
+                this._data.Entries.Add(newEntry);
+                // Update cache
+                if (this._ignored.ContainsKey(userId))
+                    this._ignored[userId] = user;
+                else this._ignored.Add(userId, user);
+                // Save changes
+                this._save();
             }
         }
 
-        /// <summary>
-        /// Find out if this entry is relevant for our current ignore method.
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private bool MatchCurrentIgnoreMethod(Entry e)
+        public void Remove(string user)
         {
-            switch (this._method)
+            if (!this.Active)
+                throw new InvalidOperationException("The ignore list cannot be modified in the current state");
+            // Find the character id
+            user = Format.UppercaseFirst(user);
+            UInt32 userId = this._context.Chat.GetUserID(user);
+            // Remove the ignore
+            lock (this)
+            {
+                // Remove all matching entries
+                bool changed;
+                do
+                {
+                    changed = false;
+                    foreach (IgnoresV1Entry entry in this._data.Entries)
+                    {
+                        if (!this._matchesIgnoreMethod(entry))
+                            continue;
+                        if (entry.CharacterID != userId && entry.Character != user)
+                            continue;
+                        changed = true;
+                        this._data.Entries.Remove(entry);
+                        break;
+                    }
+                }
+                while (changed);
+                // Remove from cache by id
+                if (this._ignored.ContainsKey(userId))
+                {
+                    this._ignored.Remove(userId);
+                }
+                // Save changes
+                this._save();
+            }
+        }
+
+        public IgnoreResult Toggle(string user)
+        {
+            // Find the character id
+            user = Format.UppercaseFirst(user);
+            UInt32 userId = this._context.Chat.GetUserID(user);
+            if (userId == 0) return IgnoreResult.Error;
+            lock (this)
+            {
+                bool exists = false;
+                foreach (IgnoresV1Entry entry in this._data.Entries)
+                {
+                    if (!this._matchesIgnoreMethod(entry))
+                        continue;
+                    if (entry.CharacterID != userId && entry.Character != user)
+                        continue;
+                    exists = true;
+                    break;
+                }
+                if (exists)
+                {
+                    this.Remove(user);
+                    return IgnoreResult.Removed;
+                }
+                else
+                {
+                    this.Add(user);
+                    return IgnoreResult.Added;
+                }
+            }
+        }
+
+        #region Internal
+        private Context _context;
+        private Dictionary<UInt32, string> _ignored = new Dictionary<uint, string>();
+        private IgnoresV1 _data = null;
+
+        internal Ignores(Context context)
+        {
+            this._context = context;
+            this._context.StateEvent += new Handler<Vha.Chat.Events.StateEventArgs>(_context_StateEvent);
+            this._data = new IgnoresV1();
+            this._load();
+        }
+
+        #region Private methods
+        private void _rebuild()
+        {
+            // Rebuild the ignore cache
+            lock (this)
+            {
+                this._ignored.Clear();
+                foreach (IgnoresV1Entry entry in this._data.Entries)
+                {
+                    if (!this._matchesIgnoreMethod(entry)) continue;
+                    if (this._ignored.ContainsKey(entry.CharacterID)) continue;
+                    this._ignored.Add(entry.CharacterID, entry.Character);
+                }
+            }
+        }
+
+        private void _load()
+        {
+            string file = this._context.Configuration.OptionsPath + this._context.Configuration.IgnoresFile;
+            Base data = Base.Load(file);
+            if (data == null) return;
+            if (data.Type != typeof(IgnoresV1))
+                throw new ArgumentException("Invalid ignores data type: " + data.Type.ToString() + " when loading file: " + file);
+            this._data = (IgnoresV1)data;
+            this._rebuild();
+        }
+
+        private void _save()
+        {
+            string file = this._context.Configuration.OptionsPath + this._context.Configuration.IgnoresFile;
+            this._data.Save(file);
+        }
+
+        private bool _matchesIgnoreMethod(IgnoresV1Entry entry)
+        {
+            // Check connection state
+            if (!this.Active) return false;
+            // Check IgnoreMethod
+            switch (this._context.Options.IgnoreMethod)
             {
                 case IgnoreMethod.None:
-                default:
                     return false;
                 case IgnoreMethod.Dimension:
-                    return true;
+                    return (entry.Dimension == this._context.Dimension);
                 case IgnoreMethod.Account:
-                    if (e.MyAccount == this._account) return true;
-                    else return false;
-                case IgnoreMethod.Character: //don't have to check account, since uids are unique per dim, not per account.
-                    if (e.MyID == this._id) return true;
-                    else return false;
+                    if (entry.Dimension != this._context.Dimension) return false;
+                    return (entry.Account == this._context.Account);
+                case IgnoreMethod.Character:
+                    if (entry.Dimension != this._context.Dimension) return false;
+                    // Character id's are unique per dimension,
+                    // so there is no need to check the account value
+                    return (entry.ID == this._context.CharacterId);
+                default:
+                    return false;
             }
         }
 
-        /// <summary>
-        /// Retrieve a comma-separated list of ignored characters.
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
+        void _context_StateEvent(Context context, Vha.Chat.Events.StateEventArgs args)
         {
-            lock (this._entries)
-            {
-                List<string> output = new List<string>();
-                foreach (Entry ie in this._entries.Items)
-                {
-                    output.Add(ie.Name);
-                }
-                output.Sort(delegate(string A, string B) { return A.CompareTo(B); });
-                return string.Join(", ", output.ToArray());
-            }
-        }
-        public int Count()
-        {
-            lock (this._entries)
-            {
-                return this._entries.Items.Count;
-            }
-        }
-
-        #region Classes
-        [XmlRoot("Ignorelist")]
-        public class Entries
-        {
-            [XmlElement("Entry")]
-            public List<Entry> Items = new List<Entry>(); //This is so we can store uid + name. Name is to be able to list who's on ignore.
-        }
-        public struct Entry
-        {
-            /// <summary>
-            /// Creates an ignore entry.
-            /// </summary>
-            /// <param name="myAccount">Account name to associate entry with</param>
-            /// <param name="myID"></param>
-            /// <param name="ignoreID"></param>
-            /// <param name="ignoreName"></param>
-            public Entry(string myAccount, uint myID, uint ignoreID, string ignoreName)
-            {
-                this.ID = ignoreID;
-                this.Name = ignoreName;
-                this.MyAccount = myAccount;
-                this.MyID = myID;
-            }
-            [XmlAttribute("ID")]
-            public uint ID;
-            [XmlAttribute("Name")]
-            public string Name;
-            [XmlAttribute("MyAccount")]
-            public string MyAccount;
-            [XmlAttribute("MyID")]
-            public uint MyID;
+            // Whenever the state changes, rebuild the cache
+            this._rebuild();
         }
         #endregion
+        #endregion
     }
-#endif
 }

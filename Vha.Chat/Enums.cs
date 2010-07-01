@@ -52,8 +52,6 @@ namespace Vha.Chat
         Connected
     }
 
-
-
     public enum ErrorType
     {
         /// <summary>
@@ -103,10 +101,26 @@ namespace Vha.Chat
         PrivateChannel
     }
 
+    public enum TextStyle
+    {
+        /// <summary>
+        /// Display the text as it is received
+        /// </summary>
+        Default,
+        /// <summary>
+        /// Invert all the colors contained within the text
+        /// </summary>
+        Invert,
+        /// <summary>
+        /// Strip all colors from the text
+        /// </summary>
+        Strip
+    }
+
     public enum IgnoreMethod
     {
         /// <summary>
-        /// No method - Ignore system is disabled
+        /// Ignores are disable
         /// </summary>
         None,
         /// <summary>

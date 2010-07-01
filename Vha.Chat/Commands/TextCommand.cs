@@ -35,7 +35,7 @@ namespace Vha.Chat.Commands
             : base(
                 "Print text", // Name
                 new string[] { "text", "echo" }, // Triggers
-                new string[] { "text [text]" }, // Usage
+                new string[] { "text [text]", "echo [text]" }, // Usage
                 new string[] { "text Ping? Pong!" }, // Examples
                 // Description
                 "The text command allows you to print text directly to the output window.\n" +

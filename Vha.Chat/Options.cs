@@ -57,10 +57,15 @@ namespace Vha.Chat
             get { return this._options.MaximumHistory; }
             set { this._options.MaximumHistory = value; this.Touch(); }
         }
-        public UI.ChatHtmlStyle TextStyle
+        public TextStyle TextStyle
         {
             get { return this._options.TextStyle; }
             set { this._options.TextStyle = value; this.Touch(); }
+        }
+        public IgnoreMethod IgnoreMethod
+        {
+            get { return this._options.IgnoreMethod; }
+            set { this._options.IgnoreMethod = value; this.Touch(); }
         }
         public OptionsProxy Proxy
         {

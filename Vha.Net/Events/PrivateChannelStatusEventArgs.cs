@@ -31,14 +31,16 @@ namespace Vha.Net.Events
         private readonly UInt32 _characterID = 0;
         private readonly string _character;
         private readonly bool _join = false;
+        private readonly bool _local = false;
 
-        public PrivateChannelStatusEventArgs(UInt32 channelID, string channel, UInt32 characterID, string character, bool join)
+        public PrivateChannelStatusEventArgs(UInt32 channelID, string channel, UInt32 characterID, string character, bool join, bool local)
         {
             this._channelID = channelID;
             this._channel = channel;
             this._characterID = characterID;
             this._character = character;
             this._join = join;
+            this._local = local;
         }
 
 		/// <summary>
@@ -50,16 +52,28 @@ namespace Vha.Net.Events
 		/// </summary>
 		public string Channel { get { return this._channel; } }
         /// <summary>
-        /// ID of the user who is triggering this event.
+        /// ID of the character who is triggering this event.
         /// </summary>
 		public UInt32 CharacterID { get { return this._characterID; } }
 		/// <summary>
-		/// Name of the user who is triggering this event.
+        /// Name of the character who is triggering this event.
 		/// </summary>
         public string Character { get { return this._character; } }
         /// <summary>
-        /// Whether someone has joined or left this channel. True if the user has joined, false when the user left.
+        /// Whether someone has joined or left this channel. True if the character has joined, false when the character left.
         /// </summary>
 		public bool Join { get { return this._join; } }
+        /// <summary>
+        /// Whether this channel is owned by our character.
+        /// </summary>
+        public bool Local { get { return this._local; } }
+        /// <summary>
+        /// Returns the combined private channel data
+        /// </summary>
+        /// <returns></returns>
+        public PrivateChannel GetPrivateChannel()
+        {
+            return new PrivateChannel(this._channelID, this._channel, this._local);
+        }
     }
 }

@@ -50,7 +50,7 @@ namespace Vha.Net.Events
         }
 
         /// <summary>
-        /// Id of the character
+        /// ID of the character
         /// </summary>
         public UInt32 CharacterID { get { return this._characterID; } }
         public string Character { get { return this._character; } }
@@ -62,6 +62,10 @@ namespace Vha.Net.Events
         /// Whether the character is a temporary friend
         /// </summary>
         public bool Temporary { get { return this._temporary; } }
-
+        /// <summary>
+        /// Returns combined friend data
+        /// </summary>
+        /// <returns>A new instance of Friend</returns>
+        public Friend GetFriend() { return new Friend(this.CharacterID, this.Character, this.Online, this.Temporary); }
     }
 }

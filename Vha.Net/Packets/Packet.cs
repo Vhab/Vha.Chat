@@ -62,7 +62,7 @@ namespace Vha.Net.Packets
             PRIVATE_CHANNEL_KICKALL = 54,
             PRIVATE_CHANNEL_CLIENTJOIN = 55,
             PRIVATE_CHANNEL_CLIENTPART = 56,
-            CHANNEL_JOIN = 60,
+            CHANNEL_STATUS = 60,
             CHANNEL_PART = 61,
             PONG = 100,
             FORWARD = 110,

@@ -22,45 +22,48 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
 using Vha.Chat;
+using Vha.Chat.UI;
 using Vha.Common;
 
 namespace Vha.Chat
 {
     public static class Program
     {
-        public static Config Configuration = null;
-        public static ApplicationContext Context;
+        /// <summary>
+        /// Returns the main ApplicationContext to control the main form
+        /// </summary>
+        public static ApplicationContext ApplicationContext;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
-            // Read configuration
-            Config configuration = XML<Config>.FromFile("Config.xml");
-            if (configuration != null) Configuration = configuration;
-            else Configuration = new Config();
-            // Start application
+            // Create context
+            Context context = new Context();
+            // Initialize Windows.Forms application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
 #if !DEBUG
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+            context.ExceptionEvent += new Handler<Exception>(UnhandledException);
 #endif
-            Context = new ApplicationContext();
-            Context.MainForm = new AuthenticationForm();
-            Application.Run(Context);
+            // Start application
+            ApplicationContext = new ApplicationContext();
+            ApplicationContext.MainForm = new AuthenticationForm(context);
+            Application.Run(ApplicationContext);
         }
 
 #if !DEBUG
         // Exception handling
-        public static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             UnhandledException((Exception)e.ExceptionObject);
         }
 
-        public static void UnhandledException(Vha.Net.Chat chat, Exception ex)
+        private static void UnhandledException(Context context, Exception args)
         {
-            UnhandledException(ex);
+            UnhandledException(args);
         }
 
         private static void UnhandledException(Exception ex)

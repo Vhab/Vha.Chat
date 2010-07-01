@@ -3,19 +3,23 @@
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; version 2 of the License only.
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
 *
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+* THE SOFTWARE.
 */
 
 using System;
@@ -23,54 +27,70 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Net;
 using Vha.Common;
 
 namespace Vha.MDB
 {
     public class Parser
     {
-        public static Message Decode(string scrambledString) { return Decode(scrambledString, false, null); }
-        public static Message Decode(string scrambledString, bool recursive, Reader reader)
+        public static Message Decode(string scrambledString) { return Decode(scrambledString, null); }
+        public static Message Decode(string scrambledString, Reader reader)
         {
-            if (reader == null)
-                reader = new Reader();
+            if (scrambledString.StartsWith("~"))
+                scrambledString = scrambledString.Substring(1);
 
-            if (scrambledString.Length < 2)
-                throw new Exception("Invalid message length!");
-
-            if (!scrambledString.StartsWith("~"))
-                throw new Exception("Invalid message start! Expecting: ~");
-
-            if (!scrambledString.EndsWith("~") && !recursive)
-                throw new Exception("Invalid message end! Expecting: ~");
-
-            scrambledString = scrambledString.Substring(1);
-            if (!recursive)
+            if (scrambledString.EndsWith("~"))
                 scrambledString = scrambledString.Substring(0, scrambledString.Length - 1);
 
-            Message descrambledMessage = new Message(0, 0, null);
-            MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(scrambledString));
-
+            return Decode(Encoding.UTF8.GetBytes(scrambledString), reader);
+        }
+        public static Message Decode(Byte[] data, Reader reader)
+        {
+            MemoryStream stream = new MemoryStream(data);
+            Message message = Decode(stream, reader);
+            stream.Close();
+            return message;
+        }
+        public static Message Decode(Stream stream, Reader reader)
+        {
+            // Create reader
+            if (reader == null)
+                reader = new Reader();
+            // Create 'empty' message
+            Message descrambledMessage = new Message(0, 0);
+            // And here the real magic happens!
             while (true)
             {
                 if (stream.Position >= stream.Length)
                     break;
 
-                //string type = char.ConvertFromUtf32(stream.ReadByte()); /* Not Supported on Mono */
                 string type = Convert.ToChar(stream.ReadByte()).ToString();
                 switch (type)
                 {
                     case "&": // Message start, Category ID and Entry ID
                         descrambledMessage = new Message(
                             Base85.Decode(Read(stream, 5)),
-                            Base85.Decode(Read(stream, 5)),
-                            "~" + scrambledString + "~"
+                            Base85.Decode(Read(stream, 5))
                         );
+                        break;
+                    case "S":
+                        Byte[] strSizeBuffer = new Byte[2];
+                        stream.Read(strSizeBuffer, 0, 2);
+                        Int16 strSize = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(strSizeBuffer, 0));
+                        String str = Read(stream, strSize);
+                        descrambledMessage.Append(new Argument(str));
                         break;
                     case "s": // String
                         Int32 textSize = stream.ReadByte();
                         String text = Read(stream, textSize - 1);
                         descrambledMessage.Append(new Argument(text));
+                        break;
+                    case "I": // Raw Integer
+                        Byte[] rawIntegerBuffer = new Byte[4];
+                        stream.Read(rawIntegerBuffer, 0, 4);
+                        Int32 rawInteger = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(rawIntegerBuffer, 0));
+                        descrambledMessage.Append(new Argument(rawInteger));
                         break;
                     case "i": // Integer
                         Int32 integer = Base85.Decode(Read(stream, 5));
@@ -104,10 +124,23 @@ namespace Vha.MDB
                     case "F": // Recursive, Complete new message
                         Int32 recursiveSize = stream.ReadByte();
                         String recursiveText = Read(stream, recursiveSize - 1);
-                        descrambledMessage.Append(new Argument(Decode(recursiveText, true, reader)));
+                        descrambledMessage.Append(new Argument(Decode(recursiveText, reader)));
+                        break;
+                    case "l": // System submessage
+                        Byte[] systemBuffer = new Byte[4];
+                        stream.Read(systemBuffer, 0, 4);
+                        Int32 systemEntryID = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(systemBuffer, 0));
+                        string systemMessage = "";
+                        if (reader != null)
+                        {
+                            Entry entry = reader.GetEntry(20000, systemEntryID);
+                            if (entry != null)
+                                systemMessage = entry.Message;
+                        }
+                        descrambledMessage.Append(new Argument(20000, systemEntryID, systemMessage));
                         break;
                     default:
-                        throw new Exception("Unknown type detected: " + type);
+                        throw new Exception("Unknown type detected: " + (int)(type[0]));
                 }
             }
             if (reader != null)
@@ -126,7 +159,7 @@ namespace Vha.MDB
             return descrambledMessage;
         }
 
-        private static string Read(MemoryStream stream, Int32 length)
+        private static string Read(Stream stream, Int32 length)
         {
             if (stream.Length < stream.Position + length)
                 throw new Exception("Trying to read beyond stream size! Size=" + stream.Length + " Position=" + stream.Position + " Length=" + length);
@@ -137,6 +170,8 @@ namespace Vha.MDB
 
         public static string PrintfToFormatString(string text)
         {
+            text = text.Replace("{", "{{");
+            text = text.Replace("}", "}}");
             Int32 counter = 0;
             string[] types = { "%s", "%u", "%d", "%f" };
             while (true)

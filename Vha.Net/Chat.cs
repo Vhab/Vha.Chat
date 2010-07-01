@@ -34,9 +34,9 @@ using Vha.Net.Events;
 namespace Vha.Net
 {
     public class Chat
-    {
-        // Public Settings
-        public bool AutoReconnect = true;
+	{
+		#region Public settings
+		public bool AutoReconnect = true;
         public int ReconnectDelay = 5000;
         public int PingInterval = 60000;
         public int PingTimeout = 120000;
@@ -44,11 +44,19 @@ namespace Vha.Net
         public double SlowPacketDelay = 2200;
         public bool IgnoreCharacterLoggedIn = true;
         public bool UseThreadPool = true;
-
-        // Events
-        public event AmdMuxInfoEventHandler AmdMuxInfoEvent;
+        /// <summary>
+        /// Default timeout of for GetCharacterID()
+        /// </summary>
+        public int LookupTimeout = 2500;
+		public object Tag = null;
+		#endregion
+		#region Events
+		public event AmdMuxInfoEventHandler AmdMuxInfoEvent;
         public event AnonVicinityEventHandler AnonVicinityEvent;
-        public event FriendStatusEventHandler FriendStatusEvent;
+        /// <summary>
+        /// Notices about friends being online or offline
+        /// </summary>
+		public event FriendStatusEventHandler FriendStatusEvent;
         public event FriendRemovedEventHandler FriendRemovedEvent;
         public event ClientUnknownEvent ClientUnknownEvent;
 		/// <summary>
@@ -57,7 +65,7 @@ namespace Vha.Net
         public event PrivateChannelRequestEventHandler PrivateChannelRequestEvent;
         public event NameLookupEventHandler NameLookupEvent;
         public event ForwardEventHandler ForwardEvent;
-        public event ChannelJoinEventHandler ChannelJoinEvent;
+        public event ChannelStatusEventHandler ChannelStatusEvent;
         public event ChannelMessageEventHandler ChannelMessageEvent;
         public event SystemMessageEventHandler SystemMessageEvent;
         public event SimpleMessageEventHandler SimpleMessageEvent;
@@ -70,11 +78,15 @@ namespace Vha.Net
         public event VicinityMessageEventHandler VicinityMessageEvent;
         public event LoginSeedEventHandler LoginSeedEvent;
         public event LoginCharlistEventHandler LoginCharlistEvent;
-        public event StatusChangeEventHandler StatusChangeEvent;
+        public event StateChangeEventHandler StateChangeEvent;
         public event DebugEventHandler DebugEvent;
+#if !DEBUG
         public event ExceptionEventHandler ExceptionEvent;
+#endif
+		#endregion
 
-        protected string _account = string.Empty;
+		#region Protected members
+		protected string _account = string.Empty;
         protected string _password = string.Empty;
         protected string _character = string.Empty;
         protected ChatState _state = ChatState.Disconnected;
@@ -89,7 +101,8 @@ namespace Vha.Net
 		/// </summary>
 		protected ManualResetEvent _sendThread_ResetEvent;
         protected Socket _socket;
-        protected Dictionary<UInt32, String> _users;
+        protected Dictionary<UInt32, String> _characters;
+        protected Dictionary<String, UInt32> _charactersByName;
         protected Dictionary<BigInteger, Channel> _channels;
         protected string _serverAddress;
         protected int _port;
@@ -106,7 +119,9 @@ namespace Vha.Net
         /// new Uri("socks4://userid@proxyserver:port/") for a Socks v4 connection.
         /// </summary>
         protected Uri _proxy = null;
+		#endregion
 
+		#region Public attributes
 		/// <summary>
 		/// My character ID
 		/// </summary>
@@ -152,8 +167,35 @@ namespace Vha.Net
 		/// Number of entries in the fast outgoing queue
 		/// </summary>
         public int FastQueueCount { get { return this._fastQueue.Count; } }
+		#endregion
 
-        public Chat(string server, int port, string account, string password)
+		#region Constructors
+		/// <summary>
+		/// </summary>
+		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
+        public Chat(Uri connectionString)
+        {
+            UriBuilder ub = new UriBuilder(connectionString);
+            this._serverAddress = ub.Host;
+            this._port = ub.Port;
+            this._account = ub.UserName;
+            this._password = ub.Password;
+            if (!string.IsNullOrEmpty(ub.Path))
+                this._character = Format.UppercaseFirst(ub.Path.Substring(1)); //Start at 1 to remove the initial /
+            this._proxy = null;
+        }
+
+		/// <summary>
+		/// </summary>
+		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
+		/// <param name="proxy">The proxy server this connection should be tunnelled through</param>
+        public Chat(Uri connectionString, Uri proxy)
+            : this(connectionString)
+        {
+            this._proxy = proxy;
+        }
+
+		public Chat(string server, int port, string account, string password)
         {
             this._serverAddress = server;
             this._port = port;
@@ -187,7 +229,7 @@ namespace Vha.Net
             this._port = port;
             this._account = account;
             this._password = password;
-            this._character = character;
+            this._character = Format.UppercaseFirst(character);
             this._proxy = null;
         }
 
@@ -208,11 +250,12 @@ namespace Vha.Net
             this._port = port;
             this._account = account;
             this._password = password;
-            this._character = character;
+            this._character = Format.UppercaseFirst(character);
             this._proxy = proxy;
-        }
+		}
+		#endregion
 
-        // Get this thing ready for running
+		// Get this thing ready for running
         protected void PrepareChat()
         {
             lock (this)
@@ -244,7 +287,8 @@ namespace Vha.Net
 				this._sendThread_ResetEvent = new ManualResetEvent(true); //Resetevent for sendthread.
                 this._sendThread = new Thread(new ThreadStart(this.RunSender));
                 this._sendThread.IsBackground = true;
-                this._users = new Dictionary<UInt32, String>();
+                this._characters = new Dictionary<UInt32, String>();
+                this._charactersByName = new Dictionary<string, uint>();
                 this._channels = new Dictionary<BigInteger, Channel>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
@@ -262,6 +306,24 @@ namespace Vha.Net
             }
         }
 
+        #region Connect
+        /// <summary>
+        /// Connect to chatserver using previously provided parameters
+        /// </summary>
+        /// <param name="async">Whether to use a blocking call to connect</param>
+        /// <returns></returns>
+        public bool Connect(bool async)
+        {
+            if (async)
+            {
+                Thread thread = new Thread(new ThreadStart(_connect));
+                thread.Start();
+                return false;
+            }
+            else return Connect();
+        }
+        internal void _connect() { Connect(); }
+
 		/// <summary>
 		/// Connect to chatserver using previously provided parameters
 		/// </summary>
@@ -275,15 +337,16 @@ namespace Vha.Net
                     this.Debug("Already Connected", "[Error]");
                     return false;
                 }
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Connecting));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Connecting));
                 this._closing = false;
                 this.PrepareChat();
 
                 this.Debug("Connecting to dimension: " + this._serverAddress + ":" + this._port, "[Auth]");
 
-                bool connected = false; //Set this to true when a connection is successfull.
+                bool connected = false; // Set this to true when a connection is successfull.
                 if (this._proxy != null)
                 {
+                    // Try connecting through a proxy
                     Proxy np = null;
                     try
                     {
@@ -312,8 +375,9 @@ namespace Vha.Net
                             this.Debug("Failed connecting to " + this._serverAddress + ":" + this._port.ToString() + " through " + np.ToString(), "[Socket]");
                     }
                 }
-                if (!connected)  //Only try this if we couldn't connect previously.
+                else
                 {
+                    // Try connecting without a proxy
                     try
                     {
                         IPHostEntry host = Dns.GetHostEntry(this._serverAddress);
@@ -345,11 +409,12 @@ namespace Vha.Net
                     return true;
                 }
             }
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             return false;
         }
+        #endregion
 
-		/// <summary>
+        /// <summary>
 		/// Remove all subscriptions from all of my events
 		/// </summary>
         public void ClearEvents()
@@ -362,7 +427,7 @@ namespace Vha.Net
             this.PrivateChannelRequestEvent = null;
             this.NameLookupEvent = null;
             this.ForwardEvent = null;
-            this.ChannelJoinEvent = null;
+            this.ChannelStatusEvent = null;
             this.ChannelMessageEvent = null;
             this.SystemMessageEvent = null;
             this.SimpleMessageEvent = null;
@@ -375,34 +440,18 @@ namespace Vha.Net
             this.VicinityMessageEvent = null;
             this.LoginSeedEvent = null;
             this.LoginCharlistEvent = null;
-            this.StatusChangeEvent = null;
+            this.StateChangeEvent = null;
             this.DebugEvent = null;
-        }
+#if !DEBUG
+            this.ExceptionEvent = null;
+#endif
+		}
 
+		#region Disconnect
 		/// <summary>
 		/// Disconnect from chat server synchronously.
 		/// </summary>
-        public void Disconnect() { Disconnect(false); }
-
-		/// <summary>
-		/// Disconnect from chatserver.
-		/// </summary>
-		/// <param name="async">weither or not to disconnect in async mode</param>
-        public void Disconnect(bool async)
-        {
-            // Prepare the disconnect
-            this._closing = true;
-            if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
-            if (this._pingTimer != null) { this._pingTimer.Stop(); }
-            // Close it up
-            if (async) ThreadPool.QueueUserWorkItem(new WaitCallback(Disconnect), null);
-            else Disconnect(null);
-        }
-		/// <summary>
-		/// Callback method for disconnecting in async mode.
-		/// </summary>
-		/// <param name="dummy"></param>
-        internal void Disconnect(Object dummy)
+        public void Disconnect()
         {
             if (this._socket != null && this._socket.Connected)
             {
@@ -424,8 +473,9 @@ namespace Vha.Net
             }
             this._socket = null;
             this._lookupReset = null;
-            if (this._users != null) this._users.Clear();
-            this._users = null;
+            if (this._characters != null) this._characters.Clear();
+            this._characters = null;
+            this._charactersByName = null;
             if (this._channels != null) this._channels.Clear();
             this._channels = null;
             this._fastQueue = null;
@@ -433,14 +483,34 @@ namespace Vha.Net
             this._reconnectTimer = null;
             this._pingTimer = null;
 
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             this._state = ChatState.Disconnected;
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
 
-        // Receive Thread
+		/// <summary>
+		/// Disconnect from chatserver.
+		/// </summary>
+		/// <param name="async">weither or not to disconnect in async mode</param>
+        public void Disconnect(bool async)
+        {
+            // Prepare the disconnect
+            this._closing = true;
+            if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
+            if (this._pingTimer != null) { this._pingTimer.Stop(); }
+            // Close it up
+            if (async)
+            {
+                Thread thread = new Thread(new ThreadStart(Disconnect));
+                thread.Start();
+            }
+            else Disconnect();
+        }
+		#endregion
+
+		// Receive Thread
         internal void RunReceiver()
         {
             this.Debug("Started", "[ReceiveThread]");
@@ -516,7 +586,7 @@ namespace Vha.Net
                 }
                 // And we're done!
                 this.Debug("Stopped!", "[ReceiveThread]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
         }
         // Send Thread
@@ -553,7 +623,7 @@ namespace Vha.Net
                         if (packet.PacketType == Packet.Type.PRIVATE_MESSAGE)
                         {
                             PrivateMessagePacket msg = (PrivateMessagePacket)packet;
-                            this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetUserName(msg.CharacterID), msg.Message, true));
+                            this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetCharacterName(msg.CharacterID), msg.Message, true));
                         }
 						if (this._fastQueue.Count > 0 || this._slowQueue.Count > 0) //If there is still something in queue, sleep for predefined delay..
 							Thread.Sleep((int)this.FastPacketDelay);
@@ -577,7 +647,7 @@ namespace Vha.Net
             finally
             {
                 this.Debug("Stopped!", "[SendThread]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
         }
 
@@ -635,7 +705,7 @@ namespace Vha.Net
                         OnFriendRemovedEvent(
                             new CharacterIDEventArgs(
                             ((SimpleIdPacket)packet).CharacterID,
-                            this.GetUserName(((SimpleIdPacket)packet).CharacterID)
+                            this.GetCharacterName(((SimpleIdPacket)packet).CharacterID)
                             ));
                         break;
                     case Packet.Type.CLIENT_UNKNOWN:
@@ -643,7 +713,7 @@ namespace Vha.Net
                         OnClientUnknownEvent(
                             new CharacterIDEventArgs(
                             ((SimpleIdPacket)packet).CharacterID,
-                            this.GetUserName(((SimpleIdPacket)packet).CharacterID)
+                            this.GetCharacterName(((SimpleIdPacket)packet).CharacterID)
                             ));
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_INVITE:
@@ -651,7 +721,7 @@ namespace Vha.Net
                         OnPrivateChannelRequestEvent(
                             new PrivateChannelRequestEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID),
                             false
                             ));
                         break;
@@ -661,8 +731,8 @@ namespace Vha.Net
                         OnPrivateChannelStatusEvent(
                             new PrivateChannelStatusEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
-                            this.ID, this.Character, false
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            this.ID, this.Character, false, false
                             ));
                         break;
                     case Packet.Type.LOGIN_OK:
@@ -690,7 +760,7 @@ namespace Vha.Net
                         OnPrivateMessageEvent(
                             new PrivateMessageEventArgs(
                             ((PrivateMessagePacket)packet).CharacterID,
-                            this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((PrivateMessagePacket)packet).CharacterID),
                             ((PrivateMessagePacket)packet).Message,
                             false
                             ));
@@ -700,7 +770,7 @@ namespace Vha.Net
                         OnVicinityMessageEvent(
                             new VicinityMessageEventArgs(
                             ((PrivateMessagePacket)packet).CharacterID,
-                            this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((PrivateMessagePacket)packet).CharacterID),
                             ((PrivateMessagePacket)packet).Message
                             ));
                         break;
@@ -717,20 +787,20 @@ namespace Vha.Net
                         OnFriendStatusEvent(
                             new FriendStatusEventArgs(
                             ((FriendStatusPacket)packet).CharacterID,
-                            this.GetUserName(((FriendStatusPacket)packet).CharacterID),
+                            this.GetCharacterName(((FriendStatusPacket)packet).CharacterID),
                             ((FriendStatusPacket)packet).Online,
                             ((FriendStatusPacket)packet).Temporary
                             ));
                         break;
-                    case Packet.Type.CHANNEL_JOIN:
-                        packet = new ChannelJoinPacket(packetData.type, packetData.data);
-                        OnChannelJoinEvent(
-                            new ChannelJoinEventArgs(
-                            ((ChannelJoinPacket)packet).ID,
-                            ((ChannelJoinPacket)packet).Name,
-                            ((ChannelJoinPacket)packet).Flags,
-                            ((ChannelJoinPacket)packet).Muted,
-                            ((ChannelJoinPacket)packet).ChannelType
+                    case Packet.Type.CHANNEL_STATUS:
+                        packet = new ChannelStatusPacket(packetData.type, packetData.data);
+                        OnChannelStatusEvent(
+                            new ChannelStatusEventArgs(
+                            ((ChannelStatusPacket)packet).ID,
+                            ((ChannelStatusPacket)packet).Name,
+                            ((ChannelStatusPacket)packet).Flags,
+                            ((ChannelStatusPacket)packet).Muted,
+                            ((ChannelStatusPacket)packet).ChannelType
                             ));
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN:
@@ -739,10 +809,11 @@ namespace Vha.Net
                         OnPrivateChannelStatusEvent(
                             new PrivateChannelStatusEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID),
                             ((PrivateChannelStatusPacket)packet).CharacterID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).CharacterID),
-                            ((PrivateChannelStatusPacket)packet).Joined
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).CharacterID),
+                            ((PrivateChannelStatusPacket)packet).Joined,
+                            ((PrivateChannelStatusPacket)packet).ChannelID == this._id
                             ));
                         break;
                     case Packet.Type.PRIVGRP_MESSAGE:
@@ -750,9 +821,9 @@ namespace Vha.Net
                         OnPrivateChannelMessageEvent(
                             new PrivateChannelMessageEventArgs(
                             ((PrivateChannelMessagePacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelMessagePacket)packet).ChannelID),
+                            this.GetCharacterName(((PrivateChannelMessagePacket)packet).ChannelID),
                             ((PrivateChannelMessagePacket)packet).CharacterID,
-                            this.GetUserName(((PrivateChannelMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((PrivateChannelMessagePacket)packet).CharacterID),
                             ((PrivateChannelMessagePacket)packet).Message,
                             ((PrivateChannelMessagePacket)packet).ChannelID == this._id
                             ));
@@ -764,7 +835,7 @@ namespace Vha.Net
                             ((ChannelMessagePacket)packet).ChannelID,
                             this.GetChannelName(((ChannelMessagePacket)packet).ChannelID),
                             ((ChannelMessagePacket)packet).CharacterID,
-                            this.GetUserName(((ChannelMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((ChannelMessagePacket)packet).CharacterID),
                             ((ChannelMessagePacket)packet).Message,
                             this.GetChannelType(((ChannelMessagePacket)packet).ChannelID)
                             ));
@@ -843,7 +914,7 @@ namespace Vha.Net
             this.Debug("Client:" + e.ClientID +
                 " Window:" + e.WindowID +
                 " ID:" + e.MessageID +
-                " Args:" + string.Join(",", e.Arguments) +
+                //" Args:" + e.Arguments + // TODO: figure out a decent way to display these arguments
                 " Notice:" + e.Notice, "[System]");
             if (this.SystemMessageEvent != null)
                 this.SystemMessageEvent(this, e);
@@ -906,10 +977,10 @@ namespace Vha.Net
                 this.PrivateChannelStatusEvent(this, e);
         }
 
-        protected virtual void OnChannelJoinEvent(ChannelJoinEventArgs e)
+        protected virtual void OnChannelStatusEvent(ChannelStatusEventArgs e)
         {
             if (this.State != ChatState.Connected)
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Connected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Connected));
 
             lock (_channels)
             {
@@ -925,8 +996,8 @@ namespace Vha.Net
                 this.Debug("Registered organization: " + e.Name + " (ID:" + e.ID + ")", "[Bot]");
             }
 
-            if (this.ChannelJoinEvent != null)
-                this.ChannelJoinEvent(this, e);
+            if (this.ChannelStatusEvent != null)
+                this.ChannelStatusEvent(this, e);
         }
 
         protected virtual void OnFriendStatusEvent(FriendStatusEventArgs e)
@@ -952,9 +1023,27 @@ namespace Vha.Net
 
         protected virtual void OnNameLookupEvent(NameLookupEventArgs e)
         {
-            lock (this._users)
+            lock (this._characters)
             {
-                this._users[e.CharacterID] = Format.UppercaseFirst(e.Name);
+                // Handle name changes
+                if (this._characters.ContainsKey(e.CharacterID))
+                {
+                    string oldName = this._characters[e.CharacterID];
+                    if (this._charactersByName.ContainsKey(oldName))
+                    {
+                        uint oldID = this._charactersByName[oldName];
+                        if (oldID != e.CharacterID)
+                        {
+                            // Old name entry was assigned to a different UID.
+                            if (this._characters.ContainsKey(oldID))
+                                this._characters.Remove(oldID);
+                        }
+                        this._charactersByName.Remove(oldName);
+                    }
+                }
+                // Store id
+                if (e.CharacterID > 0) this._characters[e.CharacterID] = e.Name;
+                this._charactersByName[e.Name] = e.CharacterID;
             }
             if (e.CharacterID > 0)
             {
@@ -962,11 +1051,12 @@ namespace Vha.Net
             }
             else
             {
-                this.Debug("User doesn't exist: " + e.Name, "[Database]");
+                this.Debug("Character doesn't exist: " + e.Name, "[Database]");
             }
+            // Notify other threads
             this._lookupReset.Set();
             this._lookupReset.Reset();
-
+            // Fire the event
             if (this.NameLookupEvent != null)
                 this.NameLookupEvent(this, e);
         }
@@ -982,7 +1072,7 @@ namespace Vha.Net
         {
             if (this.PrivateChannelRequestEvent != null)
                 this.PrivateChannelRequestEvent(this, e);
-            this.SendPacket(new PrivateChannelStatusPacket(e.CharacterID, e.Join));
+            this.SendPacket(new PrivateChannelStatusPacket(e.CharacterID, e.Accept));
         }
 
         protected virtual void OnClientUnknownEvent(CharacterIDEventArgs e)
@@ -1010,7 +1100,7 @@ namespace Vha.Net
                 if (character == null)
                 {
                     this.Debug(String.Format("The character name, {0}, was not found in {1}.", this._character, characterslist), "[Auth]");
-                    this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Error));
+                    this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Error));
                     return;
                 }
                 this.SendLoginCharacter(character);
@@ -1039,12 +1129,12 @@ namespace Vha.Net
         {
             this.Debug("Logging in with account: " + this._account, "[Auth]");
             this.SendPacket(new LoginSeedPacket(this._account, this._password, e.Seed));
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Login));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Login));
             if (this.LoginSeedEvent != null)
                 this.LoginSeedEvent(this, e);
         }
 
-        protected virtual void OnStatusChangeEvent(StatusChangeEventArgs e)
+        protected virtual void OnStateChangeEvent(StateChangeEventArgs e)
         {
             if (this._state == ChatState.Reconnecting && e.State == ChatState.Disconnected)
             {
@@ -1063,7 +1153,7 @@ namespace Vha.Net
                 if (e.State == ChatState.Disconnected && this._closing == false && this.AutoReconnect == true)
                 {
                     this._state = ChatState.Reconnecting;
-                    e = new StatusChangeEventArgs(this._state);
+                    e = new StateChangeEventArgs(this._state);
                     if (this._socket != null)
                     {
                         if (this._socket.Connected) { this._socket.Close(); }
@@ -1073,8 +1163,8 @@ namespace Vha.Net
                 }
                 this._state = e.State;
                 this.Debug("State changed to: " + e.State.ToString(), "[Bot]");
-                if (this.StatusChangeEvent != null)
-                    this.StatusChangeEvent(this, e);
+                if (this.StateChangeEvent != null)
+                    this.StateChangeEvent(this, e);
             }
         }
 
@@ -1094,13 +1184,13 @@ namespace Vha.Net
         {
             if (this._socket == null || this._socket.Connected == false)
             {
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
             TimeSpan ts = DateTime.Now.Subtract(this._lastPong);
             if (ts.TotalMilliseconds > (this.PingTimeout))
             {
                 this.Debug("Connection timed out", "[Bot]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
                 return;
             }
             this.Debug("Ping?", "[Bot]");
@@ -1109,64 +1199,100 @@ namespace Vha.Net
         #endregion
 
         #region Get Commands
-		/// <summary>
-		/// Retrieve user ID associated with an user name.
-		/// </summary>
-		/// <param name="user"></param>
-		/// <returns>UserID</returns>
-        public UInt32 GetUserID(string user)
+        /// <summary>
+        /// Retrieve character ID associated with a character name.
+        /// </summary>
+        /// <param name="character"></param>
+        /// <returns>Character ID</returns>
+        public UInt32 GetCharacterID(string character)
         {
-            bool Lookup = false;
-            user = Format.UppercaseFirst(user);
-            for (int i = 0; i < 300; i++)
-            {
-                lock (this._users)
-                {
-                    if (this._users.ContainsValue(user))
-                    {
-                        foreach (KeyValuePair<UInt32, String> kvp in this._users)
-                        {
-                            if (kvp.Value == user)
-                            {
-                                if (kvp.Key > 0)
-                                {
-                                    return kvp.Key;
-                                }
-                                else
-                                {
-                                    this._users.Remove(kvp.Key);
-                                    return 0;
-                                }
-                            }
-                        }
-                    }
-                    else if (Lookup == false)
-                    {
-                        this.SendNameLookup(user);
-                        Lookup = true;
-                    }
-                }
-                Thread.Sleep(50);
-            }
-            return 0;
+            UInt32 id;
+            this.GetCharacterID(character, this.LookupTimeout, out id);
+            return id;
         }
 
 		/// <summary>
-		/// Retrieve user name associated with an user ID.
+        /// Retrieve character ID associated with a character name.
 		/// </summary>
-		/// <param name="userID"></param>
-		/// <returns></returns>
-        public string GetUserName(UInt32 userID)
+        /// <param name="character"></param>
+        /// <param name="timeout">Timeout in ms. If set to 0, we'll only use the internal lookup table, not fetch info from server.</param>
+		/// <returns>Character ID</returns>
+        public UInt32 GetCharacterID(string character, int timeout)
         {
-            if (userID == 0 || userID == UInt32.MaxValue)
-                return "";
-            if (this._users == null)
-                return "";
-            lock (this._users)
+            UInt32 id;
+            this.GetCharacterID(character, timeout, out id);
+            return id;
+        }
+
+        public bool GetCharacterID(string character, int timeout, out UInt32 id)
+        {
+            // Default return value to 0
+            id = 0;
+            // Keep track of time so we can see when we hit the timeout
+            DateTime startTime = DateTime.Now;
+            // Some basic error handling and formatting first
+            character = Format.UppercaseFirst(character);
+            if (this._charactersByName == null) 
+                return false;
+            // Check if we already have this character cached
+            lock (this._characters)
             {
-                if (this._users.ContainsKey(userID))
+                if (this._charactersByName.ContainsKey(character))
                 {
-                    return this._users[userID];
+                    if (this._charactersByName[character] > 0)
+                    {
+                        // We found it!
+                        id = this._charactersByName[character];
+                        return true;
+                    }
+                    else
+                    {
+                        // If character id is 0, remove the entry
+                        this._charactersByName.Remove(character);
+                        return false;
+                    }
+                }
+            }
+            // We haven't found a cached entry, should we check with the server?
+            if (timeout <= 0)
+                return false;
+
+            // Request the CharacterID from the server
+            int currentTimeout = timeout;
+            this.SendNameLookup(character);
+            // Wait for a reply
+            while (currentTimeout > 0)
+            {
+                // Wait for a name lookup to come in
+                this._lookupReset.WaitOne(currentTimeout);
+                // Check if we found it
+                if (this.GetCharacterID(character, 0, out id))
+                {
+                    return true;
+                }
+                // Let's go for another round!
+                currentTimeout = timeout - (int)(DateTime.Now - startTime).TotalMilliseconds;
+            }
+            // All failed, we never found the character
+            return false;
+        }
+
+		/// <summary>
+        /// Retrieve character name associated with an character ID
+		/// </summary>
+        /// <param name="characterID"></param>
+		/// <returns></returns>
+        public string GetCharacterName(UInt32 characterID)
+        {
+            if (characterID == 0 || characterID == UInt32.MaxValue)
+                return "";
+            if (this._characters == null)
+                return "";
+            lock (this._characters)
+            {
+                if (this._characters.ContainsKey(characterID))
+                {
+                    return this._characters[characterID];
                 }
                 else
                 {
@@ -1311,13 +1437,13 @@ namespace Vha.Net
 		/// <summary>
 		/// Add a friend. (standard priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendFriendAdd(string user)
+        /// <param name="character"></param>
+        public void SendFriendAdd(string character)
         {
-            if (string.IsNullOrEmpty(user)) return;
-            this.Debug("Adding user to friendslist: " + user, "[Bot]");
+            if (string.IsNullOrEmpty(character)) return;
+            this.Debug("Adding character to friendslist: " + character, "[Bot]");
 
-            ChatCommandPacket p = new ChatCommandPacket("addbuddy", user);
+            ChatCommandPacket p = new ChatCommandPacket("addbuddy", character);
             p.Priority = PacketQueue.Priority.Standard;
 
             this.SendPacket(p);
@@ -1326,13 +1452,13 @@ namespace Vha.Net
 		/// <summary>
 		/// Remove friend. (standard priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendFriendRemove(string user)
+        /// <param name="character"></param>
+        public void SendFriendRemove(string character)
         {
-            if (string.IsNullOrEmpty(user)) return;
-            this.Debug("Removing user from friendslist: " + user, "[Bot]");
+            if (string.IsNullOrEmpty(character)) return;
+            this.Debug("Removing character from friendslist: " + character, "[Bot]");
 
-            ChatCommandPacket p = new ChatCommandPacket("rembuddy", user);
+            ChatCommandPacket p = new ChatCommandPacket("rembuddy", character);
             p.Priority = PacketQueue.Priority.Standard;
 
             this.SendPacket(p);
@@ -1359,17 +1485,17 @@ namespace Vha.Net
 		/// <summary>
 		/// Invite someone to your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendPrivateChannelInvite(string user) { this.SendPrivateChannelInvite(this.GetUserID(user)); }
+        /// <param name="character"></param>
+        public void SendPrivateChannelInvite(string character) { this.SendPrivateChannelInvite(this.GetCharacterID(character)); }
 		/// <summary>
 		/// Invite someone to your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="userID"></param>
-        public void SendPrivateChannelInvite(UInt32 userID)
+        /// <param name="characterID"></param>
+        public void SendPrivateChannelInvite(UInt32 characterID)
         {
-            if (userID == this._id)
+            if (characterID == this._id)
                 return;
-            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_INVITE, userID);
+            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_INVITE, characterID);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
@@ -1377,17 +1503,17 @@ namespace Vha.Net
 		/// <summary>
 		/// Kick someone from your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendPrivateChannelKick(string user) { this.SendPrivateChannelKick(this.GetUserID(user)); }
+        /// <param name="character"></param>
+        public void SendPrivateChannelKick(string character) { this.SendPrivateChannelKick(this.GetCharacterID(character)); }
 		/// <summary>
 		/// Kick someone from your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="userID"></param>
-        public void SendPrivateChannelKick(UInt32 userID)
+        /// <param name="characterID"></param>
+        public void SendPrivateChannelKick(UInt32 characterID)
         {
-            if (userID == this._id)
+            if (characterID == this._id)
                 return;
-            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_KICK, userID);
+            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_KICK, characterID);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
@@ -1406,7 +1532,7 @@ namespace Vha.Net
 		/// Leave someone elses private channel. (urgent priority)
 		/// </summary>
 		/// <param name="channel"></param>
-        public void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetUserID(channel)); }
+        public void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetCharacterID(channel)); }
         /// <summary>
         /// Leave someone elses private channel. (urgent priority)
         /// </summary>
@@ -1428,7 +1554,7 @@ namespace Vha.Net
 		/// </summary>
 		/// <param name="channel"></param>
 		/// <param name="text"></param>
-        public void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetUserID(channel), text); }
+        public void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetCharacterID(channel), text); }
 		/// <summary>
 		/// Send a message to someone elses private channel. (urgent priority)
 		/// </summary>
@@ -1444,38 +1570,38 @@ namespace Vha.Net
 		/// <summary>
 		/// Send a private message (tell) to someone. (standard priority)
 		/// </summary>
-		/// <param name="user"></param>
+        /// <param name="character"></param>
 		/// <param name="text"></param>
-        public void SendPrivateMessage(string user, string text) { this.SendPrivateMessage(this.GetUserID(user), text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(string character, string text) { this.SendPrivateMessage(this.GetCharacterID(character), text, PacketQueue.Priority.Standard); }
 		/// <summary>
 		/// Send a private message (tell) to someone. (standard priority)
 		/// </summary>
-		/// <param name="userID"></param>
+        /// <param name="characterID"></param>
 		/// <param name="text"></param>
-        public void SendPrivateMessage(UInt32 userID, string text) { this.SendPrivateMessage(userID, text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(UInt32 characterID, string text) { this.SendPrivateMessage(characterID, text, PacketQueue.Priority.Standard); }
 		/// <summary>
 		/// Send a private message (tell) to someone.
 		/// </summary>
-		/// <param name="userID"></param>
+        /// <param name="characterID"></param>
 		/// <param name="text"></param>
 		/// <param name="priority"></param>
-        public void SendPrivateMessage(UInt32 userID, string text, PacketQueue.Priority priority)
+        public void SendPrivateMessage(UInt32 characterID, string text, PacketQueue.Priority priority)
         {
-            if (userID == this._id || userID == 0)
+            if (characterID == this._id || characterID == 0)
                 return;
-            PrivateMessagePacket p = new PrivateMessagePacket(userID, text);
+            PrivateMessagePacket p = new PrivateMessagePacket(characterID, text);
             p.Priority = priority;
             this.SendPacket(p);
         }
 
 		/// <summary>
-		/// Query the server for a "name to user id" lookup. (urgent priority)
+        /// Query the server for a "name to character id" lookup. (urgent priority)
 		/// </summary>
 		/// <param name="name"></param>
         public void SendNameLookup(string name)
         {
-            lock (this._users)
-                if (this._users.ContainsValue(Format.UppercaseFirst(name)))
+            lock (this._characters)
+                if (this._characters.ContainsValue(Format.UppercaseFirst(name)))
                     return;
 
             NameLookupPacket p = new NameLookupPacket(name);
@@ -1503,7 +1629,7 @@ namespace Vha.Net
             if (character.IsOnline && !this.IgnoreCharacterLoggedIn)
             {
                 this.Debug("Character " + this._character + " is already online!", "[Auth]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
                 return;
             }
             this._character = Format.UppercaseFirst(character.Name);
@@ -1512,7 +1638,7 @@ namespace Vha.Net
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
             this.Debug("Selecting character: " + this._character, "[Auth]");
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.CharacterSelect));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.CharacterSelect));
         }
         #endregion
 

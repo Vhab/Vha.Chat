@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Root Name="Configuration" Version="1">
+  <OptionsPath>.\</OptionsPath>
+  <OptionsFile>Options.xml</OptionsFile>
+  <IgnoresPath>.\Ignores\</IgnoresPath>
+  <Dimension Name="Atlantean" Address="chat.d1.funcom.com" Port="7101" />
+  <Dimension Name="Rimor" Address="chat.d2.funcom.com" Port="7102" />
+  <Dimension Name="Die Neue Welt" Address="chat.d3.funcom.com" Port="7103" />
+  <Dimension Name="Test" Address="chat.dt.funcom.com" Port="7109" />
+</Root>

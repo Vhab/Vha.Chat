@@ -53,25 +53,33 @@ namespace Vha.Net.Events
         }
 
         /// <summary>
-        /// id of the channel where the message originated
+        /// ID of the channel where the message originated
         /// </summary>
         public UInt32 ChannelID { get { return this._channelID; } }
         public string Channel { get { return this._channel; } }
-
         /// <summary>
-        /// id of the sender
+        /// ID of the sender
         /// </summary>
         public UInt32 CharacterID { get { return this._characterID; } }
-        public string Character { get { return this._character; } }
-
         /// <summary>
-        /// message contents containing text and click links
+        /// Name of the sender
+        /// </summary>
+        public string Character { get { return this._character; } }
+        /// <summary>
+        /// Message contents containing text and click links
         /// </summary>
         public string Message { get { return this._message; } }
-
         /// <summary>
-        /// set true when message is from the bot's own private channel
+        /// Whether the message is from the bot's own private channel
         /// </summary>
         public bool Local { get { return this._local; } }
+        /// <summary>
+        /// Returns the combined private channel data
+        /// </summary>
+        /// <returns></returns>
+        public PrivateChannel GetPrivateChannel()
+        {
+            return new PrivateChannel(this._channelID, this._channel, this._local);
+        }
     }
 }

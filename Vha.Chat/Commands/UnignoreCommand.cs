@@ -33,7 +33,7 @@ namespace Vha.Chat.Commands
             string character = Format.UppercaseFirst(args[0]);
             if (!context.Ignores.Contains(character))
             {
-                context.Write(MessageClass.Internal, character + " is not on your ignore list");
+                context.Write(MessageClass.Error, character + " is not on your ignore list");
                 return false;
             }
             context.Ignores.Remove(args[0]);

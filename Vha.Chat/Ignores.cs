@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using Vha.Chat.Data;
 using Vha.Common;
+using Vha.Chat.Events;
 
 namespace Vha.Chat
 {
@@ -208,19 +209,22 @@ namespace Vha.Chat
         }
 
         #region Internal
-        private Context _context;
-        private Dictionary<UInt32, string> _ignored = new Dictionary<uint, string>();
-        private IgnoresV1 _data = null;
-
         internal Ignores(Context context)
         {
             this._context = context;
-            this._context.StateEvent += new Handler<Vha.Chat.Events.StateEventArgs>(_context_StateEvent);
-            this._data = new IgnoresV1();
-            this._load();
+            this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);
+            this._watcher = new Watcher(new IgnoresV1(), this._context.Configuration.OptionsPath + this._context.Configuration.IgnoresFile);
+            this._watcher.LoadedEvent += new WatcherHandler(_watcher_LoadedEvent);
+            this._watcher.Load();
+            this._data = (IgnoresV1)this._watcher.Data;
         }
 
-        #region Private methods
+        #region Private
+        private Context _context;
+        private Watcher _watcher;
+        private Dictionary<UInt32, string> _ignored = new Dictionary<uint, string>();
+        private IgnoresV1 _data = null;
+
         private void _rebuild()
         {
             // Rebuild the ignore cache
@@ -236,21 +240,9 @@ namespace Vha.Chat
             }
         }
 
-        private void _load()
-        {
-            string file = this._context.Configuration.OptionsPath + this._context.Configuration.IgnoresFile;
-            Base data = Base.Load(file);
-            if (data == null) return;
-            if (data.Type != typeof(IgnoresV1))
-                throw new ArgumentException("Invalid ignores data type: " + data.Type.ToString() + " when loading file: " + file);
-            this._data = (IgnoresV1)data;
-            this._rebuild();
-        }
-
         private void _save()
         {
-            string file = this._context.Configuration.OptionsPath + this._context.Configuration.IgnoresFile;
-            this._data.Save(file);
+            this._watcher.Save();
         }
 
         private bool _matchesIgnoreMethod(IgnoresV1Entry entry)
@@ -277,9 +269,16 @@ namespace Vha.Chat
             }
         }
 
-        void _context_StateEvent(Context context, Vha.Chat.Events.StateEventArgs args)
+        void _context_StateEvent(Context context, StateEventArgs args)
         {
             // Whenever the state changes, rebuild the cache
+            this._rebuild();
+        }
+
+        private void _watcher_LoadedEvent(Watcher watcher)
+        {
+            this._data = (IgnoresV1)watcher.Data;
+            // The data has been modified from the outside
             this._rebuild();
         }
         #endregion

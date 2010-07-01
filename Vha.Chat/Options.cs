@@ -171,9 +171,7 @@ namespace Vha.Chat
         {
             lock (this)
             {
-                this._options.Save(
-                  this._context.Configuration.OptionsPath +
-                  this._context.Configuration.OptionsFile);
+                this._watcher.Save();
                 this._modified = false;
             }
             if (this.SavedEvent != null)
@@ -181,20 +179,35 @@ namespace Vha.Chat
         }
 
         #region Internal
-        internal Options(Context context, Base data)
+        internal Options(Context context)
         {
-            if (data == null)
-                throw new ArgumentNullException("data");
-            if (data.Type != typeof(OptionsV1))
-                throw new ArgumentException("Invalid config data type: " + data.Type.ToString());
-            this._options = (OptionsV1)data;
+            // Load data
+            string path = context.Configuration.OptionsPath + context.Configuration.OptionsFile;
+            this._watcher = new Watcher(new OptionsV1(), path);
+            this._watcher.LoadedEvent += new WatcherHandler(_watcher_LoadedEvent);
+            this._watcher.Load();
+            // And the rest...
+            this._options = (OptionsV1)this._watcher.Data;
             this._modified = false;
             this._context = context;
         }
 
+        private Watcher _watcher;
         private OptionsV1 _options;
         private bool _modified;
         private Context _context;
+
+        private void _watcher_LoadedEvent(Watcher watcher)
+        {
+            this._options = (OptionsV1)watcher.Data;
+            this._modified = false;
+            // The data was modified from the outside
+            if (this.ModifiedEvent != null)
+                this.ModifiedEvent(this._context, this);
+            // The data was saved (just not by this process)
+            if (this.SavedEvent != null)
+                this.SavedEvent(this._context, this);
+        }
         #endregion
     }
 

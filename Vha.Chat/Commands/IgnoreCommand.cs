@@ -50,7 +50,7 @@ namespace Vha.Chat.Commands
             string character = Format.UppercaseFirst(args[0]);
             if (context.Ignores.Contains(character))
             {
-                context.Write(MessageClass.Internal, character + " already is on your ignore list");
+                context.Write(MessageClass.Error, character + " already is on your ignore list");
                 return false;
             }
             context.Ignores.Add(args[0]);

@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using Vha.Net;
 using Vha.Net.Events;
 using Vha.Chat.Events;
@@ -68,7 +69,7 @@ namespace Vha.Chat
         /// <summary>
         /// Fires when a recoverable error has occured, like incorrect arguments or failing to connect.
         /// </summary>
-        public event Handler<ErrorEventArgs> ErrorEvent;
+        public event Handler<Events.ErrorEventArgs> ErrorEvent;
         /// <summary>
         /// Fires whenever a new message is available
         /// </summary>
@@ -234,7 +235,7 @@ namespace Vha.Chat
                 if (dim == null)
                 {
                     if (this.ErrorEvent != null)
-                        this.ErrorEvent(this, new ErrorEventArgs(
+                        this.ErrorEvent(this, new Events.ErrorEventArgs(
                             ErrorType.Login,
                             "Attempting to connect to invalid dimension: '" + dimension + "'"));
                     return;
@@ -458,13 +459,14 @@ namespace Vha.Chat
             while (configuration.CanUpgrade) configuration = configuration.Upgrade();
             this._configuration = new Configuration(configuration);
 
-            // Read options
-            Data.Base options = Data.Base.Load(this.Configuration.OptionsPath + this.Configuration.OptionsFile);
-            if (options == null) options = new Data.OptionsV1();
-            while (options.CanUpgrade) options = options.Upgrade();
-            this._options = new Options(this, options);
+            // Ensure the options directory exists
+            if (!Directory.Exists(this.Configuration.OptionsPath))
+            {
+                Directory.CreateDirectory(this.Configuration.OptionsPath);
+            }
 
             // Initialize objects
+            this._options = new Options(this);
             this._channels = new Dictionary<string, Channel>();
             this._friends = new Dictionary<string, Friend>();
             this._privateChannels = new Dictionary<string, PrivateChannel>();
@@ -542,7 +544,7 @@ namespace Vha.Chat
         {
             // Notify listeners of the error
             if (this.ErrorEvent != null)
-                this.ErrorEvent(this, new ErrorEventArgs(ErrorType.Login, e.Error));
+                this.ErrorEvent(this, new Events.ErrorEventArgs(ErrorType.Login, e.Error));
         }
 
         void _chat_LoginOKEvent(Vha.Net.Chat chat, EventArgs e)

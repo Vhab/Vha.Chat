@@ -488,6 +488,7 @@ namespace Vha.Chat
             this.Input.RegisterCommand(new UnignoreCommand());
             this.Input.RegisterCommand(new UnmuteCommand());
             this.Input.RegisterCommand(new WhoisCommand());
+            this.Input.RegisterCommand(new ColorsCommand());
         }
 
         #region Chat callbacks

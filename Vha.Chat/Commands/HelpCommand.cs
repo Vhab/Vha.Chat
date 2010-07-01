@@ -52,7 +52,6 @@ namespace Vha.Chat.Commands
                 return true;
             }
             // General help
-            
             context.Write(
                 MessageClass.Internal,
                 string.Format(

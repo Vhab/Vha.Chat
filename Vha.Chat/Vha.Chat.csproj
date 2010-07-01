@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Character.cs" />
     <Compile Include="Commands\CCCommand.cs" />
+    <Compile Include="Commands\ColorsCommand.cs" />
     <Compile Include="Commands\FriendCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\IgnoreCommand.cs" />

@@ -52,7 +52,7 @@
     <Compile Include="Events\PrivateChannelStatusEventArgs.cs" />
     <Compile Include="Events\PrivateMessageEventArgs.cs" />
     <Compile Include="Events\SimpleMessageEventArgs.cs" />
-    <Compile Include="Events\StatusChangeEventArgs.cs" />
+    <Compile Include="Events\StateChangeEventArgs.cs" />
     <Compile Include="Events\SystemMessageEventArgs.cs" />
     <Compile Include="Events\UnknownPacketEventArgs.cs" />
     <Compile Include="Events\VicinityMessageEventArgs.cs" />

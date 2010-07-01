@@ -31,7 +31,7 @@ namespace Vha.Net
     public delegate void ForwardEventHandler(Chat chat, ForwardEventArgs e);
     public delegate void ClientUnknownEvent(Chat chat, CharacterIDEventArgs e);
 
-    public delegate void StatusChangeEventHandler(Chat chat, StatusChangeEventArgs e);
+    public delegate void StateChangeEventHandler(Chat chat, StateChangeEventArgs e);
     public delegate void DebugEventHandler(Chat chat, DebugEventArgs e);
     public delegate void NameLookupEventHandler(Chat chat, NameLookupEventArgs e);
 

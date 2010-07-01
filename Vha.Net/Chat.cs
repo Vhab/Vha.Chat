@@ -78,7 +78,7 @@ namespace Vha.Net
         public event VicinityMessageEventHandler VicinityMessageEvent;
         public event LoginSeedEventHandler LoginSeedEvent;
         public event LoginCharlistEventHandler LoginCharlistEvent;
-        public event StatusChangeEventHandler StatusChangeEvent;
+        public event StateChangeEventHandler StateChangeEvent;
         public event DebugEventHandler DebugEvent;
 #if !DEBUG
         public event ExceptionEventHandler ExceptionEvent;
@@ -337,7 +337,7 @@ namespace Vha.Net
                     this.Debug("Already Connected", "[Error]");
                     return false;
                 }
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Connecting));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Connecting));
                 this._closing = false;
                 this.PrepareChat();
 
@@ -409,7 +409,7 @@ namespace Vha.Net
                     return true;
                 }
             }
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             return false;
         }
         #endregion
@@ -440,7 +440,7 @@ namespace Vha.Net
             this.VicinityMessageEvent = null;
             this.LoginSeedEvent = null;
             this.LoginCharlistEvent = null;
-            this.StatusChangeEvent = null;
+            this.StateChangeEvent = null;
             this.DebugEvent = null;
 #if !DEBUG
             this.ExceptionEvent = null;
@@ -483,7 +483,7 @@ namespace Vha.Net
             this._reconnectTimer = null;
             this._pingTimer = null;
 
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             this._state = ChatState.Disconnected;
 
             GC.Collect();
@@ -586,7 +586,7 @@ namespace Vha.Net
                 }
                 // And we're done!
                 this.Debug("Stopped!", "[ReceiveThread]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
         }
         // Send Thread
@@ -647,7 +647,7 @@ namespace Vha.Net
             finally
             {
                 this.Debug("Stopped!", "[SendThread]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
         }
 
@@ -980,7 +980,7 @@ namespace Vha.Net
         protected virtual void OnChannelStatusEvent(ChannelStatusEventArgs e)
         {
             if (this.State != ChatState.Connected)
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Connected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Connected));
 
             lock (_channels)
             {
@@ -1100,7 +1100,7 @@ namespace Vha.Net
                 if (character == null)
                 {
                     this.Debug(String.Format("The character name, {0}, was not found in {1}.", this._character, characterslist), "[Auth]");
-                    this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Error));
+                    this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Error));
                     return;
                 }
                 this.SendLoginCharacter(character);
@@ -1129,12 +1129,12 @@ namespace Vha.Net
         {
             this.Debug("Logging in with account: " + this._account, "[Auth]");
             this.SendPacket(new LoginSeedPacket(this._account, this._password, e.Seed));
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Login));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Login));
             if (this.LoginSeedEvent != null)
                 this.LoginSeedEvent(this, e);
         }
 
-        protected virtual void OnStatusChangeEvent(StatusChangeEventArgs e)
+        protected virtual void OnStateChangeEvent(StateChangeEventArgs e)
         {
             if (this._state == ChatState.Reconnecting && e.State == ChatState.Disconnected)
             {
@@ -1153,7 +1153,7 @@ namespace Vha.Net
                 if (e.State == ChatState.Disconnected && this._closing == false && this.AutoReconnect == true)
                 {
                     this._state = ChatState.Reconnecting;
-                    e = new StatusChangeEventArgs(this._state);
+                    e = new StateChangeEventArgs(this._state);
                     if (this._socket != null)
                     {
                         if (this._socket.Connected) { this._socket.Close(); }
@@ -1163,8 +1163,8 @@ namespace Vha.Net
                 }
                 this._state = e.State;
                 this.Debug("State changed to: " + e.State.ToString(), "[Bot]");
-                if (this.StatusChangeEvent != null)
-                    this.StatusChangeEvent(this, e);
+                if (this.StateChangeEvent != null)
+                    this.StateChangeEvent(this, e);
             }
         }
 
@@ -1184,13 +1184,13 @@ namespace Vha.Net
         {
             if (this._socket == null || this._socket.Connected == false)
             {
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
             TimeSpan ts = DateTime.Now.Subtract(this._lastPong);
             if (ts.TotalMilliseconds > (this.PingTimeout))
             {
                 this.Debug("Connection timed out", "[Bot]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
                 return;
             }
             this.Debug("Ping?", "[Bot]");
@@ -1629,7 +1629,7 @@ namespace Vha.Net
             if (character.IsOnline && !this.IgnoreCharacterLoggedIn)
             {
                 this.Debug("Character " + this._character + " is already online!", "[Auth]");
-                this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.Disconnected));
+                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
                 return;
             }
             this._character = Format.UppercaseFirst(character.Name);
@@ -1638,7 +1638,7 @@ namespace Vha.Net
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
             this.Debug("Selecting character: " + this._character, "[Auth]");
-            this.OnStatusChangeEvent(new StatusChangeEventArgs(ChatState.CharacterSelect));
+            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.CharacterSelect));
         }
         #endregion
 

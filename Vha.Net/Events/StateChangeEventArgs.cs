@@ -25,10 +25,10 @@ using Vha.Common;
 
 namespace Vha.Net.Events
 {
-    public class StatusChangeEventArgs : EventArgs
+    public class StateChangeEventArgs : EventArgs
     {
         private readonly ChatState _state;
-        public StatusChangeEventArgs(ChatState state)
+        public StateChangeEventArgs(ChatState state)
         {
             this._state = state;
         }

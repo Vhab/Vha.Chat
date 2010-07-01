@@ -50,7 +50,7 @@ namespace Vha.Net.Events
         }
 
         /// <summary>
-        /// Id of the character
+        /// ID of the character
         /// </summary>
         public UInt32 CharacterID { get { return this._characterID; } }
         public string Character { get { return this._character; } }

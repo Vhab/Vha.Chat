@@ -19,6 +19,7 @@
 
 using System;
 using System.Text;
+using Vha.Common;
 
 namespace Vha.Chat.Commands
 {
@@ -27,19 +28,27 @@ namespace Vha.Chat.Commands
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0], true)) return false;
-            context.Write(MessageClass.Internal, "TODO: implement unignore command");
+            if (!context.Input.CheckCharacter(args[0], true)) return false;
+            // Remove ignore
+            string character = Format.UppercaseFirst(args[0]);
+            if (!context.Ignores.Contains(character))
+            {
+                context.Write(MessageClass.Internal, character + " is not on your ignore list");
+                return false;
+            }
+            context.Ignores.Remove(args[0]);
+            context.Write(MessageClass.Internal, character + " has been removed from your ignore list");
             return true;
         }
 
         public UnignoreCommand()
             : base(
-                "Unignore user", // Name
+                "Unignore character", // Name
                 new string[] { "unignore" }, // Triggers
-                new string[] { "unignore [username]" }, // Usage
+                new string[] { "unignore [character]" }, // Usage
                 new string[] { "unignore Vhab" }, // Examples
                 // Description
-                "The unignore command allows you to undo the effects of the ignore command for a specific user."
+                "The unignore command allows you to undo the effects of the ignore command for a specific character."
             )
         { }
     }

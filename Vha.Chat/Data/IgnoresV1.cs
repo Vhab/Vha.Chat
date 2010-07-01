@@ -41,27 +41,27 @@ namespace Vha.Chat.Data
     public class IgnoresV1Entry
     {
         /// <summary>
-        /// The dimension on which this user was ignored
+        /// The dimension on which this character was ignored
         /// </summary>
         [XmlAttribute("Dimension")]
         public string Dimension = null;
         /// <summary>
-        /// The account this user was ignored by
+        /// The account this character was ignored by
         /// </summary>
         [XmlAttribute("Account")]
         public string Account = null;
         /// <summary>
-        /// The character id this user was ignored by
+        /// The character id this character was ignored by
         /// </summary>
         [XmlAttribute("ID")]
         public uint ID = 0;
         /// <summary>
-        /// The user that is ignored's character id
+        /// The character that is ignored's id
         /// </summary>
         [XmlAttribute("CharacterID")]
         public UInt32 CharacterID = 0;
         /// <summary>
-        /// The user that is ignored
+        /// The character that is ignored
         /// </summary>
         [XmlAttribute("Character")]
         public string Character = null;

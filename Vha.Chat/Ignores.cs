@@ -41,41 +41,51 @@ namespace Vha.Chat
             }
         }
         /// <summary>
-        /// Checks if the given user is ignored by this client.
+        /// Returns the amount of characters currently being actively ignored
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+                lock (this) return this._ignored.Count;
+            }
+        }
+        /// <summary>
+        /// Checks if the given character is ignored by this client.
         /// This method will also account for any name changes as long as the character id remains the same.
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="character"></param>
         /// <returns></returns>
-        public bool Contains(string user)
+        public bool Contains(string character)
         {
             if (!this.Active) return false;
             // Find the character id
-            user = Format.UppercaseFirst(user);
-            UInt32 userId = this._context.Chat.GetUserID(user);
+            character = Format.UppercaseFirst(character);
+            UInt32 characterID = this._context.Chat.GetCharacterID(character);
             // We can't ignore ourselves
-            if (userId == this._context.CharacterId) return false;
+            if (characterID == this._context.CharacterID) return false;
             // I don't think we're ignoring characters who don't exist
-            if (userId == 0) return false;
+            if (characterID == 0) return false;
             lock (this)
             {
-                if (!this._ignored.ContainsKey(userId))
+                if (!this._ignored.ContainsKey(characterID))
                     return false;
                 // Check for name change
-                if (this._ignored[userId] != user)
-                    this.Add(user);
+                if (this._ignored[characterID] != character)
+                    this.Add(character);
                 return true;
             }
         }
 
-        public void Add(string user)
+        public void Add(string character)
         {
             if (!this.Active)
                 throw new InvalidOperationException("The ignore list cannot be modified in the current state");
             // Find the character id
-            user = Format.UppercaseFirst(user);
-            UInt32 userId = this._context.Chat.GetUserID(user);
+            character = Format.UppercaseFirst(character);
+            UInt32 characterID = this._context.Chat.GetCharacterID(character);
             // Can't ignore that which does not exist
-            if (userId == 0) return;
+            if (characterID == 0) return;
             // And now, the action!
             lock (this)
             {
@@ -90,9 +100,9 @@ namespace Vha.Chat
                             continue;
                         if (entry.Account != this._context.Account)
                             continue;
-                        if (entry.ID != this._context.CharacterId)
+                        if (entry.ID != this._context.CharacterID)
                             continue;
-                        if (entry.CharacterID != userId)
+                        if (entry.CharacterID != characterID)
                             continue;
                         changed = true;
                         this._data.Entries.Remove(entry);
@@ -104,26 +114,26 @@ namespace Vha.Chat
                 IgnoresV1Entry newEntry = new IgnoresV1Entry();
                 newEntry.Dimension = this._context.Dimension;
                 newEntry.Account = this._context.Account;
-                newEntry.ID = this._context.CharacterId;
-                newEntry.Character = user;
-                newEntry.CharacterID = userId;
+                newEntry.ID = this._context.CharacterID;
+                newEntry.Character = character;
+                newEntry.CharacterID = characterID;
                 this._data.Entries.Add(newEntry);
                 // Update cache
-                if (this._ignored.ContainsKey(userId))
-                    this._ignored[userId] = user;
-                else this._ignored.Add(userId, user);
+                if (this._ignored.ContainsKey(characterID))
+                    this._ignored[characterID] = character;
+                else this._ignored.Add(characterID, character);
                 // Save changes
                 this._save();
             }
         }
 
-        public void Remove(string user)
+        public void Remove(string character)
         {
             if (!this.Active)
                 throw new InvalidOperationException("The ignore list cannot be modified in the current state");
             // Find the character id
-            user = Format.UppercaseFirst(user);
-            UInt32 userId = this._context.Chat.GetUserID(user);
+            character = Format.UppercaseFirst(character);
+            UInt32 characterID = this._context.Chat.GetCharacterID(character);
             // Remove the ignore
             lock (this)
             {
@@ -136,7 +146,7 @@ namespace Vha.Chat
                     {
                         if (!this._matchesIgnoreMethod(entry))
                             continue;
-                        if (entry.CharacterID != userId && entry.Character != user)
+                        if (entry.CharacterID != characterID && entry.Character != character)
                             continue;
                         changed = true;
                         this._data.Entries.Remove(entry);
@@ -145,21 +155,21 @@ namespace Vha.Chat
                 }
                 while (changed);
                 // Remove from cache by id
-                if (this._ignored.ContainsKey(userId))
+                if (this._ignored.ContainsKey(characterID))
                 {
-                    this._ignored.Remove(userId);
+                    this._ignored.Remove(characterID);
                 }
                 // Save changes
                 this._save();
             }
         }
 
-        public IgnoreResult Toggle(string user)
+        public IgnoreResult Toggle(string character)
         {
             // Find the character id
-            user = Format.UppercaseFirst(user);
-            UInt32 userId = this._context.Chat.GetUserID(user);
-            if (userId == 0) return IgnoreResult.Error;
+            character = Format.UppercaseFirst(character);
+            UInt32 characterID = this._context.Chat.GetCharacterID(character);
+            if (characterID == 0) return IgnoreResult.Error;
             lock (this)
             {
                 bool exists = false;
@@ -167,22 +177,34 @@ namespace Vha.Chat
                 {
                     if (!this._matchesIgnoreMethod(entry))
                         continue;
-                    if (entry.CharacterID != userId && entry.Character != user)
+                    if (entry.CharacterID != characterID && entry.Character != character)
                         continue;
                     exists = true;
                     break;
                 }
                 if (exists)
                 {
-                    this.Remove(user);
+                    this.Remove(character);
                     return IgnoreResult.Removed;
                 }
                 else
                 {
-                    this.Add(user);
+                    this.Add(character);
                     return IgnoreResult.Added;
                 }
             }
+        }
+
+        public string[] GetCharacters()
+        {
+            List<string> characters = new List<string>();
+            lock (this)
+            {
+                foreach (string character in this._ignored.Values)
+                    characters.Add(character);
+            }
+            characters.Sort();
+            return characters.ToArray();
         }
 
         #region Internal
@@ -249,7 +271,7 @@ namespace Vha.Chat
                     if (entry.Dimension != this._context.Dimension) return false;
                     // Character id's are unique per dimension,
                     // so there is no need to check the account value
-                    return (entry.ID == this._context.CharacterId);
+                    return (entry.ID == this._context.CharacterID);
                 default:
                     return false;
             }

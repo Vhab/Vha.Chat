@@ -32,11 +32,11 @@ namespace Vha.Chat.Events
         /// </summary>
         public readonly PrivateChannel Channel;
         /// <summary>
-        /// The user who left or joined the channel
+        /// The character who left or joined the channel
         /// </summary>
         public readonly string Character;
         /// <summary>
-        /// Whether the user joined the channel
+        /// Whether the character joined the channel
         /// </summary>
         public readonly bool Joined;
         /// <summary>

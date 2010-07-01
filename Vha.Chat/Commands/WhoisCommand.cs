@@ -27,8 +27,8 @@ namespace Vha.Chat.Commands
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0], true)) return false;
-            if (!context.Input.CheckUser("Helpbot", false))
+            if (!context.Input.CheckCharacter(args[0], true)) return false;
+            if (!context.Input.CheckCharacter("Helpbot", false))
             {
                 context.Write(MessageClass.Error, "Helpbot is not available on this dimension");
                 return false;
@@ -41,10 +41,10 @@ namespace Vha.Chat.Commands
             : base(
                 "Character information", // Name
                 new string[] { "whois" }, // Triggers
-                new string[] { "whois [username]" }, // Usage
+                new string[] { "whois [character]" }, // Usage
                 new string[] { "whois Vhab" }, // Examples
                 // Description
-                "The whois command allows you to obtain information like profession, level and organization for a specific user.\n" +
+                "The whois command allows you to obtain information like profession, level and organization for a specific character.\n" +
                 "This command requires Helpbot to be available and online on your dimension."
             )
         { }

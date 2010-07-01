@@ -28,33 +28,45 @@ namespace Vha.Chat.Commands
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0], true)) return false;
-            IgnoreResult result = context.Ignores.Toggle(args[0]);
-            string character = Format.UppercaseFirst(args[0]);
-            switch (result)
+            // Display ignore list
+            if (args[0].ToLower() == "list")
             {
-                case IgnoreResult.Added:
-                    context.Write(MessageClass.Internal, character + " has been added to your ignore list");
-                    break;
-                case IgnoreResult.Removed:
-                    context.Write(MessageClass.Internal, character + " has been removed from your ignore list");
-                    break;
-                default:
-                    context.Write(MessageClass.Error, "An error has occured while attempting to ignore " + character);
-                    break;
+                string[] characters = context.Ignores.GetCharacters();
+                if (context.Ignores.Count == 0)
+                {
+                    context.Write(MessageClass.Internal, "Your ignore list is empty");
+                }
+                else
+                {
+                    context.Write(
+                       MessageClass.Internal,
+                       "The following characters are on your ignore list: " +
+                       string.Join(", ", characters));
+                }
+                return true;
             }
+            // Add ignore
+            if (!context.Input.CheckCharacter(args[0], true)) return false;
+            string character = Format.UppercaseFirst(args[0]);
+            if (context.Ignores.Contains(character))
+            {
+                context.Write(MessageClass.Internal, character + " already is on your ignore list");
+                return false;
+            }
+            context.Ignores.Add(args[0]);
+            context.Write(MessageClass.Internal, character + " has been added to your ignore list");
             return true;
         }
 
         public IgnoreCommand()
             : base(
-                "Ignore user", // Name
+                "Ignore character", // Name
                 new string[] { "ignore" }, // Triggers
-                new string[] { "ignore [username]" }, // Usage
-                new string[] { "ignore Vhab" }, // Examples
+                new string[] { "ignore [character]", "ignore list" }, // Usage
+                new string[] { "ignore Vhab", "ignore list" }, // Examples
                 // Description
-                "The ignore command allows you to prevent users from sending messages to you.\n" +
-                "Once a user has been put on ignore, (s)he no longer is able to contact you in any way through the chat server."
+                "The ignore command allows you to prevent characters from sending messages to you.\n" +
+                "Once a character has been put on ignore, (s)he no longer is able to contact you in any way through the chat server."
             )
         { }
     }

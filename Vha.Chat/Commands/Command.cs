@@ -38,7 +38,7 @@ namespace Vha.Chat.Commands
         /// <summary>
         /// An array of usage patterns for the command (excluding the command prefix).
         /// For example:
-        /// {"command [username]", "command [quantity] [username]"}
+        /// {"command [character]", "command [quantity] [character]"}
         /// </summary>
         public readonly string[] Usage;
         /// <summary>

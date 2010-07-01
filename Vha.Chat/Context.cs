@@ -47,7 +47,7 @@ namespace Vha.Chat
         /// </summary>
         public Input Input { get { return this._input; } }
         /// <summary>
-        /// Returns the toolset to manage the users on the ignore list
+        /// Returns the toolset to manage the characters on the ignore list
         /// </summary>
         public Ignores Ignores { get { return this._ignores; } }
         /// <summary>
@@ -78,7 +78,7 @@ namespace Vha.Chat
         /// </summary>
         public event Handler<FriendEventArgs> FriendAddedEvent;
         /// <summary>
-        /// Fires when a user is removed from the friends list
+        /// Fires when a character is removed from the friends list
         /// </summary>
         public event Handler<FriendEventArgs> FriendRemovedEvent;
         /// <summary>
@@ -106,13 +106,13 @@ namespace Vha.Chat
         /// </summary>
         public event Handler<PrivateChannelInviteEventArgs> PrivateChannelInviteEvent;
         /// <summary>
-        /// Fires when a user joins our local private channel
+        /// Fires when a character joins our local private channel
         /// </summary>
-        public event Handler<PrivateChannelEventArgs> UserJoinEvent;
+        public event Handler<PrivateChannelEventArgs> CharacterJoinEvent;
         /// <summary>
-        /// Fires when a user leaves our local private channel
+        /// Fires when a character leaves our local private channel
         /// </summary>
-        public event Handler<PrivateChannelEventArgs> UserLeaveEvent;
+        public event Handler<PrivateChannelEventArgs> CharacterLeaveEvent;
 #if !DEBUG
         /// <summary>
         /// Occures when an unexpected exception occured.
@@ -174,14 +174,14 @@ namespace Vha.Chat
             }
         }
 
-        public UInt32 CharacterId
+        public UInt32 CharacterID
         {
             get
             {
                 if (this.State != ContextState.Connected &&
                     this.State != ContextState.CharacterSelection)
                     throw new InvalidOperationException("Context.CharacterID is not available while in state " + this.State);
-                return this._characterId;
+                return this._characterID;
             }
         }
 
@@ -195,13 +195,13 @@ namespace Vha.Chat
             }
         }
 
-        public UInt32 OrganizationId
+        public UInt32 OrganizationID
         {
             get
             {
                 if (this.State != ContextState.Connected)
-                    throw new InvalidOperationException("Context.OrganizationId is not available while in state " + this.State);
-                return this._organizationId;
+                    throw new InvalidOperationException("Context.OrganizationID is not available while in state " + this.State);
+                return this._organizationID;
             }
         }
 
@@ -341,31 +341,31 @@ namespace Vha.Chat
             return messageClass;
         }
         /// <summary>
-        /// Whether this context contains the given user as friend
+        /// Whether this context contains the given character as friend
         /// </summary>
-        /// <param name="friend">The name of the user (case-insensitive)</param>
-        /// <returns>true if the given user is a friend, false if not</returns>
-        public bool HasFriend(string user)
+        /// <param name="friend">The name of the character (case-insensitive)</param>
+        /// <returns>true if the given character is a friend, false if not</returns>
+        public bool HasFriend(string character)
         {
-            user = Format.UppercaseFirst(user);
+            character = Format.UppercaseFirst(character);
             lock (this._friends)
             {
-                return this._friends.ContainsKey(user);
+                return this._friends.ContainsKey(character);
             }
         }
         /// <summary>
         /// Returns information about a friend by name
         /// </summary>
-        /// <param name="user">The name of the user (case-insensitive)</param>
+        /// <param name="character">The name of the character (case-insensitive)</param>
         /// <returns>An isntance of Friend or null on failure</returns>
-        public Friend GetFriend(string user)
+        public Friend GetFriend(string character)
         {
-            user = Format.UppercaseFirst(user);
+            character = Format.UppercaseFirst(character);
             lock (this._friends)
             {
-                if (!this._friends.ContainsKey(user))
+                if (!this._friends.ContainsKey(character))
                     return null;
-                return this._friends[user];
+                return this._friends[character];
             }
         }
         /// <summary>
@@ -396,12 +396,12 @@ namespace Vha.Chat
                 return this._privateChannels[channel];
             }
         }
-        public bool HasGuest(string user)
+        public bool HasGuest(string character)
         {
-            user = Format.UppercaseFirst(user);
+            character = Format.UppercaseFirst(character);
             lock (this._guests)
             {
-                return this._guests.Contains(user);
+                return this._guests.Contains(character);
             }
         }
         /// <summary>
@@ -439,9 +439,9 @@ namespace Vha.Chat
         private string _dimension = null;
         private string _account = null;
         private string _character = null;
-        private UInt32 _characterId = 0;
+        private UInt32 _characterID = 0;
         private string _organization = null;
-        private UInt32 _organizationId = 0;
+        private UInt32 _organizationID = 0;
         private ContextState _state = ContextState.Disconnected;
         private bool _disconnecting = false;
 
@@ -513,7 +513,7 @@ namespace Vha.Chat
                 if (args.Character != null && charactersMap.ContainsKey(args.Character))
                 {
                     this._character = args.Character.Name;
-                    this._characterId = args.Character.ID;
+                    this._characterID = args.Character.ID;
                     this._chat.SendLoginCharacter(charactersMap[args.Character]);
 
                     // Mark as 'recently used'
@@ -602,8 +602,8 @@ namespace Vha.Chat
                         goto case ContextState.Reconnecting;
                     case ContextState.Reconnecting:
                         this._organization = null;
-                        this._organizationId = 0;
-                        this._characterId = 0;
+                        this._organizationID = 0;
+                        this._characterID = 0;
                         this._friends.Clear();
                         this._channels.Clear();
                         this._privateChannels.Clear();
@@ -665,10 +665,10 @@ namespace Vha.Chat
                     }
                 }
                 // Dispatch events
-                if (this.UserJoinEvent != null && joined)
-                    this.UserJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, true));
-                if (this.UserLeaveEvent != null && left)
-                    this.UserLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, true));
+                if (this.CharacterJoinEvent != null && joined)
+                    this.CharacterJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, true));
+                if (this.CharacterLeaveEvent != null && left)
+                    this.CharacterLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, true));
             }
             // Handle remote
             else
@@ -810,7 +810,7 @@ namespace Vha.Chat
             if (e.MessageID == (uint)SystemMessageType.IncommingOfflineMessage)
             {
                 string character = message.Arguments[(int)IncomingOfflineMessageArgs.Name].ToString();
-                // Check ignored users list
+                // Check ignored characters list
                 if (this.Ignores.Contains(character))
                     return;
             }

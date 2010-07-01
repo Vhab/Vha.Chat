@@ -28,7 +28,7 @@ namespace Vha.Chat.Events
     public class FriendEventArgs
     {
         /// <summary>
-        /// The user who triggered this event
+        /// The character who triggered this event
         /// </summary>
         public readonly Friend Friend;
         /// <summary>

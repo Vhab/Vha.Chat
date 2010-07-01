@@ -73,13 +73,13 @@ namespace Vha.Chat
             return false;
         }
 
-        public bool CheckUser(string user, bool output)
+        public bool CheckCharacter(string character, bool output)
         {
             if (!CheckConnection(output)) return false;
-            if (this._context.Chat.GetUserID(user) != 0) return true;
+            if (this._context.Chat.GetCharacterID(character) != 0) return true;
             if (output)
             {
-                this._context.Write(MessageClass.Error, "Unknown user: " + Format.UppercaseFirst(user));
+                this._context.Write(MessageClass.Error, "Unknown character: " + Format.UppercaseFirst(character));
             }
             return false;
         }
@@ -105,6 +105,17 @@ namespace Vha.Chat
             }
             return false;
         }
+
+        public bool CheckIgnore(string character, bool output)
+        {
+            if (!CheckConnection(output)) return false;
+            if (!this._context.Ignores.Contains(character)) return true;
+            if (output)
+            {
+                this._context.Write(MessageClass.Error, Format.UppercaseFirst(character) + " is on your ignore list");
+            }
+            return false;
+        }
         #endregion
 
         #region Commands for sending message or command input
@@ -127,7 +138,8 @@ namespace Vha.Chat
             switch (target.Type)
             {
                 case MessageType.Character:
-                    if (!this.CheckUser(target.Target, true)) return false;
+                    if (!this.CheckCharacter(target.Target, true)) return false;
+                    if (!this.CheckIgnore(target.Target, true)) return false;
                     this._context.Chat.SendPrivateMessage(target.Target, message);
                     break;
                 case MessageType.Channel:

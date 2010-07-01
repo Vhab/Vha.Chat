@@ -45,9 +45,9 @@ namespace Vha.Net
         public bool IgnoreCharacterLoggedIn = true;
         public bool UseThreadPool = true;
         /// <summary>
-        /// Default timeout of method .GetUserID
+        /// Default timeout of for GetCharacterID()
         /// </summary>
-        public int UserIDLookupTimeout = 2500;
+        public int LookupTimeout = 2500;
 		public object Tag = null;
 		#endregion
 		#region Events
@@ -101,8 +101,8 @@ namespace Vha.Net
 		/// </summary>
 		protected ManualResetEvent _sendThread_ResetEvent;
         protected Socket _socket;
-        protected Dictionary<UInt32, String> _users;
-        protected Dictionary<String, UInt32> _usersByName;
+        protected Dictionary<UInt32, String> _characters;
+        protected Dictionary<String, UInt32> _charactersByName;
         protected Dictionary<BigInteger, Channel> _channels;
         protected string _serverAddress;
         protected int _port;
@@ -287,8 +287,8 @@ namespace Vha.Net
 				this._sendThread_ResetEvent = new ManualResetEvent(true); //Resetevent for sendthread.
                 this._sendThread = new Thread(new ThreadStart(this.RunSender));
                 this._sendThread.IsBackground = true;
-                this._users = new Dictionary<UInt32, String>();
-                this._usersByName = new Dictionary<string, uint>();
+                this._characters = new Dictionary<UInt32, String>();
+                this._charactersByName = new Dictionary<string, uint>();
                 this._channels = new Dictionary<BigInteger, Channel>();
                 this._fastQueue = new PacketQueue();
                 this._fastQueue.delay = this.FastPacketDelay;
@@ -473,9 +473,9 @@ namespace Vha.Net
             }
             this._socket = null;
             this._lookupReset = null;
-            if (this._users != null) this._users.Clear();
-            this._users = null;
-            this._usersByName = null;
+            if (this._characters != null) this._characters.Clear();
+            this._characters = null;
+            this._charactersByName = null;
             if (this._channels != null) this._channels.Clear();
             this._channels = null;
             this._fastQueue = null;
@@ -623,7 +623,7 @@ namespace Vha.Net
                         if (packet.PacketType == Packet.Type.PRIVATE_MESSAGE)
                         {
                             PrivateMessagePacket msg = (PrivateMessagePacket)packet;
-                            this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetUserName(msg.CharacterID), msg.Message, true));
+                            this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetCharacterName(msg.CharacterID), msg.Message, true));
                         }
 						if (this._fastQueue.Count > 0 || this._slowQueue.Count > 0) //If there is still something in queue, sleep for predefined delay..
 							Thread.Sleep((int)this.FastPacketDelay);
@@ -705,7 +705,7 @@ namespace Vha.Net
                         OnFriendRemovedEvent(
                             new CharacterIDEventArgs(
                             ((SimpleIdPacket)packet).CharacterID,
-                            this.GetUserName(((SimpleIdPacket)packet).CharacterID)
+                            this.GetCharacterName(((SimpleIdPacket)packet).CharacterID)
                             ));
                         break;
                     case Packet.Type.CLIENT_UNKNOWN:
@@ -713,7 +713,7 @@ namespace Vha.Net
                         OnClientUnknownEvent(
                             new CharacterIDEventArgs(
                             ((SimpleIdPacket)packet).CharacterID,
-                            this.GetUserName(((SimpleIdPacket)packet).CharacterID)
+                            this.GetCharacterName(((SimpleIdPacket)packet).CharacterID)
                             ));
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_INVITE:
@@ -721,7 +721,7 @@ namespace Vha.Net
                         OnPrivateChannelRequestEvent(
                             new PrivateChannelRequestEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID),
                             false
                             ));
                         break;
@@ -731,7 +731,7 @@ namespace Vha.Net
                         OnPrivateChannelStatusEvent(
                             new PrivateChannelStatusEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID),
                             this.ID, this.Character, false, false
                             ));
                         break;
@@ -760,7 +760,7 @@ namespace Vha.Net
                         OnPrivateMessageEvent(
                             new PrivateMessageEventArgs(
                             ((PrivateMessagePacket)packet).CharacterID,
-                            this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((PrivateMessagePacket)packet).CharacterID),
                             ((PrivateMessagePacket)packet).Message,
                             false
                             ));
@@ -770,7 +770,7 @@ namespace Vha.Net
                         OnVicinityMessageEvent(
                             new VicinityMessageEventArgs(
                             ((PrivateMessagePacket)packet).CharacterID,
-                            this.GetUserName(((PrivateMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((PrivateMessagePacket)packet).CharacterID),
                             ((PrivateMessagePacket)packet).Message
                             ));
                         break;
@@ -787,7 +787,7 @@ namespace Vha.Net
                         OnFriendStatusEvent(
                             new FriendStatusEventArgs(
                             ((FriendStatusPacket)packet).CharacterID,
-                            this.GetUserName(((FriendStatusPacket)packet).CharacterID),
+                            this.GetCharacterName(((FriendStatusPacket)packet).CharacterID),
                             ((FriendStatusPacket)packet).Online,
                             ((FriendStatusPacket)packet).Temporary
                             ));
@@ -809,9 +809,9 @@ namespace Vha.Net
                         OnPrivateChannelStatusEvent(
                             new PrivateChannelStatusEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).ChannelID),
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID),
                             ((PrivateChannelStatusPacket)packet).CharacterID,
-                            this.GetUserName(((PrivateChannelStatusPacket)packet).CharacterID),
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).CharacterID),
                             ((PrivateChannelStatusPacket)packet).Joined,
                             ((PrivateChannelStatusPacket)packet).ChannelID == this._id
                             ));
@@ -821,9 +821,9 @@ namespace Vha.Net
                         OnPrivateChannelMessageEvent(
                             new PrivateChannelMessageEventArgs(
                             ((PrivateChannelMessagePacket)packet).ChannelID,
-                            this.GetUserName(((PrivateChannelMessagePacket)packet).ChannelID),
+                            this.GetCharacterName(((PrivateChannelMessagePacket)packet).ChannelID),
                             ((PrivateChannelMessagePacket)packet).CharacterID,
-                            this.GetUserName(((PrivateChannelMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((PrivateChannelMessagePacket)packet).CharacterID),
                             ((PrivateChannelMessagePacket)packet).Message,
                             ((PrivateChannelMessagePacket)packet).ChannelID == this._id
                             ));
@@ -835,7 +835,7 @@ namespace Vha.Net
                             ((ChannelMessagePacket)packet).ChannelID,
                             this.GetChannelName(((ChannelMessagePacket)packet).ChannelID),
                             ((ChannelMessagePacket)packet).CharacterID,
-                            this.GetUserName(((ChannelMessagePacket)packet).CharacterID),
+                            this.GetCharacterName(((ChannelMessagePacket)packet).CharacterID),
                             ((ChannelMessagePacket)packet).Message,
                             this.GetChannelType(((ChannelMessagePacket)packet).ChannelID)
                             ));
@@ -1023,27 +1023,27 @@ namespace Vha.Net
 
         protected virtual void OnNameLookupEvent(NameLookupEventArgs e)
         {
-            lock (this._users)
+            lock (this._characters)
             {
                 // Handle name changes
-                if (this._users.ContainsKey(e.CharacterID))
+                if (this._characters.ContainsKey(e.CharacterID))
                 {
-                    string oldName = this._users[e.CharacterID];
-                    if (this._usersByName.ContainsKey(oldName))
+                    string oldName = this._characters[e.CharacterID];
+                    if (this._charactersByName.ContainsKey(oldName))
                     {
-                        uint oldID = this._usersByName[oldName];
+                        uint oldID = this._charactersByName[oldName];
                         if (oldID != e.CharacterID)
                         {
                             // Old name entry was assigned to a different UID.
-                            if (this._users.ContainsKey(oldID))
-                                this._users.Remove(oldID);
+                            if (this._characters.ContainsKey(oldID))
+                                this._characters.Remove(oldID);
                         }
-                        this._usersByName.Remove(oldName);
+                        this._charactersByName.Remove(oldName);
                     }
                 }
                 // Store id
-                if (e.CharacterID > 0) this._users[e.CharacterID] = e.Name;
-                this._usersByName[e.Name] = e.CharacterID;
+                if (e.CharacterID > 0) this._characters[e.CharacterID] = e.Name;
+                this._charactersByName[e.Name] = e.CharacterID;
             }
             if (e.CharacterID > 0)
             {
@@ -1051,7 +1051,7 @@ namespace Vha.Net
             }
             else
             {
-                this.Debug("User doesn't exist: " + e.Name, "[Database]");
+                this.Debug("Character doesn't exist: " + e.Name, "[Database]");
             }
             // Notify other threads
             this._lookupReset.Set();
@@ -1200,55 +1200,55 @@ namespace Vha.Net
 
         #region Get Commands
         /// <summary>
-        /// Retrieve user ID associated with an user name.
+        /// Retrieve character ID associated with a character name.
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns>UserID</returns>
-        public UInt32 GetUserID(string user)
+        /// <param name="character"></param>
+        /// <returns>Character ID</returns>
+        public UInt32 GetCharacterID(string character)
         {
             UInt32 id;
-            this.GetUserID(user, this.UserIDLookupTimeout, out id);
+            this.GetCharacterID(character, this.LookupTimeout, out id);
             return id;
         }
 
 		/// <summary>
-		/// Retrieve user ID associated with an user name.
+        /// Retrieve character ID associated with a character name.
 		/// </summary>
-		/// <param name="user"></param>
+        /// <param name="character"></param>
         /// <param name="timeout">Timeout in ms. If set to 0, we'll only use the internal lookup table, not fetch info from server.</param>
-		/// <returns>UserID</returns>
-        public UInt32 GetUserID(string user, int timeout)
+		/// <returns>Character ID</returns>
+        public UInt32 GetCharacterID(string character, int timeout)
         {
             UInt32 id;
-            this.GetUserID(user, timeout, out id);
+            this.GetCharacterID(character, timeout, out id);
             return id;
         }
 
-        public bool GetUserID(string user, int timeout, out UInt32 id)
+        public bool GetCharacterID(string character, int timeout, out UInt32 id)
         {
             // Default return value to 0
             id = 0;
             // Keep track of time so we can see when we hit the timeout
             DateTime startTime = DateTime.Now;
             // Some basic error handling and formatting first
-            user = Format.UppercaseFirst(user);
-            if (this._usersByName == null) 
+            character = Format.UppercaseFirst(character);
+            if (this._charactersByName == null) 
                 return false;
-            // Check if we already have this user cached
-            lock (this._users)
+            // Check if we already have this character cached
+            lock (this._characters)
             {
-                if (this._usersByName.ContainsKey(user))
+                if (this._charactersByName.ContainsKey(character))
                 {
-                    if (this._usersByName[user] > 0)
+                    if (this._charactersByName[character] > 0)
                     {
                         // We found it!
-                        id = this._usersByName[user];
+                        id = this._charactersByName[character];
                         return true;
                     }
                     else
                     {
-                        // If UserId is 0, remove the entry
-                        this._usersByName.Remove(user);
+                        // If character id is 0, remove the entry
+                        this._charactersByName.Remove(character);
                         return false;
                     }
                 }
@@ -1257,42 +1257,42 @@ namespace Vha.Net
             if (timeout <= 0)
                 return false;
 
-            // Request the UserId from the server
+            // Request the CharacterID from the server
             int currentTimeout = timeout;
-            this.SendNameLookup(user);
+            this.SendNameLookup(character);
             // Wait for a reply
             while (currentTimeout > 0)
             {
                 // Wait for a name lookup to come in
                 this._lookupReset.WaitOne(currentTimeout);
                 // Check if we found it
-                if (this.GetUserID(user, 0, out id))
+                if (this.GetCharacterID(character, 0, out id))
                 {
                     return true;
                 }
                 // Let's go for another round!
                 currentTimeout = timeout - (int)(DateTime.Now - startTime).TotalMilliseconds;
             }
-            // All failed, we never found the user
+            // All failed, we never found the character
             return false;
         }
 
 		/// <summary>
-		/// Retrieve user name associated with an user ID.
+        /// Retrieve character name associated with an character ID
 		/// </summary>
-		/// <param name="userID"></param>
+        /// <param name="characterID"></param>
 		/// <returns></returns>
-        public string GetUserName(UInt32 userID)
+        public string GetCharacterName(UInt32 characterID)
         {
-            if (userID == 0 || userID == UInt32.MaxValue)
+            if (characterID == 0 || characterID == UInt32.MaxValue)
                 return "";
-            if (this._users == null)
+            if (this._characters == null)
                 return "";
-            lock (this._users)
+            lock (this._characters)
             {
-                if (this._users.ContainsKey(userID))
+                if (this._characters.ContainsKey(characterID))
                 {
-                    return this._users[userID];
+                    return this._characters[characterID];
                 }
                 else
                 {
@@ -1437,13 +1437,13 @@ namespace Vha.Net
 		/// <summary>
 		/// Add a friend. (standard priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendFriendAdd(string user)
+        /// <param name="character"></param>
+        public void SendFriendAdd(string character)
         {
-            if (string.IsNullOrEmpty(user)) return;
-            this.Debug("Adding user to friendslist: " + user, "[Bot]");
+            if (string.IsNullOrEmpty(character)) return;
+            this.Debug("Adding character to friendslist: " + character, "[Bot]");
 
-            ChatCommandPacket p = new ChatCommandPacket("addbuddy", user);
+            ChatCommandPacket p = new ChatCommandPacket("addbuddy", character);
             p.Priority = PacketQueue.Priority.Standard;
 
             this.SendPacket(p);
@@ -1452,13 +1452,13 @@ namespace Vha.Net
 		/// <summary>
 		/// Remove friend. (standard priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendFriendRemove(string user)
+        /// <param name="character"></param>
+        public void SendFriendRemove(string character)
         {
-            if (string.IsNullOrEmpty(user)) return;
-            this.Debug("Removing user from friendslist: " + user, "[Bot]");
+            if (string.IsNullOrEmpty(character)) return;
+            this.Debug("Removing character from friendslist: " + character, "[Bot]");
 
-            ChatCommandPacket p = new ChatCommandPacket("rembuddy", user);
+            ChatCommandPacket p = new ChatCommandPacket("rembuddy", character);
             p.Priority = PacketQueue.Priority.Standard;
 
             this.SendPacket(p);
@@ -1485,17 +1485,17 @@ namespace Vha.Net
 		/// <summary>
 		/// Invite someone to your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendPrivateChannelInvite(string user) { this.SendPrivateChannelInvite(this.GetUserID(user)); }
+        /// <param name="character"></param>
+        public void SendPrivateChannelInvite(string character) { this.SendPrivateChannelInvite(this.GetCharacterID(character)); }
 		/// <summary>
 		/// Invite someone to your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="userID"></param>
-        public void SendPrivateChannelInvite(UInt32 userID)
+        /// <param name="characterID"></param>
+        public void SendPrivateChannelInvite(UInt32 characterID)
         {
-            if (userID == this._id)
+            if (characterID == this._id)
                 return;
-            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_INVITE, userID);
+            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_INVITE, characterID);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
@@ -1503,17 +1503,17 @@ namespace Vha.Net
 		/// <summary>
 		/// Kick someone from your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="user"></param>
-        public void SendPrivateChannelKick(string user) { this.SendPrivateChannelKick(this.GetUserID(user)); }
+        /// <param name="character"></param>
+        public void SendPrivateChannelKick(string character) { this.SendPrivateChannelKick(this.GetCharacterID(character)); }
 		/// <summary>
 		/// Kick someone from your own private channel. (urgent priority)
 		/// </summary>
-		/// <param name="userID"></param>
-        public void SendPrivateChannelKick(UInt32 userID)
+        /// <param name="characterID"></param>
+        public void SendPrivateChannelKick(UInt32 characterID)
         {
-            if (userID == this._id)
+            if (characterID == this._id)
                 return;
-            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_KICK, userID);
+            SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_KICK, characterID);
             p.Priority = PacketQueue.Priority.Urgent;
             this.SendPacket(p);
         }
@@ -1532,7 +1532,7 @@ namespace Vha.Net
 		/// Leave someone elses private channel. (urgent priority)
 		/// </summary>
 		/// <param name="channel"></param>
-        public void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetUserID(channel)); }
+        public void SendPrivateChannelLeave(string channel) { this.SendPrivateChannelLeave(this.GetCharacterID(channel)); }
         /// <summary>
         /// Leave someone elses private channel. (urgent priority)
         /// </summary>
@@ -1554,7 +1554,7 @@ namespace Vha.Net
 		/// </summary>
 		/// <param name="channel"></param>
 		/// <param name="text"></param>
-        public void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetUserID(channel), text); }
+        public void SendPrivateChannelMessage(string channel, string text) { this.SendPrivateChannelMessage(this.GetCharacterID(channel), text); }
 		/// <summary>
 		/// Send a message to someone elses private channel. (urgent priority)
 		/// </summary>
@@ -1570,38 +1570,38 @@ namespace Vha.Net
 		/// <summary>
 		/// Send a private message (tell) to someone. (standard priority)
 		/// </summary>
-		/// <param name="user"></param>
+        /// <param name="character"></param>
 		/// <param name="text"></param>
-        public void SendPrivateMessage(string user, string text) { this.SendPrivateMessage(this.GetUserID(user), text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(string character, string text) { this.SendPrivateMessage(this.GetCharacterID(character), text, PacketQueue.Priority.Standard); }
 		/// <summary>
 		/// Send a private message (tell) to someone. (standard priority)
 		/// </summary>
-		/// <param name="userID"></param>
+        /// <param name="characterID"></param>
 		/// <param name="text"></param>
-        public void SendPrivateMessage(UInt32 userID, string text) { this.SendPrivateMessage(userID, text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(UInt32 characterID, string text) { this.SendPrivateMessage(characterID, text, PacketQueue.Priority.Standard); }
 		/// <summary>
 		/// Send a private message (tell) to someone.
 		/// </summary>
-		/// <param name="userID"></param>
+        /// <param name="characterID"></param>
 		/// <param name="text"></param>
 		/// <param name="priority"></param>
-        public void SendPrivateMessage(UInt32 userID, string text, PacketQueue.Priority priority)
+        public void SendPrivateMessage(UInt32 characterID, string text, PacketQueue.Priority priority)
         {
-            if (userID == this._id || userID == 0)
+            if (characterID == this._id || characterID == 0)
                 return;
-            PrivateMessagePacket p = new PrivateMessagePacket(userID, text);
+            PrivateMessagePacket p = new PrivateMessagePacket(characterID, text);
             p.Priority = priority;
             this.SendPacket(p);
         }
 
 		/// <summary>
-		/// Query the server for a "name to user id" lookup. (urgent priority)
+        /// Query the server for a "name to character id" lookup. (urgent priority)
 		/// </summary>
 		/// <param name="name"></param>
         public void SendNameLookup(string name)
         {
-            lock (this._users)
-                if (this._users.ContainsValue(Format.UppercaseFirst(name)))
+            lock (this._characters)
+                if (this._characters.ContainsValue(Format.UppercaseFirst(name)))
                     return;
 
             NameLookupPacket p = new NameLookupPacket(name);

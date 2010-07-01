@@ -27,7 +27,7 @@ namespace Vha.Chat.Commands
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
-            if (!context.Input.CheckUser(args[0], true)) return false;
+            if (!context.Input.CheckCharacter(args[0], true)) return false;
             context.Chat.SendPrivateChannelKick(args[0]);
             context.Write(MessageClass.PrivateChannel, "Kicking " + args[0] + " from your private channel");
             return true;
@@ -37,10 +37,10 @@ namespace Vha.Chat.Commands
             : base(
                 "Private channel kick", // Name
                 new string[] { "kick" }, // Triggers
-                new string[] { "kick [user]" }, // Usage
+                new string[] { "kick [character]" }, // Usage
                 new string[] { "kick Vhab" }, // Examples
                 // Description
-                "The kick command allows you to kick a user from your private channel."
+                "The kick command allows you to kick a character from your private channel."
             )
         { }
     }

@@ -129,15 +129,15 @@ namespace Vha.MDB
                     case "l": // System submessage
                         Byte[] systemBuffer = new Byte[4];
                         stream.Read(systemBuffer, 0, 4);
-                        Int32 systemEntryId = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(systemBuffer, 0));
+                        Int32 systemEntryID = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(systemBuffer, 0));
                         string systemMessage = "";
                         if (reader != null)
                         {
-                            Entry entry = reader.GetEntry(20000, systemEntryId);
+                            Entry entry = reader.GetEntry(20000, systemEntryID);
                             if (entry != null)
                                 systemMessage = entry.Message;
                         }
-                        descrambledMessage.Append(new Argument(20000, systemEntryId, systemMessage));
+                        descrambledMessage.Append(new Argument(20000, systemEntryID, systemMessage));
                         break;
                     default:
                         throw new Exception("Unknown type detected: " + (int)(type[0]));

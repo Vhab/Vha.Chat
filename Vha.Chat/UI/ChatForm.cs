@@ -61,8 +61,8 @@ namespace Vha.Chat.UI
             this._context.PrivateChannelInviteEvent += new Handler<PrivateChannelInviteEventArgs>(_context_PrivateChannelInviteEvent);
             this._context.PrivateChannelJoinEvent += new Handler<PrivateChannelEventArgs>(_context_PrivateChannelJoinEvent);
             this._context.PrivateChannelLeaveEvent += new Handler<PrivateChannelEventArgs>(_context_PrivateChannelLeaveEvent);
-            this._context.UserJoinEvent += new Handler<PrivateChannelEventArgs>(_context_UserJoinEvent);
-            this._context.UserLeaveEvent += new Handler<PrivateChannelEventArgs>(_context_UserLeaveEvent);
+            this._context.CharacterJoinEvent += new Handler<PrivateChannelEventArgs>(_context_CharacterJoinEvent);
+            this._context.CharacterLeaveEvent += new Handler<PrivateChannelEventArgs>(_context_CharacterLeaveEvent);
             this._context.FriendAddedEvent += new Handler<FriendEventArgs>(_context_FriendAddedEvent);
             this._context.FriendRemovedEvent += new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
             this._context.FriendUpdatedEvent += new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
@@ -98,8 +98,8 @@ namespace Vha.Chat.UI
             this._context.PrivateChannelInviteEvent -= new Handler<PrivateChannelInviteEventArgs>(_context_PrivateChannelInviteEvent);
             this._context.PrivateChannelJoinEvent -= new Handler<PrivateChannelEventArgs>(_context_PrivateChannelJoinEvent);
             this._context.PrivateChannelLeaveEvent -= new Handler<PrivateChannelEventArgs>(_context_PrivateChannelLeaveEvent);
-            this._context.UserJoinEvent -= new Handler<PrivateChannelEventArgs>(_context_UserJoinEvent);
-            this._context.UserLeaveEvent -= new Handler<PrivateChannelEventArgs>(_context_UserLeaveEvent);
+            this._context.CharacterJoinEvent -= new Handler<PrivateChannelEventArgs>(_context_CharacterJoinEvent);
+            this._context.CharacterLeaveEvent -= new Handler<PrivateChannelEventArgs>(_context_CharacterLeaveEvent);
             this._context.FriendAddedEvent -= new Handler<FriendEventArgs>(_context_FriendAddedEvent);
             this._context.FriendRemovedEvent -= new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
             this._context.FriendUpdatedEvent -= new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
@@ -225,12 +225,12 @@ namespace Vha.Chat.UI
             this._outputBox.Document.InvokeScript("scrollToBottom");
         }
 
-        void _context_UserLeaveEvent(Context context, PrivateChannelEventArgs args)
+        void _context_CharacterLeaveEvent(Context context, PrivateChannelEventArgs args)
         {
             if (this.InvokeRequired)
             {
                 this.BeginInvoke(
-                    new Handler<PrivateChannelEventArgs>(_context_UserLeaveEvent),
+                    new Handler<PrivateChannelEventArgs>(_context_CharacterLeaveEvent),
                     new object[] { context, args });
                 return;
             }
@@ -240,12 +240,12 @@ namespace Vha.Chat.UI
             this._guests.RemoveNode(args.Character);
         }
 
-        void _context_UserJoinEvent(Context context, PrivateChannelEventArgs args)
+        void _context_CharacterJoinEvent(Context context, PrivateChannelEventArgs args)
         {
             if (this.InvokeRequired)
             {
                 this.BeginInvoke(
-                    new Handler<PrivateChannelEventArgs>(_context_UserJoinEvent),
+                    new Handler<PrivateChannelEventArgs>(_context_CharacterJoinEvent),
                     new object[] { context, args });
                 return;
             }

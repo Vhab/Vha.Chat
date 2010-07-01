@@ -250,7 +250,7 @@ namespace Vha.Chat
 
                 // Hook events (including exceptions)
                 // - State changes and more
-                this._chat.StatusChangeEvent += new StatusChangeEventHandler(_chat_StatusChangeEvent);
+                this._chat.StateChangeEvent += new StateChangeEventHandler(_chat_StateChangeEvent);
                 this._chat.LoginErrorEvent += new LoginErrorEventHandler(_chat_LoginErrorEvent);
                 this._chat.LoginCharlistEvent += new LoginCharlistEventHandler(_chat_LoginCharlistEvent);
                 this._chat.LoginOKEvent += new LoginOKEventHandler(_chat_LoginOKEvent);
@@ -559,7 +559,7 @@ namespace Vha.Chat
                 this.StateEvent(this, new StateEventArgs(this._state, previousState));
         }
 
-        void _chat_StatusChangeEvent(Vha.Net.Chat chat, StatusChangeEventArgs e)
+        void _chat_StateChangeEvent(Vha.Net.Chat chat, StateChangeEventArgs e)
         {
             ContextState state = this._state;
             ContextState previousState = this._state;

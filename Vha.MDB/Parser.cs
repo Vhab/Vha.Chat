@@ -34,7 +34,18 @@ namespace Vha.MDB
 {
     public class Parser
     {
+        /// <summary>
+        /// Decodes a template message with header
+        /// </summary>
+        /// <param name="scrambledString"></param>
+        /// <returns></returns>
         public static Message Decode(string scrambledString) { return Decode(scrambledString, null); }
+        /// <summary>
+        /// Decodes a template message with header
+        /// </summary>
+        /// <param name="scrambledString"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         public static Message Decode(string scrambledString, Reader reader)
         {
             if (scrambledString.StartsWith("~"))
@@ -45,66 +56,108 @@ namespace Vha.MDB
 
             return Decode(Encoding.UTF8.GetBytes(scrambledString), reader);
         }
+        /// <summary>
+        /// Decodes a template message with header
+        /// </summary>
+        /// <param name="data">Template message string converted to bytes</param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
         public static Message Decode(Byte[] data, Reader reader)
         {
             MemoryStream stream = new MemoryStream(data);
-            Message message = Decode(stream, reader);
-            stream.Close();
-            return message;
+            try
+            {
+                // Check header
+                if (stream.ReadByte() != Convert.ToChar('&'))
+                    throw new ArgumentException("Expecting valid template message header");
+                // Read header
+                int categoryId = Base85.Decode(Read(stream, 5));
+                int entryId = Base85.Decode(Read(stream, 5));
+                // Read message
+                Message message = Decode(categoryId, entryId, stream, reader);
+                return message;
+            }
+            finally
+            {
+                stream.Close();
+            }
         }
-        public static Message Decode(Stream stream, Reader reader)
+        /// <summary>
+        /// Decodes a template message without header
+        /// </summary>
+        /// <param name="categoryId"></param>
+        /// <param name="entryId"></param>
+        /// <param name="data"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static Message Decode(int categoryId, int entryId, Byte[] data, Reader reader)
+        {
+            MemoryStream stream = new MemoryStream(data);
+            try
+            {
+                Message message = Decode(categoryId, entryId, stream, reader);
+                return message;
+            }
+            finally
+            {
+                stream.Close();
+            }
+        }
+        /// <summary>
+        /// Decodes a template message without header
+        /// </summary>
+        /// <param name="categoryId"></param>
+        /// <param name="entryId"></param>
+        /// <param name="stream"></param>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static Message Decode(int categoryId, int entryId, Stream stream, Reader reader)
         {
             // Create reader
             if (reader == null)
                 reader = new Reader();
             // Create 'empty' message
-            Message descrambledMessage = new Message(0, 0);
+            Message descrambledMessage = new Message(categoryId, entryId);
             // And here the real magic happens!
             while (true)
             {
                 if (stream.Position >= stream.Length)
                     break;
 
-                string type = Convert.ToChar(stream.ReadByte()).ToString();
+                char type = Convert.ToChar(stream.ReadByte());
                 switch (type)
                 {
-                    case "&": // Message start, Category ID and Entry ID
-                        descrambledMessage = new Message(
-                            Base85.Decode(Read(stream, 5)),
-                            Base85.Decode(Read(stream, 5))
-                        );
-                        break;
-                    case "S":
+                    case 'S':
                         Byte[] strSizeBuffer = new Byte[2];
                         stream.Read(strSizeBuffer, 0, 2);
                         Int16 strSize = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(strSizeBuffer, 0));
                         String str = Read(stream, strSize);
                         descrambledMessage.Append(new Argument(str));
                         break;
-                    case "s": // String
+                    case 's': // String
                         Int32 textSize = stream.ReadByte();
                         String text = Read(stream, textSize - 1);
                         descrambledMessage.Append(new Argument(text));
                         break;
-                    case "I": // Raw Integer
+                    case 'I': // Raw Integer
                         Byte[] rawIntegerBuffer = new Byte[4];
                         stream.Read(rawIntegerBuffer, 0, 4);
                         Int32 rawInteger = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(rawIntegerBuffer, 0));
                         descrambledMessage.Append(new Argument(rawInteger));
                         break;
-                    case "i": // Integer
+                    case 'i': // Integer
                         Int32 integer = Base85.Decode(Read(stream, 5));
                         descrambledMessage.Append(new Argument(integer));
                         break;
-                    case "u": // Unsigned Integer
+                    case 'u': // Unsigned Integer
                         UInt32 unsignedInteger = (UInt32)Base85.Decode(Read(stream, 5));
                         descrambledMessage.Append(new Argument(unsignedInteger));
                         break;
-                    case "f": // Float
+                    case 'f': // Float
                         Single single = (Single)Base85.Decode(Read(stream, 5));
                         descrambledMessage.Append(new Argument(single));
                         break;
-                    case "R": // Reference, Category ID and Entry ID
+                    case 'R': // Reference, Category ID and Entry ID
                         String referenceMessage = string.Empty;
                         Int32 referenceCategoryID = Base85.Decode(Read(stream, 5));
                         Int32 referenceEntryID = Base85.Decode(Read(stream, 5));
@@ -121,12 +174,12 @@ namespace Vha.MDB
                         );
                         descrambledMessage.Append(reference);
                         break;
-                    case "F": // Recursive, Complete new message
+                    case 'F': // Recursive, Complete new message
                         Int32 recursiveSize = stream.ReadByte();
                         String recursiveText = Read(stream, recursiveSize - 1);
                         descrambledMessage.Append(new Argument(Decode(recursiveText, reader)));
                         break;
-                    case "l": // System submessage
+                    case 'l': // System submessage
                         Byte[] systemBuffer = new Byte[4];
                         stream.Read(systemBuffer, 0, 4);
                         Int32 systemEntryID = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(systemBuffer, 0));
@@ -140,7 +193,7 @@ namespace Vha.MDB
                         descrambledMessage.Append(new Argument(20000, systemEntryID, systemMessage));
                         break;
                     default:
-                        throw new Exception("Unknown type detected: " + (int)(type[0]));
+                        throw new Exception("Unknown type detected: " + (int)type);
                 }
             }
             if (reader != null)
@@ -153,7 +206,7 @@ namespace Vha.MDB
                 }
                 else
                 {
-                    descrambledMessage.Value = String.Format("UNKNOWN_MDB:{0}:{1}", descrambledMessage.CategoryID, descrambledMessage.EntryID);
+                    descrambledMessage.Value = "";
                 }
             }
             return descrambledMessage;

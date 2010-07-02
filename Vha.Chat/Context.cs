@@ -784,7 +784,10 @@ namespace Vha.Chat
             {
                 MDB.Message parsedMessage = null;
                 try { parsedMessage = MDB.Parser.Decode(e.Message); }
-                catch { }
+                catch (Exception ex)
+                {
+                    this.Write(MessageClass.Error, "Error while decoding message: " + ex.Message);
+                }
                 if (parsedMessage != null && !string.IsNullOrEmpty(parsedMessage.Value))
                     message = parsedMessage.Value;
             }
@@ -807,8 +810,11 @@ namespace Vha.Chat
         {
             // Descramble message
             MDB.Message message = null;
-            if (e.Arguments.Length > 0)
-                message = MDB.Parser.Decode(e.Arguments, null);
+            try { message = MDB.Parser.Decode((int)e.CategoryID, (int)e.MessageID, e.Arguments, null); }
+            catch (Exception ex)
+            {
+                this.Write(MessageClass.Error, "Error while decoding message: " + ex.Message);
+            }
             // Apply ignore filter to "received offline message from" messages
             if (e.MessageID == (uint)SystemMessageType.IncommingOfflineMessage)
             {
@@ -817,19 +823,14 @@ namespace Vha.Chat
                 if (this.Ignores.Contains(character))
                     return;
             }
-            // Descramble message
-            MDB.Reader reader = new MDB.Reader();
-            MDB.Entry entry = reader.SpeedRead((int)e.CategoryID, (int)e.MessageID);
             // Failed to get the entry
-            if (entry == null)
+            if (string.IsNullOrEmpty(message.Value))
             {
                 this.Write(MessageClass.Error, "Unknown system message " + e.CategoryID + ":" + e.MessageID);
                 return;
             }
             // Dispatch message
-            string template = MDB.Parser.PrintfToFormatString(entry.Message);
-            string text = (message == null) ? template : string.Format(template, message.Arguments);
-            this.Write(MessageClass.SystemMessage, text);
+            this.Write(MessageClass.SystemMessage, message.Value);
         }
 
         void _chat_SimpleMessageEvent(Vha.Net.Chat chat, SimpleMessageEventArgs e)

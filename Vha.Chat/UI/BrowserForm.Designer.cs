@@ -52,9 +52,6 @@ namespace Vha.Chat.UI
             this.Name = "BrowserForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat :: Browser";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BrowserForm_FormClosed);
-            this.Move += new System.EventHandler(this.BrowserForm_Move);
-            this.Resize += new System.EventHandler(this.BrowserForm_Resize);
             this.ResumeLayout(false);
 
         }

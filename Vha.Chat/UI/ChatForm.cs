@@ -33,7 +33,7 @@ using Vha.Chat.Events;
 
 namespace Vha.Chat.UI
 {
-    public partial class ChatForm : Form
+    public partial class ChatForm : BaseForm
     {
         protected ChatTreeNode _online = new ChatTreeNode(MessageType.Character, "Online");
         protected ChatTreeNode _offline = new ChatTreeNode(MessageType.Character, "Offline");
@@ -50,8 +50,10 @@ namespace Vha.Chat.UI
         protected Queue<string> _lines = new Queue<string>();
 
         public ChatForm(Context context)
+            : base(context, "Chat")
         {
             InitializeComponent();
+            base.Initialize();
 
             this._context = context;
             this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);

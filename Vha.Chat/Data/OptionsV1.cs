@@ -87,5 +87,7 @@ namespace Vha.Chat.Data
         public int Width = 0;
         [XmlAttribute("Height")]
         public int Height = 0;
+        [XmlAttribute("Maximized")]
+        public bool Maximized = false;
     }
 }

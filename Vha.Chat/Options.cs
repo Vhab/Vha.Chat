@@ -312,6 +312,11 @@ namespace Vha.Chat
             get { return this._window.Height; }
             set { this._window.Height = value; this._parent.Touch(); }
         }
+        public bool Maximized
+        {
+            get { return this._window.Maximized; }
+            set { this._window.Maximized = value; this._parent.Touch(); }
+        }
 
         #region Internal
         internal OptionsWindow(Options parent, OptionsV1Window window)

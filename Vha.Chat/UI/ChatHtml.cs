@@ -307,7 +307,7 @@ namespace Vha.Chat.UI
                 this._context.Write(MessageClass.Error, "Unable to locate text with id " + text);
                 return;
             }
-            InfoForm form = new InfoForm(this, this._texts[text]);
+            InfoForm form = new InfoForm(this._context, this, this._texts[text]);
             Utils.InvokeShow(this._form, form);
         }
         
@@ -326,7 +326,7 @@ namespace Vha.Chat.UI
                 this._context.Write(MessageClass.Error, "Invalid itemref link: " + item);
                 return;
             }
-            Form form = new BrowserForm(string.Format(url, parts[0], parts[1], parts[2]));
+            Form form = new BrowserForm(this._context, string.Format(url, parts[0], parts[1], parts[2]));
             Utils.InvokeShow(this._form, form);
         }
 

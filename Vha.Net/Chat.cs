@@ -524,7 +524,12 @@ namespace Vha.Net
                         break;
                     }
                     byte[] buffer = new byte[4];
-                    int receivedBytes = this._socket.Receive(buffer, buffer.Length, 0);
+                    int receivedBytes = 0;
+                    try
+                    {
+                        receivedBytes = this._socket.Receive(buffer, buffer.Length, 0);
+                    }
+                    catch (ObjectDisposedException) { throw new SocketException(); }
                     if (receivedBytes == 0 || !this._socket.Connected)
                     {
                         break;
@@ -545,7 +550,11 @@ namespace Vha.Net
                         int bytesLeft = length;
                         while (bytesLeft > 0)
                         {
-                            receivedBytes = this._socket.Receive(buffer, length - bytesLeft, bytesLeft, 0);
+                            try
+                            {
+                                receivedBytes = this._socket.Receive(buffer, length - bytesLeft, bytesLeft, 0);
+                            }
+                            catch (ObjectDisposedException) { throw new SocketException(); }
                             bytesLeft -= receivedBytes;
                             Thread.Sleep(10);
                         }
@@ -619,7 +628,11 @@ namespace Vha.Net
                         BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)packet.PacketType)).CopyTo(buffer, 0);
                         BitConverter.GetBytes(IPAddress.HostToNetworkOrder(len)).CopyTo(buffer, 2);
                         data.CopyTo(buffer, 4);
-                        _socket.Send(buffer, buffer.Length, 0);
+                        try
+                        {
+                            _socket.Send(buffer, buffer.Length, 0);
+                        }
+                        catch (ObjectDisposedException) { throw new SocketException(); }
                         if (packet.PacketType == Packet.Type.PRIVATE_MESSAGE)
                         {
                             PrivateMessagePacket msg = (PrivateMessagePacket)packet;

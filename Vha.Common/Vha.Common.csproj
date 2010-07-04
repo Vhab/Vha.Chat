@@ -34,6 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigInteger.cs" />
+    <Compile Include="Data\Character.cs" />
+    <Compile Include="Data\Organization.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Base85.cs" />
     <Compile Include="Colors.cs" />

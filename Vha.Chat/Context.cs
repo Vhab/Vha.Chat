@@ -669,33 +669,60 @@ namespace Vha.Chat
                 }
                 // Dispatch events
                 if (this.CharacterJoinEvent != null && joined)
+                {
                     this.CharacterJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, true));
+                }
                 if (this.CharacterLeaveEvent != null && left)
+                {
                     this.CharacterLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, true));
+                }
             }
             // Handle remote
             else
             {
-                bool joined = false;
-                bool left = false;
-                lock (this._privateChannels)
+                // Handle other characters
+                if (e.CharacterID != this.CharacterID)
                 {
-                    if (this._privateChannels.ContainsKey(e.Channel) && !e.Join)
+
+                }
+                // Handle the local character
+                {
+                    bool joined = false;
+                    bool left = false;
+                    lock (this._privateChannels)
                     {
-                        left = true;
-                        this._privateChannels.Remove(e.Channel);
+                        if (this._privateChannels.ContainsKey(e.Channel) && !e.Join)
+                        {
+                            left = true;
+                            this._privateChannels.Remove(e.Channel);
+                        }
+                        else if (!this._privateChannels.ContainsKey(e.Channel) && e.Join)
+                        {
+                            joined = true;
+                            this._privateChannels.Add(e.Channel, channel);
+                        }
                     }
-                    else if (!this._privateChannels.ContainsKey(e.Channel) && e.Join)
+                    // Dispatch events
+                    if (this.PrivateChannelJoinEvent != null && joined)
                     {
-                        joined = true;
-                        this._privateChannels.Add(e.Channel, channel);
+                        this.PrivateChannelJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, false));
+                    }
+                    if (this.PrivateChannelLeaveEvent != null && left)
+                    {
+                        this.PrivateChannelLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, false));
                     }
                 }
-                // Dispatch events
-                if (this.PrivateChannelJoinEvent != null && joined)
-                    this.PrivateChannelJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, false));
-                if (this.PrivateChannelLeaveEvent != null && left)
-                    this.PrivateChannelLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, false));
+            }
+            // Send messages
+            if (e.Join)
+            {
+                this.Write(new MessageSource(MessageType.PrivateChannel, e.Channel, null, false), MessageClass.PrivateChannel,
+                    e.Character + " joined the channel");
+            }
+            else
+            {
+                this.Write(new MessageSource(MessageType.PrivateChannel, e.Channel, null, false), MessageClass.PrivateChannel,
+                    e.Character + " left the channel");
             }
         }
 
@@ -772,8 +799,9 @@ namespace Vha.Chat
 
         void _chat_ChannelMessageEvent(Vha.Net.Chat chat, ChannelMessageEventArgs e)
         {
+            Channel channel = this.GetChannel(e.Channel);
             // Check if channel is muted
-            if (this.GetChannel(e.Channel).Muted)
+            if (channel != null && channel.Muted)
                 return;
             // Check for ignores
             if (this.Ignores.Contains(e.Character))

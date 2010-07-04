@@ -184,28 +184,35 @@ namespace Vha.Chat.UI
                 return;
             }
             // Create message
-            string line = args.Message;
+            string line = "";
+            // - Append channel
             switch (args.Source.Type)
             {
                 case MessageType.Channel:
-                    line = string.Format("[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
-                    if (!string.IsNullOrEmpty(args.Source.Character))
-                        line += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
-                    line += args.Message;
+                    if (!string.IsNullOrEmpty(args.Source.Channel))
+                        line = string.Format("[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
                     break;
                 case MessageType.Character:
                     line = string.Format(
-                        "{2}[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: {1}",
-                        args.Source.Character, args.Message,
-                        args.Source.Outgoing ? "To " : "");
+                        "{1}[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: ",
+                        args.Source.Character, args.Source.Outgoing ? "To " : "");
                     break;
                 case MessageType.PrivateChannel:
-                    line = string.Format(
-                        "[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] <a href=\"character://{1}\" class=\"Link\">{1}</a>: {2}",
-                        args.Source.Channel, args.Source.Character, args.Message);
+                    line = string.Format("[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
                     break;
             }
-            // Format message
+            // - Append character
+            switch (args.Source.Type)
+            {
+                case MessageType.Channel:
+                case MessageType.PrivateChannel:
+                    if (!string.IsNullOrEmpty(args.Source.Character))
+                        line += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
+                    break;
+            }
+            // - Append message
+            line += args.Message;
+            // Format message into html
             string html = string.Format(
                 "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
                 DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second,

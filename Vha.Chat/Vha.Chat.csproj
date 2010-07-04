@@ -235,6 +235,7 @@
     <None Include="Resources\BrowserIcon.ico" />
     <None Include="Resources\BrowserBitmap.png" />
     <None Include="Resources\AboutBitmap.png" />
+    <None Include="Version.bat" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -244,4 +245,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PreBuildEvent>"$(ProjectDir)Version.bat" "$(ProjectDir)"</PreBuildEvent>
+  </PropertyGroup>
 </Project>

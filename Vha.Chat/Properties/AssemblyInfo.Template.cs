@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Vha.Chat")]
 [assembly: AssemblyDescription("A simple stand alone chat client for Anarchy Online")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Vha.Chat Developmnet Team")]
 [assembly: AssemblyProduct("Vha.Chat")]
 [assembly: AssemblyCopyright("Copyright ©  2009-2010 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.2.0.0")]
-[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyVersion("1.2.0.$WCREV$")]
+[assembly: AssemblyFileVersion("1.2.0.$WCREV$")]

@@ -379,10 +379,8 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            if (args.Friend.Online)
-                this._offline.RemoveNode(args.Friend.Name);
-            else
-                this._online.RemoveNode(args.Friend.Name);
+            this._offline.RemoveNode(args.Friend.Name);
+            this._online.RemoveNode(args.Friend.Name);
         }
 
 

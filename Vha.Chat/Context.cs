@@ -771,6 +771,8 @@ namespace Vha.Chat
         {
             // Ignore temporary friends
             if (e.Temporary) return;
+            // Ignore invalid friends
+            if (string.IsNullOrEmpty(e.Character)) return;
             // Handle friend update
             Friend friend = e.GetFriend();
             bool added, updated;

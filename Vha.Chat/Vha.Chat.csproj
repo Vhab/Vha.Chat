@@ -204,6 +204,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
+    <None Include="Credits.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="License.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Configuration.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

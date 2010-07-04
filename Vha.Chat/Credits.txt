@@ -1,6 +1,6 @@
 /*
-* Vha.Chat, Vha.Common, Vha.Net
-* Copyright (C) 2005-2008 Remco van Oosterhout
+* Vha.Chat
+* Copyright (C) 2005-2010 Remco van Oosterhout
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ The following people have made contributions to Vha.Chat or one of the related l
 - Vhab (rk1)
 - Demoder (rk2)
 
-The following people have made contributions to VhaBot's Age of Conan port.
+The following people have made contributions to VhaBot.Net's Age of Conan port.
 
 - Azgura (EU-Dagon)
 
@@ -38,6 +38,6 @@ The following people have made contributions to "VhaBot - Community Edition" and
 - Fayelure (rk1)
 - Neksus (rk2)
 
-Vha.Net and its earlier editions rely on a forked version of "AoChat.NET Library" created by POD13.
+Vha.Net (formerly VhaBot.Net and AoLib) relies on a forked version of "AoChat.NET Library" created by POD13.
 
 The icons used within Vha.Chat are part of the "Tango Project" and have been released to the public domain.

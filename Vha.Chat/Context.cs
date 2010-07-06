@@ -475,6 +475,7 @@ namespace Vha.Chat
 
             // Create input
             this._input = new Input(this, "/");
+            this.Input.RegisterCommand(new AwayCommand(this));
             this.Input.RegisterCommand(new CCCommand());
             this.Input.RegisterCommand(new FriendCommand());
             this.Input.RegisterCommand(new HelpCommand());

@@ -77,6 +77,9 @@ namespace Vha.Chat.UI
 
             this._htmlUtil = new ChatHtml(this._context, this);
 
+            // Hide options button
+            this._options.Visible = this._options.Enabled = false;
+
             // Update buttons to reflect the state of chat.
             switch (this._context.State)
             {

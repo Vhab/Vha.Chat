@@ -325,6 +325,7 @@ namespace Vha.Chat.UI
             this.Controls.Add(this._outputBox);
             this.Controls.Add(this._tree);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(450, 270);
             this.Name = "ChatForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat";

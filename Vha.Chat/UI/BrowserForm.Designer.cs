@@ -48,7 +48,7 @@ namespace Vha.Chat.UI
             this.ClientSize = new System.Drawing.Size(634, 624);
             this.Controls.Add(this._browser);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(170, 200);
             this.Name = "BrowserForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat :: Browser";

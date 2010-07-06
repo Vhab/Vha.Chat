@@ -35,6 +35,15 @@ namespace Vha.Chat.UI
         private string _name;
         private Context _context;
 
+        /// <summary>
+        /// DO NOT USE. THIS CONSTRUCTOR EXISTS TO SATISFY THE FORM DESIGNER
+        /// </summary>
+        protected BaseForm()
+        {
+            this._context = null;
+            this._name = null;
+        }
+
         protected BaseForm(Context context, string name)
         {
             this._context = context;
@@ -53,6 +62,10 @@ namespace Vha.Chat.UI
             {
                 // Apply default values
                 this.StartPosition = FormStartPosition.Manual;
+                if (window.Width < this.MinimumSize.Width)
+                    window.Width = this.MinimumSize.Width;
+                if (window.Height < this.MinimumSize.Height)
+                    window.Height = this.MinimumSize.Height;
                 this.Size = new Size(window.Width, window.Height);
                 this.Location = new Point(window.X, window.Y);
                 if (window.Maximized && this.MaximizeBox)

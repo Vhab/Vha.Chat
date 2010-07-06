@@ -459,10 +459,14 @@ namespace Vha.Net
             }
             if (this._receiveThread != null)
             {
-                this._receiveThread.Abort();
-                if (this._receiveThread.IsAlive)
-                    this._receiveThread.Join();
-                this._receiveThread = null;
+                // This lock ensures the receive thread is not in a state unsafe for aborting
+                lock (this._receiveThread)
+                {
+                    this._receiveThread.Abort();
+                    if (this._receiveThread.IsAlive)
+                        this._receiveThread.Join();
+                    this._receiveThread = null;
+                }
             }
             if (this._sendThread != null)
             {
@@ -670,13 +674,17 @@ namespace Vha.Net
             // Register this thread
             if (local == false)
             {
+                // Keep track of this thread to ensure it's not aborted while processing a packet
                 lock (this._threads)
                     this._threads.Add(Thread.CurrentThread);
             }
+            else
+            {
+                // Lock the 'thread' to ensure it's not aborted while processing a packet
+                Monitor.Enter(this._receiveThread);
+            }
             // Handle packet
-#if !DEBUG
             try
-#endif
             {
                 Packet packet = null;
                 // figure out the packet type and raise an event.
@@ -909,10 +917,17 @@ namespace Vha.Net
                     this.ExceptionEvent(this, ex);
             }
 #endif
-            if (local == false)
+            finally
             {
-                lock (this._threads)
-                    this._threads.Remove(Thread.CurrentThread);
+                if (local == false)
+                {
+                    lock (this._threads)
+                        this._threads.Remove(Thread.CurrentThread);
+                }
+                else
+                {
+                    Monitor.Exit(this._receiveThread);
+                }
             }
         }
         #region Events

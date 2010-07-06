@@ -703,13 +703,20 @@ namespace Vha.Chat
                         }
                     }
                     // Dispatch events
-                    if (this.PrivateChannelJoinEvent != null && joined)
+                    if (joined)
                     {
-                        this.PrivateChannelJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, false));
+                        if (this.PrivateChannelJoinEvent != null)
+                            this.PrivateChannelJoinEvent(this, new PrivateChannelEventArgs(channel, e.Character, true, false));
                     }
-                    if (this.PrivateChannelLeaveEvent != null && left)
+                    else if (left)
                     {
-                        this.PrivateChannelLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, false));
+                        if (this.PrivateChannelLeaveEvent != null)
+                            this.PrivateChannelLeaveEvent(this, new PrivateChannelEventArgs(channel, e.Character, false, false));
+                    }
+                    else
+                    {
+                        // Nothing happened, don't bother writing that message!
+                        return;
                     }
                 }
             }

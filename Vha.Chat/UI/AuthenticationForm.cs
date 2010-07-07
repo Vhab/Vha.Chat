@@ -182,7 +182,9 @@ namespace Vha.Chat.UI
                     Program.ApplicationContext.MainForm.Show();
                     break;
                 case ContextState.Disconnected:
-                    // Likely already showing an error message, let's not do anything
+                    if (this._status == null) break;
+                    if (this._status.Message == "Connecting...")
+                        this._status.SetMessage("Failed to connect!");
                     break;
             }
         }

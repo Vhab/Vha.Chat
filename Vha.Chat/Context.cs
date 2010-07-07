@@ -242,7 +242,23 @@ namespace Vha.Chat
                 }
 
                 // Create chat connection
-                this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password);
+                OptionsProxy proxy = this.Options.Proxy;
+                if (proxy == null || string.IsNullOrEmpty(proxy.Type))
+                {
+                    this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password);
+                }
+                else
+                {
+                    // Construct proxy URI
+                    UriBuilder uri = new UriBuilder();
+                    uri.Scheme = proxy.Type;
+                    uri.Host = proxy.Address;
+                    uri.Port = proxy.Port;
+                    uri.UserName = proxy.Username;
+                    uri.Password = proxy.Password;
+                    // Create proxyfied chat
+                    this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password, uri.Uri);
+                }
                 // Set initial settings
                 this._chat.AutoReconnect = false;
                 this._chat.IgnoreCharacterLoggedIn = true;

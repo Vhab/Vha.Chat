@@ -57,15 +57,15 @@ namespace Vha.Chat.Data
     public class OptionsV1Proxy
     {
         [XmlAttribute("Type")]
-        public string Type;
+        public string Type = "";
         [XmlAttribute("Address")]
-        public string Address;
+        public string Address = "";
         [XmlAttribute("Port")]
-        public int Port;
+        public int Port = 0;
         [XmlAttribute("Username")]
-        public string Username;
+        public string Username = "";
         [XmlAttribute("Password")]
-        public string Password;
+        public string Password = "";
     }
 
     public class OptionsV1Account
@@ -97,10 +97,10 @@ namespace Vha.Chat.Data
     public class OptionsV1Size
     {
         [XmlAttribute("Name")]
-        public string Name;
+        public string Name = "";
         [XmlAttribute("Element")]
-        public string Element;
+        public string Element = "";
         [XmlAttribute("Size")]
-        public int Size;
+        public int Size = 0;
     }
 }

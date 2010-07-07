@@ -47,5 +47,7 @@ namespace Vha.Chat.UI
             }
             this._message.Text = message;
         }
+
+        public string Message { get { return this._message.Text; } }
     }
 }

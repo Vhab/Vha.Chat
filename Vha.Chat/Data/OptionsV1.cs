@@ -57,11 +57,11 @@ namespace Vha.Chat.Data
     public class OptionsV1Proxy
     {
         [XmlAttribute("Type")]
-        public string Type = "";
+        public ProxyType Type = ProxyType.Disabled;
         [XmlAttribute("Address")]
         public string Address = "";
         [XmlAttribute("Port")]
-        public int Port = 0;
+        public int Port = 8080;
         [XmlAttribute("Username")]
         public string Username = "";
         [XmlAttribute("Password")]

@@ -240,7 +240,7 @@ namespace Vha.Chat
 
     public class OptionsProxy
     {
-        public string Type
+        public ProxyType Type
         {
             get { return this._data.Type; }
             set { this._data.Type = value; this._parent.Touch(); }

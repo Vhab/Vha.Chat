@@ -164,4 +164,13 @@ namespace Vha.Chat
         /// </summary>
         Right
     }
+
+    public enum ProxyType
+    {
+        Disabled,
+        HTTP,
+        Socks4,
+        Socks4a,
+        Socks5
+    }
 }

@@ -30,9 +30,47 @@ namespace Vha.Chat.UI
 {
     public partial class OptionsForm : Form
     {
+        private Context _context;
+
         public OptionsForm(Context context)
         {
             InitializeComponent();
+
+            this._context = context;
+            this._context.Options.SavedEvent += new Handler<Options>(_context_SavedEvent);
+
+            // Fill comboboxes
+            this._textStyle.Items.Add(TextStyle.Default);
+            this._textStyle.Items.Add(TextStyle.Strip);
+            this._textStyle.Items.Add(TextStyle.Invert);
+            this._textStyle.SelectedIndex = 0;
+            this._panelPosition.Items.Add(HorizontalPosition.Left);
+            this._panelPosition.Items.Add(HorizontalPosition.Right);
+            this._panelPosition.SelectedIndex = 0;
+            this._ignoreMethod.Items.Add(IgnoreMethod.None);
+            this._ignoreMethod.Items.Add(IgnoreMethod.Character);
+            this._ignoreMethod.Items.Add(IgnoreMethod.Account);
+            this._ignoreMethod.Items.Add(IgnoreMethod.Dimension);
+            this._ignoreMethod.SelectedIndex = 0;
+            this._proxyType.Items.Add(ProxyType.Disabled);
+            this._proxyType.Items.Add(ProxyType.HTTP);
+            this._proxyType.Items.Add(ProxyType.Socks4);
+            this._proxyType.Items.Add(ProxyType.Socks4a);
+            this._proxyType.Items.Add(ProxyType.Socks5);
+            this._proxyType.SelectedIndex = 0;
+
+            // Manually trigger this to get in sync
+            this._readOptions(this._context.Options);
+        }
+
+        private void OptionsForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            this._context.Options.SavedEvent -= new Handler<Options>(_context_SavedEvent);
+        }
+
+        private void _proxyType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _updateProxy();
         }
 
         private void _save_Click(object sender, EventArgs e)
@@ -43,6 +81,88 @@ namespace Vha.Chat.UI
         private void _cancel_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void _reset_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+                "This will reset all options back to their default values. This will include window positions and last used accounts.\n" +
+                "Are you sure you wish to continue?", "Reset options", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+            // TODO: reset settings
+            this._readOptions(this._context.Options);
+        }
+
+        private void _context_SavedEvent(Context context, Options args)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<Options>(_context_SavedEvent),
+                    new object[] { context, args });
+                return;
+            }
+            this._readOptions(args);
+        }
+
+        private void _readOptions(Options o)
+        {
+            // Sync options with visuals
+            this._textStyle.SelectedItem = o.TextStyle;
+            this._maximumHistory.Value = o.MaximumHistory;
+            this._maximumMessages.Value = o.MaximumMessages;
+            this._maximumTexts.Value = o.MaximumTexts;
+            this._panelPosition.SelectedItem = o.PanelPosition;
+            this._ignoreMethod.SelectedItem = o.IgnoreMethod;
+            // Proxy
+            this._proxyType.SelectedItem = o.Proxy.Type;
+            this._proxyAddress.Text = o.Proxy.Address;
+            this._proxyPort.Value = o.Proxy.Port;
+            this._proxyUsername.Text = o.Proxy.Username;
+            this._proxyPassword.Text = o.Proxy.Password;
+            // Update 'the view'
+            _updateProxy();
+        }
+
+        private void _saveOptions(Options o)
+        {
+
+        }
+
+        private void _updateProxy()
+        {
+            switch ((ProxyType)this._proxyType.SelectedItem)
+            {
+                case ProxyType.HTTP:
+                    this._proxyAddress.Enabled = true;
+                    this._proxyPort.Enabled = true;
+                    this._proxyUsername.Enabled = false;
+                    this._proxyPassword.Enabled = false;
+                    break;
+                case ProxyType.Socks4:
+                    this._proxyAddress.Enabled = true;
+                    this._proxyPort.Enabled = true;
+                    this._proxyUsername.Enabled = true;
+                    this._proxyPassword.Enabled = false;
+                    break;
+                case ProxyType.Socks4a:
+                    this._proxyAddress.Enabled = true;
+                    this._proxyPort.Enabled = true;
+                    this._proxyUsername.Enabled = true;
+                    this._proxyPassword.Enabled = false;
+                    break;
+                case ProxyType.Socks5:
+                    this._proxyAddress.Enabled = true;
+                    this._proxyPort.Enabled = true;
+                    this._proxyUsername.Enabled = true;
+                    this._proxyPassword.Enabled = true;
+                    break;
+                default:
+                    this._proxyAddress.Enabled = false;
+                    this._proxyPort.Enabled = false;
+                    this._proxyUsername.Enabled = false;
+                    this._proxyPassword.Enabled = false;
+                    break;
+            }
         }
     }
 }

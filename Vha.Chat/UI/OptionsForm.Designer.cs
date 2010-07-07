@@ -37,6 +37,11 @@ namespace Vha.Chat.UI
             this._reset = new System.Windows.Forms.Button();
             this._save = new System.Windows.Forms.Button();
             this._chatOptions = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this._ignoreMethod = new System.Windows.Forms.ComboBox();
+            this._panelPosition = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this._textStyle = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -45,20 +50,15 @@ namespace Vha.Chat.UI
             this._maximumMessages = new System.Windows.Forms.NumericUpDown();
             this._maximumHistory = new System.Windows.Forms.NumericUpDown();
             this._proxyOptions = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this._textStyle = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this._proxyPassword = new System.Windows.Forms.TextBox();
+            this._proxyPort = new System.Windows.Forms.NumericUpDown();
+            this._proxyUsername = new System.Windows.Forms.TextBox();
+            this._proxyAddress = new System.Windows.Forms.TextBox();
+            this._proxyType = new System.Windows.Forms.ComboBox();
             this._topBackground.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._icon)).BeginInit();
             this._chatOptions.SuspendLayout();
@@ -66,7 +66,7 @@ namespace Vha.Chat.UI
             ((System.ComponentModel.ISupportInitialize)(this._maximumMessages)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._maximumHistory)).BeginInit();
             this._proxyOptions.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._proxyPort)).BeginInit();
             this.SuspendLayout();
             // 
             // _seperator
@@ -132,6 +132,7 @@ namespace Vha.Chat.UI
             this._reset.TabIndex = 14;
             this._reset.Text = "Reset";
             this._reset.UseVisualStyleBackColor = true;
+            this._reset.Click += new System.EventHandler(this._reset_Click);
             // 
             // _save
             // 
@@ -149,8 +150,8 @@ namespace Vha.Chat.UI
             this._chatOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._chatOptions.Controls.Add(this.label6);
-            this._chatOptions.Controls.Add(this.comboBox3);
-            this._chatOptions.Controls.Add(this.comboBox2);
+            this._chatOptions.Controls.Add(this._ignoreMethod);
+            this._chatOptions.Controls.Add(this._panelPosition);
             this._chatOptions.Controls.Add(this.label1);
             this._chatOptions.Controls.Add(this._textStyle);
             this._chatOptions.Controls.Add(this.label5);
@@ -166,6 +167,51 @@ namespace Vha.Chat.UI
             this._chatOptions.TabIndex = 13;
             this._chatOptions.TabStop = false;
             this._chatOptions.Text = "Chat";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 155);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(90, 13);
+            this.label6.TabIndex = 0;
+            this.label6.Text = "Ignore list method";
+            // 
+            // _ignoreMethod
+            // 
+            this._ignoreMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._ignoreMethod.FormattingEnabled = true;
+            this._ignoreMethod.Location = new System.Drawing.Point(189, 152);
+            this._ignoreMethod.Name = "_ignoreMethod";
+            this._ignoreMethod.Size = new System.Drawing.Size(192, 21);
+            this._ignoreMethod.TabIndex = 6;
+            // 
+            // _panelPosition
+            // 
+            this._panelPosition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._panelPosition.FormattingEnabled = true;
+            this._panelPosition.Location = new System.Drawing.Point(189, 125);
+            this._panelPosition.Name = "_panelPosition";
+            this._panelPosition.Size = new System.Drawing.Size(192, 21);
+            this._panelPosition.TabIndex = 5;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 128);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(96, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Side panel position";
+            // 
+            // _textStyle
+            // 
+            this._textStyle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._textStyle.FormattingEnabled = true;
+            this._textStyle.Location = new System.Drawing.Point(189, 20);
+            this._textStyle.Name = "_textStyle";
+            this._textStyle.Size = new System.Drawing.Size(192, 21);
+            this._textStyle.TabIndex = 1;
             // 
             // label5
             // 
@@ -206,20 +252,55 @@ namespace Vha.Chat.UI
             // _maximumTexts
             // 
             this._maximumTexts.Location = new System.Drawing.Point(189, 99);
+            this._maximumTexts.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            this._maximumTexts.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             this._maximumTexts.Name = "_maximumTexts";
             this._maximumTexts.Size = new System.Drawing.Size(62, 20);
             this._maximumTexts.TabIndex = 4;
+            this._maximumTexts.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             // 
             // _maximumMessages
             // 
             this._maximumMessages.Location = new System.Drawing.Point(189, 73);
+            this._maximumMessages.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this._maximumMessages.Minimum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
             this._maximumMessages.Name = "_maximumMessages";
             this._maximumMessages.Size = new System.Drawing.Size(62, 20);
             this._maximumMessages.TabIndex = 3;
+            this._maximumMessages.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
             // 
             // _maximumHistory
             // 
             this._maximumHistory.Location = new System.Drawing.Point(189, 47);
+            this._maximumHistory.Maximum = new decimal(new int[] {
+            250,
+            0,
+            0,
+            0});
             this._maximumHistory.Name = "_maximumHistory";
             this._maximumHistory.Size = new System.Drawing.Size(62, 20);
             this._maximumHistory.TabIndex = 2;
@@ -232,143 +313,17 @@ namespace Vha.Chat.UI
             this._proxyOptions.Controls.Add(this.label9);
             this._proxyOptions.Controls.Add(this.label8);
             this._proxyOptions.Controls.Add(this.label7);
-            this._proxyOptions.Controls.Add(this.textBox3);
-            this._proxyOptions.Controls.Add(this.numericUpDown1);
-            this._proxyOptions.Controls.Add(this.textBox2);
-            this._proxyOptions.Controls.Add(this.textBox1);
-            this._proxyOptions.Controls.Add(this.comboBox1);
+            this._proxyOptions.Controls.Add(this._proxyPassword);
+            this._proxyOptions.Controls.Add(this._proxyPort);
+            this._proxyOptions.Controls.Add(this._proxyUsername);
+            this._proxyOptions.Controls.Add(this._proxyAddress);
+            this._proxyOptions.Controls.Add(this._proxyType);
             this._proxyOptions.Location = new System.Drawing.Point(12, 248);
             this._proxyOptions.Name = "_proxyOptions";
             this._proxyOptions.Size = new System.Drawing.Size(390, 128);
             this._proxyOptions.TabIndex = 14;
             this._proxyOptions.TabStop = false;
             this._proxyOptions.Text = "Proxy";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 128);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(96, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Side panel position";
-            // 
-            // _textStyle
-            // 
-            this._textStyle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._textStyle.FormattingEnabled = true;
-            this._textStyle.Items.AddRange(new object[] {
-            "Default",
-            "Invert",
-            "Strip"});
-            this._textStyle.Location = new System.Drawing.Point(189, 20);
-            this._textStyle.Name = "_textStyle";
-            this._textStyle.Size = new System.Drawing.Size(192, 21);
-            this._textStyle.TabIndex = 1;
-            // 
-            // comboBox2
-            // 
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Items.AddRange(new object[] {
-            "Left",
-            "Right"});
-            this.comboBox2.Location = new System.Drawing.Point(189, 125);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(192, 21);
-            this.comboBox2.TabIndex = 5;
-            // 
-            // comboBox3
-            // 
-            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Items.AddRange(new object[] {
-            "Dimension",
-            "Account",
-            "Character"});
-            this.comboBox3.Location = new System.Drawing.Point(189, 152);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(192, 21);
-            this.comboBox3.TabIndex = 6;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 155);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(90, 13);
-            this.label6.TabIndex = 0;
-            this.label6.Text = "Ignore list method";
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "Disabled",
-            "HTTP",
-            "SOCKS4",
-            "SOCKS4a",
-            "SOCKS5"});
-            this.comboBox1.Location = new System.Drawing.Point(189, 19);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(192, 21);
-            this.comboBox1.TabIndex = 7;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(189, 47);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(124, 20);
-            this.textBox1.TabIndex = 8;
-            // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(189, 73);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(192, 20);
-            this.textBox2.TabIndex = 10;
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(319, 47);
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(62, 20);
-            this.numericUpDown1.TabIndex = 9;
-            // 
-            // textBox3
-            // 
-            this.textBox3.Location = new System.Drawing.Point(189, 99);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(192, 20);
-            this.textBox3.TabIndex = 11;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(7, 22);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(34, 13);
-            this.label7.TabIndex = 0;
-            this.label7.Text = "Mode";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(7, 49);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(45, 13);
-            this.label8.TabIndex = 0;
-            this.label8.Text = "Address";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(7, 76);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(55, 13);
-            this.label9.TabIndex = 0;
-            this.label9.Text = "Username";
             // 
             // label10
             // 
@@ -379,12 +334,86 @@ namespace Vha.Chat.UI
             this.label10.TabIndex = 0;
             this.label10.Text = "Password";
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 76);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(55, 13);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "Username";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(7, 49);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(45, 13);
+            this.label8.TabIndex = 0;
+            this.label8.Text = "Address";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(7, 22);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(34, 13);
+            this.label7.TabIndex = 0;
+            this.label7.Text = "Mode";
+            // 
+            // _proxyPassword
+            // 
+            this._proxyPassword.Location = new System.Drawing.Point(189, 99);
+            this._proxyPassword.Name = "_proxyPassword";
+            this._proxyPassword.PasswordChar = '*';
+            this._proxyPassword.Size = new System.Drawing.Size(192, 20);
+            this._proxyPassword.TabIndex = 11;
+            // 
+            // _proxyPort
+            // 
+            this._proxyPort.Location = new System.Drawing.Point(319, 47);
+            this._proxyPort.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this._proxyPort.Name = "_proxyPort";
+            this._proxyPort.Size = new System.Drawing.Size(62, 20);
+            this._proxyPort.TabIndex = 9;
+            this._proxyPort.Value = new decimal(new int[] {
+            8080,
+            0,
+            0,
+            0});
+            // 
+            // _proxyUsername
+            // 
+            this._proxyUsername.Location = new System.Drawing.Point(189, 73);
+            this._proxyUsername.Name = "_proxyUsername";
+            this._proxyUsername.Size = new System.Drawing.Size(192, 20);
+            this._proxyUsername.TabIndex = 10;
+            // 
+            // _proxyAddress
+            // 
+            this._proxyAddress.Location = new System.Drawing.Point(189, 47);
+            this._proxyAddress.Name = "_proxyAddress";
+            this._proxyAddress.Size = new System.Drawing.Size(124, 20);
+            this._proxyAddress.TabIndex = 8;
+            // 
+            // _proxyType
+            // 
+            this._proxyType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._proxyType.FormattingEnabled = true;
+            this._proxyType.Location = new System.Drawing.Point(189, 19);
+            this._proxyType.Name = "_proxyType";
+            this._proxyType.Size = new System.Drawing.Size(192, 21);
+            this._proxyType.TabIndex = 7;
+            this._proxyType.SelectedIndexChanged += new System.EventHandler(this._proxyType_SelectedIndexChanged);
+            // 
             // OptionsForm
             // 
-            this.AcceptButton = this._save;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this._cancel;
             this.ClientSize = new System.Drawing.Size(414, 421);
             this.Controls.Add(this._proxyOptions);
             this.Controls.Add(this._chatOptions);
@@ -400,6 +429,7 @@ namespace Vha.Chat.UI
             this.Name = "OptionsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Vha.Chat :: Options";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OptionsForm_FormClosed);
             this._topBackground.ResumeLayout(false);
             this._topBackground.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._icon)).EndInit();
@@ -410,7 +440,7 @@ namespace Vha.Chat.UI
             ((System.ComponentModel.ISupportInitialize)(this._maximumHistory)).EndInit();
             this._proxyOptions.ResumeLayout(false);
             this._proxyOptions.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._proxyPort)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -433,17 +463,17 @@ namespace Vha.Chat.UI
         private System.Windows.Forms.NumericUpDown _maximumHistory;
         private System.Windows.Forms.GroupBox _proxyOptions;
         private System.Windows.Forms.PictureBox _icon;
-        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.ComboBox _panelPosition;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox _textStyle;
-        private System.Windows.Forms.ComboBox comboBox3;
+        private System.Windows.Forms.ComboBox _ignoreMethod;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.TextBox _proxyPassword;
+        private System.Windows.Forms.NumericUpDown _proxyPort;
+        private System.Windows.Forms.TextBox _proxyUsername;
+        private System.Windows.Forms.TextBox _proxyAddress;
+        private System.Windows.Forms.ComboBox _proxyType;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;

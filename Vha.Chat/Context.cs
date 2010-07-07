@@ -243,7 +243,7 @@ namespace Vha.Chat
 
                 // Create chat connection
                 OptionsProxy proxy = this.Options.Proxy;
-                if (proxy == null || string.IsNullOrEmpty(proxy.Type))
+                if (proxy == null || proxy.Type == ProxyType.Disabled)
                 {
                     this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password);
                 }
@@ -251,7 +251,7 @@ namespace Vha.Chat
                 {
                     // Construct proxy URI
                     UriBuilder uri = new UriBuilder();
-                    uri.Scheme = proxy.Type;
+                    uri.Scheme = proxy.Type.ToString().ToLower();
                     uri.Host = proxy.Address;
                     uri.Port = proxy.Port;
                     uri.UserName = proxy.Username;

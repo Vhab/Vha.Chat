@@ -70,12 +70,13 @@ namespace Vha.Chat.UI
 
         private void _proxyType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _updateProxy();
+            this._updateProxy();
         }
 
         private void _save_Click(object sender, EventArgs e)
         {
-            this.Close();
+            if (this._saveOptions(this._context.Options))
+                this.Close();
         }
 
         private void _cancel_Click(object sender, EventArgs e)
@@ -89,6 +90,7 @@ namespace Vha.Chat.UI
                 "This will reset all options back to their default values. This will include window positions and last used accounts.\n" +
                 "Are you sure you wish to continue?", "Reset options", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             // TODO: reset settings
+            MessageBox.Show("not implemented yet...");
             this._readOptions(this._context.Options);
         }
 
@@ -123,9 +125,26 @@ namespace Vha.Chat.UI
             _updateProxy();
         }
 
-        private void _saveOptions(Options o)
+        private bool _saveOptions(Options o)
         {
-
+            // Ensure the proxy data is good
+            if (!_checkProxy()) return false;
+            // Options
+            o.TextStyle = (TextStyle)this._textStyle.SelectedItem;
+            o.MaximumHistory = (int)this._maximumHistory.Value;
+            o.MaximumMessages = (int)this._maximumMessages.Value;
+            o.MaximumTexts = (int)this._maximumTexts.Value;
+            o.PanelPosition = (HorizontalPosition)this._panelPosition.SelectedItem;
+            o.IgnoreMethod = (IgnoreMethod)this._ignoreMethod.SelectedItem;
+            // Proxy
+            o.Proxy.Type = (ProxyType)this._proxyType.SelectedItem;
+            o.Proxy.Address = this._proxyAddress.Text;
+            o.Proxy.Port = (int)this._proxyPort.Value;
+            o.Proxy.Username = this._proxyUsername.Text;
+            o.Proxy.Password = this._proxyPassword.Text;
+            // Save
+            o.Save();
+            return true;
         }
 
         private void _updateProxy()
@@ -163,6 +182,60 @@ namespace Vha.Chat.UI
                     this._proxyPassword.Enabled = false;
                     break;
             }
+        }
+
+        private bool _checkProxy()
+        {
+            if ((ProxyType)this._proxyType.SelectedItem == ProxyType.Disabled)
+            {
+                this._proxyAddress.Text = "";
+                this._proxyPort.Value = 8080;
+                this._proxyUsername.Text = "";
+                this._proxyPassword.Text = "";
+                return true;
+            }
+            // Check address and port
+            this._proxyAddress.Text = this._proxyAddress.Text.Trim();
+            if (string.IsNullOrEmpty(this._proxyAddress.Text))
+            {
+                MessageBox.Show("Invalid proxy server address", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            if (this._proxyPort.Value <= 0)
+            {
+                MessageBox.Show("Invalid proxy server port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            // Check username/password
+            this._proxyUsername.Text = this._proxyUsername.Text.Trim();
+            bool username = !string.IsNullOrEmpty(this._proxyUsername.Text);
+            this._proxyPassword.Text = this._proxyPassword.Text.Trim();
+            bool password = !string.IsNullOrEmpty(this._proxyPassword.Text);
+            switch ((ProxyType)this._proxyType.SelectedItem)
+            {
+                case ProxyType.HTTP:
+                    // Doesn't support username or passwords
+                    this._proxyUsername.Text = "";
+                    this._proxyPassword.Text = "";
+                    return true;
+                case ProxyType.Socks4:
+                    // Doesn't support passwords
+                    this._proxyPassword.Text = "";
+                    return true;
+                case ProxyType.Socks4a:
+                    // Doesn't support passwords
+                    this._proxyPassword.Text = "";
+                    return true;
+                case ProxyType.Socks5:
+                    // Doesn't support only a password
+                    if (password && !username)
+                    {
+                        MessageBox.Show("You can't use a proxy password without a proxy username", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+                    return true;
+            }
+            return true;
         }
     }
 }

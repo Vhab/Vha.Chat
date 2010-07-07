@@ -107,9 +107,9 @@ namespace Vha.Chat.UI
             this._title.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._title.Location = new System.Drawing.Point(55, 9);
             this._title.Name = "_title";
-            this._title.Size = new System.Drawing.Size(286, 25);
+            this._title.Size = new System.Drawing.Size(86, 25);
             this._title.TabIndex = 0;
-            this._title.Text = "Options (DOES NOT WORK)";
+            this._title.Text = "Options";
             // 
             // _cancel
             // 

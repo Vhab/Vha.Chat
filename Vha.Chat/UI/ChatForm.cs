@@ -151,6 +151,8 @@ namespace Vha.Chat.UI
                 this._container.RightToLeft != RightToLeft.Yes)
             {
                 this._container.RightToLeft = RightToLeft.Yes;
+                this._inputBox.RightToLeft = RightToLeft.No;
+                this._target.RightToLeft = RightToLeft.No;
             }
             // Move panel to the right
             if (args.PanelPosition == HorizontalPosition.Right &&

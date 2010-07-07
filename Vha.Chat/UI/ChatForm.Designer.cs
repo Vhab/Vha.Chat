@@ -78,7 +78,7 @@ namespace Vha.Chat.UI
             this._tree.Location = new System.Drawing.Point(2, 2);
             this._tree.Name = "_tree";
             this._tree.SelectedImageIndex = 0;
-            this._tree.Size = new System.Drawing.Size(185, 518);
+            this._tree.Size = new System.Drawing.Size(184, 518);
             this._tree.TabIndex = 3;
             this._tree.DoubleClick += new System.EventHandler(this._tree_DoubleClick);
             this._tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this._tree_NodeMouseClick);
@@ -105,7 +105,7 @@ namespace Vha.Chat.UI
             this._outputBox.MinimumSize = new System.Drawing.Size(20, 20);
             this._outputBox.Name = "_outputBox";
             this._outputBox.ScriptErrorsSuppressed = true;
-            this._outputBox.Size = new System.Drawing.Size(578, 491);
+            this._outputBox.Size = new System.Drawing.Size(579, 491);
             this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             this._outputBox.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this._outputBox_Navigating);
@@ -119,7 +119,7 @@ namespace Vha.Chat.UI
             this._inputBox.Location = new System.Drawing.Point(150, 499);
             this._inputBox.Multiline = true;
             this._inputBox.Name = "_inputBox";
-            this._inputBox.Size = new System.Drawing.Size(430, 21);
+            this._inputBox.Size = new System.Drawing.Size(431, 21);
             this._inputBox.TabIndex = 0;
             this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
@@ -341,7 +341,7 @@ namespace Vha.Chat.UI
             this._container.Panel2.Controls.Add(this._tree);
             this._container.Panel2.Padding = new System.Windows.Forms.Padding(2);
             this._container.Size = new System.Drawing.Size(774, 522);
-            this._container.SplitterDistance = 582;
+            this._container.SplitterDistance = 583;
             this._container.SplitterWidth = 3;
             this._container.TabIndex = 5;
             // 

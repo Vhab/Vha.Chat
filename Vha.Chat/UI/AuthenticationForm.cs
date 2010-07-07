@@ -115,6 +115,12 @@ namespace Vha.Chat.UI
                 this._context.Disconnect();
         }
 
+        private void _options_Click(object sender, EventArgs e)
+        {
+            Form options = new OptionsForm(this._context);
+            options.ShowDialog();
+        }
+
         #region Context event handlers
         private void _context_SelectCharacterEvent(Context context, SelectCharacterEventArgs args)
         {

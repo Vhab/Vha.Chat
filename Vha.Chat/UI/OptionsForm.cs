@@ -30,7 +30,7 @@ namespace Vha.Chat.UI
 {
     public partial class OptionsForm : Form
     {
-        public OptionsForm()
+        public OptionsForm(Context context)
         {
             InitializeComponent();
         }

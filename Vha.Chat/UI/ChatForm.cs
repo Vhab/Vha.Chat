@@ -56,6 +56,7 @@ namespace Vha.Chat.UI
             base.Initialize();
 
             this._context = context;
+            this._context.Options.SavedEvent += new Handler<Options>(_context_SavedEvent);
             this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);
             this._context.MessageEvent += new Handler<MessageEventArgs>(_context_MessageEvent);
             this._context.ChannelJoinEvent += new Handler<ChannelEventArgs>(_context_ChannelJoinEvent);
@@ -92,10 +93,14 @@ namespace Vha.Chat.UI
                     this._disconnect.Visible = this._disconnect.Enabled = true;
                     break;
             }
+
+            // Force options update manually
+            _context_SavedEvent(this._context, this._context.Options);
         }
 
         private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            this._context.Options.SavedEvent -= new Handler<Options>(_context_SavedEvent);
             this._context.StateEvent -= new Handler<StateEventArgs>(_context_StateEvent);
             this._context.MessageEvent -= new Handler<MessageEventArgs>(_context_MessageEvent);
             this._context.ChannelJoinEvent -= new Handler<ChannelEventArgs>(_context_ChannelJoinEvent);
@@ -135,6 +140,30 @@ namespace Vha.Chat.UI
         }
 
         #region Context callbacks
+        void _context_SavedEvent(Context context, Options args)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<Options>(_context_SavedEvent),
+                    new object[] { context, args });
+                return;
+            }
+            // Move panel to the left
+            if (args.PanelPosition == HorizontalPosition.Left &&
+                this._container.RightToLeft != RightToLeft.Yes)
+            {
+                this._container.RightToLeft = RightToLeft.Yes;
+            }
+            // Move panel to the right
+            if (args.PanelPosition == HorizontalPosition.Right &&
+                this._container.RightToLeft != RightToLeft.No)
+            {
+                this._container.RightToLeft = RightToLeft.No;
+            }
+            // TODO: update size thingy
+        }
+
         void _context_StateEvent(Context context, StateEventArgs args)
         {
             if (this.InvokeRequired)

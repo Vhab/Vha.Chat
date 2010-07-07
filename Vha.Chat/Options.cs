@@ -67,6 +67,11 @@ namespace Vha.Chat
             get { return this._options.IgnoreMethod; }
             set { this._options.IgnoreMethod = value; this.Touch(); }
         }
+        public HorizontalPosition PanelPosition
+        {
+            get { return this._options.PanelPosition; }
+            set { this._options.PanelPosition = value; this.Touch(); }
+        }
         public OptionsProxy Proxy
         {
             get
@@ -155,6 +160,28 @@ namespace Vha.Chat
             return null;
         }
 
+        public OptionsSize GetSize(string name, string element) { return this.GetSize(name, element, false); }
+        public OptionsSize GetSize(string name, string element, bool create)
+        {
+            lock (this)
+            {
+                foreach (OptionsV1Size size in this._options.Sizes)
+                    if (size.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase) &&
+                        size.Element.Equals(element, StringComparison.CurrentCultureIgnoreCase))
+                        return new OptionsSize(this, size);
+                if (create)
+                {
+                    this.Touch();
+                    OptionsV1Size size = new OptionsV1Size();
+                    size.Name = name;
+                    size.Element = element;
+                    this._options.Sizes.Add(size);
+                    return new OptionsSize(this, size);
+                }
+            }
+            return null;
+        }
+
         public bool Modified { get { return this._modified; } }
 
         /// <summary>
@@ -215,28 +242,28 @@ namespace Vha.Chat
     {
         public string Type
         {
-            get { return this._proxy.Type; }
-            set { this._proxy.Type = value; this._parent.Touch(); }
+            get { return this._data.Type; }
+            set { this._data.Type = value; this._parent.Touch(); }
         }
         public string Address
         {
-            get { return this._proxy.Address; }
-            set { this._proxy.Address = value; this._parent.Touch(); }
+            get { return this._data.Address; }
+            set { this._data.Address = value; this._parent.Touch(); }
         }
         public int Port
         {
-            get { return this._proxy.Port; }
-            set { this._proxy.Port = value; this._parent.Touch(); }
+            get { return this._data.Port; }
+            set { this._data.Port = value; this._parent.Touch(); }
         }
         public string Username
         {
-            get { return this._proxy.Username; }
-            set { this._proxy.Username = value; this._parent.Touch(); }
+            get { return this._data.Username; }
+            set { this._data.Username = value; this._parent.Touch(); }
         }
         public string Password
         {
-            get { return this._proxy.Password; }
-            set { this._proxy.Password = value; this._parent.Touch(); }
+            get { return this._data.Password; }
+            set { this._data.Password = value; this._parent.Touch(); }
         }
 
         #region Internal
@@ -245,11 +272,11 @@ namespace Vha.Chat
             if (parent == null) throw new ArgumentNullException("parent");
             if (proxy == null) throw new ArgumentNullException("proxy");
             this._parent = parent;
-            this._proxy = proxy;
+            this._data = proxy;
         }
 
         private Options _parent;
-        private OptionsV1Proxy _proxy;
+        private OptionsV1Proxy _data;
         #endregion
     }
 
@@ -257,18 +284,18 @@ namespace Vha.Chat
     {
         public string Dimension
         {
-            get { return this._account.Dimension; }
-            set { this._account.Dimension = value; this._parent.Touch(); }
+            get { return this._data.Dimension; }
+            set { this._data.Dimension = value; this._parent.Touch(); }
         }
         public string Name
         {
-            get { return this._account.Name; }
-            set { this._account.Name = value; this._parent.Touch(); }
+            get { return this._data.Name; }
+            set { this._data.Name = value; this._parent.Touch(); }
         }
         public string Character
         {
-            get { return this._account.Character; }
-            set { this._account.Character = value; this._parent.Touch(); }
+            get { return this._data.Character; }
+            set { this._data.Character = value; this._parent.Touch(); }
         }
 
         #region Internal
@@ -277,11 +304,11 @@ namespace Vha.Chat
             if (parent == null) throw new ArgumentNullException("parent");
             if (account == null) throw new ArgumentNullException("account");
             this._parent = parent;
-            this._account = account;
+            this._data = account;
         }
 
         private Options _parent;
-        private OptionsV1Account _account;
+        private OptionsV1Account _data;
         #endregion
     }
 
@@ -289,33 +316,33 @@ namespace Vha.Chat
     {
         public string Name
         {
-            get { return this._window.Name; }
-            set { this._window.Name = value; this._parent.Touch(); }
+            get { return this._data.Name; }
+            set { this._data.Name = value; this._parent.Touch(); }
         }
         public int X
         {
-            get { return this._window.X; }
-            set { this._window.X = value; this._parent.Touch(); }
+            get { return this._data.X; }
+            set { this._data.X = value; this._parent.Touch(); }
         }
         public int Y
         {
-            get { return this._window.Y; }
-            set { this._window.Y = value; this._parent.Touch(); }
+            get { return this._data.Y; }
+            set { this._data.Y = value; this._parent.Touch(); }
         }
         public int Width
         {
-            get { return this._window.Width; }
-            set { this._window.Width = value; this._parent.Touch(); }
+            get { return this._data.Width; }
+            set { this._data.Width = value; this._parent.Touch(); }
         }
         public int Height
         {
-            get { return this._window.Height; }
-            set { this._window.Height = value; this._parent.Touch(); }
+            get { return this._data.Height; }
+            set { this._data.Height = value; this._parent.Touch(); }
         }
         public bool Maximized
         {
-            get { return this._window.Maximized; }
-            set { this._window.Maximized = value; this._parent.Touch(); }
+            get { return this._data.Maximized; }
+            set { this._data.Maximized = value; this._parent.Touch(); }
         }
 
         #region Internal
@@ -324,11 +351,43 @@ namespace Vha.Chat
             if (parent == null) throw new ArgumentNullException("parent");
             if (window == null) throw new ArgumentNullException("window");
             this._parent = parent;
-            this._window = window;
+            this._data = window;
         }
 
         private Options _parent;
-        private OptionsV1Window _window;
+        private OptionsV1Window _data;
+        #endregion
+    }
+
+    public class OptionsSize
+    {
+        public string Name
+        {
+            get { return this._data.Name; }
+            set { this._data.Name = value; this._parent.Touch(); }
+        }
+        public string Element
+        {
+            get { return this._data.Element; }
+            set { this._data.Element = value; this._parent.Touch(); }
+        }
+        public int Size
+        {
+            get { return this._data.Size; }
+            set { this._data.Size = value; this._parent.Touch(); }
+        }
+
+        #region Internal
+        internal OptionsSize(Options parent, OptionsV1Size size)
+        {
+            if (parent == null) throw new ArgumentNullException("parent");
+            if (size == null) throw new ArgumentNullException("size");
+            this._parent = parent;
+            this._data = size;
+        }
+
+        private Options _parent;
+        private OptionsV1Size _data;
         #endregion
     }
 }

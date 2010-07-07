@@ -32,6 +32,7 @@ namespace Vha.Chat.Data
         public int MaximumHistory = 20;
         public TextStyle TextStyle = TextStyle.Strip;
         public IgnoreMethod IgnoreMethod = IgnoreMethod.Character;
+        public HorizontalPosition PanelPosition = HorizontalPosition.Right;
 
         public OptionsV1Proxy Proxy = null;
 
@@ -41,6 +42,8 @@ namespace Vha.Chat.Data
         public List<OptionsV1Account> Accounts = new List<OptionsV1Account>();
         [XmlElement("Window")]
         public List<OptionsV1Window> Windows = new List<OptionsV1Window>();
+        [XmlElement("Size")]
+        public List<OptionsV1Size> Sizes = new List<OptionsV1Size>();
 
         #region Implement Base
         public OptionsV1()
@@ -89,5 +92,15 @@ namespace Vha.Chat.Data
         public int Height = 0;
         [XmlAttribute("Maximized")]
         public bool Maximized = false;
+    }
+
+    public class OptionsV1Size
+    {
+        [XmlAttribute("Name")]
+        public string Name;
+        [XmlAttribute("Element")]
+        public string Element;
+        [XmlAttribute("Size")]
+        public int Size;
     }
 }

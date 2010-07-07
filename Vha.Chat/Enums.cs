@@ -152,4 +152,16 @@ namespace Vha.Chat
         /// </summary>
         Error
     }
+
+    public enum HorizontalPosition
+    {
+        /// <summary>
+        /// Indicates an element is on the left side
+        /// </summary>
+        Left,
+        /// <summary>
+        /// Indicates an element is on the right side
+        /// </summary>
+        Right
+    }
 }

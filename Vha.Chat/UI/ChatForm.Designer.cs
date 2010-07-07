@@ -75,10 +75,10 @@ namespace Vha.Chat.UI
             this._tree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this._tree.ImageIndex = 0;
             this._tree.ImageList = this._icons;
-            this._tree.Location = new System.Drawing.Point(3, 9);
+            this._tree.Location = new System.Drawing.Point(2, 2);
             this._tree.Name = "_tree";
             this._tree.SelectedImageIndex = 0;
-            this._tree.Size = new System.Drawing.Size(178, 479);
+            this._tree.Size = new System.Drawing.Size(185, 518);
             this._tree.TabIndex = 3;
             this._tree.DoubleClick += new System.EventHandler(this._tree_DoubleClick);
             this._tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this._tree_NodeMouseClick);
@@ -101,11 +101,11 @@ namespace Vha.Chat.UI
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._outputBox.IsWebBrowserContextMenuEnabled = false;
-            this._outputBox.Location = new System.Drawing.Point(9, 9);
+            this._outputBox.Location = new System.Drawing.Point(2, 2);
             this._outputBox.MinimumSize = new System.Drawing.Size(20, 20);
             this._outputBox.Name = "_outputBox";
             this._outputBox.ScriptErrorsSuppressed = true;
-            this._outputBox.Size = new System.Drawing.Size(579, 452);
+            this._outputBox.Size = new System.Drawing.Size(578, 491);
             this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             this._outputBox.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this._outputBox_Navigating);
@@ -116,10 +116,10 @@ namespace Vha.Chat.UI
             this._inputBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._inputBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._inputBox.Location = new System.Drawing.Point(157, 467);
+            this._inputBox.Location = new System.Drawing.Point(150, 499);
             this._inputBox.Multiline = true;
             this._inputBox.Name = "_inputBox";
-            this._inputBox.Size = new System.Drawing.Size(431, 21);
+            this._inputBox.Size = new System.Drawing.Size(430, 21);
             this._inputBox.TabIndex = 0;
             this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
@@ -130,7 +130,7 @@ namespace Vha.Chat.UI
             this._target.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._target.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this._target.FormattingEnabled = true;
-            this._target.Location = new System.Drawing.Point(9, 467);
+            this._target.Location = new System.Drawing.Point(2, 499);
             this._target.Name = "_target";
             this._target.Size = new System.Drawing.Size(142, 21);
             this._target.TabIndex = 1;
@@ -193,7 +193,7 @@ namespace Vha.Chat.UI
             this._buttons.Location = new System.Drawing.Point(0, 0);
             this._buttons.Name = "_buttons";
             this._buttons.Padding = new System.Windows.Forms.Padding(6);
-            this._buttons.Size = new System.Drawing.Size(783, 32);
+            this._buttons.Size = new System.Drawing.Size(784, 32);
             this._buttons.TabIndex = 2;
             // 
             // _channelMenu
@@ -325,7 +325,8 @@ namespace Vha.Chat.UI
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._container.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this._container.Location = new System.Drawing.Point(0, 35);
+            this._container.Location = new System.Drawing.Point(5, 37);
+            this._container.Margin = new System.Windows.Forms.Padding(5);
             this._container.Name = "_container";
             // 
             // _container.Panel1
@@ -333,22 +334,22 @@ namespace Vha.Chat.UI
             this._container.Panel1.Controls.Add(this._target);
             this._container.Panel1.Controls.Add(this._inputBox);
             this._container.Panel1.Controls.Add(this._outputBox);
-            this._container.Panel1.Padding = new System.Windows.Forms.Padding(3, 3, 0, 3);
+            this._container.Panel1.Padding = new System.Windows.Forms.Padding(2);
             // 
             // _container.Panel2
             // 
             this._container.Panel2.Controls.Add(this._tree);
-            this._container.Panel2.Padding = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this._container.Size = new System.Drawing.Size(783, 497);
-            this._container.SplitterDistance = 591;
-            this._container.SplitterWidth = 2;
+            this._container.Panel2.Padding = new System.Windows.Forms.Padding(2);
+            this._container.Size = new System.Drawing.Size(774, 522);
+            this._container.SplitterDistance = 582;
+            this._container.SplitterWidth = 3;
             this._container.TabIndex = 5;
             // 
             // ChatForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(783, 531);
+            this.ClientSize = new System.Drawing.Size(784, 564);
             this.Controls.Add(this._container);
             this.Controls.Add(this._buttons);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

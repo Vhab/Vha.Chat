@@ -88,6 +88,32 @@ namespace Vha.Chat.Data
             if (this.LoadedEvent != null)
                 this.LoadedEvent(this);
         }
+        /// <summary>
+        /// Reset the watcher with a new set of data
+        /// </summary>
+        /// <param name="data"></param>
+        public void Reset(Base data)
+        {
+            lock (this)
+            {
+                if (data == null)
+                    throw new ArgumentNullException();
+                if (data.Type != this._data.Type)
+                {
+                    throw new InvalidOperationException(
+                        "Received new data of type '" +
+                        data.Type.ToString() +
+                        "' but was expecting data of type '" +
+                        this._data.Type.ToString());
+                }
+                this._data = data;
+            }
+            // Trigger load event
+            if (this.LoadedEvent != null)
+                this.LoadedEvent(this);
+            // Save data to disk
+            this.Save();
+        }
 
         public Watcher(Base data, string path)
         {

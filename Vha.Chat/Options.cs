@@ -205,6 +205,15 @@ namespace Vha.Chat
                 this.SavedEvent(this._context, this);
         }
 
+        public void Reset()
+        {
+            lock (this)
+            {
+                this._watcher.Reset(new OptionsV1());
+                this._modified = false;
+            }
+        }
+
         #region Internal
         internal Options(Context context)
         {

@@ -89,9 +89,8 @@ namespace Vha.Chat.UI
             DialogResult result = MessageBox.Show(
                 "This will reset all options back to their default values. This will include window positions and last used accounts.\n" +
                 "Are you sure you wish to continue?", "Reset options", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-            // TODO: reset settings
-            MessageBox.Show("not implemented yet...");
-            this._readOptions(this._context.Options);
+            if (result == DialogResult.OK)
+                this._context.Options.Reset();
         }
 
         private void _context_SavedEvent(Context context, Options args)

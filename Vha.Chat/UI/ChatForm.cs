@@ -110,6 +110,12 @@ namespace Vha.Chat.UI
             this._context.FriendAddedEvent -= new Handler<FriendEventArgs>(_context_FriendAddedEvent);
             this._context.FriendRemovedEvent -= new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
             this._context.FriendUpdatedEvent -= new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
+            // If we're still the main form at this stage, let's just call it quits
+            if (Program.ApplicationContext.MainForm == this)
+            {
+                this._context.Disconnect();
+                Application.Exit();
+            }
         }
 
         public delegate void SetTargetDelegate(MessageTarget target);

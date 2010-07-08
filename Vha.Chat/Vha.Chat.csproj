@@ -43,6 +43,7 @@
     <Compile Include="Commands\AwayCommand.cs" />
     <Compile Include="Commands\CCCommand.cs" />
     <Compile Include="Commands\ColorsCommand.cs" />
+    <Compile Include="Commands\CrashCommand.cs" />
     <Compile Include="Commands\FriendCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\IgnoreCommand.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Commands\LeaveCommand.cs" />
     <Compile Include="Commands\MuteCommand.cs" />
     <Compile Include="Commands\OrganizationCommand.cs" />
+    <Compile Include="Commands\ReplyCommand.cs" />
     <Compile Include="Commands\TellCommand.cs" />
     <Compile Include="Commands\TextCommand.cs" />
     <Compile Include="Commands\UnignoreCommand.cs" />

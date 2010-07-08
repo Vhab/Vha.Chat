@@ -493,6 +493,8 @@ namespace Vha.Chat
             this._input = new Input(this, "/");
             this.Input.RegisterCommand(new AwayCommand(this));
             this.Input.RegisterCommand(new CCCommand());
+            this.Input.RegisterCommand(new ColorsCommand());
+            this.Input.RegisterCommand(new CrashCommand());
             this.Input.RegisterCommand(new FriendCommand());
             this.Input.RegisterCommand(new HelpCommand());
             this.Input.RegisterCommand(new IgnoreCommand());
@@ -503,11 +505,11 @@ namespace Vha.Chat
             this.Input.RegisterCommand(new MuteCommand());
             this.Input.RegisterCommand(new OrganizationCommand());
             this.Input.RegisterCommand(new TellCommand());
+            this.Input.RegisterCommand(new ReplyCommand(this));
             this.Input.RegisterCommand(new TextCommand());
             this.Input.RegisterCommand(new UnignoreCommand());
             this.Input.RegisterCommand(new UnmuteCommand());
             this.Input.RegisterCommand(new WhoisCommand());
-            this.Input.RegisterCommand(new ColorsCommand());
         }
 
         #region Chat callbacks

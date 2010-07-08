@@ -40,7 +40,7 @@ namespace Vha.Chat
                 {
                     // Generic response
                     string arguments = minimum == 1 ? "argument" : "arguments";
-                    this._context.Write(MessageClass.Error, "Expecting at least " + minimum + " " + arguments);
+                    message = "Expecting at least " + minimum + " " + arguments;
                 }
                 else
                 {
@@ -49,9 +49,8 @@ namespace Vha.Chat
                     message = "Expected usage: ";
                     foreach (string usage in c.Usage)
                         message += "\n" + this.Prefix + usage;
-                    this._context.Write(MessageClass.Error, message);
                 }
-                message = string.Format("Use '{0}help {1}' for more information", this.Prefix, trigger);
+                message += string.Format("\nUse '{0}help {1}' for more information", this.Prefix, trigger);
                 this._context.Write(MessageClass.Error, message);
             }
             return false;

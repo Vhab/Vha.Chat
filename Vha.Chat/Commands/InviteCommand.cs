@@ -29,6 +29,11 @@ namespace Vha.Chat.Commands
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckCharacter(args[0], true)) return false;
             if (!context.Input.CheckIgnore(args[0], true)) return false;
+            if (context.Character.Equals(args[0], StringComparison.CurrentCultureIgnoreCase))
+            {
+                context.Write(MessageClass.Error, "You can't invite yourself to your private channel");
+                return false;
+            }
             context.Chat.SendPrivateChannelInvite(args[0]);
             context.Write(MessageClass.PrivateChannel, "Inviting " + args[0] + " to your private channel");
             return true;

@@ -393,6 +393,8 @@ namespace Vha.Chat
         public bool HasPrivateChannel(string channel)
         {
             channel = Format.UppercaseFirst(channel);
+            if (channel == this.Character)
+                return true;
             lock (this._privateChannels)
             {
                 return this._privateChannels.ContainsKey(channel);
@@ -406,6 +408,8 @@ namespace Vha.Chat
         public PrivateChannel GetPrivateChannel(string channel)
         {
             channel = Format.UppercaseFirst(channel);
+            if (channel == this.Character)
+                return new PrivateChannel(this.CharacterID, this.Character, true);
             lock (this._privateChannels)
             {
                 if (!this._privateChannels.ContainsKey(channel))
@@ -416,6 +420,8 @@ namespace Vha.Chat
         public bool HasGuest(string character)
         {
             character = Format.UppercaseFirst(character);
+            if (character == this.Character)
+                return true;
             lock (this._guests)
             {
                 return this._guests.Contains(character);

@@ -317,6 +317,7 @@ namespace Vha.Net
             if (async)
             {
                 Thread thread = new Thread(new ThreadStart(_connect));
+                thread.IsBackground = true;
                 thread.Start();
                 return false;
             }
@@ -460,19 +461,19 @@ namespace Vha.Net
             if (this._receiveThread != null)
             {
                 // This lock ensures the receive thread is not in a state unsafe for aborting
-                lock (this._receiveThread)
+                lock (this._threads)
                 {
                     this._receiveThread.Abort();
-                    if (this._receiveThread.IsAlive)
-                        this._receiveThread.Join();
-                    this._receiveThread = null;
                 }
+                while (this._receiveThread.ThreadState != System.Threading.ThreadState.Stopped)
+                    this._receiveThread.Join(100);
+                this._receiveThread = null;
             }
             if (this._sendThread != null)
             {
                 this._sendThread.Abort();
-                if (this._sendThread.IsAlive)
-                    this._sendThread.Join();
+                while (this._sendThread.ThreadState != System.Threading.ThreadState.Stopped)
+                    this._sendThread.Join(100);
                 this._sendThread = null;
             }
             this._socket = null;
@@ -508,6 +509,7 @@ namespace Vha.Net
             if (async)
             {
                 Thread thread = new Thread(new ThreadStart(Disconnect));
+                thread.IsBackground = true;
                 thread.Start();
             }
             else Disconnect();
@@ -587,7 +589,8 @@ namespace Vha.Net
                     Thread t = null;
                     lock (this._threads)
                     {
-                        if (this._threads.Count == 0) break;
+                        if (this._threads.Count == 0)
+                            break;
                         t = this._threads[0];
                     }
                     t.Abort();
@@ -681,7 +684,12 @@ namespace Vha.Net
             else
             {
                 // Lock the 'thread' to ensure it's not aborted while processing a packet
-                Monitor.Enter(this._receiveThread);
+                while (!Monitor.TryEnter(this._threads, 1000))
+                {
+                    // Abort if the connection is lost
+                    if (this._socket == null || !this._socket.Connected)
+                        return;
+                }
             }
             // Handle packet
             try
@@ -909,6 +917,11 @@ namespace Vha.Net
                         break;
                 }
             }
+            catch (ThreadAbortException)
+            {
+                // Rethrow abort exceptions
+                throw;
+            }
 #if !DEBUG
             catch (Exception ex)
             {
@@ -926,7 +939,7 @@ namespace Vha.Net
                 }
                 else
                 {
-                    Monitor.Exit(this._receiveThread);
+                    Monitor.Exit(this._threads);
                 }
             }
         }

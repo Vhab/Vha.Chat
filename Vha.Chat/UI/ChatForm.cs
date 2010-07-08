@@ -488,7 +488,7 @@ namespace Vha.Chat.UI
                 // Handle the input
                 if (this._inputBox.Text.StartsWith(this._context.Input.Prefix))
                 {
-                    this._context.Input.Command(this._inputBox.Text);
+                    this._context.Input.Command(HTML.EscapeString(this._inputBox.Text));
                     this._inputBox.Text = "";
                     return;
                 }
@@ -498,7 +498,7 @@ namespace Vha.Chat.UI
                     return;
                 }
                 MessageTarget target = (MessageTarget)this._target.SelectedItem;
-                this._context.Input.Send(target, this._inputBox.Text, false);
+                this._context.Input.Send(target, HTML.EscapeString(this._inputBox.Text), false);
                 this._inputBox.Text = "";
             }
         }

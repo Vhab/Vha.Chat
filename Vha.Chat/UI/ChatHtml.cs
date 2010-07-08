@@ -95,6 +95,9 @@ namespace Vha.Chat.UI
             validTags.Add("font");
             validTags.Add("a");
             validTags.Add("br");
+            validTags.Add("center");
+            validTags.Add("left");
+            validTags.Add("right");
             List<string> validAttributes = new List<string>();
             validAttributes.Add("style");
             validAttributes.Add("align");

@@ -665,6 +665,13 @@ namespace Vha.Chat
                 updated = !this._channels[name].Equals(channel);
                 this._channels[name] = channel;
             }
+            // Detect organization
+            if (e.Type == ChannelType.Organization)
+            {
+                this._organization = e.Name;
+                this._organizationID = (UInt32)e.ID.IntValue();
+            }
+            // Fire events
             if (this.ChannelJoinEvent != null && joined)
                 this.ChannelJoinEvent(this, new ChannelEventArgs(channel, true));
             if (this.ChannelUpdatedEvent != null && updated)

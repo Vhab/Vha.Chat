@@ -728,9 +728,9 @@ namespace Vha.Net
                         packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
                         OnPrivateChannelRequestEvent(
                             new PrivateChannelRequestEventArgs(
+                            this,
                             ((PrivateChannelStatusPacket)packet).ChannelID,
-                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID),
-                            false
+                            this.GetCharacterName(((PrivateChannelStatusPacket)packet).ChannelID)
                             ));
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_KICK:
@@ -1085,7 +1085,6 @@ namespace Vha.Net
         {
             if (this.PrivateChannelRequestEvent != null)
                 this.PrivateChannelRequestEvent(this, e);
-            this.SendPacket(new PrivateChannelStatusPacket(e.CharacterID, e.Accept));
         }
 
         protected virtual void OnClientUnknownEvent(CharacterIDEventArgs e)

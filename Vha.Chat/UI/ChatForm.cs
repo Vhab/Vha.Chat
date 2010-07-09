@@ -340,7 +340,7 @@ namespace Vha.Chat.UI
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(
+                this.BeginInvoke(
                     new Handler<PrivateChannelInviteEventArgs>(_context_PrivateChannelInviteEvent),
                     new object[] { context, args });
                 return;
@@ -352,9 +352,9 @@ namespace Vha.Chat.UI
                 MessageBoxButtons.YesNo);
             // Join channel if accepted
             if (result == DialogResult.Yes)
-            {
-                args.Accept = true;
-            }
+                args.Accept();
+            else
+                args.Decline();
         }
 
         void _context_ChannelJoinEvent(Context context, ChannelEventArgs args)

@@ -785,10 +785,9 @@ namespace Vha.Chat
                 return;
             }
             // Dispatch invite event
-            PrivateChannelInviteEventArgs args = new PrivateChannelInviteEventArgs(channel, false);
+            PrivateChannelInviteEventArgs args = new PrivateChannelInviteEventArgs(e, channel);
             if (this.PrivateChannelInviteEvent != null)
                 this.PrivateChannelInviteEvent(this, args);
-            e.Accept = args.Accept;
         }
 
         void _chat_FriendRemovedEvent(Vha.Net.Chat chat, CharacterIDEventArgs e)

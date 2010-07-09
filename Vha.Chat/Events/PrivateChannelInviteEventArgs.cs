@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Text;
 using Vha.Chat;
 using Vha.Net;
+using Vha.Net.Events;
 
 namespace Vha.Chat.Events
 {
@@ -32,14 +33,20 @@ namespace Vha.Chat.Events
         /// </summary>
         public readonly PrivateChannel Channel;
         /// <summary>
-        /// Whether we accept this request
+        /// Accept this invite
         /// </summary>
-        public bool Accept;
+        public void Accept() { this._event.Accept(); }
+        /// <summary>
+        /// Decline this invite
+        /// </summary>
+        public void Decline() { this._event.Decline(); }
 
-        public PrivateChannelInviteEventArgs(PrivateChannel channel, bool accept)
+        public PrivateChannelInviteEventArgs(PrivateChannelRequestEventArgs evnt, PrivateChannel channel)
         {
+            this._event = evnt;
             this.Channel = channel;
-            this.Accept = accept;
         }
+
+        private Vha.Net.Events.PrivateChannelRequestEventArgs _event;
     }
 }

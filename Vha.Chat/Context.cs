@@ -597,6 +597,8 @@ namespace Vha.Chat
                 switch (e.State)
                 {
                     case ChatState.CharacterSelect:
+                        state = ContextState.CharacterSelection;
+                        break;
                     case ChatState.Connecting:
                     case ChatState.Login:
                         state = ContextState.Connecting;

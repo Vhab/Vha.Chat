@@ -262,23 +262,15 @@ namespace Vha.Net
             {
                 if (this._receiveThread != null)
                 {
-                    if (this._receiveThread.ThreadState == System.Threading.ThreadState.Running)
-                    {
-                        this._receiveThread.Abort();
-                        this._receiveThread.Join(500);
-                    }
+                    throw new InvalidOperationException("Can not prepare a new connection while ReceiveThread is still running");
                 }
                 if (this._sendThread != null)
                 {
-                    if (this._sendThread.ThreadState == System.Threading.ThreadState.Running)
-                    {
-                        this._sendThread.Abort();
-                        this._sendThread.Join(500);
-                    }
+                    throw new InvalidOperationException("Can not prepare a new connection while ReceiveThread is still running");
                 }
                 if (this._socket != null && this._socket.Connected)
                 {
-                    this._socket.Close();
+                    throw new InvalidOperationException("Can not prepare a new connection while a connection is still active");
                 }
                 this._threads = new List<Thread>();
                 this._lookupReset = new ManualResetEvent(false);
@@ -331,14 +323,17 @@ namespace Vha.Net
 		/// <returns></returns>
         public bool Connect()
         {
+            if (this.State == ChatState.Connected)
+            {
+                this.Debug("Already Connected", "[Error]");
+                return false;
+            }
             lock (this)
             {
-                if (this._socket != null && this._socket.Connected)
-                {
-                    this.Debug("Already Connected", "[Error]");
-                    return false;
-                }
-                this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Connecting));
+                // Ensure we're really disconnected
+                this.Disconnect(ChatState.Connecting);
+
+                // Let's fire it up!
                 this._closing = false;
                 this.PrepareChat();
 
@@ -452,60 +447,13 @@ namespace Vha.Net
 		/// <summary>
 		/// Disconnect from chat server synchronously.
 		/// </summary>
-        public void Disconnect()
-        {
-            if (this._socket != null && this._socket.Connected)
-            {
-                this._socket.Close();
-            }
-            if (this._receiveThread != null)
-            {
-                // This lock ensures the receive thread is not in a state unsafe for aborting
-                lock (this._threads)
-                {
-                    this._receiveThread.Abort();
-                }
-                while (this._receiveThread.ThreadState != System.Threading.ThreadState.Stopped)
-                    this._receiveThread.Join(100);
-                this._receiveThread = null;
-            }
-            if (this._sendThread != null)
-            {
-                this._sendThread.Abort();
-                while (this._sendThread.ThreadState != System.Threading.ThreadState.Stopped)
-                    this._sendThread.Join(100);
-                this._sendThread = null;
-            }
-            this._socket = null;
-            this._lookupReset = null;
-            if (this._characters != null) this._characters.Clear();
-            this._characters = null;
-            this._charactersByName = null;
-            if (this._channels != null) this._channels.Clear();
-            this._channels = null;
-            this._fastQueue = null;
-            this._slowQueue = null;
-            this._reconnectTimer = null;
-            this._pingTimer = null;
-
-            this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
-            this._state = ChatState.Disconnected;
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
-
-		/// <summary>
-		/// Disconnect from chatserver.
-		/// </summary>
-		/// <param name="async">weither or not to disconnect in async mode</param>
+        public void Disconnect() { this.Disconnect(ChatState.Disconnected); }
+        /// <summary>
+        /// Disconnect from chatserver.
+        /// </summary>
+        /// <param name="async">weither or not to disconnect in async mode</param>
         public void Disconnect(bool async)
         {
-            // Prepare the disconnect
-            this._closing = true;
-            if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
-            if (this._pingTimer != null) { this._pingTimer.Stop(); }
-            // Close it up
             if (async)
             {
                 Thread thread = new Thread(new ThreadStart(Disconnect));
@@ -513,6 +461,50 @@ namespace Vha.Net
                 thread.Start();
             }
             else Disconnect();
+        }
+        private void Disconnect(ChatState nextState)
+        {
+            lock (this)
+            {
+                this._closing = true;
+                // Kill the timers
+                if (this._reconnectTimer != null) { this._reconnectTimer.Stop(); }
+                if (this._pingTimer != null) { this._pingTimer.Stop(); }
+                // Close the socket (and release the receive thread)
+                if (this._socket != null)
+                {
+                    if (this._socket.Connected)
+                        this._socket.Close();
+                }
+                if (this._receiveThread != null)
+                {
+                    // Wait for the thread to end
+                    while (this._receiveThread.IsAlive)
+                        this._receiveThread.Join(1000);
+                    this._receiveThread = null;
+                }
+                if (this._sendThread != null)
+                {
+                    this._sendThread.Abort();
+                    while (this._sendThread.IsAlive)
+                        this._sendThread.Join(1000);
+                    this._sendThread = null;
+                }
+                this._socket = null;
+                this._lookupReset = null;
+                if (this._characters != null) this._characters.Clear();
+                this._characters = null;
+                this._charactersByName = null;
+                if (this._channels != null) this._channels.Clear();
+                this._channels = null;
+                this._fastQueue = null;
+                this._slowQueue = null;
+                this._reconnectTimer = null;
+                this._pingTimer = null;
+
+                this.OnStateChangeEvent(new StateChangeEventArgs(nextState));
+                this._state = nextState;
+            }
         }
 		#endregion
 
@@ -572,10 +564,6 @@ namespace Vha.Net
                     }
                     Thread.Sleep(0);
                 }
-            }
-            catch (ThreadAbortException)
-            {
-                this.Debug("Thread aborted", "[ReceiveThread]");
             }
             catch (SocketException ex)
             {
@@ -674,22 +662,13 @@ namespace Vha.Net
         internal void ParsePacket(Object o) { ParsePacket((ParsePacketData)o, false); }
         internal void ParsePacket(ParsePacketData packetData, bool local)
         {
+            List<Thread> threads = this._threads;
             // Register this thread
             if (local == false)
             {
-                // Keep track of this thread to ensure it's not aborted while processing a packet
-                lock (this._threads)
-                    this._threads.Add(Thread.CurrentThread);
-            }
-            else
-            {
-                // Lock the 'thread' to ensure it's not aborted while processing a packet
-                while (!Monitor.TryEnter(this._threads, 1000))
-                {
-                    // Abort if the connection is lost
-                    if (this._socket == null || !this._socket.Connected)
-                        return;
-                }
+                // Keep track of this thread so we can wait for it to end
+                lock (threads)
+                    threads.Add(Thread.CurrentThread);
             }
             // Handle packet
             try
@@ -902,10 +881,12 @@ namespace Vha.Net
                             {
                                 Trace.WriteLine("Disconnect packet received.", "[Debug]");
                                 if (local == false)
+                                {
                                     lock (this._threads)
                                         this._threads.Remove(Thread.CurrentThread);
+                                }
                                 this.Disconnect(false);
-                                return;
+                                break;
                             }
                         }
                         packet = new UnknownPacket(packetData.type, packetData.data);
@@ -916,11 +897,6 @@ namespace Vha.Net
                             ));
                         break;
                 }
-            }
-            catch (ThreadAbortException)
-            {
-                // Rethrow abort exceptions
-                throw;
             }
 #if !DEBUG
             catch (Exception ex)
@@ -934,12 +910,8 @@ namespace Vha.Net
             {
                 if (local == false)
                 {
-                    lock (this._threads)
-                        this._threads.Remove(Thread.CurrentThread);
-                }
-                else
-                {
-                    Monitor.Exit(this._threads);
+                    lock (threads)
+                        threads.Remove(Thread.CurrentThread);
                 }
             }
         }

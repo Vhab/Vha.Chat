@@ -32,7 +32,7 @@ namespace Vha.Chat.UI
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChatForm));
             this._tree = new System.Windows.Forms.TreeView();
             this._icons = new System.Windows.Forms.ImageList(this.components);
-            this._outputBox = new System.Windows.Forms.WebBrowser();
+            this._outputBox = new Vha.Chat.UI.AomlBox();
             this._inputBox = new System.Windows.Forms.TextBox();
             this._target = new System.Windows.Forms.ComboBox();
             this._connect = new System.Windows.Forms.ToolStripButton();
@@ -78,7 +78,7 @@ namespace Vha.Chat.UI
             this._tree.Location = new System.Drawing.Point(2, 2);
             this._tree.Name = "_tree";
             this._tree.SelectedImageIndex = 0;
-            this._tree.Size = new System.Drawing.Size(184, 518);
+            this._tree.Size = new System.Drawing.Size(183, 518);
             this._tree.TabIndex = 3;
             this._tree.DoubleClick += new System.EventHandler(this._tree_DoubleClick);
             this._tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this._tree_NodeMouseClick);
@@ -105,7 +105,7 @@ namespace Vha.Chat.UI
             this._outputBox.MinimumSize = new System.Drawing.Size(20, 20);
             this._outputBox.Name = "_outputBox";
             this._outputBox.ScriptErrorsSuppressed = true;
-            this._outputBox.Size = new System.Drawing.Size(579, 491);
+            this._outputBox.Size = new System.Drawing.Size(580, 491);
             this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             this._outputBox.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this._outputBox_Navigating);
@@ -119,7 +119,7 @@ namespace Vha.Chat.UI
             this._inputBox.Location = new System.Drawing.Point(150, 499);
             this._inputBox.Multiline = true;
             this._inputBox.Name = "_inputBox";
-            this._inputBox.Size = new System.Drawing.Size(431, 21);
+            this._inputBox.Size = new System.Drawing.Size(432, 21);
             this._inputBox.TabIndex = 0;
             this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
@@ -341,7 +341,7 @@ namespace Vha.Chat.UI
             this._container.Panel2.Controls.Add(this._tree);
             this._container.Panel2.Padding = new System.Windows.Forms.Padding(2);
             this._container.Size = new System.Drawing.Size(774, 522);
-            this._container.SplitterDistance = 583;
+            this._container.SplitterDistance = 584;
             this._container.SplitterWidth = 3;
             this._container.TabIndex = 5;
             // 
@@ -375,7 +375,7 @@ namespace Vha.Chat.UI
         #endregion
 
         private System.Windows.Forms.TreeView _tree;
-        private System.Windows.Forms.WebBrowser _outputBox;
+        private AomlBox _outputBox;
         private System.Windows.Forms.TextBox _inputBox;
         private System.Windows.Forms.ComboBox _target;
         private System.Windows.Forms.ToolStripButton _disconnect;

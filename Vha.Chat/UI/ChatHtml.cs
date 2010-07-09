@@ -259,7 +259,6 @@ namespace Vha.Chat.UI
 
         protected void Clicked(object sender, HtmlElementEventArgs e)
         {
-            //HtmlElement element = (HtmlElement)sender;
             HtmlDocument document = (HtmlDocument)sender;
             HtmlElement element = document.GetElementFromPoint(e.ClientMousePosition);
             if (element == null || element.TagName.ToLower() != "a") return;

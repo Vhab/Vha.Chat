@@ -75,6 +75,9 @@
     <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\AomlBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UI\AuthenticationForm.cs">
       <SubType>Form</SubType>
     </Compile>

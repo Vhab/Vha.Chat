@@ -24,7 +24,7 @@ using Vha.Net.Events;
 namespace Vha.Net
 {
     public delegate void AmdMuxInfoEventHandler(Chat chat, AmdMuxInfoEventArgs e);
-    public delegate void AnonVicinityEventHandler(Chat chat, AnonVicinityEventArgs e);
+    public delegate void BroadcastMessageEventHandler(Chat chat, BroadcastMessageEventArgs e);
     public delegate void SimpleMessageEventHandler(Chat chat, SimpleMessageEventArgs e);
     public delegate void SystemMessageEventHandler(Chat chat, SystemMessageEventArgs e);
     public delegate void UnknownPacketEventHandler(Chat chat, UnknownPacketEventArgs e);

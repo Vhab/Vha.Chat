@@ -67,7 +67,7 @@ namespace Vha.Chat
         Error, // Error messages
         Text, // Echo'd messages
         SystemMessage,
-        VicinityMessage,
+        BroadcastMessage,
         PrivateMessage,
         PrivateChannel,
         // Public channels

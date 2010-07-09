@@ -25,9 +25,9 @@ using System.Text;
 namespace Vha.Net.Events
 {
     /// <summary>
-    /// Class for holding event args for anonymous vicinity messages.
+    /// Class for holding event args for broadcast messages.
     /// </summary>
-    public class AnonVicinityEventArgs : EventArgs
+    public class BroadcastMessageEventArgs : EventArgs
     {
         private readonly string _str = null;
         private readonly string _message = null;
@@ -37,7 +37,7 @@ namespace Vha.Net.Events
         /// </summary>
         /// <param name="str">an unknown string</param>
         /// <param name="message">the text of the message</param>
-        public AnonVicinityEventArgs(String str, string message)
+        public BroadcastMessageEventArgs(String str, string message)
         {
             this._str = str;
             this._message = message;

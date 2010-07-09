@@ -52,7 +52,7 @@ namespace Vha.Net
 		#endregion
 		#region Events
 		public event AmdMuxInfoEventHandler AmdMuxInfoEvent;
-        public event AnonVicinityEventHandler AnonVicinityEvent;
+        public event BroadcastMessageEventHandler BroadcastMessageEvent;
         /// <summary>
         /// Notices about friends being online or offline
         /// </summary>
@@ -416,7 +416,7 @@ namespace Vha.Net
         public void ClearEvents()
         {
             this.AmdMuxInfoEvent = null;
-            this.AnonVicinityEvent = null;
+            this.BroadcastMessageEvent = null;
             this.FriendStatusEvent = null;
             this.FriendRemovedEvent = null;
             this.ClientUnknownEvent = null;
@@ -783,11 +783,11 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.ANON_MESSAGE:
-                        packet = new AnonVicinityPacket(packetData.type, packetData.data);
-                        OnAnonVicinityEvent(
-                            new AnonVicinityEventArgs(
-                            ((AnonVicinityPacket)packet).UnknownString,
-                            ((AnonVicinityPacket)packet).Message
+                        packet = new BroadcastMessagePacket(packetData.type, packetData.data);
+                        OnBroadcastMessageEvent(
+                            new BroadcastMessageEventArgs(
+                            ((BroadcastMessagePacket)packet).UnknownString,
+                            ((BroadcastMessagePacket)packet).Message
                             ));
                         break;
                     case Packet.Type.FRIEND_STATUS:
@@ -1028,10 +1028,10 @@ namespace Vha.Net
                 this.FriendRemovedEvent(this, e);
         }
 
-        protected virtual void OnAnonVicinityEvent(AnonVicinityEventArgs e)
+        protected virtual void OnBroadcastMessageEvent(BroadcastMessageEventArgs e)
         {
-            if (this.AnonVicinityEvent != null)
-                this.AnonVicinityEvent(this, e);
+            if (this.BroadcastMessageEvent != null)
+                this.BroadcastMessageEvent(this, e);
         }
 
         protected virtual void OnNameLookupEvent(NameLookupEventArgs e)

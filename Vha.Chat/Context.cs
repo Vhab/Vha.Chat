@@ -287,7 +287,7 @@ namespace Vha.Chat
                 this._chat.PrivateChannelMessageEvent += new PrivateChannelMessageEventHandler(_chat_PrivateChannelMessageEvent);
                 this._chat.SystemMessageEvent += new SystemMessageEventHandler(_chat_SystemMessageEvent);
                 this._chat.SimpleMessageEvent += new SimpleMessageEventHandler(_chat_SimpleMessageEvent);
-                this._chat.AnonVicinityEvent += new AnonVicinityEventHandler(_chat_AnonVicinityEvent);
+                this._chat.BroadcastMessageEvent += new BroadcastMessageEventHandler(_chat_BroadcastMessageEvent);
                 // Store values
                 this._account = account.ToLower();
                 this._dimension = dim.Name;
@@ -871,6 +871,12 @@ namespace Vha.Chat
             // Check for ignores
             if (this.Ignores.Contains(e.Character))
                 return;
+            // Treat 'null-characters' as broadcasts
+            if (e.CharacterID == 0)
+            {
+                this.Write(MessageClass.BroadcastMessage, e.Message);
+                return;
+            }
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.Character, null, e.Character, e.Outgoing);
             this.Write(source, MessageClass.PrivateMessage, e.Message);
@@ -906,13 +912,13 @@ namespace Vha.Chat
         void _chat_SimpleMessageEvent(Vha.Net.Chat chat, SimpleMessageEventArgs e)
         {
             // Dispatch message
-            this.Write(MessageClass.SystemMessage, e.Message);
+            this.Write(MessageClass.BroadcastMessage, e.Message);
         }
 
-        void _chat_AnonVicinityEvent(Vha.Net.Chat chat, AnonVicinityEventArgs e)
+        void _chat_BroadcastMessageEvent(Vha.Net.Chat chat, BroadcastMessageEventArgs e)
         {
             // Dispatch message
-            this.Write(MessageClass.VicinityMessage, e.Message);
+            this.Write(MessageClass.BroadcastMessage, e.Message);
         }
 
         #endregion

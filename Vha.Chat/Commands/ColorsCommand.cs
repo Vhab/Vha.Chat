@@ -37,7 +37,7 @@ namespace Vha.Chat.Commands
             context.Write(MessageClass.LeadersChannel, "This is a leaders channel message");
             context.Write(MessageClass.OrganizationChannel, "This is an organization channel message");
             context.Write(MessageClass.ShoppingChannel, "This is a shopping channel message");
-            context.Write(MessageClass.VicinityMessage, "This is a vicinity message");
+            context.Write(MessageClass.BroadcastMessage, "This is a broadcast message");
             return true;
         }
 

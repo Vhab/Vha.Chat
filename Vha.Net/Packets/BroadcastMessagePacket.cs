@@ -23,10 +23,10 @@ using System.Net;
 
 namespace Vha.Net.Packets
 {
-    internal class AnonVicinityPacket : Packet
+    internal class BroadcastMessagePacket : Packet
     {
-        internal AnonVicinityPacket(Packet.Type type, byte[] data) : base(type, data) { }
-        internal AnonVicinityPacket(String str, String formattedText) : base(Packet.Type.ANON_MESSAGE)
+        internal BroadcastMessagePacket(Packet.Type type, byte[] data) : base(type, data) { }
+        internal BroadcastMessagePacket(String str, String formattedText) : base(Packet.Type.ANON_MESSAGE)
         {
             this.AddData(new NetString("\0"));
             this.AddData(new NetString(formattedText));

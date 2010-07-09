@@ -36,7 +36,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Events\AmdMuxInfoEventArgs.cs" />
-    <Compile Include="Events\AnonVicinityEventArgs.cs" />
+    <Compile Include="Events\BroadcastMessageEventArgs.cs" />
     <Compile Include="Events\ChannelStatusEventArgs.cs" />
     <Compile Include="Events\ChannelMessageEventArgs.cs" />
     <Compile Include="Events\CharacterIDEventArgs.cs" />
@@ -60,7 +60,7 @@
     <Compile Include="PrivateChannel.cs" />
     <Compile Include="Proxy.cs" />
     <Compile Include="Packets\AmdMuxInfoPacket.cs" />
-    <Compile Include="Packets\AnonVicinityPacket.cs" />
+    <Compile Include="Packets\BroadcastMessagePacket.cs" />
     <Compile Include="Packets\ChannelUpdatePacket.cs" />
     <Compile Include="Packets\ClientNamePacket.cs" />
     <Compile Include="NetConvert.cs" />

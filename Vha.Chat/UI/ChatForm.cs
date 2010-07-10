@@ -138,7 +138,18 @@ namespace Vha.Chat.UI
                 return;
             }
             // Add new target
-            int index = this._target.Items.Add(target);
+            int index = 0;
+            foreach (MessageTarget t in this._target.Items)
+            {
+                if (t.Target.CompareTo(target.Target) > 0)
+                {
+                    this._target.Items.Insert(index, target);
+                    this._target.SelectedIndex = index;
+                    return;
+                }
+                index++;
+            }
+            index = this._target.Items.Add(target);
             this._target.SelectedIndex = index;
         }
 

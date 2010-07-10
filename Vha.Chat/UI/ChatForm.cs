@@ -730,6 +730,24 @@ namespace Vha.Chat.UI
             if (string.IsNullOrEmpty((string)this._guestsMenu.Tag)) return;
             this._context.Input.Command("kick " + (string)this._guestsMenu.Tag);
         }
+
+        private void _channelMenu_Open_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
+            this._context.Input.Command("open channel " + (string)this._channelMenu.Tag);
+        }
+
+        private void _privateChannelMenu_Open_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
+            this._context.Input.Command("open privatechannel " + (string)this._privateChannelMenu.Tag);
+        }
+
+        private void _characterMenu_Open_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
+            this._context.Input.Command("open character " + (string)this._characterMenu.Tag);
+        }
         #endregion
     }
 }

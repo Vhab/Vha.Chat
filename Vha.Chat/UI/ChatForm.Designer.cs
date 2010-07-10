@@ -57,6 +57,9 @@ namespace Vha.Chat.UI
             this._guestsMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._guestsMenu_Kick = new System.Windows.Forms.ToolStripMenuItem();
             this._container = new System.Windows.Forms.SplitContainer();
+            this._characterMenu_Open = new System.Windows.Forms.ToolStripMenuItem();
+            this._privateChannelMenu_Open = new System.Windows.Forms.ToolStripMenuItem();
+            this._channelMenu_Open = new System.Windows.Forms.ToolStripMenuItem();
             this._buttons.SuspendLayout();
             this._channelMenu.SuspendLayout();
             this._privateChannelMenu.SuspendLayout();
@@ -78,7 +81,7 @@ namespace Vha.Chat.UI
             this._tree.Location = new System.Drawing.Point(2, 2);
             this._tree.Name = "_tree";
             this._tree.SelectedImageIndex = 0;
-            this._tree.Size = new System.Drawing.Size(183, 518);
+            this._tree.Size = new System.Drawing.Size(181, 518);
             this._tree.TabIndex = 3;
             this._tree.DoubleClick += new System.EventHandler(this._tree_DoubleClick);
             this._tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this._tree_NodeMouseClick);
@@ -109,7 +112,7 @@ namespace Vha.Chat.UI
             this._outputBox.MinimumSize = new System.Drawing.Size(20, 20);
             this._outputBox.Name = "_outputBox";
             this._outputBox.ScriptErrorsSuppressed = true;
-            this._outputBox.Size = new System.Drawing.Size(576, 491);
+            this._outputBox.Size = new System.Drawing.Size(578, 491);
             this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             // 
@@ -121,7 +124,7 @@ namespace Vha.Chat.UI
             this._inputBox.Location = new System.Drawing.Point(150, 499);
             this._inputBox.Multiline = true;
             this._inputBox.Name = "_inputBox";
-            this._inputBox.Size = new System.Drawing.Size(428, 21);
+            this._inputBox.Size = new System.Drawing.Size(430, 21);
             this._inputBox.TabIndex = 0;
             this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
@@ -202,30 +205,31 @@ namespace Vha.Chat.UI
             // 
             this._channelMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._channelMenu_TalkTo,
+            this._channelMenu_Open,
             this._channelMenu_Seperator,
             this._channelMenu_Mute,
             this._channelMenu_Unmute});
             this._channelMenu.Name = "_channelMenu";
-            this._channelMenu.Size = new System.Drawing.Size(123, 76);
+            this._channelMenu.Size = new System.Drawing.Size(123, 98);
             // 
             // _channelMenu_TalkTo
             // 
             this._channelMenu_TalkTo.Image = global::Vha.Chat.Properties.Resources.TalkBitmap;
             this._channelMenu_TalkTo.Name = "_channelMenu_TalkTo";
-            this._channelMenu_TalkTo.Size = new System.Drawing.Size(122, 22);
+            this._channelMenu_TalkTo.Size = new System.Drawing.Size(152, 22);
             this._channelMenu_TalkTo.Text = "Talk To...";
             this._channelMenu_TalkTo.Click += new System.EventHandler(this._channelMenu_TalkTo_Click);
             // 
             // _channelMenu_Seperator
             // 
             this._channelMenu_Seperator.Name = "_channelMenu_Seperator";
-            this._channelMenu_Seperator.Size = new System.Drawing.Size(119, 6);
+            this._channelMenu_Seperator.Size = new System.Drawing.Size(149, 6);
             // 
             // _channelMenu_Mute
             // 
             this._channelMenu_Mute.Image = global::Vha.Chat.Properties.Resources.ChannelDisabledBitmap;
             this._channelMenu_Mute.Name = "_channelMenu_Mute";
-            this._channelMenu_Mute.Size = new System.Drawing.Size(122, 22);
+            this._channelMenu_Mute.Size = new System.Drawing.Size(152, 22);
             this._channelMenu_Mute.Text = "Mute";
             this._channelMenu_Mute.Click += new System.EventHandler(this._channelMenu_Mute_Click);
             // 
@@ -233,7 +237,7 @@ namespace Vha.Chat.UI
             // 
             this._channelMenu_Unmute.Image = global::Vha.Chat.Properties.Resources.ChannelBitmap;
             this._channelMenu_Unmute.Name = "_channelMenu_Unmute";
-            this._channelMenu_Unmute.Size = new System.Drawing.Size(122, 22);
+            this._channelMenu_Unmute.Size = new System.Drawing.Size(152, 22);
             this._channelMenu_Unmute.Text = "Unmute";
             this._channelMenu_Unmute.Click += new System.EventHandler(this._channelMenu_Unmute_Click);
             // 
@@ -241,10 +245,11 @@ namespace Vha.Chat.UI
             // 
             this._privateChannelMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._privateChannelMenu_TalkTo,
+            this._privateChannelMenu_Open,
             this._privateChannelMenu_Seperator,
             this._privateChannelMenu_Leave});
             this._privateChannelMenu.Name = "_privateChannelMenu";
-            this._privateChannelMenu.Size = new System.Drawing.Size(123, 54);
+            this._privateChannelMenu.Size = new System.Drawing.Size(123, 76);
             // 
             // _privateChannelMenu_TalkTo
             // 
@@ -271,11 +276,12 @@ namespace Vha.Chat.UI
             // 
             this._characterMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._characterMenu_TalkTo,
+            this._characterMenu_Open,
             this._characterMenu_Seperator,
             this._characterMenu_Invite,
             this._characterMenu_Remove});
             this._characterMenu.Name = "_characterMenu";
-            this._characterMenu.Size = new System.Drawing.Size(123, 76);
+            this._characterMenu.Size = new System.Drawing.Size(153, 120);
             // 
             // _characterMenu_TalkTo
             // 
@@ -343,9 +349,33 @@ namespace Vha.Chat.UI
             this._container.Panel2.Controls.Add(this._tree);
             this._container.Panel2.Padding = new System.Windows.Forms.Padding(2);
             this._container.Size = new System.Drawing.Size(774, 522);
-            this._container.SplitterDistance = 584;
+            this._container.SplitterDistance = 586;
             this._container.SplitterWidth = 3;
             this._container.TabIndex = 5;
+            // 
+            // _characterMenu_Open
+            // 
+            this._characterMenu_Open.Image = global::Vha.Chat.Properties.Resources.PopupBitmap;
+            this._characterMenu_Open.Name = "_characterMenu_Open";
+            this._characterMenu_Open.Size = new System.Drawing.Size(152, 22);
+            this._characterMenu_Open.Text = "Open";
+            this._characterMenu_Open.Click += new System.EventHandler(this._characterMenu_Open_Click);
+            // 
+            // _privateChannelMenu_Open
+            // 
+            this._privateChannelMenu_Open.Image = global::Vha.Chat.Properties.Resources.PopupBitmap;
+            this._privateChannelMenu_Open.Name = "_privateChannelMenu_Open";
+            this._privateChannelMenu_Open.Size = new System.Drawing.Size(152, 22);
+            this._privateChannelMenu_Open.Text = "Open";
+            this._privateChannelMenu_Open.Click += new System.EventHandler(this._privateChannelMenu_Open_Click);
+            // 
+            // _channelMenu_Open
+            // 
+            this._channelMenu_Open.Image = global::Vha.Chat.Properties.Resources.PopupBitmap;
+            this._channelMenu_Open.Name = "_channelMenu_Open";
+            this._channelMenu_Open.Size = new System.Drawing.Size(152, 22);
+            this._channelMenu_Open.Text = "Open";
+            this._channelMenu_Open.Click += new System.EventHandler(this._channelMenu_Open_Click);
             // 
             // ChatForm
             // 
@@ -403,6 +433,9 @@ namespace Vha.Chat.UI
         private System.Windows.Forms.ContextMenuStrip _guestsMenu;
         private System.Windows.Forms.ToolStripMenuItem _guestsMenu_Kick;
         private System.Windows.Forms.SplitContainer _container;
+        private System.Windows.Forms.ToolStripMenuItem _channelMenu_Open;
+        private System.Windows.Forms.ToolStripMenuItem _privateChannelMenu_Open;
+        private System.Windows.Forms.ToolStripMenuItem _characterMenu_Open;
 
     }
 }

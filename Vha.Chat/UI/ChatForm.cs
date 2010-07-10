@@ -41,7 +41,6 @@ namespace Vha.Chat.UI
         protected ChatTreeNode _privateChannels = new ChatTreeNode(MessageType.PrivateChannel, "Private Channels");
         protected ChatTreeNode _guests = new ChatTreeNode(MessageType.Character, "Guests");
 
-        protected ChatHtml _htmlUtil;
         protected Context _context;
 
         protected List<string> _history = new List<string>();
@@ -73,8 +72,6 @@ namespace Vha.Chat.UI
             this._tree.Nodes.Add(this._channels);
             this._tree.Nodes.Add(this._privateChannels);
             this._tree.Nodes.Add(this._guests);
-
-            this._htmlUtil = new ChatHtml(this._context, this);
 
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
@@ -522,7 +519,30 @@ namespace Vha.Chat.UI
 
         private void _outputBox_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
         {
-            this._htmlUtil.Link(e.Type, e.Argument);
+            switch (e.Type)
+            {
+                case "text":
+                    Utils.InvokeShow(this, new InfoForm(this._context, this, e.Argument));
+                    break;
+                case "chatcmd":
+                    this._context.Input.Command(e.Argument);
+                    break;
+                case "itemref":
+                    Utils.InvokeShow(this, new BrowserForm(this._context, e.Argument, BrowserFormType.Item));
+                    break;
+                case "character":
+                    this.SetTarget(new MessageTarget(MessageType.Character, e.Argument));
+                    break;
+                case "channel":
+                    this.SetTarget(new MessageTarget(MessageType.Channel, e.Argument));
+                    break;
+                case "privchan":
+                    this.SetTarget(new MessageTarget(MessageType.PrivateChannel, e.Argument));
+                    break;
+                default:
+                    this._context.Write(MessageClass.Error, "Unexpected link type '" + e.Type + "' in ChatForm");
+                    break;
+            }
         }
 
         private void _tree_DoubleClick(object sender, EventArgs e)

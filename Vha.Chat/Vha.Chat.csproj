@@ -99,7 +99,6 @@
     <Compile Include="UI\ChatForm.Designer.cs">
       <DependentUpon>ChatForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\ChatHtml.cs" />
     <Compile Include="UI\ChatTreeNode.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Configuration.cs" />

@@ -28,15 +28,39 @@ using Vha.Chat;
 
 namespace Vha.Chat.UI
 {
+    public enum BrowserFormType
+    {
+        Url,
+        Item
+    }
+
     public partial class BrowserForm : BaseForm
     {
-        public BrowserForm(Context context, string url)
+        public BrowserForm(Context context, string argument, BrowserFormType type)
             : base(context, "Browser")
         {
             InitializeComponent();
             base.Initialize();
-            // Navigate
-            this._browser.Navigate(url);
+            // Handle argument
+            switch (type)
+            {
+                case BrowserFormType.Item:
+                    string[] parts = argument.Split(new char[] { '/' });
+                    if (parts.Length < 3)
+                    {
+                        this._browser.DocumentText = "Invalid item: " + argument;
+                        return;
+                    }
+                    else
+                    {
+                        string url = "http://www.xyphos.com/ao/aodb.php?id={0}&id2={1}&ql={2}&minimode=1";
+                        this._browser.Navigate(string.Format(url, parts[0], parts[1], parts[2]));
+                    }
+                    break;
+                case BrowserFormType.Url:
+                    this._browser.Navigate(argument);
+                    break;
+            }
         }
     }
 }

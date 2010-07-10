@@ -31,15 +31,18 @@ namespace Vha.Chat.UI
     public partial class InfoForm : BaseForm
     {
         protected string _html = "";
-        protected ChatHtml _htmlUtil;
+        protected Form _parent = null;
+        protected Context _context = null;
 
-        public InfoForm(Context context, ChatHtml links, string html)
+        public InfoForm(Context context, Form parent, string html)
             : base (context, "Info")
         {
             InitializeComponent();
             base.Initialize();
+
+            this._context = context;
+            this._parent = parent;
             this._html = html;
-            this._htmlUtil = links;
             this._info.BackgroundColor = this.BackColor;
             this._info.ForegroundColor = this.ForeColor;
             this._info.MaximumLines = 0;
@@ -57,7 +60,21 @@ namespace Vha.Chat.UI
 
         void _info_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
         {
-            this._htmlUtil.Link(e.Type, e.Argument);
+            switch (e.Type)
+            {
+                case "text":
+                    Utils.InvokeShow(this._parent, new InfoForm(this._context, this, e.Argument));
+                    break;
+                case "chatcmd":
+                    this._context.Input.Command(e.Argument);
+                    break;
+                case "itemref":
+                    Utils.InvokeShow(this._parent, new BrowserForm(this._context, e.Argument, BrowserFormType.Item));
+                    break;
+                default:
+                    this._context.Write(MessageClass.Error, "Unexpected link type '" + e.Type + "' in InfoForm");
+                    break;
+            }
         }
     }
 }

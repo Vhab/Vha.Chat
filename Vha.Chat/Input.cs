@@ -226,6 +226,17 @@ namespace Vha.Chat
             }
         }
 
+        public void UnregisterCommandByTrigger(string trigger)
+        {
+            lock (this)
+            {
+                Command command = GetCommandByTrigger(trigger);
+                if (command == null)
+                    throw new ArgumentException("Unknown trigger: " + trigger);
+                UnregisterCommand(command.Name);
+            }
+        }
+
         public Command[] GetCommands()
         {
             List<Command> commands = new List<Command>();

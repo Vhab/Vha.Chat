@@ -29,6 +29,7 @@ using Vha.Net;
 using Vha.Net.Events;
 using Vha.Common;
 using Vha.Chat;
+using Vha.Chat.Commands;
 using Vha.Chat.Events;
 
 namespace Vha.Chat.UI
@@ -95,6 +96,9 @@ namespace Vha.Chat.UI
 
             // A gentle welcome message
             this._context.Write(MessageClass.Internal, "Type /help to view all available commands");
+
+            // Enable the open command
+            this._context.Input.RegisterCommand(new OpenCommand(this));
         }
 
         private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -112,6 +116,8 @@ namespace Vha.Chat.UI
             this._context.FriendAddedEvent -= new Handler<FriendEventArgs>(_context_FriendAddedEvent);
             this._context.FriendRemovedEvent -= new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
             this._context.FriendUpdatedEvent -= new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
+            // Disable open command
+            this._context.Input.UnregisterCommandByTrigger("open");
             // If we're still the main form at this stage, let's just call it quits
             if (Program.ApplicationContext.MainForm == this)
             {
@@ -544,6 +550,9 @@ namespace Vha.Chat.UI
                     this._context.Write(MessageClass.Error, "Unexpected link type '" + e.Type + "' in ChatForm");
                     return;
             }
+            if (target.Type == MessageType.Character &&
+                target.Target.ToLower() == this._context.Character.ToLower())
+                return;
             if (!e.ShiftPressed)
             {
                 // Switch target
@@ -552,7 +561,7 @@ namespace Vha.Chat.UI
             else
             {
                 // Show popup
-                Utils.InvokeShow(this, new ChatPopupForm(this._context, this, target));
+                this._context.Input.Command("open " + target.Type.ToString() + " " + target.Target);
             }
         }
 

@@ -52,6 +52,7 @@
     <Compile Include="Commands\KickCommand.cs" />
     <Compile Include="Commands\LeaveCommand.cs" />
     <Compile Include="Commands\MuteCommand.cs" />
+    <Compile Include="Commands\OpenCommand.cs" />
     <Compile Include="Commands\OrganizationCommand.cs" />
     <Compile Include="Commands\ReplyCommand.cs" />
     <Compile Include="Commands\TellCommand.cs" />

@@ -37,6 +37,7 @@ namespace Vha.Chat.UI
             : base(context, "ChatPopup")
         {
             InitializeComponent();
+            base.Initialize();
 
             this.Text += target.Target;
 

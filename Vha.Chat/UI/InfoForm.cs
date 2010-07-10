@@ -30,11 +30,11 @@ namespace Vha.Chat.UI
 {
     public partial class InfoForm : BaseForm
     {
-        protected string _html = "";
+        protected string _aoml = "";
         protected Form _parent = null;
         protected Context _context = null;
 
-        public InfoForm(Context context, Form parent, string html)
+        public InfoForm(Context context, Form parent, string aoml)
             : base (context, "Info")
         {
             InitializeComponent();
@@ -42,11 +42,11 @@ namespace Vha.Chat.UI
 
             this._context = context;
             this._parent = parent;
-            this._html = html;
+            this._aoml = aoml;
             this._info.BackgroundColor = this.BackColor;
             this._info.ForegroundColor = this.ForeColor;
             this._info.MaximumLines = 0;
-            this._info.Write(html, TextStyle.Default, false);
+            this._info.Write(aoml, TextStyle.Default, false);
             this._info.ReadyEvent += new AomlHandler(_info_ReadyEvent);
             this._info.ClickedEvent += new AomlHandler<AomlClickedEventArgs>(_info_ClickedEvent);
         }

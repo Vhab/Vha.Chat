@@ -100,12 +100,16 @@ namespace Vha.Chat.UI
             this._outputBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this._outputBox.BackgroundColor = System.Drawing.Color.White;
+            this._outputBox.ForegroundColor = System.Drawing.Color.Black;
             this._outputBox.IsWebBrowserContextMenuEnabled = false;
             this._outputBox.Location = new System.Drawing.Point(2, 2);
+            this._outputBox.MaximumLines = 0;
+            this._outputBox.MaximumTexts = 50;
             this._outputBox.MinimumSize = new System.Drawing.Size(20, 20);
             this._outputBox.Name = "_outputBox";
             this._outputBox.ScriptErrorsSuppressed = true;
-            this._outputBox.Size = new System.Drawing.Size(580, 491);
+            this._outputBox.Size = new System.Drawing.Size(576, 491);
             this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             // 
@@ -117,7 +121,7 @@ namespace Vha.Chat.UI
             this._inputBox.Location = new System.Drawing.Point(150, 499);
             this._inputBox.Multiline = true;
             this._inputBox.Name = "_inputBox";
-            this._inputBox.Size = new System.Drawing.Size(432, 21);
+            this._inputBox.Size = new System.Drawing.Size(428, 21);
             this._inputBox.TabIndex = 0;
             this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
@@ -191,7 +195,7 @@ namespace Vha.Chat.UI
             this._buttons.Location = new System.Drawing.Point(0, 0);
             this._buttons.Name = "_buttons";
             this._buttons.Padding = new System.Windows.Forms.Padding(6);
-            this._buttons.Size = new System.Drawing.Size(784, 32);
+            this._buttons.Size = new System.Drawing.Size(788, 32);
             this._buttons.TabIndex = 2;
             // 
             // _channelMenu

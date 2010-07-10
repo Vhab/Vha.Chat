@@ -266,7 +266,7 @@ namespace Vha.Chat.UI
             }
             // - Append message
             line += args.Message;
-            // Format message into html
+            // Format message into aoml
             string aoml = string.Format(
                 "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
                 DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second,

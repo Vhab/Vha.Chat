@@ -126,6 +126,8 @@ namespace Vha.Chat.UI
                 string replacement = string.Format("href={0}text://{1}{0}", seperator, this._textsIndex);
                 aoml = aoml.Replace(match.Groups[0].Value, replacement);
             }
+            // Strip images the aggressive way
+            aoml = _stripImages(aoml);
             // Invert or strip colors if needed
             if (style == TextStyle.Invert)
                 aoml = _invertColors(aoml);
@@ -169,6 +171,7 @@ namespace Vha.Chat.UI
         private Regex _charrefRegex = null;
         private Regex _colorRegex = null;
         private Regex _fontRegex = null;
+        private Regex _imgRegex = null;
 
         protected string _invertColors(string aoml)
         {
@@ -185,6 +188,20 @@ namespace Vha.Chat.UI
                 string inverse = string.Format("{0:X2}{1:X2}{2:X2}", 255 - r, 255 - g, 255 - b);
                 string replacement = string.Format("color={0}#{1}{0}", seperator, inverse);
                 aoml = aoml.Substring(0, match.Index) + replacement + aoml.Substring(match.Index + replacement.Length);
+            }
+            return aoml;
+        }
+
+        protected string _stripImages(string aoml)
+        {
+            if (this._imgRegex == null)
+                this._imgRegex = new Regex("[<][/]?img[^><]*[>]");
+            MatchCollection matches = this._imgRegex.Matches(aoml);
+            int offset = 0;
+            foreach (Match match in matches)
+            {
+                aoml = aoml.Substring(0, match.Index - offset) + aoml.Substring(match.Index + match.Length - offset);
+                offset += match.Length;
             }
             return aoml;
         }

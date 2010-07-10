@@ -40,6 +40,8 @@ namespace Vha.Chat.UI
             this._info.ForegroundColor = System.Drawing.Color.Black;
             this._info.IsWebBrowserContextMenuEnabled = false;
             this._info.Location = new System.Drawing.Point(0, 0);
+            this._info.MaximumLines = 0;
+            this._info.MaximumTexts = 50;
             this._info.MinimumSize = new System.Drawing.Size(20, 20);
             this._info.Name = "_info";
             this._info.ScriptErrorsSuppressed = true;

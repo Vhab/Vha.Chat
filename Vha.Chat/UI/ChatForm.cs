@@ -519,29 +519,40 @@ namespace Vha.Chat.UI
 
         private void _outputBox_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
         {
+            MessageTarget target = null;
             switch (e.Type)
             {
                 case "text":
                     Utils.InvokeShow(this, new InfoForm(this._context, this, e.Argument));
-                    break;
+                    return;
                 case "chatcmd":
                     this._context.Input.Command(e.Argument);
-                    break;
+                    return;
                 case "itemref":
                     Utils.InvokeShow(this, new BrowserForm(this._context, e.Argument, BrowserFormType.Item));
-                    break;
+                    return;
                 case "character":
-                    this.SetTarget(new MessageTarget(MessageType.Character, e.Argument));
+                    target = new MessageTarget(MessageType.Character, e.Argument);
                     break;
                 case "channel":
-                    this.SetTarget(new MessageTarget(MessageType.Channel, e.Argument));
+                    target = new MessageTarget(MessageType.Channel, e.Argument);
                     break;
                 case "privchan":
-                    this.SetTarget(new MessageTarget(MessageType.PrivateChannel, e.Argument));
+                    target = new MessageTarget(MessageType.PrivateChannel, e.Argument);
                     break;
                 default:
                     this._context.Write(MessageClass.Error, "Unexpected link type '" + e.Type + "' in ChatForm");
-                    break;
+                    return;
+            }
+            if (!e.ShiftPressed)
+            {
+                // Switch target
+                this.SetTarget(target);
+            }
+            else
+            {
+                // Show popup
+                Utils.InvokeShow(this, new ChatPopupForm(this._context, this, target));
             }
         }
 

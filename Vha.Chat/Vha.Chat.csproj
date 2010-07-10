@@ -99,6 +99,12 @@
     <Compile Include="UI\ChatForm.Designer.cs">
       <DependentUpon>ChatForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ChatPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\ChatPopupForm.Designer.cs">
+      <DependentUpon>ChatPopupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\ChatTreeNode.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Configuration.cs" />
@@ -143,6 +149,10 @@
     <EmbeddedResource Include="UI\ChatForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ChatForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\ChatPopupForm.resx">
+      <DependentUpon>ChatPopupForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\InfoForm.resx">
       <SubType>Designer</SubType>

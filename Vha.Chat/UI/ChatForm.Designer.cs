@@ -108,8 +108,6 @@ namespace Vha.Chat.UI
             this._outputBox.Size = new System.Drawing.Size(580, 491);
             this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
-            this._outputBox.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this._outputBox_Navigating);
-            this._outputBox.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this._outputBox_DocumentCompleted);
             // 
             // _inputBox
             // 
@@ -375,7 +373,7 @@ namespace Vha.Chat.UI
         #endregion
 
         private System.Windows.Forms.TreeView _tree;
-        private AomlBox _outputBox;
+        private Vha.Chat.UI.AomlBox _outputBox;
         private System.Windows.Forms.TextBox _inputBox;
         private System.Windows.Forms.ComboBox _target;
         private System.Windows.Forms.ToolStripButton _disconnect;

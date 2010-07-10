@@ -40,28 +40,24 @@ namespace Vha.Chat.UI
             base.Initialize();
             this._html = html;
             this._htmlUtil = links;
-        }
-        
-        private void _info_Navigating(object sender, WebBrowserNavigatingEventArgs e)
-        {
-            if (e.Url.Scheme != "file")
-                e.Cancel = true;
+            this._info.BackgroundColor = this.BackColor;
+            this._info.ForegroundColor = this.ForeColor;
+            this._info.MaximumLines = 0;
+            this._info.Write(html, TextStyle.Default, false);
+            this._info.ReadyEvent += new AomlHandler(_info_ReadyEvent);
+            this._info.ClickedEvent += new AomlHandler<AomlClickedEventArgs>(_info_ClickedEvent);
         }
 
-        private void _info_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private void _info_ReadyEvent(AomlBox sender)
         {
-            this._info.Document.Write(this._htmlUtil.Template);
-            // Set background color
-            this._info.Document.BackColor = this.BackColor;
-            if (this._info.Document.Body != null)
-            {
-                string color = this.ForeColor.R.ToString("X") + this.ForeColor.G.ToString("X") + this.ForeColor.B.ToString("X");
-                this._info.Document.Body.Style =
-                    "color: #" + color + ";" +
-                    "padding: 6px;";
-            }
-            // Put in some content
-            this._htmlUtil.AppendHtml(this._info.Document, TextStyle.Default, this._html);
+            this._info.Document.Body.Style =
+                this._info.Document.Body.Style +
+                "; padding: 7px;";
+        }
+
+        void _info_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
+        {
+            this._htmlUtil.Link(e.Type, e.Argument);
         }
     }
 }

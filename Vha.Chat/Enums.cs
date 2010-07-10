@@ -165,6 +165,18 @@ namespace Vha.Chat
         Right
     }
 
+    public enum VerticalPosition
+    {
+        /// <summary>
+        /// Indicates an element is on the top side
+        /// </summary>
+        Top,
+        /// <summary>
+        /// Indicates an element is on the bottom side
+        /// </summary>
+        Bottom
+    }
+
     public enum ProxyType
     {
         Disabled,

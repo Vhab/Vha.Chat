@@ -29,13 +29,15 @@ namespace Vha.Chat.UI
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InfoForm));
-            this._info = new System.Windows.Forms.WebBrowser();
+            this._info = new Vha.Chat.UI.AomlBox();
             this.SuspendLayout();
             // 
             // _info
             // 
             this._info.AllowWebBrowserDrop = false;
+            this._info.BackgroundColor = System.Drawing.Color.White;
             this._info.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._info.ForegroundColor = System.Drawing.Color.Black;
             this._info.IsWebBrowserContextMenuEnabled = false;
             this._info.Location = new System.Drawing.Point(0, 0);
             this._info.MinimumSize = new System.Drawing.Size(20, 20);
@@ -44,8 +46,6 @@ namespace Vha.Chat.UI
             this._info.Size = new System.Drawing.Size(374, 374);
             this._info.TabIndex = 0;
             this._info.Url = new System.Uri("about:blank", System.UriKind.Absolute);
-            this._info.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this._info_Navigating);
-            this._info.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this._info_DocumentCompleted);
             // 
             // InfoForm
             // 
@@ -66,6 +66,6 @@ namespace Vha.Chat.UI
 
         #endregion
 
-        private System.Windows.Forms.WebBrowser _info;
+        private Vha.Chat.UI.AomlBox _info;
     }
 }

@@ -47,8 +47,6 @@ namespace Vha.Chat.UI
         protected List<string> _history = new List<string>();
         protected int _historyIndex = 0;
 
-        protected Queue<string> _lines = new Queue<string>();
-
         public ChatForm(Context context)
             : base(context, "Chat")
         {
@@ -78,6 +76,10 @@ namespace Vha.Chat.UI
 
             this._htmlUtil = new ChatHtml(this._context, this);
 
+            this._outputBox.BackgroundColor = this.BackColor;
+            this._outputBox.ForegroundColor = this.ForeColor;
+            this._outputBox.ClickedEvent += new AomlHandler<AomlClickedEventArgs>(_outputBox_ClickedEvent);
+
             // Update buttons to reflect the state of chat.
             switch (this._context.State)
             {
@@ -92,7 +94,10 @@ namespace Vha.Chat.UI
             }
 
             // Force options update manually
-            _context_SavedEvent(this._context, this._context.Options);
+            this._context_SavedEvent(this._context, this._context.Options);
+
+            // A gentle welcome message
+            this._context.Write(MessageClass.Internal, "Type /help to view all available commands");
         }
 
         private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -178,6 +183,10 @@ namespace Vha.Chat.UI
                 this._container.RightToLeft = RightToLeft.No;
             }
             // TODO: update size thingy
+
+            // Update AomlBox settings
+            this._outputBox.MaximumTexts = args.MaximumTexts;
+            this._outputBox.MaximumLines = args.MaximumMessages;
         }
 
         void _context_StateEvent(Context context, StateEventArgs args)
@@ -261,25 +270,11 @@ namespace Vha.Chat.UI
             // - Append message
             line += args.Message;
             // Format message into html
-            string html = string.Format(
+            string aoml = string.Format(
                 "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
                 DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second,
                 args.Class.ToString(), line);
-            
-            // Queue messages if the browser isn't ready yet
-            if (this._outputBox.Document == null || this._outputBox.Document.Body == null)
-            {
-                this._lines.Enqueue(html);
-                return;
-            }
-            this._htmlUtil.AppendHtml(this._outputBox.Document, this._context.Options.TextStyle, html, true);
-            // Clean up old messages
-            while (this._outputBox.Document.Body.Children.Count > this._context.Options.MaximumMessages)
-            {
-                this._outputBox.Document.Body.FirstChild.OuterHtml = "";
-            }
-            // Scroll to bottom
-            this._outputBox.Document.InvokeScript("scrollToBottom");
+            this._outputBox.Write(aoml, context.Options.TextStyle, true);
         }
 
         void _context_CharacterLeaveEvent(Context context, PrivateChannelEventArgs args)
@@ -520,34 +515,14 @@ namespace Vha.Chat.UI
             }
         }
 
-        private void _outputBox_Navigating(object sender, WebBrowserNavigatingEventArgs e)
-        {
-            // We can navigate to local files
-            if (e.Url.Scheme == "file") return;
-            // Cancel all other actions
-            e.Cancel = true;
-        }
-
         private void ChatForm_FormClosing(object sender, FormClosingEventArgs e)
         {
 
         }
 
-        private void _outputBox_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private void _outputBox_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
         {
-            this._outputBox.Document.Write(this._htmlUtil.Template);
-            this._outputBox.Document.BackColor = this.BackColor;
-            if (this._outputBox.Document.Body == null) return;
-            string color = this.ForeColor.R.ToString("X") + this.ForeColor.G.ToString("X") + this.ForeColor.B.ToString("X");
-            this._outputBox.Document.Body.Style = "color: #" + color + ";";
-            // Welcome message
-            this._context.Write(MessageClass.Internal, "Type /help to view all available commands");
-            // Clear queue
-            while (this._lines.Count > 0)
-            {
-                string html = this._lines.Dequeue();
-                this._htmlUtil.AppendHtml(this._outputBox.Document, this._context.Options.TextStyle, html, true);
-            }
+            this._htmlUtil.Link(e.Type, e.Argument);
         }
 
         private void _tree_DoubleClick(object sender, EventArgs e)

@@ -28,7 +28,7 @@ namespace Vha.AOML.DOM
     /// <summary>
     /// A collection of elements
     /// </summary>
-    public class ElementCollection : IEnumerable<Element>
+    public sealed class ElementCollection : IEnumerable<Element>
     {
         /// <summary>
         /// Returns the amount of elements currently contained in this collection.
@@ -61,11 +61,11 @@ namespace Vha.AOML.DOM
                 // Attempt to insert this element
                 this._elements.Insert(index, element);
             }
-            catch (IndexOutOfRangeException e)
+            catch (IndexOutOfRangeException)
             {
                 // Ensure the element is in a valid state after insertion failure
                 element.OnDetach();
-                throw e;
+                throw; 
             }
         }
 

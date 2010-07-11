@@ -38,10 +38,10 @@ namespace Vha.Net.Packets
 	///		the read-only type and direction members.
 	/// 
 	/// </remarks>
-	public class Packet
+	internal class Packet
 	{
 		#region Packet Type Enumeration
-        public enum Type : short
+        internal enum Type : short
         {
             // INCOMING PACKETS
             NULL = -1,
@@ -110,8 +110,8 @@ namespace Vha.Net.Packets
 		/// </summary>
 		private ArrayList _msg;
 
-		protected PacketQueue.Priority _priority = PacketQueue.Priority.Standard;
-		public PacketQueue.Priority Priority
+		protected PacketPriority _priority = PacketPriority.Standard;
+		public PacketPriority Priority
 		{
 			get { return this._priority; }
 			set { this._priority = value; }
@@ -203,12 +203,12 @@ namespace Vha.Net.Packets
 		/// <param name="data">the byte array</param>
 		/// <param name="offset">index to start pulling from the array</param>
 		/// <returns>returns an AoString object</returns>
-		internal static NetString popString(ref byte[] data, ref Int32 offset)
+		internal static NetString PopString(ref byte[] data, ref Int32 offset)
 		{
 			if (data == null || data.Length - offset < 3)
 				return new NetString(String.Empty);
 
-			short len = popShort(ref data, ref offset);
+			short len = PopShort(ref data, ref offset);
             NetString ret;
             if (data.Length >= len && len > 0)
             {
@@ -228,12 +228,12 @@ namespace Vha.Net.Packets
 		/// <param name="data">the byte array</param>
 		/// <param name="offset">index to start pulling from the array</param>
 		/// <returns>returns a byte array</returns>
-		internal static byte[] popData(ref byte[] data, ref Int32 offset)
+		internal static byte[] PopData(ref byte[] data, ref Int32 offset)
 		{
 			if (data == null || data.Length - offset < 3)
 				return null;
 
-			short len = popShort(ref data, ref offset);
+			short len = PopShort(ref data, ref offset);
             if (len < 0)
                 return new byte[0];
 			byte[] ret = new byte[len];
@@ -248,7 +248,7 @@ namespace Vha.Net.Packets
 		/// <param name="data">the byte array</param>
 		/// <param name="offset">index where to start pulling from the array</param>
 		/// <returns>returns a 4-byte integer</returns>
-		internal static Int32 popInteger(ref byte[] data, ref Int32 offset)
+		internal static Int32 PopInteger(ref byte[] data, ref Int32 offset)
 		{
 			if (data.Length - offset < 4)
 				return 0;
@@ -264,7 +264,7 @@ namespace Vha.Net.Packets
         /// <param name="data">the byte array</param>
         /// <param name="offset">index where to start pulling from the array</param>
         /// <returns>returns a 4-byte unsigned integer</returns>
-        internal static UInt32 popUnsignedInteger(ref byte[] data, ref Int32 offset)
+        internal static UInt32 PopUnsignedInteger(ref byte[] data, ref Int32 offset)
         {
             if (data.Length - offset < 4)
                 return 0;
@@ -280,7 +280,7 @@ namespace Vha.Net.Packets
 		/// <param name="data">byte array containing the data</param>
 		/// <param name="offset">the index where to begin pulling off the array</param>
 		/// <returns>5-byte channel id</returns>
-		internal static BigInteger popChannelID(ref byte[] data, ref Int32 offset)
+		internal static BigInteger PopChannelID(ref byte[] data, ref Int32 offset)
 		{
 			if (data.Length - offset < 5)
 				return 0;
@@ -301,7 +301,7 @@ namespace Vha.Net.Packets
 		/// <param name="data">the byte array</param>
 		/// <param name="offset">index where to begin pulling off the array</param>
 		/// <returns>a short (2-byte) integer</returns>
-		internal static Int16 popShort(ref byte[] data, ref Int32 offset)
+		internal static Int16 PopShort(ref byte[] data, ref Int32 offset)
 		{
 			if (data.Length - offset < 2)
 				return 0;
@@ -317,7 +317,7 @@ namespace Vha.Net.Packets
         /// <param name="data">the byte array</param>
         /// <param name="offset">index where to begin pulling off the array</param>
         /// <returns>an unsigned short (2-byte) integer</returns>
-        internal static UInt16 popUnsignedShort(ref byte[] data, ref Int32 offset)
+        internal static UInt16 PopUnsignedShort(ref byte[] data, ref Int32 offset)
         {
             if (data.Length - offset < 2)
                 return 0;
@@ -333,7 +333,7 @@ namespace Vha.Net.Packets
         /// <param name="data">the byte array</param>
         /// <param name="offset">index where to begin pulling off the array</param>
         /// <returns>a byte</returns>
-        internal static Byte popByte(ref byte[] data, ref Int32 offset)
+        internal static Byte PopByte(ref byte[] data, ref Int32 offset)
         {
             if (data.Length - offset < 1)
                 return 0;
@@ -348,7 +348,7 @@ namespace Vha.Net.Packets
         /// <param name="data">the byte array</param>
         /// <param name="offset">index where to begin pulling off the array</param>
         /// <returns>a char (1-byte) integer</returns>
-        internal static Char popChar(ref byte[] data, ref Int32 offset)
+        internal static Char PopChar(ref byte[] data, ref Int32 offset)
         {
             if (data.Length - offset < 1)
                 return (Char)0;
@@ -363,7 +363,7 @@ namespace Vha.Net.Packets
         /// <param name="data">the byte array</param>
         /// <param name="offset">index where to begin pulling off the array</param>
         /// <returns>a boolean (1-byte)</returns>
-        internal static Boolean popBoolean(ref byte[] data, ref Int32 offset)
+        internal static Boolean PopBoolean(ref byte[] data, ref Int32 offset)
         {
             if (data.Length - offset < 1)
                 return false;
@@ -439,7 +439,7 @@ namespace Vha.Net.Packets
 						break;
 					default:
 						if (o.GetType() == typeof(BigInteger) || o.GetType().IsSubclassOf(typeof(BigInteger)))
-							b = ((BigInteger)o).getBytes();
+							b = ((BigInteger)o).GetBytes();
                         else if (o.GetType() == typeof(NetString) || o.GetType().IsSubclassOf(typeof(NetString)))
 							b = ((NetString)o).GetBytes();
 						else

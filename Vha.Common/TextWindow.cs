@@ -95,17 +95,17 @@ namespace Vha.Common
         /// <param name="name">Name of the item</param>
         /// <param name="lowID">LowID of the item</param>
         /// <param name="highID">HighID of the item</param>
-        /// <param name="QL">Quality of the item</param>
-        public void AppendItem(string name, int lowID, int highID, int QL) { this.AppendItem(name, lowID, highID, QL, false); }
-        public void AppendItem(string name, int lowID, int highID, int QL, bool disableStyle)
+        /// <param name="ql">Quality of the item</param>
+        public void AppendItem(string name, int lowID, int highID, int ql) { this.AppendItem(name, lowID, highID, ql, false); }
+        public void AppendItem(string name, int lowID, int highID, int ql, bool disableStyle)
         {
-            this._builder.Append(HTML.CreateItem(name, lowID, highID, QL, disableStyle, this._innerQuotes));
+            this._builder.Append(HTML.CreateItem(name, lowID, highID, ql, disableStyle, this._innerQuotes));
         }
 
-        public void AppendItemStart(int lowID, int highID, int QL) { this.AppendItemStart(lowID, highID, QL, false); }
-        public void AppendItemStart(int lowID, int highID, int QL, bool disableStyle)
+        public void AppendItemStart(int lowID, int highID, int ql) { this.AppendItemStart(lowID, highID, ql, false); }
+        public void AppendItemStart(int lowID, int highID, int ql, bool disableStyle)
         {
-            this._builder.Append(HTML.CreateItemStart(lowID, highID, QL, disableStyle, this._innerQuotes));
+            this._builder.Append(HTML.CreateItemStart(lowID, highID, ql, disableStyle, this._innerQuotes));
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace Vha.Common
         public virtual string[] ToStrings(string title, bool disableStyle) { return this.ToStrings(title, this._characterLimit, disableStyle); }
         public string[] ToStrings(string title, int characterLimit, bool disableStyle)
         {
-            if (this.Text == null && this.Text == string.Empty)
+            if (string.IsNullOrEmpty(this.Text))
                 return new string[0];
 
             List<string> pages = new List<string>();
@@ -284,7 +284,7 @@ namespace Vha.Common
                 }
                 buffer += line + "\n";
             }
-            if (buffer != string.Empty)
+            if (!string.IsNullOrEmpty(buffer))
                 pages.Add(HTML.CreateWindow(title, buffer, disableStyle, this._outerQuotes));
 
             return pages.ToArray();

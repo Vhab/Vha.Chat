@@ -25,7 +25,7 @@ using Vha.Common;
 
 namespace Vha.Net.Packets
 {
-    public class SystemMessagePacket : Packet
+    internal class SystemMessagePacket : Packet
     {
         internal SystemMessagePacket(Packet.Type type, byte[] data) : base(type, data) { }
 
@@ -35,11 +35,11 @@ namespace Vha.Net.Packets
         {
             if (data == null || data.Length < 6) { return; }
             int offset = 0;
-            this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popData(ref data, ref offset));
-            this.AddData(popString(ref data, ref offset).Value);
+            this.AddData(PopUnsignedInteger(ref data, ref offset));
+            this.AddData(PopUnsignedInteger(ref data, ref offset));
+            this.AddData(PopUnsignedInteger(ref data, ref offset));
+            this.AddData(PopData(ref data, ref offset));
+            this.AddData(PopString(ref data, ref offset).Value);
         }
 
         internal UInt32 ClientID { get { return (UInt32)this.Data[0]; } }

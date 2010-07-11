@@ -31,8 +31,8 @@ namespace Vha.Net.Packets
         {
             if (data == null || data.Length < 5) { return; }
             int offset = 0;
-            this.AddData(popInteger(ref data, ref offset));
-            this.AddData(popInteger(ref data, ref offset));
+            this.AddData(PopInteger(ref data, ref offset));
+            this.AddData(PopInteger(ref data, ref offset));
         }
         internal Int32 ID1 { get { return (Int32)this.Data[0]; } }
         internal Int32 ID2 { get { return (Int32)this.Data[1]; } }

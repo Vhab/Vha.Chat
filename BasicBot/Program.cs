@@ -26,7 +26,7 @@ using Vha.Net.Events;
 
 namespace BasicBot
 {
-    class Program
+    internal static class Program
     {
         private static string _owner;
         public static string Owner { get { return _owner; } }

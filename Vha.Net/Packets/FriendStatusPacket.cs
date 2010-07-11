@@ -33,14 +33,14 @@ namespace Vha.Net.Packets
             if (data == null || data.Length < 10) { return; }
 
             int offset = 0;
-            this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popInteger(ref data, ref offset));
+            this.AddData(PopUnsignedInteger(ref data, ref offset));
+            this.AddData(PopInteger(ref data, ref offset));
             // Originally the last part of this packet was identified as a set of data,
             // prefixed with the size and followed by a value.
             // Unfortunately some errors have proven this to be incorrect,
             // leaving us with 2 bytes of unidentified data om this.Data[2].
-            this.AddData(popUnsignedShort(ref data, ref offset));
-            this.AddData(popByte(ref data, ref offset));
+            this.AddData(PopUnsignedShort(ref data, ref offset));
+            this.AddData(PopByte(ref data, ref offset));
         }
 
         internal UInt32 CharacterID { get { return (UInt32)this.Data[0]; } }

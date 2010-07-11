@@ -34,17 +34,17 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the red component of this color in a range of 0 to 256
         /// </summary>
-        public Byte Red;
+        public readonly Byte Red;
 
         /// <summary>
         /// Returns the green component of this color in a range of 0 to 256
         /// </summary>
-        public Byte Green;
+        public readonly Byte Green;
 
         /// <summary>
         /// Returns the blue component of this color in a range of 0 to 256
         /// </summary>
-        public Byte Blue;
+        public readonly Byte Blue;
 
         /// <summary>
         /// Initializes a new color

@@ -29,8 +29,8 @@ namespace Vha.Net
     {
         public static Encoding Encoding = Encoding.GetEncoding("utf-8");
 
-        protected String _value;
-        protected short _length;
+        private String _value;
+        private short _length;
 
         public NetString(byte[] data) : this(data, 0) { }
         public NetString(byte[] data, int offset)

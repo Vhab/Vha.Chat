@@ -87,7 +87,7 @@ namespace Vha.MDB
                 else if (this._mode == Mode.MLDB)
                     return this.MldbRead(stream);
             }
-            catch { }
+            catch (Exception) { }
             finally
             {
                 if (stream != null)
@@ -144,7 +144,7 @@ namespace Vha.MDB
                     }
                 }
             }
-            catch { }
+            catch (Exception) { }
             finally
             {
                 if (stream != null)
@@ -158,10 +158,10 @@ namespace Vha.MDB
             Stream stream;
             try
             {
-                if (file != "") stream = File.OpenRead(file);
+                if (string.IsNullOrEmpty(file)) stream = File.OpenRead(file);
                 else stream = new MemoryStream(Properties.Resources.Text);
             }
-            catch
+            catch (Exception)
             {
                 Trace.WriteLine("[MDB] Unable to open " + this._file);
                 return null;
@@ -197,7 +197,7 @@ namespace Vha.MDB
                     this._mode = Mode.MLDB;
                 }
             }
-            catch { }
+            catch (Exception) { }
         }
 
         #region MMDB Reader
@@ -267,7 +267,7 @@ namespace Vha.MDB
                         break;
                 }
             }
-            catch
+            catch (Exception)
             {
                 Trace.WriteLine("[MDB] Error during reading " + this._file);
                 return false;
@@ -279,7 +279,7 @@ namespace Vha.MDB
             return true;
         }
 
-        protected bool MmdbReadKey(Stream stream, ref Int32 ID, ref Int32 Offset)
+        protected bool MmdbReadKey(Stream stream, ref Int32 id, ref Int32 offset)
         {
             try
             {
@@ -288,19 +288,19 @@ namespace Vha.MDB
                 // Read ID
                 int bytes = stream.Read(buffer, 0, buffer.Length);
                 if (bytes == 0) return false;
-                ID = BitConverter.ToInt32(buffer, 0);
+                id = BitConverter.ToInt32(buffer, 0);
 
                 // Read Offset
                 bytes = stream.Read(buffer, 0, buffer.Length);
                 if (bytes == 0) return false;
-                Offset = BitConverter.ToInt32(buffer, 0);
+                offset = BitConverter.ToInt32(buffer, 0);
 
                 return true;
             }
-            catch { return false; }
+            catch (Exception) { return false; }
         }
 
-        protected bool MmdbReadString(Stream stream, Int32 offset, ref string Message)
+        protected bool MmdbReadString(Stream stream, Int32 offset, ref string message)
         {
             try
             {
@@ -313,11 +313,11 @@ namespace Vha.MDB
                     if ((Int32)buffer[0] == 0)
                         break;
 
-                    Message += Encoding.UTF8.GetString(buffer);
+                    message += Encoding.UTF8.GetString(buffer);
                 }
                 return true;
             }
-            catch { return false; }
+            catch (Exception) { return false; }
         }
         #endregion
 
@@ -362,20 +362,20 @@ namespace Vha.MDB
                     category.Add(entry);
                 }
             }
-            catch { }
+            catch (Exception) { }
             return false;
         }
 
-        protected bool MldbReadInteger(Stream stream, ref Int32 Integer)
+        protected bool MldbReadInteger(Stream stream, ref Int32 integer)
         {
             try
             {
                 byte[] buffer = new byte[4];
                 stream.Read(buffer, 0, buffer.Length);
-                Integer = BitConverter.ToInt32(buffer, 0);
+                integer = BitConverter.ToInt32(buffer, 0);
                 return true;
             }
-            catch { return false; }
+            catch (Exception) { return false; }
         }
         #endregion
 

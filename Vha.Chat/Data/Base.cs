@@ -87,7 +87,7 @@ namespace Vha.Chat.Data
                     data = data.Upgrade();
                 return data;
             }
-            catch { return null; }
+            catch (Exception) { return null; }
             finally
             {
                 // Close anything left open

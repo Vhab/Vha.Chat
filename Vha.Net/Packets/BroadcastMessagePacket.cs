@@ -37,8 +37,8 @@ namespace Vha.Net.Packets
             if (data == null || data.Length < 6) { return; }
 
             int offset = 0;
-            this.AddData(popString(ref data, ref offset).ToString());
-            this.AddData(popString(ref data, ref offset).ToString());
+            this.AddData(PopString(ref data, ref offset).ToString());
+            this.AddData(PopString(ref data, ref offset).ToString());
         }
         internal String UnknownString { get { return (String)this.Data[0]; } }
         internal string Message { get { return (String)this.Data[1]; } }

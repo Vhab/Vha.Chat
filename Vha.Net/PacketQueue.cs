@@ -26,19 +26,13 @@ using Vha.Net.Packets;
 
 namespace Vha.Net
 {
-	public class PacketQueue
+	internal class PacketQueue
 	{
-		public enum Priority
-		{
-			Urgent = 1,
-			Standard,
-			Low
-		}
         private Queue<Packet> _queueLow = new Queue<Packet>();
         private Queue<Packet> _queueNormal = new Queue<Packet>();
         private Queue<Packet> _queueHigh = new Queue<Packet>();
         private DateTime lastAction;
-        public double delay = 0;
+        public double Delay = 0;
 
         public PacketQueue()
         {
@@ -72,23 +66,23 @@ namespace Vha.Net
             }
 			return null;
 		}
-        public void Enqueue(Priority order, Packet item)
+        public void Enqueue(PacketPriority order, Packet item)
 		{
             if (item == null)
 				return;
 
-			if (! Enum.IsDefined(typeof(Priority), order))
-				order = Priority.Standard;
+            if (!Enum.IsDefined(typeof(PacketPriority), order))
+                order = PacketPriority.Standard;
 
             switch (order)
             {
-                case Priority.Low:
+                case PacketPriority.Low:
                     lock (this._queueLow)
                     {
                         this._queueLow.Enqueue(item);
                     }
                     break;
-                case Priority.Urgent:
+                case PacketPriority.Urgent:
                     lock (this._queueHigh)
                     {
                         this._queueHigh.Enqueue(item);
@@ -118,7 +112,7 @@ namespace Vha.Net
             get
             {
                 TimeSpan ts = DateTime.Now - lastAction;
-                if (ts.TotalMilliseconds > delay && this.Count > 0)
+                if (ts.TotalMilliseconds > Delay && this.Count > 0)
                 {
                     return true;
                 }

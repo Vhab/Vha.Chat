@@ -3,6 +3,10 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Globalization;
 using System;
+using System.Security.Permissions;
+
+[assembly: SecurityPermission(SecurityAction.RequestMinimum, UnmanagedCode = false)]
+
 
 
 [assembly: AssemblyTitle("Starksoft.Net.Proxy")]

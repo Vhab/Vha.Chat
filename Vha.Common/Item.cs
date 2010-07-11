@@ -74,7 +74,7 @@ namespace Vha.Common
         private static Regex Regex;
         public static Item[] ParseString(string raw)
         {
-            if (raw == null || raw == string.Empty)
+            if (string.IsNullOrEmpty(raw))
                 return new Item[0];
             if (Item.Regex == null)
                 Item.Regex = new Regex("<a href=\"itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})\">([^<]+)</a>");
@@ -91,7 +91,7 @@ namespace Vha.Common
                     Int32 ql = Convert.ToInt32(match.Groups[3].Value);
                     items.Add(new Item(name, lowid, highid, ql, match.Groups[0].Value));
                 }
-                catch { }
+                catch (Exception) { }
             }
             return items.ToArray();
         }

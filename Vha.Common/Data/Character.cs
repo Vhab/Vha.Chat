@@ -35,9 +35,9 @@ namespace Vha.Common.Data
         [XmlElement("basic_stats")]
         public CharacterStats Stats;
         [XmlElement("pictureurl")]
-        public string PictureURL;
+        public string PictureUrl;
         [XmlElement("smallpictureurl")]
-        public string SmallPictureURL;
+        public string SmallPictureUrl;
         [XmlElement("organization_membership")]
         public CharacterOrganization Organization;
         [XmlElement("last_updated")]

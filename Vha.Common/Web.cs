@@ -96,7 +96,7 @@ namespace Vha.Common
                     }
                     // Request
                     try { response = (HttpWebResponse)request.GetResponse(); }
-                    catch { }
+                    catch (Exception) { }
                     // Update time
                     limit.LastRequest = DateTime.Now;
                 }
@@ -105,7 +105,7 @@ namespace Vha.Common
             {
                 // No limits applied, just request it
                 try { response = (HttpWebResponse)request.GetResponse(); }
-                catch { }
+                catch (Exception) { }
             }
             return response;
         }

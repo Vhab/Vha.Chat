@@ -57,12 +57,12 @@ namespace Vha.Common
             Stream stream = null;
             try
             {
-                stream = (Stream)File.Open(file, FileMode.Open, FileAccess.Read);
+                stream = (Stream)File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read);
                 Object obj = GetSerializer(type).Deserialize(stream);
                 stream.Close();
                 return obj;
             }
-            catch
+            catch (Exception)
             {
                 if (stream != null)
                     stream.Close();
@@ -85,7 +85,7 @@ namespace Vha.Common
                 if (closeStream) stream.Close();
                 return obj;
             }
-            catch
+            catch (Exception)
             {
                 if (stream != null && closeStream)
                     stream.Close();
@@ -112,7 +112,7 @@ namespace Vha.Common
                 Object obj = GetSerializer(type).Deserialize(reader);
                 return obj;
             }
-            catch { return null; }
+            catch (Exception) { return null; }
             finally
             {
                 if (reader != null)
@@ -160,7 +160,7 @@ namespace Vha.Common
             {
                 GetSerializer(type).Serialize(memorystream, obj);
             }
-            catch
+            catch (Exception)
             {
                 // Serailization failed
                 if (memorystream != null)
@@ -177,7 +177,7 @@ namespace Vha.Common
                 memorystream.Close();
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 // Clean up and return
                 if (memorystream != null)
@@ -208,7 +208,7 @@ namespace Vha.Common
                 if (closeStream) stream.Close();
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 // Serailization failed
                 if (closeStream && stream != null)
@@ -233,7 +233,7 @@ namespace Vha.Common
                 GetSerializer(type).Serialize(writer, obj);
                 return true;
             }
-            catch
+            catch (Exception)
             {
                 return false;
             }

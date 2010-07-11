@@ -26,7 +26,7 @@ using System;
 
 namespace Vha.Common
 {
-    public class Base85
+    public static class Base85
     {
         public static Int32 Decode(string encoded)
         {

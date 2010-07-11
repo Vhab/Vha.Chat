@@ -56,4 +56,11 @@ namespace Vha.Net
         Name = 0,
         Date = 1
     }
+
+    public enum PacketPriority
+    {
+        Urgent = 1,
+        Standard,
+        Low
+    }
 }

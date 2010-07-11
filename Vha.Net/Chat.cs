@@ -85,40 +85,39 @@ namespace Vha.Net
 #endif
 		#endregion
 
-		#region Protected members
-		protected string _account = string.Empty;
-        protected string _password = string.Empty;
-        protected string _character = string.Empty;
-        protected ChatState _state = ChatState.Disconnected;
-        protected UInt32 _id = 0;
-        protected BigInteger _organizationid = 0;
-        protected string _organization = string.Empty;
-        protected List<Thread> _threads;
-        protected Thread _receiveThread;
-        protected Thread _sendThread;
+		#region Private members
+		private string _account = string.Empty;
+        private string _password = string.Empty;
+        private string _character = string.Empty;
+        private ChatState _state = ChatState.Disconnected;
+        private UInt32 _id = 0;
+        private BigInteger _organizationid = 0;
+        private string _organization = string.Empty;
+        private List<Thread> _threads;
+        private Thread _receiveThread;
+        private Thread _sendThread;
 		/// <summary>
 		/// This event is signaled whenever something is added to the send queue.
 		/// </summary>
-		protected ManualResetEvent _sendThread_ResetEvent;
-        protected Socket _socket;
-        protected Dictionary<UInt32, String> _characters;
-        protected Dictionary<String, UInt32> _charactersByName;
-        protected Dictionary<BigInteger, Channel> _channels;
-        protected string _serverAddress;
-        protected int _port;
-        protected PacketQueue _fastQueue;
-        protected PacketQueue _slowQueue;
-        protected bool _closing = false;
-        protected System.Timers.Timer _reconnectTimer;
-        protected ManualResetEvent _lookupReset;
-        protected System.Timers.Timer _pingTimer;
-        protected DateTime _lastPong = DateTime.Now;
-
+		private ManualResetEvent _sendThread_ResetEvent;
+        private Socket _socket;
+        private Dictionary<UInt32, String> _characters;
+        private Dictionary<String, UInt32> _charactersByName;
+        private Dictionary<BigInteger, Channel> _channels;
+        private string _serverAddress;
+        private int _port;
+        private PacketQueue _fastQueue;
+        private PacketQueue _slowQueue;
+        private bool _closing = false;
+        private System.Timers.Timer _reconnectTimer;
+        private ManualResetEvent _lookupReset;
+        private System.Timers.Timer _pingTimer;
+        private DateTime _lastPong = DateTime.Now;
         /// <summary>
         /// Proxy server. new Uri("http://proxyserver:port/") for a HTTP proxy supporting Connect().
         /// new Uri("socks4://userid@proxyserver:port/") for a Socks v4 connection.
         /// </summary>
-        protected Uri _proxy = null;
+        private Uri _proxy = null;
 		#endregion
 
 		#region Public attributes
@@ -256,7 +255,7 @@ namespace Vha.Net
 		#endregion
 
 		// Get this thing ready for running
-        protected void PrepareChat()
+        private void _prepareChat()
         {
             lock (this)
             {
@@ -274,18 +273,18 @@ namespace Vha.Net
                 }
                 this._threads = new List<Thread>();
                 this._lookupReset = new ManualResetEvent(false);
-                this._receiveThread = new Thread(new ThreadStart(this.RunReceiver));
+                this._receiveThread = new Thread(new ThreadStart(this._runReceiver));
                 this._receiveThread.IsBackground = true;
 				this._sendThread_ResetEvent = new ManualResetEvent(true); //Resetevent for sendthread.
-                this._sendThread = new Thread(new ThreadStart(this.RunSender));
+                this._sendThread = new Thread(new ThreadStart(this._runSender));
                 this._sendThread.IsBackground = true;
                 this._characters = new Dictionary<UInt32, String>();
                 this._charactersByName = new Dictionary<string, uint>();
                 this._channels = new Dictionary<BigInteger, Channel>();
                 this._fastQueue = new PacketQueue();
-                this._fastQueue.delay = this.FastPacketDelay;
+                this._fastQueue.Delay = this.FastPacketDelay;
                 this._slowQueue = new PacketQueue();
-                this._slowQueue.delay = this.SlowPacketDelay;
+                this._slowQueue.Delay = this.SlowPacketDelay;
                 this._reconnectTimer = new System.Timers.Timer();
                 this._reconnectTimer.AutoReset = false;
                 this._reconnectTimer.Interval = this.ReconnectDelay;
@@ -331,11 +330,11 @@ namespace Vha.Net
             lock (this)
             {
                 // Ensure we're really disconnected
-                this.Disconnect(ChatState.Connecting);
+                this._disconnect(ChatState.Connecting);
 
                 // Let's fire it up!
                 this._closing = false;
-                this.PrepareChat();
+                this._prepareChat();
 
                 this.Debug("Connecting to dimension: " + this._serverAddress + ":" + this._port, "[Auth]");
 
@@ -361,7 +360,7 @@ namespace Vha.Net
                             throw new Exception();
                         }
                     }
-                    catch
+                    catch (Exception)
                     {
                         if (np == null)
                             this.Debug("Failed construct proxy connection", "[Socket]");
@@ -393,7 +392,7 @@ namespace Vha.Net
                                 this.Debug("Failed connecting to " + ipe.ToString(), "[Socket]");
                         }
                     }
-                    catch
+                    catch (Exception)
                     {
                         this.Debug("Unknown error during connecting", "[Error]");
                     }
@@ -447,7 +446,7 @@ namespace Vha.Net
 		/// <summary>
 		/// Disconnect from chat server synchronously.
 		/// </summary>
-        public void Disconnect() { this.Disconnect(ChatState.Disconnected); }
+        public void Disconnect() { this._disconnect(ChatState.Disconnected); }
         /// <summary>
         /// Disconnect from chatserver.
         /// </summary>
@@ -462,7 +461,7 @@ namespace Vha.Net
             }
             else Disconnect();
         }
-        private void Disconnect(ChatState nextState)
+        private void _disconnect(ChatState nextState)
         {
             lock (this)
             {
@@ -509,7 +508,7 @@ namespace Vha.Net
 		#endregion
 
 		// Receive Thread
-        internal void RunReceiver()
+        private void _runReceiver()
         {
             this.Debug("Started", "[ReceiveThread]");
             try
@@ -538,9 +537,9 @@ namespace Vha.Net
                     {
                         ParsePacketData packetData = new ParsePacketData(type, length, null);
                         if (this.UseThreadPool)
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(this._parsePacket), packetData);
                         else
-                            this.ParsePacket(packetData, true);
+                            this._parsePacket(packetData, true);
                     }
                     else
                     {
@@ -557,10 +556,10 @@ namespace Vha.Net
                             Thread.Sleep(10);
                         }
                         ParsePacketData packetData = new ParsePacketData(type, length, buffer);
-                        if (this.UseThreadPool == false || packetData.type == Packet.Type.NAME_LOOKUP)
-                            this.ParsePacket(packetData, true);
+                        if (this.UseThreadPool == false || packetData.Type == Packet.Type.NAME_LOOKUP)
+                            this._parsePacket(packetData, true);
                         else
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(this.ParsePacket), packetData);
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(this._parsePacket), packetData);
                     }
                     Thread.Sleep(0);
                 }
@@ -594,7 +593,7 @@ namespace Vha.Net
             }
         }
         // Send Thread
-        internal void RunSender()
+        private void _runSender()
         {
             this.Debug("Started", "[SendThread]");
             try
@@ -659,8 +658,8 @@ namespace Vha.Net
             }
         }
 
-        internal void ParsePacket(Object o) { ParsePacket((ParsePacketData)o, false); }
-        internal void ParsePacket(ParsePacketData packetData, bool local)
+        private void _parsePacket(Object o) { _parsePacket((ParsePacketData)o, false); }
+        private void _parsePacket(ParsePacketData packetData, bool local)
         {
             List<Thread> threads = this._threads;
             // Register this thread
@@ -675,41 +674,41 @@ namespace Vha.Net
             {
                 Packet packet = null;
                 // figure out the packet type and raise an event.
-                switch (packetData.type)
+                switch (packetData.Type)
                 {
                     case Packet.Type.PING:
                         OnPongEvent();
                         break;
                     case Packet.Type.LOGIN_SEED:
-                        packet = new LoginSeedPacket(packetData.type, packetData.data);
+                        packet = new LoginSeedPacket(packetData.Type, packetData.Data);
                         OnLoginSeedEvent(
                             new LoginSeedEventArgs(
                             ((LoginSeedPacket)packet).Seed
                             ));
                         break;
                     case Packet.Type.SYSTEM_MESSAGE:
-                        packet = new SimpleStringPacket(packetData.type, packetData.data);
+                        packet = new SimpleStringPacket(packetData.Type, packetData.Data);
                         OnSimpleMessageEvent(
                             new SimpleMessageEventArgs(
                             ((SimpleStringPacket)packet).Message
                             ));
                         break;
                     case Packet.Type.LOGIN_ERROR:
-                        packet = new SimpleStringPacket(packetData.type, packetData.data);
+                        packet = new SimpleStringPacket(packetData.Type, packetData.Data);
                         OnLoginErrorEvent(
                             new LoginErrorEventArgs(
                             ((SimpleStringPacket)packet).Message
                             ));
                         break;
                     case Packet.Type.LOGIN_CHARACTERLIST:
-                        packet = new LoginCharacterListPacket(packetData.type, packetData.data);
+                        packet = new LoginCharacterListPacket(packetData.Type, packetData.Data);
                         OnLoginCharacterListEvent(
                             new LoginChararacterListEventArgs(
                             ((LoginCharacterListPacket)packet).Characters
                             ));
                         break;
                     case Packet.Type.FRIEND_REMOVED:
-                        packet = new SimpleIdPacket(packetData.type, packetData.data);
+                        packet = new SimpleIdPacket(packetData.Type, packetData.Data);
                         OnFriendRemovedEvent(
                             new CharacterIDEventArgs(
                             ((SimpleIdPacket)packet).CharacterID,
@@ -717,7 +716,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.CLIENT_UNKNOWN:
-                        packet = new SimpleIdPacket(packetData.type, packetData.data);
+                        packet = new SimpleIdPacket(packetData.Type, packetData.Data);
                         OnClientUnknownEvent(
                             new CharacterIDEventArgs(
                             ((SimpleIdPacket)packet).CharacterID,
@@ -725,7 +724,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_INVITE:
-                        packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
+                        packet = new PrivateChannelStatusPacket(packetData.Type, packetData.Data);
                         OnPrivateChannelRequestEvent(
                             new PrivateChannelRequestEventArgs(
                             this,
@@ -735,7 +734,7 @@ namespace Vha.Net
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_KICK:
                     case Packet.Type.PRIVATE_CHANNEL_PART:
-                        packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
+                        packet = new PrivateChannelStatusPacket(packetData.Type, packetData.Data);
                         OnPrivateChannelStatusEvent(
                             new PrivateChannelStatusEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
@@ -744,11 +743,11 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.LOGIN_OK:
-                        packet = new EmptyPacket(packetData.type);
+                        packet = new EmptyPacket(packetData.Type);
                         OnLoginOKEvent();
                         break;
                     case Packet.Type.CLIENT_NAME:
-                        packet = new ClientNamePacket(packetData.type, packetData.data);
+                        packet = new ClientNamePacket(packetData.Type, packetData.Data);
                         OnNameLookupEvent(
                             new NameLookupEventArgs(
                             ((ClientNamePacket)packet).CharacterID,
@@ -756,7 +755,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.NAME_LOOKUP:
-                        packet = new NameLookupPacket(packetData.type, packetData.data);
+                        packet = new NameLookupPacket(packetData.Type, packetData.Data);
                         OnNameLookupEvent(
                             new NameLookupEventArgs(
                             ((NameLookupPacket)packet).CharacterID,
@@ -764,7 +763,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.PRIVATE_MESSAGE:
-                        packet = new PrivateMessagePacket(packetData.type, packetData.data);
+                        packet = new PrivateMessagePacket(packetData.Type, packetData.Data);
                         OnPrivateMessageEvent(
                             new PrivateMessageEventArgs(
                             ((PrivateMessagePacket)packet).CharacterID,
@@ -774,7 +773,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.VICINITY_MESSAGE:
-                        packet = new PrivateMessagePacket(packetData.type, packetData.data);
+                        packet = new PrivateMessagePacket(packetData.Type, packetData.Data);
                         OnVicinityMessageEvent(
                             new VicinityMessageEventArgs(
                             ((PrivateMessagePacket)packet).CharacterID,
@@ -783,7 +782,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.ANON_MESSAGE:
-                        packet = new BroadcastMessagePacket(packetData.type, packetData.data);
+                        packet = new BroadcastMessagePacket(packetData.Type, packetData.Data);
                         OnBroadcastMessageEvent(
                             new BroadcastMessageEventArgs(
                             ((BroadcastMessagePacket)packet).UnknownString,
@@ -791,7 +790,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.FRIEND_STATUS:
-                        packet = new FriendStatusPacket(packetData.type, packetData.data);
+                        packet = new FriendStatusPacket(packetData.Type, packetData.Data);
                         OnFriendStatusEvent(
                             new FriendStatusEventArgs(
                             ((FriendStatusPacket)packet).CharacterID,
@@ -801,7 +800,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.CHANNEL_STATUS:
-                        packet = new ChannelStatusPacket(packetData.type, packetData.data);
+                        packet = new ChannelStatusPacket(packetData.Type, packetData.Data);
                         OnChannelStatusEvent(
                             new ChannelStatusEventArgs(
                             ((ChannelStatusPacket)packet).ID,
@@ -813,7 +812,7 @@ namespace Vha.Net
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN:
                     case Packet.Type.PRIVATE_CHANNEL_CLIENTPART:
-                        packet = new PrivateChannelStatusPacket(packetData.type, packetData.data);
+                        packet = new PrivateChannelStatusPacket(packetData.Type, packetData.Data);
                         OnPrivateChannelStatusEvent(
                             new PrivateChannelStatusEventArgs(
                             ((PrivateChannelStatusPacket)packet).ChannelID,
@@ -825,7 +824,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.PRIVGRP_MESSAGE:
-                        packet = new PrivateChannelMessagePacket(packetData.type, packetData.data);
+                        packet = new PrivateChannelMessagePacket(packetData.Type, packetData.Data);
                         OnPrivateChannelMessageEvent(
                             new PrivateChannelMessageEventArgs(
                             ((PrivateChannelMessagePacket)packet).ChannelID,
@@ -837,7 +836,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.CHANNEL_MESSAGE:
-                        packet = new ChannelMessagePacket(packetData.type, packetData.data);
+                        packet = new ChannelMessagePacket(packetData.Type, packetData.Data);
                         OnChannelMessageEvent(
                             new ChannelMessageEventArgs(
                             ((ChannelMessagePacket)packet).ChannelID,
@@ -849,7 +848,7 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.FORWARD:
-                        packet = new ForwardPacket(packetData.type, packetData.data);
+                        packet = new ForwardPacket(packetData.Type, packetData.Data);
                         OnForwardEvent(
                             new ForwardEventArgs(
                             ((ForwardPacket)packet).ID1,
@@ -857,14 +856,14 @@ namespace Vha.Net
                             ));
                         break;
                     case Packet.Type.AMD_MUX_INFO:
-                        packet = new AmdMuxInfoPacket(packetData.type, packetData.data);
+                        packet = new AmdMuxInfoPacket(packetData.Type, packetData.Data);
                         OnAmdMuxInfoEvent(
                             new AmdMuxInfoEventArgs(
                             ((AmdMuxInfoPacket)packet).Message
                             ));
                         break;
                     case Packet.Type.MESSAGE_SYSTEM:
-                        packet = new SystemMessagePacket(packetData.type, packetData.data);
+                        packet = new SystemMessagePacket(packetData.Type, packetData.Data);
                         OnSystemMessageEvent(
                             new SystemMessageEventArgs(
                             ((SystemMessagePacket)packet).ClientID,
@@ -875,9 +874,9 @@ namespace Vha.Net
                             ));
                         break;
                     default:
-                        if (packetData.type == Packet.Type.NULL && packetData.data != null)
+                        if (packetData.Type == Packet.Type.NULL && packetData.Data != null)
                         {
-                            if (BitConverter.ToInt32(packetData.data, 0) == 0 && packetData.data.Length == 4)
+                            if (BitConverter.ToInt32(packetData.Data, 0) == 0 && packetData.Data.Length == 4)
                             {
                                 Trace.WriteLine("Disconnect packet received.", "[Debug]");
                                 if (local == false)
@@ -889,10 +888,10 @@ namespace Vha.Net
                                 break;
                             }
                         }
-                        packet = new UnknownPacket(packetData.type, packetData.data);
+                        packet = new UnknownPacket(packetData.Type, packetData.Data);
                         OnUnknownPacketEvent(
                             new UnknownPacketEventArgs(
-                            ((UnknownPacket)packet).PacketType,
+                            (UInt16)((UnknownPacket)packet).PacketType,
                             ((UnknownPacket)packet).UnknownData
                             ));
                         break;
@@ -1381,7 +1380,7 @@ namespace Vha.Net
         #endregion
 
         #region Send Commands
-        public void SendPacket(Packet packet)
+        internal void SendPacket(Packet packet)
         {
             if (this._socket == null || !this._socket.Connected)
             {
@@ -1417,7 +1416,7 @@ namespace Vha.Net
             this.Debug("Updating channel " + this.GetChannelName(channelID) + " with mute=" + mute.ToString(), "[Bot]");
 
             ChannelUpdatePacket p = new ChannelUpdatePacket(channelID, mute);
-            p.Priority = PacketQueue.Priority.Standard;
+            p.Priority = PacketPriority.Standard;
             this.SendPacket(p);
         }
 
@@ -1426,20 +1425,20 @@ namespace Vha.Net
 		/// </summary>
 		/// <param name="channel"></param>
 		/// <param name="text"></param>
-        public void SendChannelMessage(string channel, string text) { this.SendChannelMessage(this.GetChannelID(channel), text, PacketQueue.Priority.Standard); }
+        public void SendChannelMessage(string channel, string text) { this.SendChannelMessage(this.GetChannelID(channel), text, PacketPriority.Standard); }
 		/// <summary>
 		/// Send a channel message (standard priority)
 		/// </summary>
 		/// <param name="channelID"></param>
 		/// <param name="text"></param>
-        public void SendChannelMessage(BigInteger channelID, string text) { this.SendChannelMessage(channelID, text, PacketQueue.Priority.Standard); }
+        public void SendChannelMessage(BigInteger channelID, string text) { this.SendChannelMessage(channelID, text, PacketPriority.Standard); }
 		/// <summary>
 		/// Send a channel message. Custom priority
 		/// </summary>
 		/// <param name="channelID"></param>
 		/// <param name="text"></param>
 		/// <param name="priority"></param>
-        public void SendChannelMessage(BigInteger channelID, string text, PacketQueue.Priority priority)
+        public void SendChannelMessage(BigInteger channelID, string text, PacketPriority priority)
         {
             ChannelMessagePacket p = new ChannelMessagePacket(channelID, text);
             p.Priority = priority;
@@ -1456,7 +1455,7 @@ namespace Vha.Net
             this.Debug("Adding character to friendslist: " + character, "[Bot]");
 
             ChatCommandPacket p = new ChatCommandPacket("addbuddy", character);
-            p.Priority = PacketQueue.Priority.Standard;
+            p.Priority = PacketPriority.Standard;
 
             this.SendPacket(p);
         }
@@ -1471,7 +1470,7 @@ namespace Vha.Net
             this.Debug("Removing character from friendslist: " + character, "[Bot]");
 
             ChatCommandPacket p = new ChatCommandPacket("rembuddy", character);
-            p.Priority = PacketQueue.Priority.Standard;
+            p.Priority = PacketPriority.Standard;
 
             this.SendPacket(p);
         }
@@ -1490,7 +1489,7 @@ namespace Vha.Net
             this.Debug("Sending command: /cc " + string.Join(" ", arguments), "[Bot]");
 
             ChatCommandPacket p = new ChatCommandPacket(arguments);
-            p.Priority = PacketQueue.Priority.Standard;
+            p.Priority = PacketPriority.Standard;
             this.SendPacket(p);
         }
 
@@ -1508,7 +1507,7 @@ namespace Vha.Net
             if (characterID == this._id)
                 return;
             SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_INVITE, characterID);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.SendPacket(p);
         }
 
@@ -1526,7 +1525,7 @@ namespace Vha.Net
             if (characterID == this._id)
                 return;
             SimpleIdPacket p = new SimpleIdPacket(Packet.Type.PRIVATE_CHANNEL_KICK, characterID);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.SendPacket(p);
         }
 
@@ -1536,7 +1535,7 @@ namespace Vha.Net
         public void SendPrivateChannelKickAll()
         {
             EmptyPacket p = new EmptyPacket(Packet.Type.PRIVATE_CHANNEL_KICKALL);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.SendPacket(p);
         }
 
@@ -1552,7 +1551,7 @@ namespace Vha.Net
 		public void SendPrivateChannelLeave(UInt32 channelID)
         {
             PrivateChannelStatusPacket p = new PrivateChannelStatusPacket(channelID, false);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.SendPacket(p);
         }
 
@@ -1575,7 +1574,7 @@ namespace Vha.Net
         public void SendPrivateChannelMessage(UInt32 channelID, string text)
         {
             PrivateChannelMessagePacket p = new PrivateChannelMessagePacket(channelID, text);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.SendPacket(p);
         }
 
@@ -1584,20 +1583,20 @@ namespace Vha.Net
 		/// </summary>
         /// <param name="character"></param>
 		/// <param name="text"></param>
-        public void SendPrivateMessage(string character, string text) { this.SendPrivateMessage(this.GetCharacterID(character), text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(string character, string text) { this.SendPrivateMessage(this.GetCharacterID(character), text, PacketPriority.Standard); }
 		/// <summary>
 		/// Send a private message (tell) to someone. (standard priority)
 		/// </summary>
         /// <param name="characterID"></param>
 		/// <param name="text"></param>
-        public void SendPrivateMessage(UInt32 characterID, string text) { this.SendPrivateMessage(characterID, text, PacketQueue.Priority.Standard); }
+        public void SendPrivateMessage(UInt32 characterID, string text) { this.SendPrivateMessage(characterID, text, PacketPriority.Standard); }
 		/// <summary>
 		/// Send a private message (tell) to someone.
 		/// </summary>
         /// <param name="characterID"></param>
 		/// <param name="text"></param>
 		/// <param name="priority"></param>
-        public void SendPrivateMessage(UInt32 characterID, string text, PacketQueue.Priority priority)
+        public void SendPrivateMessage(UInt32 characterID, string text, PacketPriority priority)
         {
             if (characterID == this._id || characterID == 0)
                 return;
@@ -1617,7 +1616,7 @@ namespace Vha.Net
                     return;
 
             NameLookupPacket p = new NameLookupPacket(name);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.Debug("Requesting ID: " + name, "[Database]");
             this.SendPacket(p);
         }
@@ -1628,7 +1627,7 @@ namespace Vha.Net
         public void SendPing()
         {
             EmptyPacket p = new EmptyPacket(Packet.Type.PING);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.SendPacket(p);
         }
 
@@ -1647,7 +1646,7 @@ namespace Vha.Net
             this._character = Format.UppercaseFirst(character.Name);
             this._id = character.ID;
             SimpleIdPacket p = new SimpleIdPacket(Packet.Type.LOGIN_SELCHAR, character.ID);
-            p.Priority = PacketQueue.Priority.Urgent;
+            p.Priority = PacketPriority.Urgent;
             this.SendPacket(p);
             this.Debug("Selecting character: " + this._character, "[Auth]");
             this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.CharacterSelect));
@@ -1669,23 +1668,23 @@ namespace Vha.Net
                 this.DebugEvent(this, new DebugEventArgs(this.ToString(), cat + " " + msg));
             Trace.WriteLine("[" + this.ToString() + "] " + cat + " " + msg);
         }
-    } // end of Chat
 
-    internal class ParsePacketData
-    {
-        public Packet.Type type;
-        public short length = 0;
-        public byte[] data;
-
-        public ParsePacketData(Packet.Type t, short l, byte[] d)
+        private class ParsePacketData
         {
-            this.type = t;
-            this.length = l;
-            if (d != null)
+            public Packet.Type Type;
+            public short Length = 0;
+            public byte[] Data;
+
+            public ParsePacketData(Packet.Type t, short l, byte[] d)
             {
-                this.data = new byte[d.Length];
-                d.CopyTo(this.data, 0);
+                this.Type = t;
+                this.Length = l;
+                if (d != null)
+                {
+                    this.Data = new byte[d.Length];
+                    d.CopyTo(this.Data, 0);
+                }
             }
         }
-    }
+    } // end of Chat
 }

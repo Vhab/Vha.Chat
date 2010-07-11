@@ -40,9 +40,9 @@ namespace Vha.Net.Packets
             if (data == null || data.Length < 4) { return; }
 
             int offset = 0;
-            this._characterID = popUnsignedInteger(ref data, ref offset);
+            this._characterID = PopUnsignedInteger(ref data, ref offset);
             this.AddData(this._characterID);
-            this.AddData(popString(ref data, ref offset));
+            this.AddData(PopString(ref data, ref offset));
         }
         internal UInt32 CharacterID
         {

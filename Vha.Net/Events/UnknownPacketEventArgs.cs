@@ -34,16 +34,16 @@ namespace Vha.Net.Events
         /// Private member to store the message.
         /// </summary>
         private readonly String _text = null;
-        private readonly Packet.Type _type = 0;
+        private readonly UInt16 _type = 0;
 
         /// <summary>
         /// Constructor for creating event args
         /// </summary>
-        /// <param name="Message"></param>
-        public UnknownPacketEventArgs(Packet.Type type, String Message)
+        /// <param name="message"></param>
+        public UnknownPacketEventArgs(UInt16 type, String message)
         {
             this._type = type;
-            this._text = Message;
+            this._text = message;
         }
 
         /// <summary>
@@ -51,6 +51,6 @@ namespace Vha.Net.Events
         /// </summary>
         /// <value>returns the message</value>
         public String Message { get { return this._text; } }
-        public Packet.Type PacketType { get { return this._type; } }
+        public UInt16 PacketType { get { return this._type; } }
     }
 }

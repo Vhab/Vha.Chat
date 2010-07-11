@@ -32,8 +32,8 @@ namespace Vha.Net.Packets
             if (data == null || data.Length < 6) { return; }
 
             int offset = 0;
-            this.AddData(popUnsignedInteger(ref data, ref offset));
-            this.AddData(popString(ref data, ref offset).ToString());
+            this.AddData(PopUnsignedInteger(ref data, ref offset));
+            this.AddData(PopString(ref data, ref offset).ToString());
             if ((UInt32)this.Data[0] == UInt32.MaxValue)
                 this.Data[0] = UInt32.MinValue;
         }

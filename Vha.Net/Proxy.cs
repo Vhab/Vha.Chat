@@ -119,7 +119,7 @@ namespace Vha.Net
             if (this._serverURI.Port == 0) this._serverURI.Port = 1080; // default port in Starksoft.Net.Proxy.Socks4ProxyClient.cs. No override in Socks4a.
 
             // Connect
-            if (this._serverURI.UserName != string.Empty) // If the user provided an username
+            if (!string.IsNullOrEmpty(this._serverURI.UserName)) // If the user provided an username
                 proxyclient = this._proxyclientfactory.CreateProxyClient(pt, this._serverURI.Host, this._serverURI.Port, this._serverURI.UserName, string.Empty); // Socks v4 only supports UserID as auth
             else
                 proxyclient = this._proxyclientfactory.CreateProxyClient(pt, this._serverURI.Host, this._serverURI.Port);
@@ -137,7 +137,7 @@ namespace Vha.Net
         {
             if (this._serverURI.Port == 0) this._serverURI.Port = 1080; // default port in Starksoft.Net.Proxy.Socks5ProxyClient.cs
             IProxyClient proxyclient;
-            if (this._serverURI.UserName != string.Empty && this._serverURI.Password != string.Empty) // If the user provided an username
+            if (!string.IsNullOrEmpty(this._serverURI.UserName)) // If the user provided an username
                 proxyclient = this._proxyclientfactory.CreateProxyClient(ProxyType.Socks5, this._serverURI.Host, this._serverURI.Port, this._serverURI.UserName, this._serverURI.Password); // Socks v5 supports user+pass auth.
             else
                 proxyclient = this._proxyclientfactory.CreateProxyClient(ProxyType.Socks5, this._serverURI.Host, this._serverURI.Port);
@@ -157,12 +157,12 @@ namespace Vha.Net
         /// </summary>
         public struct Protocol
         {
-            public Protocol(string scheme, SupportLevel username, SupportLevel password, SupportLevel user_and_pass)
+            public Protocol(string scheme, SupportLevel username, SupportLevel password, SupportLevel userAndPass)
             {
                 this.Scheme = scheme;
                 this.Username = username;
                 this.Password = password;
-                this.UserAndPassword = user_and_pass;
+                this.UserAndPassword = userAndPass;
             }
             // The idea here is to know what we need to supply.
             public string Scheme;

@@ -35,7 +35,7 @@ namespace Vha.Net.Packets
         {
             if (data == null || data.Length < 4) { return; }
             int offset = 0;
-            this.AddData(popUnsignedInteger(ref data, ref offset));
+            this.AddData(PopUnsignedInteger(ref data, ref offset));
         }
 
         internal UInt32 CharacterID { get { return (UInt32)this.Data[0]; } }

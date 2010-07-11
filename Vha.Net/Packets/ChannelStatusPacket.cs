@@ -32,15 +32,15 @@ namespace Vha.Net.Packets
             if (data == null || data.Length < 10) { return; }
 
             int offset = 0;
-            this.AddData(popChannelID(ref data, ref offset));
-            this.AddData(popString(ref data, ref offset).ToString());
-            this.AddData(popUnsignedShort(ref data, ref offset));
-            this.AddData(popShort(ref data, ref offset));
+            this.AddData(PopChannelID(ref data, ref offset));
+            this.AddData(PopString(ref data, ref offset).ToString());
+            this.AddData(PopUnsignedShort(ref data, ref offset));
+            this.AddData(PopShort(ref data, ref offset));
         }
 
         internal BigInteger ID { get { return (BigInteger)this.Data[0]; } }
         internal String Name { get { return (String)this.Data[1]; } }
-        internal byte ChannelType { get { return ((BigInteger)this.Data[0]).getBytes()[0]; } }
+        internal byte ChannelType { get { return ((BigInteger)this.Data[0]).GetBytes()[0]; } }
         internal UInt16 Flags { get { return (UInt16)this.Data[2]; } }
         internal bool Muted { get { return Convert.ToBoolean(this.Flags & 0x0100); } }
     }

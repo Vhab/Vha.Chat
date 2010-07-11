@@ -32,29 +32,29 @@ using Vha.Common;
 
 namespace Vha.MDB
 {
-    public class Parser
+    public static class Parser
     {
         /// <summary>
         /// Decodes a template message with header
         /// </summary>
-        /// <param name="scrambledString"></param>
+        /// <param name="scrambled"></param>
         /// <returns></returns>
-        public static Message Decode(string scrambledString) { return Decode(scrambledString, null); }
+        public static Message Decode(string scrambled) { return Decode(scrambled, null); }
         /// <summary>
         /// Decodes a template message with header
         /// </summary>
-        /// <param name="scrambledString"></param>
+        /// <param name="scrambled"></param>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public static Message Decode(string scrambledString, Reader reader)
+        public static Message Decode(string scrambled, Reader reader)
         {
-            if (scrambledString.StartsWith("~"))
-                scrambledString = scrambledString.Substring(1);
+            if (scrambled.StartsWith("~"))
+                scrambled = scrambled.Substring(1);
 
-            if (scrambledString.EndsWith("~"))
-                scrambledString = scrambledString.Substring(0, scrambledString.Length - 1);
+            if (scrambled.EndsWith("~"))
+                scrambled = scrambled.Substring(0, scrambled.Length - 1);
 
-            return Decode(Encoding.UTF8.GetBytes(scrambledString), reader);
+            return Decode(Encoding.UTF8.GetBytes(scrambled), reader);
         }
         /// <summary>
         /// Decodes a template message with header
@@ -202,7 +202,7 @@ namespace Vha.MDB
                 if (entry != null)
                 {
                     try { descrambledMessage.Value = String.Format(PrintfToFormatString(entry.Message), descrambledMessage.Arguments); }
-                    catch { }
+                    catch (Exception) { }
                 }
                 else
                 {

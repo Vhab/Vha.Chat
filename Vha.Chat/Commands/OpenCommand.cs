@@ -60,10 +60,9 @@ namespace Vha.Chat.Commands
             lock (this._forms)
             {
                 // Check if a window already exists
-                foreach (KeyValuePair<MessageTarget, Form> kvp in this._forms)
+                if (this._forms.ContainsKey(target))
                 {
-                    if (!kvp.Key.Equals(target)) continue;
-                    kvp.Value.Focus();
+                    this._forms[target].Focus();
                     return true;
                 }
                 // Create new window

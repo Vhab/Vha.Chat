@@ -22,12 +22,15 @@ using System.Text;
 
 namespace Vha.Chat
 {
-    public class MessageSource : IComparable<MessageSource>
+    public class MessageSource
+        : IEquatable<MessageSource>
+        , IComparable<MessageSource>
     {
         public readonly MessageType Type;
         public readonly string Channel;
         public readonly string Character;
         public readonly bool Outgoing;
+        private readonly int _hashCode;
 
         public MessageSource()
         {
@@ -35,6 +38,7 @@ namespace Vha.Chat
             this.Channel = null;
             this.Character = null;
             this.Outgoing = false;
+            this._hashCode = 0;
         }
 
         public MessageSource(MessageType type, string channel, string character, bool outgoing)
@@ -43,6 +47,33 @@ namespace Vha.Chat
             this.Channel = channel;
             this.Character = character;
             this.Outgoing = outgoing;
+            this._hashCode =
+                (this.Type.ToString() +
+                this.Channel +
+                this.Character +
+                this.Outgoing.ToString())
+                .GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns the target associated with this source
+        /// </summary>
+        /// <returns></returns>
+        public MessageTarget GetTarget()
+        {
+            MessageType type = this.Type;
+            string target = null;
+            switch (this.Type)
+            {
+                case MessageType.Channel:
+                case MessageType.PrivateChannel:
+                    target = this.Channel;
+                    break;
+                case MessageType.Character:
+                    target = this.Character;
+                    break;
+            }
+            return new MessageTarget(type, target);
         }
 
         public override string ToString()
@@ -71,25 +102,13 @@ namespace Vha.Chat
 
         public bool Equals(MessageSource right) { return this.CompareTo(right) == 0; }
 
-        /// <summary>
-        /// Returns the target associated with this source
-        /// </summary>
-        /// <returns></returns>
-        public MessageTarget GetTarget()
+        public override bool Equals(Object obj)
         {
-            MessageType type = this.Type;
-            string target = null;
-            switch (this.Type)
-            {
-                case MessageType.Channel:
-                case MessageType.PrivateChannel:
-                    target = this.Channel;
-                    break;
-                case MessageType.Character:
-                    target = this.Character;
-                    break;
-            }
-            return new MessageTarget(type, target);
+            if (obj == null) return base.Equals(obj);
+            if (!(obj is MessageSource)) return false;
+            return this.Equals((MessageSource)obj);
         }
+
+        public override int GetHashCode() { return this._hashCode; }
     }
 }

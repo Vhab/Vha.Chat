@@ -19,18 +19,23 @@
 
 using System;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Vha.Chat
 {
-    public class MessageTarget : IComparable<MessageTarget>
+    public class MessageTarget
+        : IEquatable<MessageTarget>
+        , IComparable<MessageTarget>
     {
         public readonly MessageType Type;
         public readonly string Target;
+        private readonly int _hashCode;
 
         public MessageTarget()
         {
             this.Type = MessageType.None;
             this.Target = null;
+            this._hashCode = (this.Type.ToString() + this.Target).GetHashCode();
         }
 
         public MessageTarget(MessageType type, string target)
@@ -58,5 +63,14 @@ namespace Vha.Chat
         }
 
         public bool Equals(MessageTarget right) { return this.CompareTo(right) == 0; }
+
+        public override bool Equals(Object obj)
+        {
+            if (obj == null) return base.Equals(obj);
+            if (!(obj is MessageTarget)) return false;
+            return this.Equals((MessageTarget)obj);
+        }
+
+        public override int GetHashCode() { return this._hashCode; }
     }
 }

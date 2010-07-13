@@ -264,6 +264,7 @@ namespace Vha.Chat
                 this._chat.IgnoreCharacterLoggedIn = true;
                 this._chat.UseThreadPool = false;
                 this._chat.Tag = this;
+                this._chat.LookupTimeout = 10000;
 
                 // Hook events (including exceptions)
                 // - State changes and more

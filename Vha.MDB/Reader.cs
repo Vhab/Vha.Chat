@@ -158,7 +158,7 @@ namespace Vha.MDB
             Stream stream;
             try
             {
-                if (string.IsNullOrEmpty(file)) stream = File.OpenRead(file);
+                if (!string.IsNullOrEmpty(file)) stream = File.OpenRead(file);
                 else stream = new MemoryStream(Properties.Resources.Text);
             }
             catch (Exception)

@@ -44,6 +44,22 @@ namespace Vha.Chat
             this.Target = target;
         }
 
+        public bool Valid
+        {
+            get
+            {
+                switch (this.Type)
+                {
+                    case MessageType.Channel:
+                    case MessageType.Character:
+                    case MessageType.PrivateChannel:
+                        return !string.IsNullOrEmpty(this.Target);
+                    default:
+                        return false;
+                }
+            }
+        }
+
         public override string ToString()
         {
             if (this.Type == MessageType.None)

@@ -439,6 +439,20 @@ namespace Vha.Chat
             if (source == null)
                 throw new ArgumentNullException("source");
             MessageEventArgs args = new MessageEventArgs(source, messageClass, message);
+            // Log message in history buffer
+            MessageTarget target = source.GetTarget();
+            if (target.Valid)
+            {
+                lock (this._messageHistory)
+                {
+                    if (!this._messageHistory.ContainsKey(target))
+                        this._messageHistory.Add(target, new List<MessageEventArgs>());
+                    this._messageHistory[target].Add(args);
+                    while (this._messageHistory[target].Count > this.Options.MessageBuffer)
+                        this._messageHistory[target].RemoveAt(0);
+                }
+            }
+            // Dispatch event
             if (this.MessageEvent != null)
                 this.MessageEvent(this, args);
         }
@@ -451,6 +465,24 @@ namespace Vha.Chat
         {
             MessageSource source = new MessageSource();
             Write(source, messageClass, message);
+        }
+
+        /// <summary>
+        /// Returns the last X incoming and outgoing messages for a given message target.
+        /// The returned array starts with the oldest message first.
+        /// </summary>
+        /// <param name="target">A character, private channel or channel target</param>
+        /// <returns>A list of X most recent messages to the given target</returns>
+        public MessageEventArgs[] GetHistory(MessageTarget target)
+        {
+            lock (this._messageHistory)
+            {
+                // Early out
+                if (!this._messageHistory.ContainsKey(target))
+                    return new MessageEventArgs[] {};
+                // Return messages
+                return this._messageHistory[target].ToArray();
+            }
         }
         #endregion
 
@@ -473,6 +505,7 @@ namespace Vha.Chat
         private Dictionary<string, Friend> _friends;
         private Dictionary<string, PrivateChannel> _privateChannels;
         private List<string> _guests;
+        private Dictionary<MessageTarget, List<MessageEventArgs>> _messageHistory;
 
         internal Context()
         {
@@ -494,6 +527,7 @@ namespace Vha.Chat
             this._friends = new Dictionary<string, Friend>();
             this._privateChannels = new Dictionary<string, PrivateChannel>();
             this._guests = new List<string>();
+            this._messageHistory = new Dictionary<MessageTarget, List<MessageEventArgs>>();
             this._ignores = new Ignores(this);
 
             // Create input
@@ -623,6 +657,8 @@ namespace Vha.Chat
                 switch (state)
                 {
                     case ContextState.Disconnected:
+                        lock (this._messageHistory)
+                            this._messageHistory.Clear();
                         this._chat.AutoReconnect = false;
                         this._chat.ClearEvents();
                         this._chat = null;
@@ -635,10 +671,14 @@ namespace Vha.Chat
                         this._organization = null;
                         this._organizationID = 0;
                         this._characterID = 0;
-                        this._friends.Clear();
-                        this._channels.Clear();
-                        this._privateChannels.Clear();
-                        this._guests.Clear();
+                        lock (this._friends)
+                            this._friends.Clear();
+                        lock (this._channels)
+                            this._channels.Clear();
+                        lock (this._privateChannels)
+                            this._privateChannels.Clear();
+                        lock (this._guests)
+                            this._guests.Clear();
                         break;
                 }
             }

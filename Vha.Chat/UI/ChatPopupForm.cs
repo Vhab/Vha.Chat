@@ -49,6 +49,11 @@ namespace Vha.Chat.UI
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
             this._outputBox.ClickedEvent += new AomlHandler<AomlClickedEventArgs>(_outputBox_ClickedEvent);
+
+            // Preload output window with messages
+            MessageEventArgs[] messages = context.GetHistory(target);
+            foreach (MessageEventArgs message in messages)
+                _context_MessageEvent(context, message);
         }
 
         private void ChatPopupForm_FormClosed(object sender, FormClosedEventArgs e)

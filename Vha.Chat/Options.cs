@@ -57,6 +57,11 @@ namespace Vha.Chat
             get { return this._options.MaximumHistory; }
             set { this._options.MaximumHistory = value; this.Touch(); }
         }
+        public int MessageBuffer
+        {
+            get { return this._options.MessageBuffer; }
+            set { this._options.MessageBuffer = value; this.Touch(); }
+        }
         public TextStyle TextStyle
         {
             get { return this._options.TextStyle; }

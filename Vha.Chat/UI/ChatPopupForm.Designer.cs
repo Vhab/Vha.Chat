@@ -42,6 +42,7 @@
             this._inputBox.Name = "_inputBox";
             this._inputBox.Size = new System.Drawing.Size(454, 20);
             this._inputBox.TabIndex = 0;
+            this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
             // 
             // _outputBox

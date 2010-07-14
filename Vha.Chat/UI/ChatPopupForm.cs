@@ -87,6 +87,37 @@ namespace Vha.Chat.UI
             this._outputBox.Write(aoml, context.Options.TextStyle, true);
         }
 
+        private void _inputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up)
+            {
+                e.Handled = true;
+                if (this._historyIndex < this._history.Count)
+                {
+                    this._historyIndex++;
+                    this._inputBox.Text = this._history[this._historyIndex - 1];
+                    this._inputBox.Select(this._inputBox.Text.Length, 0);
+                }
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                e.Handled = true;
+                if (this._historyIndex > 0)
+                {
+                    this._historyIndex--;
+                    if (this._historyIndex == 0)
+                        this._inputBox.Text = "";
+                    else
+                        this._inputBox.Text = this._history[this._historyIndex - 1];
+                    this._inputBox.Select(this._inputBox.Text.Length, 0);
+                }
+            }
+            else
+            {
+                this._historyIndex = 0;
+            }
+        }
+
         private void _inputBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)

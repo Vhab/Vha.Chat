@@ -43,6 +43,7 @@ namespace Vha.Chat.UI
         protected ChatTreeNode _guests = new ChatTreeNode(MessageType.Character, "Guests");
 
         protected Context _context;
+        protected bool _initialized = false;
 
         protected List<string> _history = new List<string>();
         protected int _historyIndex = 0;
@@ -91,14 +92,22 @@ namespace Vha.Chat.UI
                     break;
             }
 
-            // Force options update manually
-            this._context_SavedEvent(this._context, this._context.Options);
-
             // A gentle welcome message
             this._context.Write(MessageClass.Internal, "Type /help to view all available commands");
 
             // Enable the open command
             this._context.Input.RegisterCommand(new OpenCommand(this));
+
+            // Wait for load event
+            this.Load += new EventHandler(ChatForm_Load);
+        }
+
+        private void ChatForm_Load(object sender, EventArgs e)
+        {
+            // Force options update manually
+            this._context_SavedEvent(this._context, this._context.Options);
+            // Ready!
+            this._initialized = true;
         }
 
         private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -171,6 +180,12 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
+            // Update splitter size
+            OptionsSize splitter = this._context.Options.GetSize("ChatForm", "Splitter", false);
+            if (splitter != null)
+            {
+                this._container.SplitterDistance = splitter.Size;
+            }
             // Move panel to the left
             if (args.PanelPosition == HorizontalPosition.Left &&
                 this._container.RightToLeft != RightToLeft.Yes)
@@ -185,8 +200,6 @@ namespace Vha.Chat.UI
             {
                 this._container.RightToLeft = RightToLeft.No;
             }
-            // TODO: update size thingy
-
             // Update AomlBox settings
             this._outputBox.MaximumTexts = args.MaximumTexts;
             this._outputBox.MaximumLines = args.MaximumMessages;
@@ -675,6 +688,13 @@ namespace Vha.Chat.UI
         {
             Form options = new OptionsForm(this._context);
             options.ShowDialog();
+        }
+
+        private void _container_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            if (this._context == null || !this._initialized) return;
+            OptionsSize size = this._context.Options.GetSize("ChatForm", "Splitter", true);
+            size.Size = this._container.SplitterDistance;
         }
 
         private void _channelMenu_TalkTo_Click(object sender, EventArgs e)

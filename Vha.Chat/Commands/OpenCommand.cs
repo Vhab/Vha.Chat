@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using Vha.Chat.UI;
+using Vha.Common;
 
 namespace Vha.Chat.Commands
 {
@@ -41,16 +42,16 @@ namespace Vha.Chat.Commands
                         context.Write(MessageClass.Error, "You cannot open a popup window to talk to yourself");
                         return false;
                     }
-                    target = new MessageTarget(MessageType.Character, args[1]);
+                    target = new MessageTarget(MessageType.Character, Format.UppercaseFirst(args[1]));
                     break;
                 case "channel":
                     string channel = string.Join(" ", args, 1, args.Length - 1);
                     if (!context.Input.CheckChannel(channel, true)) return false;
-                    target = new MessageTarget(MessageType.Channel, channel);
+                    target = new MessageTarget(MessageType.Channel, context.GetChannel(channel).Name);
                     break;
                 case "privatechannel":
                     if (!context.Input.CheckPrivateChannel(args[1], true)) return false;
-                    target = new MessageTarget(MessageType.PrivateChannel, args[1]);
+                    target = new MessageTarget(MessageType.PrivateChannel, Format.UppercaseFirst(args[1]));
                     break;
                 default:
                     context.Write(MessageClass.Error, "Expecting either 'character', 'channel' or 'privatechannel' as first argument for this command");

@@ -355,6 +355,8 @@ namespace Vha.Chat.UI
             // Setup events
             this.Document.Click -= new HtmlElementEventHandler(OnClick);
             this.Document.Click += new HtmlElementEventHandler(OnClick);
+            this.Document.MouseUp -= new HtmlElementEventHandler(OnMouseUp);
+            this.Document.MouseUp += new HtmlElementEventHandler(OnMouseUp);
             // Trigger event
             base.OnDocumentCompleted(e);
             // Clear buffer
@@ -382,6 +384,11 @@ namespace Vha.Chat.UI
         }
 
         protected void OnClick(object sender, HtmlElementEventArgs e)
+        {
+            e.ReturnValue = false;
+        }
+
+        void OnMouseUp(object sender, HtmlElementEventArgs e)
         {
             e.ReturnValue = false;
             // Get element

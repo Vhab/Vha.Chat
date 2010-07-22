@@ -538,6 +538,10 @@ namespace Vha.Chat.UI
 
         private void _outputBox_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
         {
+            // Handle only left and middle clicks
+            if (e.ButtonsPressed != MouseButtons.Left &&
+                e.ButtonsPressed != MouseButtons.Middle)
+                return;
             MessageTarget target = null;
             switch (e.Type)
             {
@@ -566,7 +570,7 @@ namespace Vha.Chat.UI
             if (target.Type == MessageType.Character &&
                 target.Target.ToLower() == this._context.Character.ToLower())
                 return;
-            if (!e.ShiftPressed)
+            if (!e.ShiftPressed && e.ButtonsPressed != MouseButtons.Middle)
             {
                 // Switch target
                 this.SetTarget(target);

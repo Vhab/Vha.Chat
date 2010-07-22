@@ -145,6 +145,8 @@ namespace Vha.Chat.UI
 
         void _outputBox_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
         {
+            // Handle only left mouse button
+            if (e.ButtonsPressed != MouseButtons.Left) return;
             switch (e.Type)
             {
                 case "text":

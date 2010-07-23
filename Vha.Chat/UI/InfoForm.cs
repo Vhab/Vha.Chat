@@ -43,40 +43,19 @@ namespace Vha.Chat.UI
             this._context = context;
             this._parent = parent;
             this._aoml = aoml;
+            this._info.Context = context;
             this._info.BackgroundColor = this.BackColor;
             this._info.ForegroundColor = this.ForeColor;
             this._info.MaximumLines = 0;
             this._info.Write(aoml, TextStyle.Default, false);
-            this._info.ReadyEvent += new AomlHandler(_info_ReadyEvent);
-            this._info.ClickedEvent += new AomlHandler<AomlClickedEventArgs>(_info_ClickedEvent);
+            this._info.ReadyEvent += new ChatOutputBoxHandler(_info_ReadyEvent);
         }
 
-        private void _info_ReadyEvent(AomlBox sender)
+        private void _info_ReadyEvent(ChatOutputBox sender)
         {
             this._info.Document.Body.Style =
                 this._info.Document.Body.Style +
                 "; padding: 7px;";
-        }
-
-        void _info_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
-        {
-            // Handle only left mouse button
-            if (e.ButtonsPressed != MouseButtons.Left) return;
-            switch (e.Type)
-            {
-                case "text":
-                    Utils.InvokeShow(this._parent, new InfoForm(this._context, this, e.Argument));
-                    break;
-                case "chatcmd":
-                    this._context.Input.Command(e.Argument);
-                    break;
-                case "itemref":
-                    Utils.InvokeShow(this._parent, new BrowserForm(this._context, e.Argument, BrowserFormType.Item));
-                    break;
-                default:
-                    this._context.Write(MessageClass.Error, "Unexpected link type '" + e.Type + "' in InfoForm");
-                    break;
-            }
         }
     }
 }

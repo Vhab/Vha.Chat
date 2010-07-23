@@ -28,12 +28,11 @@ namespace Vha.Chat.UI
     public partial class ChatPopupForm : BaseForm
     {
         protected Context _context;
-        protected Form _parent;
         protected MessageTarget _target;
         protected List<string> _history = new List<string>();
         protected int _historyIndex = 0;
 
-        public ChatPopupForm(Context context, Form parent, MessageTarget target)
+        public ChatPopupForm(Context context, MessageTarget target)
             : base(context, "ChatPopup")
         {
             InitializeComponent();
@@ -42,13 +41,12 @@ namespace Vha.Chat.UI
             this.Text += target.Target;
 
             this._target = target;
-            this._parent = parent;
             this._context = context;
             this._context.MessageEvent += new Handler<MessageEventArgs>(_context_MessageEvent);
 
+            this._outputBox.Context = context;
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
-            this._outputBox.ClickedEvent += new AomlHandler<AomlClickedEventArgs>(_outputBox_ClickedEvent);
 
             // Preload output window with messages
             MessageEventArgs[] messages = context.GetHistory(target);
@@ -82,7 +80,7 @@ namespace Vha.Chat.UI
             else
             {
                 if (!string.IsNullOrEmpty(args.Source.Character))
-                    line += string.Format("<span class=\"Link\">{0}</span>: ", args.Source.Character);
+                    line += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
             }
             line += args.Message;
             string aoml = string.Format(
@@ -140,27 +138,6 @@ namespace Vha.Chat.UI
                 // Handle the input
                 this._context.Input.Send(this._target, HTML.EscapeString(this._inputBox.Text), false);
                 this._inputBox.Text = "";
-            }
-        }
-
-        void _outputBox_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
-        {
-            // Handle only left mouse button
-            if (e.ButtonsPressed != MouseButtons.Left) return;
-            switch (e.Type)
-            {
-                case "text":
-                    Utils.InvokeShow(this._parent, new InfoForm(this._context, this, e.Argument));
-                    break;
-                case "chatcmd":
-                    this._context.Input.Command(e.Argument);
-                    break;
-                case "itemref":
-                    Utils.InvokeShow(this._parent, new BrowserForm(this._context, e.Argument, BrowserFormType.Item));
-                    break;
-                default:
-                    this._context.Write(MessageClass.Error, "Unexpected link type '" + e.Type + "' in ChatPopupForm");
-                    break;
             }
         }
     }

@@ -67,7 +67,7 @@ namespace Vha.Chat.Commands
                     return true;
                 }
                 // Create new window
-                Form form = new ChatPopupForm(context, Program.ApplicationContext.MainForm, target);
+                Form form = new ChatPopupForm(context, target);
                 form.FormClosed += new FormClosedEventHandler(_formClosed);
                 this._forms.Add(target, form);
                 Utils.InvokeShow(Program.ApplicationContext.MainForm, form);

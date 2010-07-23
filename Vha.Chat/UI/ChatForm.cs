@@ -75,9 +75,10 @@ namespace Vha.Chat.UI
             this._tree.Nodes.Add(this._privateChannels);
             this._tree.Nodes.Add(this._guests);
 
+            this._outputBox.Context = context;
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
-            this._outputBox.ClickedEvent += new AomlHandler<AomlClickedEventArgs>(_outputBox_ClickedEvent);
+            this._outputBox.ClickedEvent += new ChatOutputBoxHandler<ChatClickedEventArgs>(_outputBox_ClickedEvent);
 
             // Update buttons to reflect the state of chat.
             switch (this._context.State)
@@ -536,24 +537,15 @@ namespace Vha.Chat.UI
 
         }
 
-        private void _outputBox_ClickedEvent(AomlBox sender, AomlClickedEventArgs e)
+        private void _outputBox_ClickedEvent(ChatOutputBox sender, ChatClickedEventArgs e)
         {
-            // Handle only left and middle clicks
-            if (e.ButtonsPressed != MouseButtons.Left &&
-                e.ButtonsPressed != MouseButtons.Middle)
+            // Handle only left click, except for when shift is pressed
+            if (e.ButtonsPressed != MouseButtons.Left || e.ShiftPressed)
                 return;
+            // Determine target
             MessageTarget target = null;
             switch (e.Type)
             {
-                case "text":
-                    Utils.InvokeShow(this, new InfoForm(this._context, this, e.Argument));
-                    return;
-                case "chatcmd":
-                    this._context.Input.Command(e.Argument);
-                    return;
-                case "itemref":
-                    Utils.InvokeShow(this, new BrowserForm(this._context, e.Argument, BrowserFormType.Item));
-                    return;
                 case "character":
                     target = new MessageTarget(MessageType.Character, e.Argument);
                     break;
@@ -564,22 +556,16 @@ namespace Vha.Chat.UI
                     target = new MessageTarget(MessageType.PrivateChannel, e.Argument);
                     break;
                 default:
-                    this._context.Write(MessageClass.Error, "Unexpected link type '" + e.Type + "' in ChatForm");
                     return;
             }
+            // We'll be handling this event
+            e.Handled = true;
+            // Ignore local character
             if (target.Type == MessageType.Character &&
                 target.Target.ToLower() == this._context.Character.ToLower())
                 return;
-            if (!e.ShiftPressed && e.ButtonsPressed != MouseButtons.Middle)
-            {
-                // Switch target
-                this.SetTarget(target);
-            }
-            else
-            {
-                // Show popup
-                this._context.Input.Command("open " + target.Type.ToString() + " " + target.Target);
-            }
+            // Switch target
+            this.SetTarget(target);
         }
 
         private void _tree_DoubleClick(object sender, EventArgs e)

@@ -24,10 +24,10 @@ using System.Windows.Forms;
 
 namespace Vha.Chat.UI
 {
-    public delegate void AomlHandler(AomlBox sender);
-    public delegate void AomlHandler<T>(AomlBox sender, T e);
+    public delegate void ChatOutputBoxHandler(ChatOutputBox sender);
+    public delegate void ChatOutputBoxHandler<T>(ChatOutputBox sender, T e);
 
-    public class AomlClickedEventArgs
+    public class ChatClickedEventArgs
     {
         public readonly string Type;
         public readonly string Argument;
@@ -35,8 +35,9 @@ namespace Vha.Chat.UI
         public readonly bool ShiftPressed;
         public readonly bool CtrlPressed;
         public readonly Point Position;
+        public bool Handled;
 
-        public AomlClickedEventArgs(string type, string argument, MouseButtons buttonsPressed, bool shiftPressed, bool ctrlPressed, Point position)
+        public ChatClickedEventArgs(string type, string argument, MouseButtons buttonsPressed, bool shiftPressed, bool ctrlPressed, Point position)
         {
             this.Type = type;
             this.Argument = argument;
@@ -44,12 +45,13 @@ namespace Vha.Chat.UI
             this.ShiftPressed = shiftPressed;
             this.CtrlPressed = ctrlPressed;
             this.Position = position;
+            this.Handled = false;
         }
     }
 
-    public class AomlBox : WebBrowser
+    public class ChatOutputBox : WebBrowser
     {
-        public AomlBox() : base() { }
+        public ChatOutputBox() : base() { }
 
         #region Properties
         /// <summary>
@@ -100,12 +102,21 @@ namespace Vha.Chat.UI
             get { return this._maximumLines; }
             set { this._maximumLines = value; }
         }
+
+        /// <summary>
+        /// Gets or sets the current Context used to handle links
+        /// </summary>
+        public Context Context
+        {
+            get { return this._context; }
+            set { this._context = value; }
+        }
         #endregion
 
         #region Events
-        public event AomlHandler ReadyEvent;
+        public event ChatOutputBoxHandler ReadyEvent;
 
-        public event AomlHandler<AomlClickedEventArgs> ClickedEvent;
+        public event ChatOutputBoxHandler<ChatClickedEventArgs> ClickedEvent;
         #endregion
 
         #region Methods
@@ -165,6 +176,37 @@ namespace Vha.Chat.UI
                 aoml = "<span>" + aoml + "</span>";
             // Fill content
             this.Document.Body.InnerHtml += aoml;
+            // Update link colors
+            HtmlElementCollection links = this.Document.Body.GetElementsByTagName("A");
+            foreach (HtmlElement link in links)
+            {
+                // Ignore links without href
+                if (string.IsNullOrEmpty(link.GetAttribute("href")))
+                    continue;
+                // Set title
+                link.SetAttribute("title", link.GetAttribute("href"));
+                // Handle FC's 'no decoration' style
+                if (string.IsNullOrEmpty(link.Style)) continue;
+                if (link.Style.ToLower().Replace(" ", "").Contains("text-decoration:none"))
+                {
+                    HtmlElement parent = link.Parent;
+                    string color = "";
+                    while (parent != null)
+                    {
+                        if (parent.TagName.ToLower() == "font")
+                        {
+                            color = parent.GetAttribute("color");
+                            if (color != "") break;
+                        }
+                        parent = parent.Parent;
+                    }
+                    if (color != "")
+                    {
+                        link.Style = "color: " + color + ";";
+                        link.SetAttribute("className", "NoStyle");
+                    }
+                }
+            }
             // Apply the maximum lines rule
             while (this._maximumLines > 0 && this.Document.Body.Children.Count > this._maximumLines)
                 this.Document.Body.FirstChild.OuterHtml = "";
@@ -179,6 +221,7 @@ namespace Vha.Chat.UI
         private Color _foregroundColor = Color.Black;
         private int _maximumTexts = 50;
         private int _maximumLines = 0;
+        private Context _context = null;
 
         private Queue<WriteBuffer> _buffer = new Queue<WriteBuffer>();
         private Dictionary<string, string> _texts = new Dictionary<string,string>();
@@ -410,12 +453,60 @@ namespace Vha.Chat.UI
                     argument = this._texts[argument];
                 else argument = "";
             }
+
             // Raise event
-            AomlClickedEventArgs args = new AomlClickedEventArgs(
+            ChatClickedEventArgs args = new ChatClickedEventArgs(
                 type, argument, e.MouseButtonsPressed, e.ShiftKeyPressed,
                 e.CtrlKeyPressed, e.MousePosition);
             if (this.ClickedEvent != null)
                 this.ClickedEvent(this, args);
+            if (args.Handled || this._context == null) return;
+
+            // Default behavior
+            MessageTarget target = null;
+            switch (type)
+            {
+                case "text":
+                    // Left and middle clicks on text:// shows info window
+                    if (e.MouseButtonsPressed != MouseButtons.Left && e.MouseButtonsPressed != MouseButtons.Middle) return;
+                    Utils.InvokeShow(Program.ApplicationContext.MainForm, new InfoForm(this._context, Program.ApplicationContext.MainForm, argument));
+                    return;
+                case "chatcmd":
+                    // Left and middle clicks on chatcmd:// executes command
+                    if (e.MouseButtonsPressed != MouseButtons.Left && e.MouseButtonsPressed != MouseButtons.Middle) return;
+                    this._context.Input.Command(argument);
+                    return;
+                case "itemref":
+                    // Left and middle clicks on itemref:// shows item window
+                    if (e.MouseButtonsPressed != MouseButtons.Left && e.MouseButtonsPressed != MouseButtons.Middle) return;
+                    Utils.InvokeShow(Program.ApplicationContext.MainForm, new BrowserForm(this._context, argument, BrowserFormType.Item));
+                    return;
+                case "character":
+                    target = new MessageTarget(MessageType.Character, argument);
+                    break;
+                case "channel":
+                    target = new MessageTarget(MessageType.Channel, argument);
+                    break;
+                case "privchan":
+                    target = new MessageTarget(MessageType.PrivateChannel, argument);
+                    break;
+                default:
+                    this._context.Write(MessageClass.Error, "Unknown link type '" + type + "'");
+                    return;
+            }
+            // A 'message target' was clicked
+            if (target == null || target.Type == MessageType.None) return;
+            if (target.Type == MessageType.Character && target.Target.ToLower() == this._context.Character.ToLower()) return;
+            if (e.MouseButtonsPressed == MouseButtons.Left || e.MouseButtonsPressed == MouseButtons.Middle)
+            {
+                // Show popup window
+                this._context.Input.Command("open " + target.Type.ToString() + " " + target.Target);
+            }
+            else if (e.MouseButtonsPressed == MouseButtons.Right)
+            {
+                // Show 'right-click' context menu
+                
+            }
         }
         #endregion
 

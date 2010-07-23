@@ -32,7 +32,7 @@ namespace Vha.Chat.UI
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChatForm));
             this._tree = new System.Windows.Forms.TreeView();
             this._icons = new System.Windows.Forms.ImageList(this.components);
-            this._outputBox = new Vha.Chat.UI.AomlBox();
+            this._outputBox = new Vha.Chat.UI.ChatOutputBox();
             this._inputBox = new System.Windows.Forms.TextBox();
             this._target = new System.Windows.Forms.ComboBox();
             this._connect = new System.Windows.Forms.ToolStripButton();
@@ -408,7 +408,7 @@ namespace Vha.Chat.UI
         #endregion
 
         private System.Windows.Forms.TreeView _tree;
-        private Vha.Chat.UI.AomlBox _outputBox;
+        private Vha.Chat.UI.ChatOutputBox _outputBox;
         private System.Windows.Forms.TextBox _inputBox;
         private System.Windows.Forms.ComboBox _target;
         private System.Windows.Forms.ToolStripButton _disconnect;

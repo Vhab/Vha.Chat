@@ -122,6 +122,7 @@ namespace Vha.Chat.Data
             this._path = path;
             this._data = data;
             this._watcher = new FileSystemWatcher(this._directory, this._file);
+            this._watcher.NotifyFilter = NotifyFilters.LastWrite;
             this._watcher.Changed += new FileSystemEventHandler(_watcher_Changed);
             this._watcher.EnableRaisingEvents = true;
         }

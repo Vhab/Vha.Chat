@@ -43,6 +43,7 @@ namespace Vha.Chat.UI
         protected ChatTreeNode _guests = new ChatTreeNode(MessageType.Character, "Guests");
 
         protected Context _context;
+        protected ChatContextMenu _contextMenu;
         protected bool _initialized = false;
 
         protected List<string> _history = new List<string>();
@@ -75,6 +76,8 @@ namespace Vha.Chat.UI
             this._tree.Nodes.Add(this._privateChannels);
             this._tree.Nodes.Add(this._guests);
 
+            this._contextMenu = new ChatContextMenu(this, context, this);
+            this._outputBox.ContextMenu = this._contextMenu;
             this._outputBox.Context = context;
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
@@ -592,62 +595,25 @@ namespace Vha.Chat.UI
             // Set as selected node
             this._tree.SelectedNode = e.Node;
             // Show menu
-            if (e.Node.Parent == this._online)
+            if (e.Node.Parent == this._online || e.Node.Parent == this._offline)
             {
-                // Online character menu
-                this._characterMenu.Tag = target;
-                if (this._context.HasGuest(target))
-                {
-                    this._characterMenu_Invite.Enabled = false;
-                }
-                else
-                {
-                    this._characterMenu_Invite.Enabled = true;
-                }
-                this._characterMenu.Show((Control)sender, e.Location);
-            }
-            else if (e.Node.Parent == this._offline)
-            {
-                // Offline character menu
-                this._characterMenu.Tag = target;
-                this._characterMenu_Invite.Enabled = false;
-                this._characterMenu.Show((Control)sender, e.Location);
+                // Character menu
+                this._contextMenu.Show(new MessageTarget(MessageType.Character, target));
             }
             else if (e.Node.Parent == this._channels)
             {
-                this._channelMenu.Tag = target;
-                // Disable irrelevant buttons
-                if (this._context.GetChannel(target).Muted)
-                {
-                    this._channelMenu_Mute.Enabled = false;
-                    this._channelMenu_Unmute.Enabled = true;
-                }
-                else
-                {
-                    this._channelMenu_Mute.Enabled = true;
-                    this._channelMenu_Unmute.Enabled = false;
-                }
-                this._channelMenu.Show((Control)sender, e.Location);
+                // Channel menu
+                this._contextMenu.Show(new MessageTarget(MessageType.Channel, target));
             }
             else if (e.Node.Parent == this._privateChannels)
             {
-                this._privateChannelMenu.Tag = target;
-                // Can't leave the channel if it's our own channel
-                if (target == this._context.Character)
-                {
-                    this._privateChannelMenu_Leave.Enabled = false;
-                }
-                else
-                {
-                    this._privateChannelMenu_Leave.Enabled = true;
-                }
-                this._privateChannelMenu.Show((Control)sender, e.Location);
+                // Private channel menu
+                this._contextMenu.Show(new MessageTarget(MessageType.PrivateChannel, target));
             }
             else if (e.Node.Parent == this._guests)
             {
-                // Guest character menu
-                this._guestsMenu.Tag = target;
-                this._guestsMenu.Show((Control)sender, e.Location);
+                // Character menu
+                this._contextMenu.Show(new MessageTarget(MessageType.Character, target));
             }
         }
 
@@ -685,78 +651,6 @@ namespace Vha.Chat.UI
             if (this._context == null || !this._initialized) return;
             OptionsSize size = this._context.Options.GetSize("ChatForm", "Splitter", true);
             size.Size = this._container.SplitterDistance;
-        }
-
-        private void _channelMenu_TalkTo_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            SetTarget(new MessageTarget(MessageType.Channel, (string)this._channelMenu.Tag));
-        }
-
-        private void _channelMenu_Mute_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            this._context.Input.Command("mute " + (string)this._channelMenu.Tag);
-        }
-
-        private void _channelMenu_Unmute_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            this._context.Input.Command("unmute " + (string)this._channelMenu.Tag);
-        }
-
-        private void _privateChannelMenu_TalkTo_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
-            SetTarget(new MessageTarget(MessageType.PrivateChannel, (string)this._privateChannelMenu.Tag));
-        }
-
-        private void _privateChannelMenu_Leave_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
-            this._context.Input.Command("leave " + (string)this._privateChannelMenu.Tag);
-        }
-
-        private void _characterMenu_TalkTo_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            SetTarget(new MessageTarget(MessageType.Character, (string)this._characterMenu.Tag));
-        }
-
-        private void _characterMenu_Remove_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            this._context.Input.Command("friend remove " + (string)this._characterMenu.Tag);
-        }
-
-        private void _characterMenu_Invite_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            this._context.Input.Command("invite " + (string)this._characterMenu.Tag);
-        }
-
-        private void _guestsMenu_Kick_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._guestsMenu.Tag)) return;
-            this._context.Input.Command("kick " + (string)this._guestsMenu.Tag);
-        }
-
-        private void _channelMenu_Open_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._channelMenu.Tag)) return;
-            this._context.Input.Command("open channel " + (string)this._channelMenu.Tag);
-        }
-
-        private void _privateChannelMenu_Open_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._privateChannelMenu.Tag)) return;
-            this._context.Input.Command("open privatechannel " + (string)this._privateChannelMenu.Tag);
-        }
-
-        private void _characterMenu_Open_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty((string)this._characterMenu.Tag)) return;
-            this._context.Input.Command("open character " + (string)this._characterMenu.Tag);
         }
         #endregion
     }

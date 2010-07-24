@@ -51,8 +51,6 @@ namespace Vha.Chat.UI
 
     public class ChatOutputBox : WebBrowser
     {
-        public ChatOutputBox() : base() { }
-
         #region Properties
         /// <summary>
         /// Gets the default template which fills the control when first loaded
@@ -110,6 +108,15 @@ namespace Vha.Chat.UI
         {
             get { return this._context; }
             set { this._context = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the context menu used to handle right clicks on links
+        /// </summary>
+        public new ChatContextMenu ContextMenu
+        {
+            get { return this._contextMenu; }
+            set { this._contextMenu = value; }
         }
         #endregion
 
@@ -216,12 +223,15 @@ namespace Vha.Chat.UI
         }
         #endregion
 
+        public ChatOutputBox() : base() { }
+
         #region Private methods and members
         private Color _backgroundColor = Color.White;
         private Color _foregroundColor = Color.Black;
         private int _maximumTexts = 50;
         private int _maximumLines = 0;
         private Context _context = null;
+        private ChatContextMenu _contextMenu = null;
 
         private Queue<WriteBuffer> _buffer = new Queue<WriteBuffer>();
         private Dictionary<string, string> _texts = new Dictionary<string,string>();
@@ -504,8 +514,9 @@ namespace Vha.Chat.UI
             }
             else if (e.MouseButtonsPressed == MouseButtons.Right)
             {
+                if (this._contextMenu == null) return;
                 // Show 'right-click' context menu
-                
+                this._contextMenu.Show(target);
             }
         }
         #endregion

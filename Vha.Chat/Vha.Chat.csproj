@@ -76,6 +76,7 @@
     <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\ChatContextMenu.cs" />
     <Compile Include="UI\ChatOutputBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -220,6 +221,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
+    <None Include="Resources\CharacterDeleteBitmap.png" />
+    <None Include="Resources\CharacterAddBitmap.png" />
+    <None Include="Resources\CharacterDisabledBitmap.png" />
+    <None Include="Resources\CharacterInformationBitmap.png" />
     <None Include="Resources\PopupBitmap.png" />
     <None Include="Credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

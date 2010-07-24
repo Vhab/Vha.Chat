@@ -47,11 +47,14 @@
             // 
             // _outputBox
             // 
+            this._outputBox.AllowWebBrowserDrop = false;
             this._outputBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._outputBox.BackgroundColor = System.Drawing.Color.White;
+            this._outputBox.Context = null;
             this._outputBox.ForegroundColor = System.Drawing.Color.Black;
+            this._outputBox.IsWebBrowserContextMenuEnabled = false;
             this._outputBox.Location = new System.Drawing.Point(5, 5);
             this._outputBox.MaximumLines = 0;
             this._outputBox.MaximumTexts = 50;

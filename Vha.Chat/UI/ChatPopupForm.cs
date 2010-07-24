@@ -28,6 +28,7 @@ namespace Vha.Chat.UI
     public partial class ChatPopupForm : BaseForm
     {
         protected Context _context;
+        protected ChatContextMenu _contextMenu;
         protected MessageTarget _target;
         protected List<string> _history = new List<string>();
         protected int _historyIndex = 0;
@@ -44,6 +45,8 @@ namespace Vha.Chat.UI
             this._context = context;
             this._context.MessageEvent += new Handler<MessageEventArgs>(_context_MessageEvent);
 
+            this._contextMenu = new ChatContextMenu(this, context);
+            this._outputBox.ContextMenu = this._contextMenu;
             this._outputBox.Context = context;
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
@@ -136,6 +139,12 @@ namespace Vha.Chat.UI
                     this._history.RemoveAt(this._history.Count - 1);
                 this._historyIndex = 0;
                 // Handle the input
+                if (this._inputBox.Text.StartsWith(this._context.Input.Prefix))
+                {
+                    this._context.Input.Command(HTML.EscapeString(this._inputBox.Text));
+                    this._inputBox.Text = "";
+                    return;
+                }
                 this._context.Input.Send(this._target, HTML.EscapeString(this._inputBox.Text), false);
                 this._inputBox.Text = "";
             }

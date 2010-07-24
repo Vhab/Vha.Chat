@@ -95,9 +95,37 @@ namespace Vha.Chat.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap CharacterAddBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharacterAddBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap CharacterBitmap {
             get {
                 object obj = ResourceManager.GetObject("CharacterBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CharacterDeleteBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharacterDeleteBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CharacterDisabledBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharacterDisabledBitmap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CharacterInformationBitmap {
+            get {
+                object obj = ResourceManager.GetObject("CharacterInformationBitmap", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -137,11 +165,11 @@ namespace Vha.Chat.Properties {
         ///	    margin: 0px;
         ///    }
         ///    .Line {
-        ///        margin-left: 10px;
+        ///    	margin-left: 10px;
+        ///        text-indent: -10px;
         ///    }
         ///    .Time {
-        ///        margin-left: -10px;
-        ///    [rest of string was truncated]&quot;;.
+        ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Chat {
             get {

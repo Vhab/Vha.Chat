@@ -61,9 +61,9 @@ namespace Vha.Chat.UI
             this._channelMenu_Open = new ToolStripMenuItem(
                 "Open", Resources.PopupBitmap, new EventHandler(_channelMenu_Open_Click));
             this._channelMenu_Mute = new ToolStripMenuItem(
-                "Mute", Resources.ChannelBitmap, new EventHandler(_channelMenu_Mute_Click));
+                "Mute", Resources.ChannelDisabledBitmap, new EventHandler(_channelMenu_Mute_Click));
             this._channelMenu_Unmute = new ToolStripMenuItem(
-                "Unmute", Resources.ChannelDisabledBitmap, new EventHandler(_channelMenu_Unmute_Click));
+                "Unmute", Resources.ChannelBitmap, new EventHandler(_channelMenu_Unmute_Click));
             this._channelMenu = new ContextMenuStrip();
             this._channelMenu.Items.AddRange(new ToolStripItem[] {
                 this._channelMenu_TalkTo,

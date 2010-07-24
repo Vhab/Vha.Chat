@@ -24,6 +24,7 @@ using System.IO;
 using Vha.Chat;
 using Vha.Chat.UI;
 using Vha.Common;
+using System.Reflection;
 
 namespace Vha.Chat
 {
@@ -39,6 +40,13 @@ namespace Vha.Chat
         [STAThread]
         static void Main()
         {
+            // Fix working directory
+            string path = Assembly.GetExecutingAssembly().Location;
+            if (path.LastIndexOf(Path.DirectorySeparatorChar) > 0)
+            {
+                path = Path.GetDirectoryName(path);
+                Environment.CurrentDirectory = path;
+            }
             // Create context
             Context context = new Context();
             // Initialize Windows.Forms application

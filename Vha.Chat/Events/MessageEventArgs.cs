@@ -26,14 +26,16 @@ namespace Vha.Chat.Events
 {
     public class MessageEventArgs
     {
+        public readonly DateTime Time;
         public readonly MessageSource Source;
         public readonly MessageClass Class;
         public readonly string Message;
 
-        public MessageEventArgs(MessageSource source, MessageClass messageClass, string message)
+        public MessageEventArgs(DateTime time, MessageSource source, MessageClass messageClass, string message)
         {
             if (source == null)
                 throw new ArgumentNullException();
+            this.Time = time;
             this.Source = source;
             this.Class = messageClass;
             this.Message = message;

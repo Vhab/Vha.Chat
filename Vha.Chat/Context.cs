@@ -439,7 +439,7 @@ namespace Vha.Chat
         {
             if (source == null)
                 throw new ArgumentNullException("source");
-            MessageEventArgs args = new MessageEventArgs(source, messageClass, message);
+            MessageEventArgs args = new MessageEventArgs(DateTime.Now, source, messageClass, message);
             // Log message in history buffer
             MessageTarget target = source.GetTarget();
             if (target.Valid)

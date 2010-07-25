@@ -20,8 +20,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
-using Vha.Net;
+using System.IO;
 using Vha.Chat.Data;
 
 namespace Vha.Chat
@@ -224,7 +223,7 @@ namespace Vha.Chat
         internal Options(Context context)
         {
             // Load data
-            string path = context.Configuration.OptionsPath + context.Configuration.OptionsFile;
+            string path = context.Configuration.OptionsPath + Path.DirectorySeparatorChar + context.Configuration.OptionsFile;
             this._watcher = new Watcher(new OptionsV1(), path);
             this._watcher.LoadedEvent += new WatcherHandler(_watcher_LoadedEvent);
             this._watcher.Load();

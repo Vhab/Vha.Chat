@@ -28,7 +28,7 @@ namespace Vha.Chat.Data
     [XmlRoot("Root")]
     public class ConfigurationV1 : Base
     {
-        public string OptionsPath = ".\\";
+        public string OptionsPath = ".";
         public string OptionsFile = "Options.xml";
         public string IgnoresFile = "Ignores.xml";
         [XmlElement("Dimension")]

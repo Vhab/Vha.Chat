@@ -20,9 +20,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Vha.Chat.Data;
-using Vha.Common;
 using Vha.Chat.Events;
+using Vha.Common;
 
 namespace Vha.Chat
 {
@@ -214,7 +215,7 @@ namespace Vha.Chat
         {
             this._context = context;
             this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);
-            this._watcher = new Watcher(new IgnoresV1(), this._context.Configuration.OptionsPath + this._context.Configuration.IgnoresFile);
+            this._watcher = new Watcher(new IgnoresV1(), this._context.Configuration.OptionsPath + Path.DirectorySeparatorChar + this._context.Configuration.IgnoresFile);
             this._watcher.LoadedEvent += new WatcherHandler(_watcher_LoadedEvent);
             this._watcher.Load();
             this._data = (IgnoresV1)this._watcher.Data;

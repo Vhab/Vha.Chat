@@ -37,6 +37,7 @@ namespace Vha.AOML
         SingleQuote, // '
         DoubleQuote, // "
         Equal, // =
+        Slash, // /
         Text // anything, else
     }
 

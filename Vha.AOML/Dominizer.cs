@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.AOML
 * Copyright (C) 2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
@@ -21,33 +21,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Vha.AOML.DOM;
 
 namespace Vha.AOML
 {
     /// <summary>
-    /// This class represents an AOML closing tag
+    /// This class allows you to transform a string of AOML into a DOM.Element tree
     /// </summary>
-    public class CloseNode : Node
+    public class Dominizer
     {
-        /// <summary>
-        /// Returns the type of this AOML closing tag
-        /// </summary>
-        public readonly string Name;
-        /// <summary>
-        /// Creates a clone of the current node
-        /// </summary>
-        /// <returns>A new CloseNode instance</returns>
-        public override Node Clone()
-        {
-            return new CloseNode(this.Name, "");
-        }
-
-        #region Internal
-        internal CloseNode(string name, string raw)
-            : base(NodeType.Close, raw)
-        {
-            this.Name = name.ToLower();
-        }
-        #endregion
+        public ElementCollection Parse(string aoml) { return null; }
     }
 }

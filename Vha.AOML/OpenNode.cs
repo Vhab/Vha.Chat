@@ -33,6 +33,15 @@ namespace Vha.AOML
         /// Returns the type of this AOML opening tag
         /// </summary>
         public readonly string Name;
+
+        /// <summary>
+        /// Returns whether this element is automatically closed
+        /// </summary>
+        public bool Closed
+        {
+            get { return this._closed; }
+            internal set { this._closed = value; }
+        }
         
         /// <summary>
         /// Returns the amount of attributes contained within this node
@@ -64,20 +73,57 @@ namespace Vha.AOML
             return this._attributes[name];
         }
 
-        #region Internal
-        internal Dictionary<string, string> _attributes;
+        /// <summary>
+        /// Returns the name of an attribute for iteration purposes
+        /// </summary>
+        /// <param name="index">A value 0 or greater and less than Count</param>
+        /// <returns>The attribute name at a given index</returns>
+        public string GetAttributeName(int index)
+        {
+            if (index < 0 || index >= this.Count)
+                throw new IndexOutOfRangeException();
+            foreach (string name in this._attributes.Keys)
+            {
+                if (index == 0)
+                    return name;
+                index--;
+            }
+            return null;
+        }
 
-        internal OpenNode(string name)
-            : base(NodeType.Open)
+        /// <summary>
+        /// Creates a clone of the current node
+        /// </summary>
+        /// <returns>A new OpenNode instance</returns>
+        public override Node Clone()
+        {
+            OpenNode node = new OpenNode(this.Name, "", this.Closed);
+            for (int i = 0; i < this.Count; i++)
+            {
+                string attr = this.GetAttributeName(i);
+                node.AddAttribute(attr, this.GetAttribute(attr));
+            }
+            return node;
+        }
+
+        #region Internal
+        private Dictionary<string, string> _attributes;
+        private bool _closed;
+
+        internal OpenNode(string name, string raw, bool closed)
+            : base(NodeType.Open, raw)
         {
             this.Name = name.ToLower();
+            this._closed = closed;
             this._attributes = new Dictionary<string, string>();
         }
 
         internal void AddAttribute(string name, string value)
         {
             name = name.ToLower();
-            this._attributes[name] = value;
+            if (this._attributes.ContainsKey(name))
+                this._attributes[name] = value;
+            else this._attributes.Add(name, value);
         }
 
         internal void RemoveAttribute(string name)

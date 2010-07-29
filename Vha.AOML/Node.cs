@@ -43,11 +43,22 @@ namespace Vha.AOML
         /// Returns the type of this Node
         /// </summary>
         public readonly NodeType Type;
+        /// <summary>
+        /// The raw unparsed HTML that forms this node.
+        /// This value is not garanteed to be filled and might be left empty.
+        /// </summary>
+        public readonly string Raw;
+        /// <summary>
+        /// Creates a clone of the current node
+        /// </summary>
+        /// <returns>A new Node instance</returns>
+        public abstract Node Clone();
 
         #region Internal
-        internal Node(NodeType type)
+        internal Node(NodeType type, string raw)
         {
             this.Type = type;
+            this.Raw = raw;
         }
         #endregion
     }

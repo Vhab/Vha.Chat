@@ -33,10 +33,18 @@ namespace Vha.AOML
         /// Returns the text content associated with this node
         /// </summary>
         public readonly string Value;
+        /// <summary>
+        /// Creates a clone of the current node
+        /// </summary>
+        /// <returns>A new ContentNode instance</returns>
+        public override Node Clone()
+        {
+            return new ContentNode(this.Value, "");
+        }
 
         #region Internal
-        internal ContentNode(string value)
-            : base(NodeType.Content)
+        internal ContentNode(string value, string raw)
+            : base(NodeType.Content, raw)
         {
             this.Value = value;
         }

@@ -94,8 +94,21 @@ namespace Vha.AOML.DOM
             if (_colors == null)
             {
                 MemoryStream stream = new MemoryStream(Properties.Resources.TextColors);
-                _colors = new XmlDocument();
-                _colors.Load(stream);
+                XmlDocument xml = new XmlDocument();
+                xml.Load(stream);
+                Dictionary<string, string> dictionary = new Dictionary<string, string>();
+                // Fetch colors
+                XmlNodeList colors = xml.GetElementsByTagName("HTMLColor");
+                foreach (XmlNode node in colors)
+                {
+                    // Some safety
+                    if (node.Attributes["color"] == null) continue;
+                    if (node.Attributes["name"] == null) continue;
+                    dictionary.Add(
+                        node.Attributes["name"].Value.ToLower(),
+                        node.Attributes["color"].Value.ToLower());
+                }
+                _colors = dictionary;
             }
             // Check for # prefix
             if (color.StartsWith("#"))
@@ -110,17 +123,11 @@ namespace Vha.AOML.DOM
                 else if (color.Length == 6) return FromHex(color);
                 else return null;
             }
-            // Fetch colors
-            XmlNodeList colors = _colors.GetElementsByTagName("HTMLColor");
-            foreach (XmlNode node in colors)
+            // Fetch named color
+            color = color.ToLower();
+            if (_colors.ContainsKey(color))
             {
-                // Some safety
-                if (node.Attributes["color"] == null) continue;
-                if (node.Attributes["name"] == null) continue;
-                // Check if this is the one
-                if (string.Equals(node.Attributes["name"].Value, color, StringComparison.CurrentCultureIgnoreCase) == false) continue;
-                // Convert the value to something sensible
-                return FromString(node.Attributes["color"].Value);
+                return FromString(_colors[color]);
             }
             return null;
         }
@@ -149,8 +156,13 @@ namespace Vha.AOML.DOM
             }
         }
 
+        public override string ToString()
+        {
+            return string.Format("{0:X2}{1:X2}{2:X2}", this.Red, this.Green, this.Blue);
+        }
+
         #region Internal
-        private static XmlDocument _colors = null;
+        private static Dictionary<string, string> _colors = null;
         #endregion
     }
 }

@@ -29,6 +29,7 @@ namespace Vha.AOML.DOM
     /// </summary>
     public enum Alignment
     {
+        Inherit,
         Left,
         Right,
         Center

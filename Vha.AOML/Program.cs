@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Vha.AOML.DOM;
 
 namespace Vha.AOML
 {
@@ -11,20 +12,41 @@ namespace Vha.AOML
         // Application entry
         static void Main(string[] args)
         {
-            string data = "<test /><noes><font color=\"<font color=\"green\" grumble wobble=red color=orange><font color = \'red\'>888<font color=blue>999<center>123<right>3</font>4</font>5<div /></div>6</center><br></br>< img src=\"123\" />678";
-            Parse(data);
+            string data = "<test /><noes><a href=\"charref://123/0/<font color='CCInfoHeader'><font color = 'red'>888<font color=blue>999<center>123<right>3\"></font>4</font>5<div /></div>6</center><br></br>< img src=\"123\" />678";
+            //Parse(data);
+            //Dominize(data);
 
             data = "<font color=#79CBE6>Your query <font color=#FFFFFF>combined</font> has returned <font color=#FFFFFF>65</font> results\n" +
                 "  <font color=#79CBE6>Blackmane's Combined Officer's Headwear <font color=#CCCCCC>[</font><a href='itemref://257383/257383/300'>300</a><font color=#CCCCCC>] </font></font>\n" +
                 "  <font color=#79CBE6>Combined Bio Samples - Stage Four <font color=#CCCCCC>[</font><a href='itemref://267777/267777/250'>250</a><font color=#CCCCCC>] </font></font>\n" +
                 "  <font color=#79CBE6>Combined Bio Samples - Stage One <font color=#CCCCCC>[</font><a href='itemref://267774/267774/250'>250</a><font color=#CCCCCC>] </font></font>\n" +
                 "  <font color=#79CBE6>Combined Bio Samples - Stage Three <font color=#CCCCCC>[</font><a href='itemref://267776/267776/250'>250</a><font color=#CCCCCC>] </font></font>\n" +
-                "  <font color=#79CBE6>Combined Bio Samples - Stage Two <font color=#CCCCCC>[</font><a href='itemref://267775/267775/250'>250</a><font color=#CCCCCC>] </font></font>\n" +
-                "[vhabbots:Vhabion@chat.d1.funcom.com:7101] [Itemsbot]: <font color=#79CBE6>More Results »» <a href=\"text://<font color=#FFFFFF><font color=#3C8799>:::::::::::</font> VhaBot Client Terminal <font color=#3C8799>:::::::::::</font>\n" +
-                "<font color=#3C8799>« </font><a href='chatcmd:///tell Itemsbot version' style='text-decoration:none'>About</a><font color=#3C8799> »     « </font><a href='chatcmd:///tell Itemsbot help' style='text-decoration:none'>Help</a><font color=#3C8799> »     « </font><a href='chatcmd:///close InfoView' style='text-decoration:none'>Close Terminal</a><font color=#3C8799> »</font>\n" +
-                "</font><font color=#3C8799>¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯</font>\">clickme";
-            data = "[Clan OOC] Flikfak: <a href=\"text://  <img src=rdb://214739> <font color=#FF3300>My Tradeskill Service</font>  <img src=rdb://214739><br> <br>Mech. Engi     --> 2100<br>Elec. Engi      --> 2100<br>Quantum FT   --> 2100<br>Weapon Smt  --> 2100<br>Pharma Tech  --> 1950</font><br>Nano Program --> 1800<br>Comp. Liter    --> 1800<br>Psychology    --> 1650<br>Chemistry      --> 2100<br>Tutoring        --> 1600<br>Break&Entry   --> 1250<br><br>All Tredaskills without city<br><br><a href='chatcmd:///tell Flikfak Master, i need your help>Tell Flik</a> or get <a href='chatcmd:///fxscript EP03_Orbital_Attack #\n /fxscript EP03_Bomber_Event_01 #\n /text Boom>Nuked!</a>\">Need a Builder?</a> Engi @ Missi Term Nord</a>";
+                "  <font color=#79CBE6>Combined Bio Samples - Stage Two <font color=#CCCCCC>[</font><a href='itemref://267775/267775/250'>250</a><font color=#CCCCCC>] </font></font>\n";
+            data = "<font color=#79CBE6>More Results »» <a href=\"text://<font color=#FFFFFF><font color=#3C8799>:::::::::::</font> VhaBot Client Terminal <font color=#3C8799>:::::::::::</font>\n" +
+"<font color=#3C8799>« </font><a href='chatcmd:///tell Itemsbot version' style='text-decoration:none'>About</a><font color=#3C8799> »     « </font><a href='chatcmd:///tell Itemsbot help' style='text-decoration:none'>Help</a><font color=#3C8799> »     « </font><a href='chatcmd:///close InfoView' style='text-decoration:none'>Close Terminal</a><font color=#3C8799> »</font>\n" +
+"</font><font color=#3C8799>¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯</font>\n" +
+"<font color=#FFFFFF>Search Results</font>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Footwear <font color=#CCCCCC>[</font><a href='itemref://246703/246704/1'>1</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246703/246704/300'>300</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256303>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Gloves <font color=#CCCCCC>[</font><a href='itemref://246699/246700/1'>1</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246699/246700/300'>300</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256298>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Headwear <font color=#CCCCCC>[</font><a href='itemref://246693/246694/1'>1</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246693/246694/300'>300</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256305>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Jacket <font color=#CCCCCC>[</font><a href='itemref://246695/246696/1'>1</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246695/246696/300'>300</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256302>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Legwear <font color=#CCCCCC>[</font><a href='itemref://246701/246702/300'>300</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246701/246702/1'>1</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256306>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Legwear <font color=#CCCCCC>[</font><a href='itemref://246701/246702/1'>1</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246701/246702/300'>300</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256306>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Sleeves <font color=#CCCCCC>[</font><a href='itemref://246697/246698/300'>300</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246697/246698/1'>1</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256301>\n" +
+"<font color=#79CBE6>Combined Sharpshooter's Sleeves <font color=#CCCCCC>[</font><a href='itemref://246697/246698/1'>1</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246697/246698/300'>300</a><font color=#CCCCCC>]</font></font>\n" +
+"<img src=rdb://256301>\n" +
+"\">Click to View</a>";
+            //data = "[Clan OOC] Flikfak: <a href=text://  <img src=rdb://214739> <font color=#FF3300>My Tradeskill Service</font>  <img src=rdb://214739><br> <br>Mech. Engi     --> 2100<br>Elec. Engi      --> 2100<br>Quantum FT   --> 2100<br>Weapon Smt  --> 2100<br>Pharma Tech  --> 1950</font><br>Nano Program --> 1800<br>Comp. Liter    --> 1800<br>Psychology    --> 1650<br>Chemistry      --> 2100<br>Tutoring        --> 1600<br>Break&Entry   --> 1250<br><br>All Tredaskills without city<br><br><a href='chatcmd:///tell Flikfak Master, i need your help>Tell Flik</a> or get <a href='chatcmd:///fxscript EP03_Orbital_Attack #\n /fxscript EP03_Bomber_Event_01 #\n /text Boom>Nuked!</a>\">Need a Builder?</a> Engi @ Missi Term Nord</a>";
             //Parse(data);
+            Dominize(data);
+
             Console.ReadLine();
         }
 
@@ -67,9 +89,77 @@ namespace Vha.AOML
             Console.WriteLine();
             foreach (Node node in n)
             {
-                Console.Write(node.Raw);
+                //Console.Write(node.Raw);
             }
             Console.WriteLine();
+        }
+
+        static void Dominize(string aoml)
+        {
+            Dominizer d = new Dominizer();
+            Element e = d.Parse(aoml);
+            PrintElement("", e);
+        }
+
+        static void PrintElement(string prefix, Element e)
+        {
+            Console.Write(prefix + e.Type.ToString());
+            switch (e.Type)
+            {
+                case ElementType.Align:
+                    AlignElement align = (AlignElement)e;
+                    Console.Write(": " + align.Alignment.ToString());
+                    break;
+                case ElementType.Break:
+                    break;
+                case ElementType.Color:
+                    ColorElement color = (ColorElement)e;
+                    Console.Write(": " + color.Color.ToString());
+                    break;
+                case ElementType.Container:
+                    break;
+                case ElementType.Image:
+                    ImageElement image = (ImageElement)e;
+                    Console.Write(": " + image.ImageType.ToString() + ":" + image.Image);
+                    break;
+                case ElementType.Link:
+                    LinkElement link = (LinkElement)e;
+                    Console.Write(": " + link.Link.Type.ToString());
+                    if (!link.Stylized) Console.Write(" NoStyle");
+                    if (link.Link.Type == LinkType.Element)
+                    {
+                        Console.WriteLine();
+                        ElementLink el = (ElementLink)link.Link;
+                        PrintElement(prefix + "| ", el.Element);
+                    }
+                    else if (link.Link.Type == LinkType.Item)
+                    {
+                        ItemLink i = (ItemLink)link.Link;
+                        Console.WriteLine();
+                        Console.Write(prefix + "|" +
+                            " lid=" + i.LowID.ToString() +
+                            " hid=" + i.HighID.ToString() +
+                            " ql=" + i.Quality.ToString());
+                    }
+                    else if (link.Link.Type == LinkType.Command)
+                    {
+                        CommandLink c = (CommandLink)link.Link;
+                        Console.WriteLine();
+                        Console.Write(prefix + "| command=" + c.Command);
+                    }
+                    break;
+                case ElementType.Text:
+                    TextElement text = (TextElement)e;
+                    Console.Write(": " + text.Text.Replace("\n", "\\n"));
+                    break;
+                case ElementType.Underline:
+                    break;
+            }
+            if (Console.CursorLeft != 0)
+                Console.WriteLine();
+            if (e.Children == null) return;
+            foreach (Element c in e.Children)
+                PrintElement(prefix + "  ", c);
         }
     }
 }

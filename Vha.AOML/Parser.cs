@@ -33,7 +33,7 @@ namespace Vha.AOML
         /// <summary>
         /// Allows attributes without " or ' wrapper inside tags
         /// </summary>
-        Default,
+        Normal,
         /// <summary>
         /// Allows attributes without closing ' inside tags
         /// </summary>
@@ -321,8 +321,6 @@ namespace Vha.AOML
             e.Add("font");
             e.Add("a");
             e.Add("u");
-            e.Add("b");
-            e.Add("i");
             this._inlineElements = e;
             e = new List<string>();
             e.Add("div");
@@ -341,7 +339,7 @@ namespace Vha.AOML
 
         #region Internal
         private Regex _regex = null;
-        private ParserMode _mode = ParserMode.Default;
+        private ParserMode _mode = ParserMode.Normal;
         private List<string> _singularElements;
         private List<string> _inlineElements;
         private List<string> _blockElements;

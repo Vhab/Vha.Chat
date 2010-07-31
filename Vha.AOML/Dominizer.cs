@@ -20,7 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Vha.AOML.DOM;
 
 namespace Vha.AOML

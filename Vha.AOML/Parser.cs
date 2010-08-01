@@ -41,7 +41,7 @@ namespace Vha.AOML
     }
 
     /// <summary>
-    /// This class allows you to transform a string of AOML into a HTML.Node stream
+    /// This class allows you to transform a string of AOML into a NodeCollection
     /// </summary>
     public class Parser
     {
@@ -50,7 +50,7 @@ namespace Vha.AOML
         /// </summary>
         public ParserMode Mode
         {
-            get { return _mode; }
+            get { return this._mode; }
             set
             {
                 this._mode = value;
@@ -59,7 +59,16 @@ namespace Vha.AOML
         }
 
         /// <summary>
-        /// Parses an AOML string into HTML nodes
+        /// Whether to automatically convert newline symbols in a ContentNode to an OpenNode("br", "", true)
+        /// </summary>
+        public bool NewlineToBreak
+        {
+            get { return this._newlineToBreak; }
+            set { this._newlineToBreak = value; }
+        }
+
+        /// <summary>
+        /// Parses an AOML string into open, close and content nodes
         /// </summary>
         /// <param name="aoml">The aoml string to be parsed</param>
         public NodeCollection Parse(string aoml)
@@ -88,6 +97,8 @@ namespace Vha.AOML
             int regexAttribute = regex.GroupNumberFromName("attribute");
             int regexValue = regex.GroupNumberFromName("value");
             int regexClosed = regex.GroupNumberFromName("closed");
+            // Convert to unix line endings
+            aoml = aoml.Replace("\r\n", "\n");
             // Parse AOML
             MatchCollection matches = regex.Matches(aoml);
             int offset = 0;
@@ -97,7 +108,7 @@ namespace Vha.AOML
                 if (match.Index > offset)
                 {
                     string content = aoml.Substring(offset, match.Index - offset);
-                    nodes.Add(new ContentNode(content, content));
+                    _addContent(nodes, content, content);
                 }
                 offset = match.Index + match.Length;
                 // Extract tag
@@ -106,7 +117,7 @@ namespace Vha.AOML
                 if (string.IsNullOrEmpty(name))
                 {
                     // No name, let's assume it's just text
-                    nodes.Add(new ContentNode(raw, raw));
+                    _addContent(nodes, raw, raw);
                     continue;
                 }
                 bool closer = !string.IsNullOrEmpty(match.Groups[regexCloser].Value);
@@ -135,7 +146,7 @@ namespace Vha.AOML
             if (offset < aoml.Length)
             {
                 string content = aoml.Substring(offset);
-                nodes.Add(new ContentNode(content, content));
+                _addContent(nodes, content, content);
             }
             return nodes;
         }
@@ -203,7 +214,7 @@ namespace Vha.AOML
                     continue;
                 }
                 // Replace node as content node
-                nodes.Replace(node, new ContentNode(node.Raw, node.Raw));
+                this._replaceContent(nodes, node, node.Raw, node.Raw);
             }
             // And we're done!
             nodes.Reset();
@@ -340,10 +351,52 @@ namespace Vha.AOML
         #region Internal
         private Regex _regex = null;
         private ParserMode _mode = ParserMode.Normal;
+        private bool _newlineToBreak = false;
         private List<string> _singularElements;
         private List<string> _inlineElements;
         private List<string> _blockElements;
         private List<string> _validAttributes;
+
+        private Node[] _createContent(string content, string raw)
+        {
+            List<Node> nodes = new List<Node>();
+            if (string.IsNullOrEmpty(content)) nodes.ToArray();
+            if (this.NewlineToBreak)
+            {
+                string[] contentParts = content.Split('\n');
+                string[] rawParts = raw != null ? raw.Split('\n') : new string[] { };
+                int i = 0;
+                foreach (string c in contentParts)
+                {
+                    nodes.Add(new ContentNode(c, raw.Length > i ? rawParts[i] : ""));
+                    if (i + 1 < contentParts.Length)
+                        nodes.Add(new OpenNode("br", raw.Length > i ? "\n" : "", true));
+                    i++;
+                }
+            }
+            else
+            {
+                nodes.Add(new ContentNode(content, raw));
+            }
+            return nodes.ToArray();
+        }
+
+        private void _addContent(NodeCollection nodes, string content, string raw)
+        {
+            if (nodes == null)
+                throw new ArgumentNullException();
+            Node[] nn = _createContent(content, raw);
+            foreach (Node n in nn) nodes.Add(n);
+        }
+
+        private void _replaceContent(NodeCollection nodes, Node target, string content, string raw)
+        {
+            if (nodes == null || target == null)
+                throw new ArgumentNullException();
+            Node[] nn = _createContent(content, raw);
+            foreach (Node n in nn) nodes.InsertBefore(target, n);
+            nodes.Remove(target);
+        }
         #endregion
     }
 }

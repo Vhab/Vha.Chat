@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Vha.AOML.DOM;
+using Vha.AOML.Formatting;
 
 namespace Vha.AOML
 {
@@ -43,7 +44,7 @@ namespace Vha.AOML
 "<font color=#79CBE6>Combined Sharpshooter's Sleeves <font color=#CCCCCC>[</font><a href='itemref://246697/246698/1'>1</a><font color=#CCCCCC>] </font><font color=#CCCCCC>[</font><a href='itemref://246697/246698/300'>300</a><font color=#CCCCCC>]</font></font>\n" +
 "<img src=rdb://256301>\n" +
 "\">Click to View</a>";
-            //data = "[Clan OOC] Flikfak: <a href=text://  <img src=rdb://214739> <font color=#FF3300>My Tradeskill Service</font>  <img src=rdb://214739><br> <br>Mech. Engi     --> 2100<br>Elec. Engi      --> 2100<br>Quantum FT   --> 2100<br>Weapon Smt  --> 2100<br>Pharma Tech  --> 1950</font><br>Nano Program --> 1800<br>Comp. Liter    --> 1800<br>Psychology    --> 1650<br>Chemistry      --> 2100<br>Tutoring        --> 1600<br>Break&Entry   --> 1250<br><br>All Tredaskills without city<br><br><a href='chatcmd:///tell Flikfak Master, i need your help>Tell Flik</a> or get <a href='chatcmd:///fxscript EP03_Orbital_Attack #\n /fxscript EP03_Bomber_Event_01 #\n /text Boom>Nuked!</a>\">Need a Builder?</a> Engi @ Missi Term Nord</a>";
+            data = "[Clan OOC] Flikfak: <a href=\"text://  <img src=rdb://214739> <font color=#FF3300>My Tradeskill Service</font>  <img src=rdb://214739><br> <br>Mech. Engi     --> 2100<br>Elec. Engi      --> 2100<br>Quantum FT   --> 2100<br>Weapon Smt  --> 2100<br>Pharma Tech  --> 1950</font><br>Nano Program --> 1800<br>Comp. Liter    --> 1800<br>Psychology    --> 1650<br>Chemistry      --> 2100<br>Tutoring        --> 1600<br>Break&Entry   --> 1250<br><br>All Tredaskills without city<br><br><a href='chatcmd:///tell Flikfak Master, i need your help>Tell Flik</a> or get <moo href='chatcmd:///fxscript EP03_Orbital_Attack #\n /fxscript EP03_Bomber_Event_01 #\n /text Boom>Nuked!</a>\">Need a Builder?</a> Engi @ Missi Term Nord</a>";
             //Parse(data);
             Dominize(data);
 
@@ -54,6 +55,7 @@ namespace Vha.AOML
         {
             Parser p = new Parser();
             p.Mode = ParserMode.Compatibility;
+            p.NewlineToBreak = true;
             NodeCollection n = p.Parse(aoml);
             p.Sanitize(n);
             p.Balance(n);
@@ -89,7 +91,7 @@ namespace Vha.AOML
             Console.WriteLine();
             foreach (Node node in n)
             {
-                //Console.Write(node.Raw);
+                Console.Write(node.Raw.Replace("\n", "\\n"));
             }
             Console.WriteLine();
         }
@@ -98,68 +100,8 @@ namespace Vha.AOML
         {
             Dominizer d = new Dominizer();
             Element e = d.Parse(aoml);
-            PrintElement("", e);
-        }
-
-        static void PrintElement(string prefix, Element e)
-        {
-            Console.Write(prefix + e.Type.ToString());
-            switch (e.Type)
-            {
-                case ElementType.Align:
-                    AlignElement align = (AlignElement)e;
-                    Console.Write(": " + align.Alignment.ToString());
-                    break;
-                case ElementType.Break:
-                    break;
-                case ElementType.Color:
-                    ColorElement color = (ColorElement)e;
-                    Console.Write(": " + color.Color.ToString());
-                    break;
-                case ElementType.Container:
-                    break;
-                case ElementType.Image:
-                    ImageElement image = (ImageElement)e;
-                    Console.Write(": " + image.ImageType.ToString() + ":" + image.Image);
-                    break;
-                case ElementType.Link:
-                    LinkElement link = (LinkElement)e;
-                    Console.Write(": " + link.Link.Type.ToString());
-                    if (!link.Stylized) Console.Write(" NoStyle");
-                    if (link.Link.Type == LinkType.Element)
-                    {
-                        Console.WriteLine();
-                        ElementLink el = (ElementLink)link.Link;
-                        PrintElement(prefix + "| ", el.Element);
-                    }
-                    else if (link.Link.Type == LinkType.Item)
-                    {
-                        ItemLink i = (ItemLink)link.Link;
-                        Console.WriteLine();
-                        Console.Write(prefix + "|" +
-                            " lid=" + i.LowID.ToString() +
-                            " hid=" + i.HighID.ToString() +
-                            " ql=" + i.Quality.ToString());
-                    }
-                    else if (link.Link.Type == LinkType.Command)
-                    {
-                        CommandLink c = (CommandLink)link.Link;
-                        Console.WriteLine();
-                        Console.Write(prefix + "| command=" + c.Command);
-                    }
-                    break;
-                case ElementType.Text:
-                    TextElement text = (TextElement)e;
-                    Console.Write(": " + text.Text.Replace("\n", "\\n"));
-                    break;
-                case ElementType.Underline:
-                    break;
-            }
-            if (Console.CursorLeft != 0)
-                Console.WriteLine();
-            if (e.Children == null) return;
-            foreach (Element c in e.Children)
-                PrintElement(prefix + "  ", c);
+            Formatter f = new TextFormatter();
+            Console.WriteLine(f.Format(e));
         }
     }
 }

@@ -153,6 +153,7 @@ namespace Vha.AOML
         {
             this._parser = new Parser();
             this._parser.Mode = ParserMode.Compatibility;
+            this._parser.NewlineToBreak = true;
         }
 
         protected Element CreateImageElement(OpenNode node)

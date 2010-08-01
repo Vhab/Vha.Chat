@@ -100,7 +100,7 @@ namespace Vha.AOML
         {
             Dominizer d = new Dominizer();
             Element e = d.Parse(aoml);
-            Formatter f = new TextFormatter();
+            Formatter f = new PlainTextFormatter();
             Console.WriteLine(f.Format(e));
         }
     }

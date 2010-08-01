@@ -219,6 +219,9 @@ namespace Vha.AOML
                 case "chatcmd":
                     link = new CommandLink(argument);
                     break;
+                default:
+                    link = new OtherLink(href);
+                    break;
             }
             if (link == null) return new ContainerElement();
             string style = node.GetAttribute("style");

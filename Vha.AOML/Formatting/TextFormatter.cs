@@ -96,6 +96,10 @@ namespace Vha.AOML.Formatting
                         "lid=" + item.LowID.ToString() +
                         " hid=" + item.HighID.ToString() +
                         " ql=" + item.Quality.ToString() + "\n";
+                case LinkType.Other:
+                    OtherLink other = (OtherLink)element.Link;
+                    return this._prefix.Peek() +
+                        "uri=" + other.Uri.ToString() + "\n";
                 default:
                     return this._prefix.Peek() +
                         "unknown LinkType: " +

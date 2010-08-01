@@ -55,6 +55,8 @@
     <Compile Include="DOM\LinkElement.cs" />
     <Compile Include="DOM\TextElement.cs" />
     <Compile Include="DOM\UnderlineElement.cs" />
+    <Compile Include="Formatting\AomlFormatter.cs" />
+    <Compile Include="Formatting\Formatter.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="NodeCollection.cs" />
     <Compile Include="OpenNode.cs" />
@@ -65,6 +67,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Formatting\TextFormatter.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenCollection.cs" />
     <Compile Include="Tokenizer.cs" />

@@ -53,6 +53,7 @@
     <Compile Include="DOM\ItemLink.cs" />
     <Compile Include="DOM\Link.cs" />
     <Compile Include="DOM\LinkElement.cs" />
+    <Compile Include="DOM\OtherLink.cs" />
     <Compile Include="DOM\TextElement.cs" />
     <Compile Include="DOM\UnderlineElement.cs" />
     <Compile Include="Formatting\AomlFormatter.cs" />

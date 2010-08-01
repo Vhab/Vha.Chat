@@ -85,6 +85,12 @@
     <None Include="Resources\TextColors.xml" />
     <None Include="Vha.AOML.snk" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vha.Common\Vha.Common.csproj">
+      <Project>{711F8307-944C-4864-8D5E-0987C87E903A}</Project>
+      <Name>Vha.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

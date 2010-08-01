@@ -57,6 +57,7 @@
     <Compile Include="DOM\UnderlineElement.cs" />
     <Compile Include="Formatting\AomlFormatter.cs" />
     <Compile Include="Formatting\Formatter.cs" />
+    <Compile Include="Formatting\PlainTextFormatter.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="NodeCollection.cs" />
     <Compile Include="OpenNode.cs" />

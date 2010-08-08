@@ -22,10 +22,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using Vha.Chat.UI;
+using Vha.Chat.Commands;
 using Vha.Common;
 
-namespace Vha.Chat.Commands
+namespace Vha.Chat.UI.Commands
 {
     public class OpenCommand : Command
     {

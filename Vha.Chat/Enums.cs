@@ -186,4 +186,10 @@ namespace Vha.Chat
         Socks4a,
         Socks5
     }
+
+    public enum Platform
+    {
+        DotNet,
+        Mono
+    }
 }

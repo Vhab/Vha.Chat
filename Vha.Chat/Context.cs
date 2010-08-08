@@ -126,6 +126,8 @@ namespace Vha.Chat
         #endregion
 
         #region Attributes
+        public Platform Platform { get { return this._platform; } }
+
         public ContextState State
         {
             get
@@ -488,6 +490,7 @@ namespace Vha.Chat
         #endregion
 
         #region Internal
+        private Platform _platform;
         private Configuration _configuration;
         private Options _options;
         private Input _input = null;
@@ -510,6 +513,11 @@ namespace Vha.Chat
 
         internal Context()
         {
+            // Detect platform
+            this._platform = Platform.DotNet;
+            if (Type.GetType("Mono.Runtime") != null)
+                this._platform = Platform.Mono;
+
             // Read initial configuration
             Data.Base configuration = Data.Base.Load("Configuration.xml");
             if (configuration == null) configuration = new Data.ConfigurationV1();

@@ -38,14 +38,19 @@ namespace Vha.Chat.UI.Commands
                 context.Write(MessageClass.Error, "The start command only supports urls starting with http:// or https://");
                 return false;
             }
-            if (context.Platform == Platform.Mono)
+            switch (context.OS)
             {
-                context.Write(MessageClass.Error, "This command is not yet available on Mono. We apologize for the inconvenience.");
-                return false;
+                case OS.Windows:
+                    System.Diagnostics.Process.Start(message);
+                    return true;
+                case OS.Unix:
+                    System.Diagnostics.Process.Start("xdg-open", message);
+                    return true;
+                default:
+                    context.Write(MessageClass.Error, "This command is not yet available on " + context.OS.ToString() + ". We apologize for the inconvenience.");
+                    return false;
             }
-            // Open in default browser
-            System.Diagnostics.Process.Start(message);
-            return true;
+            
         }
 
         public StartCommand()

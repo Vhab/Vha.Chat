@@ -192,4 +192,24 @@ namespace Vha.Chat
         DotNet,
         Mono
     }
+
+    public enum OS
+    {
+        /// <summary>
+        /// Microsoft Windows
+        /// </summary>
+        Windows,
+        /// <summary>
+        /// Unix or a variation of it (including Linux, FreeBSD, etc)
+        /// </summary>
+        Unix,
+        /// <summary>
+        /// Apple MacOS
+        /// </summary>
+        MacOS,
+        /// <summary>
+        /// Running on an unknown other platform
+        /// </summary>
+        Unknown
+    }
 }

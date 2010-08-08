@@ -128,6 +128,8 @@ namespace Vha.Chat
         #region Attributes
         public Platform Platform { get { return this._platform; } }
 
+        public OS OS { get { return this._os; } }
+
         public ContextState State
         {
             get
@@ -491,6 +493,7 @@ namespace Vha.Chat
 
         #region Internal
         private Platform _platform;
+        private OS _os;
         private Configuration _configuration;
         private Options _options;
         private Input _input = null;
@@ -517,6 +520,26 @@ namespace Vha.Chat
             this._platform = Platform.DotNet;
             if (Type.GetType("Mono.Runtime") != null)
                 this._platform = Platform.Mono;
+
+            // Detect OS
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.MacOSX:
+                    this._os = OS.MacOS;
+                    break;
+                case PlatformID.Unix:
+                    this._os = OS.Unix;
+                    break;
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.WinCE:
+                    this._os = OS.Windows;
+                    break;
+                default:
+                    this._os = OS.Unknown;
+                    break;
+            } 
 
             // Read initial configuration
             Data.Base configuration = Data.Base.Load("Configuration.xml");

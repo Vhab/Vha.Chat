@@ -1275,7 +1275,7 @@ namespace Vha.Net
             while (currentTimeout > 0)
             {
                 // Wait for a name lookup to come in
-                this._lookupReset.WaitOne(currentTimeout);
+                this._lookupReset.WaitOne(currentTimeout, false);
                 // Check if we found it
                 if (this.GetCharacterID(character, 0, out id))
                 {

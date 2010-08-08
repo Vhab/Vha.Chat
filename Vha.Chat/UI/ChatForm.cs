@@ -100,8 +100,9 @@ namespace Vha.Chat.UI
             // A gentle welcome message
             this._context.Write(MessageClass.Internal, "Type /help to view all available commands");
 
-            // Enable the open command
-            this._context.Input.RegisterCommand(new OpenCommand(this));
+            // Enable commands
+            this._context.Input.RegisterCommand(new UI.Commands.OpenCommand(this));
+            this._context.Input.RegisterCommand(new UI.Commands.StartCommand());
 
             // Wait for load event
             this.Load += new EventHandler(ChatForm_Load);

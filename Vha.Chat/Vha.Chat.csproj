@@ -52,7 +52,7 @@
     <Compile Include="Commands\KickCommand.cs" />
     <Compile Include="Commands\LeaveCommand.cs" />
     <Compile Include="Commands\MuteCommand.cs" />
-    <Compile Include="Commands\OpenCommand.cs" />
+    <Compile Include="UI\Commands\OpenCommand.cs" />
     <Compile Include="Commands\OrganizationCommand.cs" />
     <Compile Include="Commands\ReplyCommand.cs" />
     <Compile Include="Commands\TellCommand.cs" />
@@ -116,6 +116,7 @@
     <Compile Include="Data\OptionsV1.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Events\MessageEventArgs.cs" />
+    <Compile Include="UI\Commands\StartCommand.cs" />
     <Compile Include="UI\Utils.cs" />
     <Compile Include="Ignores.cs" />
     <Compile Include="UI\InfoForm.cs">

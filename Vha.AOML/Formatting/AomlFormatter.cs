@@ -67,7 +67,7 @@ namespace Vha.AOML.Formatting
         {
             if (element.Alignment == Alignment.Inherit)
                 return "<div>";
-            return string.Format("<div align={0}{1}{0}",
+            return string.Format("<div align={0}{1}{0}>",
                 this.Quote, element.Alignment.ToString().ToLower());
         }
 

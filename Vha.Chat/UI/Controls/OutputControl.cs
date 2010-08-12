@@ -18,6 +18,7 @@
 * USA
 */
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -163,10 +164,10 @@ namespace Vha.Chat.UI.Controls
                 html = string.Format(template, formatter.Format(element));
             }
             // Write output to control
-            this.Document.InvokeScript("write", new object[] { html, this._maximumLines });
+            this._execute("write", html, this._maximumLines);
             // Scroll
             if (scroll)
-                this.Document.InvokeScript("scrollToBottom");
+                this._execute("scrollToBottom");
         }
         #endregion
 
@@ -189,13 +190,40 @@ namespace Vha.Chat.UI.Controls
             if (this.Document == null || this.Document.Body == null) return;
             // Foreground color
             string fgcolor = string.Format("#{0:X2}{1:X2}{2:X2}", this.ForegroundColor.R, this.ForegroundColor.G, this.ForegroundColor.B);
-            this.Document.InvokeScript("setForegroundColor", new object[] { fgcolor });
+            this._execute("setForegroundColor", fgcolor);
             // Background color
             string bgcolor = string.Format("#{0:X2}{1:X2}{2:X2}", this.BackgroundColor.R, this.BackgroundColor.G, this.BackgroundColor.B);
-            this.Document.InvokeScript("setBackgroundColor", new object[] { bgcolor });
+            this._execute("setBackgroundColor", bgcolor);
             // Padding
             Padding p = this.InnerPadding;
-            this.Document.InvokeScript("setPadding", new object[] { p.Top, p.Right, p.Bottom, p.Left });
+            this._execute("setPadding", p.Top, p.Right, p.Bottom, p.Left);
+        }
+
+        private void _execute(string command, params object[] arguments)
+        {
+            if (Type.GetType("Mono.Runtime") != null)
+            {
+                List<string> args = new List<string>();
+                foreach (object o in arguments)
+                {
+                    if (o is string)
+                    {
+                        args.Add("'" + ((string)o).Replace("'", "\\'") + "'");
+                    }
+                    else
+                    {
+                        args.Add(o.ToString());
+                    }
+                }
+                command = string.Format(
+                    "{0}({1})", command,
+                    string.Join(", ", args.ToArray()));
+                this.Document.InvokeScript(command);
+            }
+            else
+            {
+                this.Document.InvokeScript(command, arguments);
+            }
         }
         #endregion
 
@@ -205,7 +233,7 @@ namespace Vha.Chat.UI.Controls
             // Load template
             if (this._useBootstrap)
             {
-                this.Document.InvokeScript("Write", new object[] { this.Template });
+                this._execute("Write", this.Template);
             }
             // Setup properties
             this._updateProperties();

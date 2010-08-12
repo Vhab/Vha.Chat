@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using Vha.AOML.Formatting;
 using Vha.AOML.DOM;
 using Vha.Common;
@@ -147,7 +148,28 @@ namespace Vha.Chat.UI.Controls
 
         public override string OnText(TextElement element)
         {
-            return HTML.EscapeString(element.Text).Replace("  ", "&nbsp; ");
+            string text = element.Text;
+            // Escape tags
+            text = text.Replace("<", "&lt;");
+            text = text.Replace(">", "&gt;");
+            // Replace URL's with links
+            Regex urls = new Regex("(http|https)://\\S+", RegexOptions.IgnoreCase);
+            MatchCollection matches = urls.Matches(text);
+            int offset = 0;
+            foreach (Match match in matches)
+            {
+                string replacement = string.Format(
+                    "<a href=\"chatcmd:///start {0}\">{0}</a>",
+                    match.Groups[0].Value);
+                text =
+                    text.Substring(0, match.Index + offset) +
+                    replacement +
+                    text.Substring(match.Index + offset + match.Length);
+                offset += (replacement.Length - match.Groups[0].Value.Length);
+            }
+            // Force double-whitespace to be visible
+            text = text.Replace("  ", "&nbsp; ");
+            return text;
         }
 
         public override string OnUnderlineOpen(UnderlineElement element)

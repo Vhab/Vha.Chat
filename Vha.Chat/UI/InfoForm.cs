@@ -26,16 +26,17 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using Vha.Chat;
+using Vha.Chat.UI.Controls;
+using Vha.AOML.DOM;
 
 namespace Vha.Chat.UI
 {
     public partial class InfoForm : BaseForm
     {
-        protected string _aoml = "";
         protected Form _parent = null;
         protected Context _context = null;
 
-        public InfoForm(Context context, Form parent, string aoml)
+        public InfoForm(Context context, Form parent, Element element)
             : base (context, "Info")
         {
             InitializeComponent();
@@ -43,16 +44,15 @@ namespace Vha.Chat.UI
 
             this._context = context;
             this._parent = parent;
-            this._aoml = aoml;
             this._info.Context = context;
             this._info.BackgroundColor = this.BackColor;
             this._info.ForegroundColor = this.ForeColor;
             this._info.MaximumLines = 0;
-            this._info.Write(aoml, TextStyle.Default, false);
-            this._info.ReadyEvent += new ChatOutputBoxHandler(_info_ReadyEvent);
+            this._info.Write("{0}", element, TextStyle.Default, false);
+            this._info.ReadyEvent += new OutputControlHandler(_info_ReadyEvent);
         }
 
-        private void _info_ReadyEvent(ChatOutputBox sender)
+        private void _info_ReadyEvent(OutputControl sender)
         {
             this._info.Document.Body.Style =
                 this._info.Document.Body.Style +

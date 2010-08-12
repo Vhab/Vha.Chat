@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using Vha.AOML.DOM;
+using Vha.Common;
 
 namespace Vha.AOML
 {
@@ -50,7 +51,7 @@ namespace Vha.AOML
                         // Content doesn't introduce a new level
                         // We'll simply add it as child at the current depth
                         ContentNode content = (ContentNode)node;
-                        element = new TextElement(content.Value);
+                        element = new TextElement(HTML.UnescapeString(content.Value));
                         elements.Peek().Children.Add(element);
                         break;
                     case NodeType.Open:

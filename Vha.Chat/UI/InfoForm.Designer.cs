@@ -29,7 +29,7 @@ namespace Vha.Chat.UI
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InfoForm));
-            this._info = new Vha.Chat.UI.ChatOutputBox();
+            this._info = new Vha.Chat.UI.Controls.OutputControl();
             this.SuspendLayout();
             // 
             // _info
@@ -68,6 +68,6 @@ namespace Vha.Chat.UI
 
         #endregion
 
-        private Vha.Chat.UI.ChatOutputBox _info;
+        private Vha.Chat.UI.Controls.OutputControl _info;
     }
 }

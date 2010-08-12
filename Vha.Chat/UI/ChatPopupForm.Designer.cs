@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChatPopupForm));
             this._inputBox = new System.Windows.Forms.TextBox();
-            this._outputBox = new Vha.Chat.UI.ChatOutputBox();
+            this._outputBox = new Vha.Chat.UI.Controls.OutputControl();
             this.SuspendLayout();
             // 
             // _inputBox
@@ -85,6 +85,6 @@
         #endregion
 
         private System.Windows.Forms.TextBox _inputBox;
-        private Vha.Chat.UI.ChatOutputBox _outputBox;
+        private Vha.Chat.UI.Controls.OutputControl _outputBox;
     }
 }

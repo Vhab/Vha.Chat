@@ -32,6 +32,7 @@ using Vha.Common;
 using Vha.Chat;
 using Vha.Chat.Commands;
 using Vha.Chat.Events;
+using Vha.Chat.UI.Controls;
 
 namespace Vha.Chat.UI
 {
@@ -82,7 +83,7 @@ namespace Vha.Chat.UI
             this._outputBox.Context = context;
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
-            this._outputBox.ClickedEvent += new ChatOutputBoxHandler<ChatClickedEventArgs>(_outputBox_ClickedEvent);
+            this._outputBox.ClickedEvent += new OutputControlHandler<OutputControlClickedEventArgs>(_outputBox_ClickedEvent);
 
             // Update buttons to reflect the state of chat.
             switch (this._context.State)
@@ -133,6 +134,7 @@ namespace Vha.Chat.UI
             this._context.FriendUpdatedEvent -= new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
             // Disable open command
             this._context.Input.UnregisterCommandByTrigger("open");
+            this._context.Input.UnregisterCommandByTrigger("start");
             // If we're still the main form at this stage, let's just call it quits
             if (Program.ApplicationContext.MainForm == this)
             {
@@ -263,21 +265,21 @@ namespace Vha.Chat.UI
                 return;
             }
             // Create message
-            string line = "";
+            string prefix = "";
             // - Append channel
             switch (args.Source.Type)
             {
                 case MessageType.Channel:
                     if (!string.IsNullOrEmpty(args.Source.Channel))
-                        line = string.Format("[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
+                        prefix = string.Format("[<a href=\"channel://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
                     break;
                 case MessageType.Character:
-                    line = string.Format(
+                    prefix = string.Format(
                         "{1}[<a href=\"character://{0}\" class=\"Link\">{0}</a>]: ",
                         args.Source.Character, args.Source.Outgoing ? "To " : "");
                     break;
                 case MessageType.PrivateChannel:
-                    line = string.Format("[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
+                    prefix = string.Format("[<a href=\"privchan://{0}\" class=\"Link\">{0}</a>] ", args.Source.Channel);
                     break;
             }
             // - Append character
@@ -286,17 +288,15 @@ namespace Vha.Chat.UI
                 case MessageType.Channel:
                 case MessageType.PrivateChannel:
                     if (!string.IsNullOrEmpty(args.Source.Character))
-                        line += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
+                        prefix += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
                     break;
             }
-            // - Append message
-            line += args.Message;
             // Format message into aoml
-            string aoml = string.Format(
-                "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
+            string template = string.Format(
+                "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}{{0}}</span></div>",
                 args.Time.Hour, args.Time.Minute, args.Time.Second,
-                args.Class.ToString(), line);
-            this._outputBox.Write(aoml, context.Options.TextStyle, true);
+                args.Class.ToString(), prefix);
+            this._outputBox.Write(template, args.Message, context.Options.TextStyle, true);
         }
 
         void _context_CharacterLeaveEvent(Context context, PrivateChannelEventArgs args)
@@ -542,7 +542,7 @@ namespace Vha.Chat.UI
 
         }
 
-        private void _outputBox_ClickedEvent(ChatOutputBox sender, ChatClickedEventArgs e)
+        private void _outputBox_ClickedEvent(OutputControl sender, OutputControlClickedEventArgs e)
         {
             // Handle only left click, except for when shift is pressed
             if (e.ButtonsPressed != MouseButtons.Left || e.ShiftPressed)

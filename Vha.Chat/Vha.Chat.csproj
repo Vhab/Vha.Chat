@@ -77,7 +77,7 @@
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\ChatContextMenu.cs" />
-    <Compile Include="UI\ChatOutputBox.cs">
+    <Compile Include="UI\Controls\OutputControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UI\AuthenticationForm.cs">
@@ -117,6 +117,8 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Events\MessageEventArgs.cs" />
     <Compile Include="UI\Commands\StartCommand.cs" />
+    <Compile Include="UI\Controls\OutputControlCache.cs" />
+    <Compile Include="UI\Controls\OutputControlFormatter.cs" />
     <Compile Include="UI\Utils.cs" />
     <Compile Include="Ignores.cs" />
     <Compile Include="UI\InfoForm.cs">
@@ -207,6 +209,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Vha.AOML\Vha.AOML.csproj">
+      <Project>{817796E9-C1DC-41EF-A279-8589C732FCFC}</Project>
+      <Name>Vha.AOML</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Vha.Common\Vha.Common.csproj">
       <Project>{711F8307-944C-4864-8D5E-0987C87E903A}</Project>
       <Name>Vha.Common</Name>

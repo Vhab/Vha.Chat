@@ -75,23 +75,22 @@ namespace Vha.Chat.UI
             // Filter messages
             if (!args.Source.GetTarget().Equals(this._target)) return;
             // Format message
-            string line = "";
+            string prefix = "";
             if (args.Source.Type == MessageType.Character)
             {
-                if (args.Source.Outgoing) line += "To ";
-                line += string.Format("[<span class=\"Link\">{0}</span>] ", args.Source.Character);
+                if (args.Source.Outgoing) prefix += "To ";
+                prefix += string.Format("[<span class=\"Link\">{0}</span>] ", args.Source.Character);
             }
             else
             {
                 if (!string.IsNullOrEmpty(args.Source.Character))
-                    line += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
+                    prefix += string.Format("<a href=\"character://{0}\" class=\"Link\">{0}</a>: ", args.Source.Character);
             }
-            line += args.Message;
-            string aoml = string.Format(
-                "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}</span></div>",
+            string template = string.Format(
+                "<div class=\"Line\"><span class=\"Time\">[{0:00}:{1:00}:{2:00}]</span> <span class=\"{3}\">{4}{{0}}</span></div>",
                 args.Time.Hour, args.Time.Minute, args.Time.Second,
-                args.Class.ToString(), line);
-            this._outputBox.Write(aoml, context.Options.TextStyle, true);
+                args.Class.ToString(), prefix);
+            this._outputBox.Write(template, args.Message, context.Options.TextStyle, true);
         }
 
         private void _inputBox_KeyDown(object sender, KeyEventArgs e)

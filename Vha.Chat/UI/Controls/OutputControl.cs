@@ -201,29 +201,7 @@ namespace Vha.Chat.UI.Controls
 
         private void _execute(string command, params object[] arguments)
         {
-            if (Type.GetType("Mono.Runtime") != null)
-            {
-                List<string> args = new List<string>();
-                foreach (object o in arguments)
-                {
-                    if (o is string)
-                    {
-                        args.Add("'" + ((string)o).Replace("'", "\\'") + "'");
-                    }
-                    else
-                    {
-                        args.Add(o.ToString());
-                    }
-                }
-                command = string.Format(
-                    "{0}({1})", command,
-                    string.Join(", ", args.ToArray()));
-                this.Document.InvokeScript(command);
-            }
-            else
-            {
-                this.Document.InvokeScript(command, arguments);
-            }
+            this.Document.InvokeScript(command, arguments);
         }
         #endregion
 

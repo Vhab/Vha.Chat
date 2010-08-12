@@ -57,7 +57,28 @@
     .TowersChannel, .TowersChannel .Link { color: #b86b2c; }
     .LeadersChannel, .LeadersChannel .Link { color: #a938e4; }
 </style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript">
+    function setForegroundColor(color) { $('body').css('color', color); }
+    function setBackgroundColor(color) { $('body').css('background-color', color); }
+    function setPadding(top, right, bottom, left)
+    {
+        $('body').css('paddingTop', top);
+        $('body').css('paddingRight', right);
+        $('body').css('paddingBottom', bottom);
+        $('body').css('paddingLeft', left);
+    }
+    
+    function write(html, maximumLines)
+    {
+        $('body').append(html);
+        if (maximumLines <= 0) return;
+        while ($('body').children().size() > maximumLines)
+        {
+            $('body').children().first().remove();
+        }
+    }
+    
     function scrollToBottom()
     {
         window.scrollBy(0, 1000);

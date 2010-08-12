@@ -35,8 +35,11 @@ namespace Vha.Chat.UI
             // _info
             // 
             this._info.AllowWebBrowserDrop = false;
+            this._info.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this._info.BackgroundColor = System.Drawing.Color.White;
-            this._info.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._info.Context = null;
             this._info.ForegroundColor = System.Drawing.Color.Black;
             this._info.IsWebBrowserContextMenuEnabled = false;
             this._info.Location = new System.Drawing.Point(0, 0);
@@ -47,7 +50,6 @@ namespace Vha.Chat.UI
             this._info.ScriptErrorsSuppressed = true;
             this._info.Size = new System.Drawing.Size(374, 374);
             this._info.TabIndex = 0;
-            this._info.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             // 
             // InfoForm
             // 

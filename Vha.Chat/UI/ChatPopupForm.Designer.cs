@@ -62,7 +62,6 @@
             this._outputBox.Name = "_outputBox";
             this._outputBox.Size = new System.Drawing.Size(454, 358);
             this._outputBox.TabIndex = 1;
-            this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             // 
             // ChatPopupForm
             // 

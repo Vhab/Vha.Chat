@@ -243,7 +243,7 @@
     <None Include="Configuration.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\Chat.html" />
+    <None Include="Resources\OutputControl.html" />
     <None Include="Resources\OptionsBigBitmap.png" />
     <None Include="Resources\OptionsIcon.ico" />
     <None Include="Resources\EnterBitmap.png" />

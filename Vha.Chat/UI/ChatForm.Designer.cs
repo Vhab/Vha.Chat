@@ -92,7 +92,6 @@ namespace Vha.Chat.UI
             this._outputBox.ScriptErrorsSuppressed = true;
             this._outputBox.Size = new System.Drawing.Size(586, 491);
             this._outputBox.TabIndex = 4;
-            this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             // 
             // _inputBox
             // 

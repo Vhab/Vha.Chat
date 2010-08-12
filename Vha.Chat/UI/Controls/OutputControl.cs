@@ -37,7 +37,7 @@ namespace Vha.Chat.UI.Controls
         /// <summary>
         /// Gets the default template which fills the control when first loaded
         /// </summary>
-        public string Template { get { return Properties.Resources.Chat; } }
+        public string Template { get { return Properties.Resources.OutputControl; } }
         /// <summary>
         /// Gets or sets the background color
         /// </summary>
@@ -47,8 +47,7 @@ namespace Vha.Chat.UI.Controls
             set
             {
                 this._backgroundColor = value;
-                if (this.Document == null) return;
-                this.Document.BackColor = value;
+                this._updateProperties();
             }
         }
         /// <summary>
@@ -60,9 +59,16 @@ namespace Vha.Chat.UI.Controls
             set
             {
                 this._foregroundColor = value;
-                if (this.Document == null || this.Document.Body == null) return;
-                string color = string.Format("#{0:X2}{1:X2}{2:X2}", value.R, value.G, value.B);
-                this.Document.Body.Style = "color: " + color + ";";
+                this._updateProperties();
+            }
+        }
+        public Padding Padding
+        {
+            get { return this._padding; }
+            set
+            {
+                this._padding = value;
+                this._updateProperties();
             }
         }
         /// <summary>
@@ -136,41 +142,51 @@ namespace Vha.Chat.UI.Controls
                 OutputControlFormatter formatter = new OutputControlFormatter(this._cache, style);
                 html = string.Format(template, formatter.Format(element));
             }
-            // To be able to count the lines, we need to make this a single root element
-            if (this._maximumLines > 0)
-                html = "<span>" + html + "</span>";
-            // Write content
-            this.Document.Body.InnerHtml += html;
-            // Apply the maximum lines rule
-            while (this._maximumLines > 0 && this.Document.Body.Children.Count > this._maximumLines)
-                this.Document.Body.FirstChild.OuterHtml = "";
+            // Write output to control
+            this.Document.InvokeScript("write", new object[] { html, this._maximumLines });
             // Scroll
             if (scroll)
                 this.Document.InvokeScript("scrollToBottom");
         }
         #endregion
 
-        public OutputControl() : base() { }
+        public OutputControl()
+            : base()
+        {
+            this.DocumentText = this.Template;
+        }
 
         #region Internal
         private System.Drawing.Color _backgroundColor = System.Drawing.Color.White;
         private System.Drawing.Color _foregroundColor = System.Drawing.Color.Black;
+        private Padding _padding = new Padding(0);
         private int _maximumLines = 0;
         private Context _context = null;
         private ChatContextMenu _contextMenu = null;
         private OutputControlCache _cache = new OutputControlCache();
         private Dominizer _dominizer = new Dominizer();
         private Queue<WriteBuffer> _buffer = new Queue<WriteBuffer>();
+
+        private void _updateProperties()
+        {
+            if (this.Document == null || this.Document.Body == null) return;
+            // Foreground color
+            string fgcolor = string.Format("#{0:X2}{1:X2}{2:X2}", this.ForegroundColor.R, this.ForegroundColor.G, this.ForegroundColor.B);
+            this.Document.InvokeScript("setForegroundColor", new object[] { fgcolor });
+            // Background color
+            string bgcolor = string.Format("#{0:X2}{1:X2}{2:X2}", this.BackgroundColor.R, this.BackgroundColor.G, this.BackgroundColor.B);
+            this.Document.InvokeScript("setBackgroundColor", new object[] { bgcolor });
+            // Padding
+            Padding p = this.Padding;
+            this.Document.InvokeScript("setPadding", new object[] { p.Top, p.Right, p.Bottom, p.Left });
+        }
         #endregion
 
         #region Internal overrides
         protected override void OnDocumentCompleted(WebBrowserDocumentCompletedEventArgs e)
         {
-            // Write template
-            this.Document.Write(this.Template);
-            // Setup colors
-            this.BackgroundColor = this._backgroundColor;
-            this.ForegroundColor = this._foregroundColor;
+            // Setup properties
+            this._updateProperties();
             // Setup events
             this.Document.Click -= new HtmlElementEventHandler(OnClick);
             this.Document.Click += new HtmlElementEventHandler(OnClick);

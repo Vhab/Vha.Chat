@@ -151,32 +151,6 @@ namespace Vha.Chat.Properties {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;
-        ///&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
-        ///&lt;head&gt;
-        ///&lt;meta http-equiv = &quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
-        ///&lt;title&gt;&lt;/title&gt;
-        ///&lt;style type=&quot;text/css&quot;&gt;
-        ///    body {
-        ///        font-family: verdana, helvetica, sans-serif;
-        ///	    font-size: 11px;
-        ///	    padding: 0px 3px 0px 1px;
-        ///	    margin: 0px;
-        ///    }
-        ///    .Line {
-        ///    	margin-left: 10px;
-        ///        text-indent: -10px;
-        ///    }
-        ///    .Time {
-        ///       [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string Chat {
-            get {
-                return ResourceManager.GetString("Chat", resourceCulture);
-            }
-        }
-        
         internal static System.Drawing.Bitmap ChatBigBitmap {
             get {
                 object obj = ResourceManager.GetObject("ChatBigBitmap", resourceCulture);
@@ -251,6 +225,32 @@ namespace Vha.Chat.Properties {
             get {
                 object obj = ResourceManager.GetObject("OptionsIcon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;
+        ///&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+        ///&lt;head&gt;
+        ///&lt;meta http-equiv = &quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+        ///&lt;title&gt;&lt;/title&gt;
+        ///&lt;style type=&quot;text/css&quot;&gt;
+        ///    body {
+        ///        font-family: verdana, helvetica, sans-serif;
+        ///	    font-size: 11px;
+        ///	    padding: 0px 3px 0px 1px;
+        ///	    margin: 0px;
+        ///    }
+        ///    .Line {
+        ///    	margin-left: 10px;
+        ///        text-indent: -10px;
+        ///    }
+        ///    .Time {
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string OutputControl {
+            get {
+                return ResourceManager.GetString("OutputControl", resourceCulture);
             }
         }
         

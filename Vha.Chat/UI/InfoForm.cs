@@ -49,14 +49,7 @@ namespace Vha.Chat.UI
             this._info.ForegroundColor = this.ForeColor;
             this._info.MaximumLines = 0;
             this._info.Write("{0}", element, TextStyle.Default, false);
-            this._info.ReadyEvent += new OutputControlHandler(_info_ReadyEvent);
-        }
-
-        private void _info_ReadyEvent(OutputControl sender)
-        {
-            this._info.Document.Body.Style =
-                this._info.Document.Body.Style +
-                "; padding: 7px;";
+            this._info.Padding = new Padding(7);
         }
     }
 }

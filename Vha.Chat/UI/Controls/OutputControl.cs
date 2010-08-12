@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Web;
 using Vha.AOML;
 using Vha.AOML.DOM;
 
@@ -215,6 +216,7 @@ namespace Vha.Chat.UI.Controls
             if (element == null || element.TagName.ToLower() != "a") return;
             // Get href
             string href = element.GetAttribute("href").Trim('/');
+            href = HttpUtility.UrlDecode(href);
             if (string.IsNullOrEmpty(href)) return;
             // Parse href
             int index = href.IndexOf("://");

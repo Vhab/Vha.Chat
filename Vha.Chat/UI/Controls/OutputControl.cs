@@ -20,9 +20,9 @@
 
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
+using System.IO;
 using System.Web;
+using System.Windows.Forms;
 using Vha.AOML;
 using Vha.AOML.DOM;
 
@@ -38,6 +38,12 @@ namespace Vha.Chat.UI.Controls
         /// Gets the default template which fills the control when first loaded
         /// </summary>
         public string Template { get { return Properties.Resources.OutputControl; } }
+        /// <summary>
+        /// Gets the initialization mode.
+        /// If set to true, this control will first initialize Bootstrap.html.
+        /// If set to false, it will load the template directly.
+        /// </summary>
+        public bool UseBootstrap { get { return this._useBootstrap; } }
         /// <summary>
         /// Gets or sets the background color
         /// </summary>
@@ -62,7 +68,7 @@ namespace Vha.Chat.UI.Controls
                 this._updateProperties();
             }
         }
-        public Padding Padding
+        public Padding InnerPadding
         {
             get { return this._padding; }
             set
@@ -115,6 +121,20 @@ namespace Vha.Chat.UI.Controls
         #endregion
 
         #region Methods
+        public void Initialize(bool useBootstrap)
+        {
+            this._useBootstrap = useBootstrap;
+            if (this._useBootstrap)
+            {
+                string path = "file://" + System.Environment.CurrentDirectory + Path.DirectorySeparatorChar;
+                this.Navigate(new System.Uri(path + "Bootstrap.html", System.UriKind.Absolute));
+            }
+            else
+            {
+                this.DocumentText = this.Template;
+            }
+        }
+
         /// <summary>
         /// Adds AOML code to this control
         /// </summary>
@@ -150,11 +170,7 @@ namespace Vha.Chat.UI.Controls
         }
         #endregion
 
-        public OutputControl()
-            : base()
-        {
-            this.DocumentText = this.Template;
-        }
+        public OutputControl() : base() { }
 
         #region Internal
         private System.Drawing.Color _backgroundColor = System.Drawing.Color.White;
@@ -166,6 +182,7 @@ namespace Vha.Chat.UI.Controls
         private OutputControlCache _cache = new OutputControlCache();
         private Dominizer _dominizer = new Dominizer();
         private Queue<WriteBuffer> _buffer = new Queue<WriteBuffer>();
+        private bool _useBootstrap = false;
 
         private void _updateProperties()
         {
@@ -177,7 +194,7 @@ namespace Vha.Chat.UI.Controls
             string bgcolor = string.Format("#{0:X2}{1:X2}{2:X2}", this.BackgroundColor.R, this.BackgroundColor.G, this.BackgroundColor.B);
             this.Document.InvokeScript("setBackgroundColor", new object[] { bgcolor });
             // Padding
-            Padding p = this.Padding;
+            Padding p = this.InnerPadding;
             this.Document.InvokeScript("setPadding", new object[] { p.Top, p.Right, p.Bottom, p.Left });
         }
         #endregion
@@ -185,6 +202,11 @@ namespace Vha.Chat.UI.Controls
         #region Internal overrides
         protected override void OnDocumentCompleted(WebBrowserDocumentCompletedEventArgs e)
         {
+            // Load template
+            if (this._useBootstrap)
+            {
+                this.Document.InvokeScript("Write", new object[] { this.Template });
+            }
             // Setup properties
             this._updateProperties();
             // Setup events
@@ -210,7 +232,7 @@ namespace Vha.Chat.UI.Controls
 
         protected override void OnNavigating(WebBrowserNavigatingEventArgs e)
         {
-            if (e.Url.Scheme != "about")
+            if (e.Url.Scheme != "about" && e.Url.Scheme != "file")
             {
                 e.Cancel = true;
                 return;

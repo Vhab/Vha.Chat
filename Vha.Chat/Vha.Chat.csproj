@@ -229,6 +229,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
+    <None Include="Bootstrap.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\CharacterDeleteBitmap.png" />
     <None Include="Resources\CharacterAddBitmap.png" />
     <None Include="Resources\CharacterDisabledBitmap.png" />

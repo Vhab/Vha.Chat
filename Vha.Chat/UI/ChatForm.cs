@@ -84,6 +84,7 @@ namespace Vha.Chat.UI
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
             this._outputBox.ClickedEvent += new OutputControlHandler<OutputControlClickedEventArgs>(_outputBox_ClickedEvent);
+            this._outputBox.Initialize(context.Platform != Platform.DotNet);
 
             // Update buttons to reflect the state of chat.
             switch (this._context.State)

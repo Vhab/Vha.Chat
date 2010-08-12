@@ -49,7 +49,8 @@ namespace Vha.Chat.UI
             this._info.ForegroundColor = this.ForeColor;
             this._info.MaximumLines = 0;
             this._info.Write("{0}", element, TextStyle.Default, false);
-            this._info.Padding = new Padding(7);
+            this._info.InnerPadding = new Padding(7, 6, 7, 7);
+            this._info.Initialize(context.Platform != Platform.DotNet);
         }
     }
 }

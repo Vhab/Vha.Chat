@@ -133,6 +133,7 @@ namespace Vha.Chat.UI
             this._context.FriendUpdatedEvent -= new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
             // Disable open command
             this._context.Input.UnregisterCommandByTrigger("open");
+            this._context.Input.UnregisterCommandByTrigger("start");
             // If we're still the main form at this stage, let's just call it quits
             if (Program.ApplicationContext.MainForm == this)
             {

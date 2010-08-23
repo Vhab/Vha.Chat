@@ -1260,7 +1260,8 @@ namespace Vha.Net
                     {
                         // If character id is 0, remove the entry
                         this._charactersByName.Remove(character);
-                        return false;
+                        id = 0;
+                        return true;
                     }
                 }
             }

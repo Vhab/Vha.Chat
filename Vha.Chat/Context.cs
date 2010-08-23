@@ -329,9 +329,12 @@ namespace Vha.Chat
         /// <returns>true if the given channel is known, false if not</returns>
         public bool HasChannel(string channel)
         {
+            if (this._chat == null) return false;
+            BigInteger id = this._chat.GetChannelID(channel);
+            if (id == 0) return false;
             lock (this._channels)
             {
-                return this._channels.ContainsKey(channel.ToLower());
+                return this._channels.ContainsKey(id);
             }
         }
         /// <summary>
@@ -341,12 +344,14 @@ namespace Vha.Chat
         /// <returns>An instance of Channel or null on failure</returns>
         public Channel GetChannel(string channel)
         {
-            channel = channel.ToLower();
+            if (this._chat == null) return null;
+            BigInteger id = this._chat.GetChannelID(channel);
+            if (id == 0) return null;
             lock (this._channels)
             {
-                if (!this._channels.ContainsKey(channel))
+                if (!this._channels.ContainsKey(id))
                     return null;
-                return this._channels[channel];
+                return this._channels[id];
             }
         }
         /// <summary>
@@ -370,10 +375,12 @@ namespace Vha.Chat
         /// <returns>true if the given character is a friend, false if not</returns>
         public bool HasFriend(string character)
         {
-            character = Format.UppercaseFirst(character);
+            if (this._chat == null) return false;
+            UInt32 id = this._chat.GetCharacterID(character);
+            if (id == 0) return false;
             lock (this._friends)
             {
-                return this._friends.ContainsKey(character);
+                return this._friends.ContainsKey(id);
             }
         }
         /// <summary>
@@ -383,12 +390,14 @@ namespace Vha.Chat
         /// <returns>An isntance of Friend or null on failure</returns>
         public Friend GetFriend(string character)
         {
-            character = Format.UppercaseFirst(character);
+            if (this._chat == null) return null;
+            UInt32 id = this._chat.GetCharacterID(character);
+            if (id == 0) return null;
             lock (this._friends)
             {
-                if (!this._friends.ContainsKey(character))
+                if (!this._friends.ContainsKey(id))
                     return null;
-                return this._friends[character];
+                return this._friends[id];
             }
         }
         /// <summary>
@@ -401,9 +410,12 @@ namespace Vha.Chat
             channel = Format.UppercaseFirst(channel);
             if (channel == this.Character)
                 return true;
+            if (this._chat == null) return false;
+            UInt32 id = this._chat.GetCharacterID(channel);
+            if (id == 0) return false;
             lock (this._privateChannels)
             {
-                return this._privateChannels.ContainsKey(channel);
+                return this._privateChannels.ContainsKey(id);
             }
         }
         /// <summary>
@@ -416,21 +428,32 @@ namespace Vha.Chat
             channel = Format.UppercaseFirst(channel);
             if (channel == this.Character)
                 return new PrivateChannel(this.CharacterID, this.Character, true);
+            if (this._chat == null) return null;
+            UInt32 id = this._chat.GetCharacterID(channel);
+            if (id == 0) return null;
             lock (this._privateChannels)
             {
-                if (!this._privateChannels.ContainsKey(channel))
+                if (!this._privateChannels.ContainsKey(id))
                     return null;
-                return this._privateChannels[channel];
+                return this._privateChannels[id];
             }
         }
+        /// <summary>
+        /// Whether this context contains the given character as guest
+        /// </summary>
+        /// <param name="character"></param>
+        /// <returns></returns>
         public bool HasGuest(string character)
         {
             character = Format.UppercaseFirst(character);
             if (character == this.Character)
                 return true;
+            if (this._chat == null) return false;
+            UInt32 id = this._chat.GetCharacterID(character);
+            if (id == 0) return false;
             lock (this._guests)
             {
-                return this._guests.Contains(character);
+                return this._guests.Contains(id);
             }
         }
         /// <summary>
@@ -508,10 +531,10 @@ namespace Vha.Chat
         private ContextState _state = ContextState.Disconnected;
         private bool _disconnecting = false;
 
-        private Dictionary<string, Channel> _channels;
-        private Dictionary<string, Friend> _friends;
-        private Dictionary<string, PrivateChannel> _privateChannels;
-        private List<string> _guests;
+        private Dictionary<BigInteger, Channel> _channels;
+        private Dictionary<UInt32, Friend> _friends;
+        private Dictionary<UInt32, PrivateChannel> _privateChannels;
+        private List<UInt32> _guests;
         private Dictionary<MessageTarget, List<MessageEventArgs>> _messageHistory;
 
         internal Context()
@@ -555,10 +578,10 @@ namespace Vha.Chat
 
             // Initialize objects
             this._options = new Options(this);
-            this._channels = new Dictionary<string, Channel>();
-            this._friends = new Dictionary<string, Friend>();
-            this._privateChannels = new Dictionary<string, PrivateChannel>();
-            this._guests = new List<string>();
+            this._channels = new Dictionary<BigInteger, Channel>();
+            this._friends = new Dictionary<UInt32, Friend>();
+            this._privateChannels = new Dictionary<UInt32, PrivateChannel>();
+            this._guests = new List<UInt32>();
             this._messageHistory = new Dictionary<MessageTarget, List<MessageEventArgs>>();
             this._ignores = new Ignores(this);
 
@@ -734,11 +757,10 @@ namespace Vha.Chat
             bool joined, updated;
             lock (this._channels)
             {
-                string name = e.Name.ToLower();
-                joined = !this._channels.ContainsKey(name);
-                if (joined) this._channels.Add(name, channel);
-                updated = !this._channels[name].Equals(channel);
-                this._channels[name] = channel;
+                joined = !this._channels.ContainsKey(e.ID);
+                if (joined) this._channels.Add(e.ID, channel);
+                updated = !this._channels[e.ID].Equals(channel);
+                this._channels[e.ID] = channel;
             }
             // Detect organization
             if (e.Type == ChannelType.Organization)
@@ -763,15 +785,15 @@ namespace Vha.Chat
                 bool left = false;
                 lock (this._guests)
                 {
-                    if (this._guests.Contains(e.Character) && !e.Join)
+                    if (this._guests.Contains(e.CharacterID) && !e.Join)
                     {
                         left = true;
-                        this._guests.Remove(e.Character);
+                        this._guests.Remove(e.CharacterID);
                     }
-                    else if (!this._guests.Contains(e.Character) && e.Join)
+                    else if (!this._guests.Contains(e.CharacterID) && e.Join)
                     {
                         joined = true;
-                        this._guests.Add(e.Character);
+                        this._guests.Add(e.CharacterID);
                     }
                 }
                 // Dispatch events
@@ -798,15 +820,15 @@ namespace Vha.Chat
                     bool left = false;
                     lock (this._privateChannels)
                     {
-                        if (this._privateChannels.ContainsKey(e.Channel) && !e.Join)
+                        if (this._privateChannels.ContainsKey(e.ChannelID) && !e.Join)
                         {
                             left = true;
-                            this._privateChannels.Remove(e.Channel);
+                            this._privateChannels.Remove(e.ChannelID);
                         }
-                        else if (!this._privateChannels.ContainsKey(e.Channel) && e.Join)
+                        else if (!this._privateChannels.ContainsKey(e.ChannelID) && e.Join)
                         {
                             joined = true;
-                            this._privateChannels.Add(e.Channel, channel);
+                            this._privateChannels.Add(e.ChannelID, channel);
                         }
                     }
                     // Dispatch events
@@ -850,7 +872,7 @@ namespace Vha.Chat
             bool error = false;
             lock (this._privateChannels)
             {
-                error = this._privateChannels.ContainsKey(e.Character);
+                error = this._privateChannels.ContainsKey(e.CharacterID);
             }
             if (error)
             {
@@ -869,11 +891,11 @@ namespace Vha.Chat
             bool removed = false;
             lock (this._friends)
             {
-                if (this._friends.ContainsKey(e.Character))
+                if (this._friends.ContainsKey(e.CharacterID))
                 {
                     removed = true;
-                    friend = this._friends[e.Character];
-                    this._friends.Remove(e.Character);
+                    friend = this._friends[e.CharacterID];
+                    this._friends.Remove(e.CharacterID);
                 }
             }
             if (this.FriendRemovedEvent != null && removed)
@@ -891,10 +913,10 @@ namespace Vha.Chat
             bool added, updated;
             lock (this._friends)
             {
-                added = !this._friends.ContainsKey(e.Character);
-                if (added) this._friends.Add(e.Character, friend);
-                updated = !this._friends[e.Character].Equals(friend);
-                this._friends[e.Character] = friend;
+                added = !this._friends.ContainsKey(e.CharacterID);
+                if (added) this._friends.Add(e.CharacterID, friend);
+                updated = !this._friends[e.CharacterID].Equals(friend);
+                this._friends[e.CharacterID] = friend;
             }
             if (this.FriendAddedEvent != null && added)
                 this.FriendAddedEvent(this, new FriendEventArgs(friend, true));

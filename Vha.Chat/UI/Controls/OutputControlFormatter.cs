@@ -88,11 +88,13 @@ namespace Vha.Chat.UI.Controls
         {
             // Transform link
             string href = "";
+            string title = "";
             switch (element.Link.Type)
             {
                 case LinkType.Command:
                     CommandLink command = (CommandLink)element.Link;
                     href = "chatcmd://" + command.Command;
+                    title = command.Command;
                     break;
                 case LinkType.Element:
                     ElementLink link = (ElementLink)element.Link;
@@ -102,10 +104,12 @@ namespace Vha.Chat.UI.Controls
                     ItemLink item = (ItemLink)element.Link;
                     href = string.Format("itemref://{0}/{1}/{2}",
                         item.LowID, item.HighID, item.Quality);
+                    title = href;
                     break;
                 case LinkType.Other:
                     OtherLink other = (OtherLink)element.Link;
                     href = other.Uri.ToString();
+                    title = href;
                     break;
             }
             // Handle 'no-style' links
@@ -138,7 +142,7 @@ namespace Vha.Chat.UI.Controls
                     style = " class=\"NoStyle\"";
                 }
             }
-            return string.Format("<a href=\"{0}\"{1}>", href, style);
+            return string.Format("<a href=\"{0}\" title=\"{1}\"{2}>", href, title, style);
         }
 
         public override string OnLinkClose(LinkElement element)
@@ -159,7 +163,7 @@ namespace Vha.Chat.UI.Controls
             foreach (Match match in matches)
             {
                 string replacement = string.Format(
-                    "<a href=\"chatcmd:///start {0}\">{0}</a>",
+                    "<a href=\"chatcmd:///start {0}\" title=\"{0}\">{0}</a>",
                     match.Groups[0].Value);
                 text =
                     text.Substring(0, match.Index + offset) +

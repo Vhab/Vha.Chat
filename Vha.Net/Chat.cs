@@ -1260,7 +1260,8 @@ namespace Vha.Net
                     {
                         // If character id is 0, remove the entry
                         this._charactersByName.Remove(character);
-                        return false;
+                        id = 0;
+                        return true;
                     }
                 }
             }
@@ -1330,12 +1331,6 @@ namespace Vha.Net
             return new BigInteger(0);
         }
 
-		/// <summary>
-		/// Retrieve channel name associated with a channel ID.
-		/// </summary>
-		/// <param name="channelID"></param>
-		/// <returns></returns>
-        public string GetChannelName(Int32 channelID) { return this.GetChannelName(new BigInteger(channelID)); }
         /// <summary>
         /// Retrieve channel name associated with a channel ID.
         /// </summary>

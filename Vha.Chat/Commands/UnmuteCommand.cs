@@ -20,6 +20,7 @@
 
 using System;
 using System.Text;
+using Vha.Net;
 
 namespace Vha.Chat.Commands
 {
@@ -29,7 +30,7 @@ namespace Vha.Chat.Commands
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckChannel(message, true)) return false;
-            context.Chat.SendChannelMute(message, false);
+            context.Chat.SendChannelUpdate(message, (ChannelFlags)0);
             return true;
         }
 

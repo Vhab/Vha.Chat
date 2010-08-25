@@ -181,8 +181,8 @@ namespace Vha.Chat.UI
             this._channelMenu.Tag = c.Name;
             this._channelMenu.Show(location);
             // Setup
-            this._channelMenu_TalkTo.Visible = this._form != null;
-            this._channelMenu_Mute.Visible = !c.Muted;
+            this._channelMenu_TalkTo.Visible = this._form != null && (c.Flags & ChannelFlags.CantSend) == 0;
+            this._channelMenu_Mute.Visible = (c.Flags & ChannelFlags.Muted) == 0;
             this._channelMenu_Unmute.Visible = !this._channelMenu_Mute.Visible;
         }
 

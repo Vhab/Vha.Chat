@@ -32,8 +32,7 @@ namespace Vha.Net.Events
     {
         private readonly BigInteger _id = 0;
         private readonly String _name = null;
-        private readonly UInt16 _flags = 0;
-        private readonly bool _mute = false;
+        private readonly ChannelFlags _flags = 0;
         private readonly byte _typeID = 0;
         private ChannelType _type = ChannelType.Unknown;
 
@@ -44,12 +43,11 @@ namespace Vha.Net.Events
         /// <param name="name">channel name</param>
         /// <param name="mute">whether the channel is muted or not</param>
         /// <param name="channelType">channel type</param>
-        public ChannelStatusEventArgs(BigInteger id, String name, UInt16 flags, bool mute, byte channelType)
+        public ChannelStatusEventArgs(BigInteger id, String name, ChannelFlags flags, byte channelType)
         {
             this._id = id;
             this._name = name;
             this._flags = flags;
-            this._mute = mute;
             this._typeID = channelType;
             if (Enum.IsDefined(typeof(ChannelType), (int)channelType))
                 this._type = (ChannelType)channelType;
@@ -68,12 +66,7 @@ namespace Vha.Net.Events
         /// <summary>
         /// Channel flags
         /// </summary>
-        public UInt16 Flags { get { return this._flags; } }
-
-        /// <summary>
-        /// Whether the channel is muted or not
-        /// </summary>
-        public bool Muted { get { return this._mute; } }
+        public ChannelFlags Flags { get { return this._flags; } }
 
         /// <summary>
         /// Channel type ID
@@ -88,6 +81,6 @@ namespace Vha.Net.Events
         /// <summary>
         /// Returns combined channel data
         /// </summary>
-        public Channel GetChannel() { return new Channel(this._id, this._name, this._type, this.Muted); }
+        public Channel GetChannel() { return new Channel(this._id, this._name, this._type, this._flags); }
     }
 }

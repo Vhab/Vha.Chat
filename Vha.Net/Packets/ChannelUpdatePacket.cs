@@ -27,29 +27,17 @@ namespace Vha.Net.Packets
     internal class ChannelUpdatePacket : Packet
     {
         internal ChannelUpdatePacket(Packet.Type type, byte[] data) : base(type, data) { }
-        internal ChannelUpdatePacket(BigInteger channelID, bool mute)
+        internal ChannelUpdatePacket(BigInteger channelID, ChannelFlags flags)
             : base(Packet.Type.CHANNEL_UPDATE)
         {
             // Write channel id
             this.AddData(channelID);
 
             // Write flags
-            if (mute)
-            {
-                this.AddData((byte)1);
-                this.AddData((byte)1);
-            }
-            else
-            {
-                this.AddData((byte)0);
-                this.AddData((byte)0);
-            }
+            this.AddData(NetConvert.HostToNetworkOrder((uint)flags));
 
-            // Some mandatory filling
+            // Write empty data blob
             this.AddData((byte)0);
-            this.AddData((byte)0);
-            this.AddData((byte)0);
-            this.AddData((byte)1);
             this.AddData((byte)0);
         }
     }

@@ -44,6 +44,18 @@ namespace Vha.Net
         Leaders = 4
     }
 
+    [Flags]
+    public enum ChannelFlags : uint
+    {
+        CantIgnore = 0x1,
+        CantSend = 0x2,
+        NoInternational = 0x10,
+        NoVoice = 0x20,
+        SendCriteria = 0x40,
+        GroupOnName = 0x80,
+        Muted = 0x1000000,
+    }
+
     public enum SystemMessageType
     {
         Other = 0,

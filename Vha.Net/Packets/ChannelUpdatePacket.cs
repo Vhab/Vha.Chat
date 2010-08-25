@@ -37,8 +37,7 @@ namespace Vha.Net.Packets
             this.AddData(NetConvert.HostToNetworkOrder((uint)flags));
 
             // Write empty data blob
-            this.AddData((byte)0);
-            this.AddData((byte)0);
+            this.AddData((ushort)0);
         }
     }
 }

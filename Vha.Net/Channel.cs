@@ -29,20 +29,20 @@ namespace Vha.Net
         private readonly BigInteger _id = 0;
         private readonly String _name = null;
         private readonly ChannelType _type = ChannelType.Unknown;
-        private readonly bool _muted = false;
+        private readonly ChannelFlags _flags;
 
-        public Channel(BigInteger id, String name, ChannelType type, bool muted)
+        public Channel(BigInteger id, String name, ChannelType type, ChannelFlags flags)
         {
             this._id = id;
             this._name = name;
             this._type = type;
-            this._muted = muted;
+            this._flags = flags;
         }
 
         public BigInteger ID { get { return this._id; } }
         public String Name { get { return this._name; } }
         public ChannelType Type { get { return this._type; } }
-        public bool Muted { get { return this._muted; } }
+        public ChannelFlags Flags { get { return this._flags; } }
         public override string ToString() { return this._name; }
 
         public int CompareTo(Channel channel)
@@ -55,8 +55,8 @@ namespace Vha.Net
                 return this.Name.CompareTo(channel.Name);
             if (this.Type != channel.Type)
                 return this.Type.CompareTo(channel.Type);
-            if (this.Muted != channel.Muted)
-                return this.Muted.CompareTo(channel.Muted);
+            if (this.Flags != channel.Flags)
+                return this.Flags.CompareTo(channel.Flags);
             return 0;
         }
 

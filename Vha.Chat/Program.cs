@@ -26,6 +26,8 @@ using Vha.Chat;
 using Vha.Chat.UI;
 using Vha.Common;
 using System.Reflection;
+using System.Security;
+using System.Security.Permissions;
 
 namespace Vha.Chat
 {
@@ -41,6 +43,21 @@ namespace Vha.Chat
         [STAThread]
         static void Main()
         {
+            // Check security
+            try
+            {
+                SecurityPermission permissions = new SecurityPermission(PermissionState.Unrestricted);
+                permissions.Demand();
+            }
+            catch (SecurityException)
+            {
+                MessageBox.Show(
+                    "Vha.Chat was unable to obtain the required execution permissions.\n" +
+                    "This might be because you're attempting to run this application from a network drive or due to specific restrictions setup on your machine.\n\n" +
+                    "This application will now close.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             // Fix working directory
             string path = Assembly.GetExecutingAssembly().Location;
             if (path.LastIndexOf(Path.DirectorySeparatorChar) > 0)

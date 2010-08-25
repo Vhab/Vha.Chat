@@ -938,7 +938,7 @@ namespace Vha.Chat
         {
             Channel channel = this.GetChannel(e.Channel);
             // Check if channel is muted
-            if (channel != null && channel.Muted)
+            if (channel != null && (channel.Flags & ChannelFlags.Muted) != 0)
                 return;
             // Check for ignores
             if (this.Ignores.Contains(e.Character))

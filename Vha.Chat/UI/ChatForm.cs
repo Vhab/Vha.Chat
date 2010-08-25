@@ -395,7 +395,7 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            if (args.Channel.Muted) this._channels.AddNode(args.Channel.Name, "ChannelDisabled");
+            if ((args.Channel.Flags & ChannelFlags.Muted) != 0) this._channels.AddNode(args.Channel.Name, "ChannelDisabled");
             else this._channels.AddNode(args.Channel.Name, "Channel");
             if (this._channels.Nodes.Count == 1)
                 this._channels.Expand();
@@ -411,7 +411,7 @@ namespace Vha.Chat.UI
                 return;
             }
             TreeNode node = this._channels.GetNode(args.Channel.Name);
-            if (args.Channel.Muted) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
+            if ((args.Channel.Flags & ChannelFlags.Muted) != 0) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
             else node.ImageKey = node.SelectedImageKey = "Channel";
         }
 

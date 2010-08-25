@@ -806,7 +806,6 @@ namespace Vha.Net
                             ((ChannelStatusPacket)packet).ID,
                             ((ChannelStatusPacket)packet).Name,
                             ((ChannelStatusPacket)packet).Flags,
-                            ((ChannelStatusPacket)packet).Muted,
                             ((ChannelStatusPacket)packet).ChannelType
                             ));
                         break;
@@ -1000,7 +999,12 @@ namespace Vha.Net
             }
             if (e.Type == ChannelType.Unknown)
                 this.Debug("Unknown channel type: " + e.TypeID, "[Error]");
-            this.Debug("Joined channel: " + e.Name + " (ID:" + e.ID + " Type:" + e.Type.ToString() + " Muted:" + e.Muted.ToString() + " Flags:" + e.Flags.ToString() + ")", "[Bot]");
+            this.Debug("Joined channel: " + e.Name +
+                " (ID:" + e.ID +
+                " Type:" + e.Type.ToString() +
+                " Muted:" + ((e.Flags & ChannelFlags.Muted) != 0).ToString() +
+                " Flags:" + e.Flags.ToString() +
+                ")", "[Bot]");
             if (e.Type == ChannelType.Organization)
             {
                 this._organization = e.Name;
@@ -1399,18 +1403,18 @@ namespace Vha.Net
 		/// Mute or unmute a channel
 		/// </summary>
 		/// <param name="channel">Name of channel to (un)mute</param>
-		/// <param name="mute">true to mute, false to unmute</param>
-        public void SendChannelMute(string channel, bool mute) { this.SendChannelMute(this.GetChannelID(channel), mute); }
+        /// <param name="mute">the updated set of channel flags</param>
+        public void SendChannelUpdate(string channel, ChannelFlags flags) { this.SendChannelUpdate(this.GetChannelID(channel), flags); }
 		/// <summary>
 		/// Mute or unmute a channel
 		/// </summary>
 		/// <param name="channelID">ID of channel to (un)mute</param>
-		/// <param name="mute">true to mute, false to unmute</param>
-        public void SendChannelMute(BigInteger channelID, bool mute)
+		/// <param name="flags">the updated set of channel flags</param>
+        public void SendChannelUpdate(BigInteger channelID, ChannelFlags flags)
         {
-            this.Debug("Updating channel " + this.GetChannelName(channelID) + " with mute=" + mute.ToString(), "[Bot]");
+            this.Debug("Updating channel " + this.GetChannelName(channelID) + " with flags=" + flags.ToString(), "[Bot]");
 
-            ChannelUpdatePacket p = new ChannelUpdatePacket(channelID, mute);
+            ChannelUpdatePacket p = new ChannelUpdatePacket(channelID, flags);
             p.Priority = PacketPriority.Standard;
             this.SendPacket(p);
         }

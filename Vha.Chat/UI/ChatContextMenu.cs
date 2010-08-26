@@ -155,8 +155,8 @@ namespace Vha.Chat.UI
             this._characterMenu.Show(location);
             // Setup
             this._characterMenu_TalkTo.Visible = this._form != null;
-            this._characterMenu_Add.Visible = f == null;
-            this._characterMenu_Remove.Visible = !this._characterMenu_Add.Visible;
+            this._characterMenu_Add.Visible = f == null || f.Temporary;
+            this._characterMenu_Remove.Visible = f != null;
             if (f != null && !f.Online)
             {
                 // We can't kick or invite offline characters

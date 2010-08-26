@@ -29,19 +29,22 @@ namespace Vha.Net
         private readonly UInt32 _id;
         private readonly String _name;
         private readonly bool _online;
+        private readonly string _tag;
         private readonly bool _temporary;
 
-        public Friend(UInt32 id, String name, bool online, bool temporary)
+        public Friend(UInt32 id, String name, bool online, string tag, bool temporary)
         {
             this._id = id;
             this._name = name;
             this._online = online;
+            this._tag = tag;
             this._temporary = temporary;
         }
 
         public UInt32 ID { get { return this._id; } }
         public String Name { get { return this._name; } }
         public bool Online { get { return this._online; } }
+        public string Tag { get { return this._tag; } }
         public bool Temporary { get { return this._temporary; } }
         public override string ToString() { return this._name; }
 
@@ -55,8 +58,10 @@ namespace Vha.Net
                 return this.Name.CompareTo(friend.Name);
             if (this.Online != friend.Online)
                 return this.Online.CompareTo(friend.Online);
+            if (string.Compare(this.Tag, friend.Tag, StringComparison.Ordinal) != 0)
+                return string.Compare(this.Tag, friend.Tag, StringComparison.Ordinal);
             if (this.Temporary != friend.Temporary)
-                return this.Temporary.CompareTo(friend.Temporary);
+                return this.Tag.CompareTo(friend.Temporary);
             return 0;
         }
 

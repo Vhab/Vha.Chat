@@ -33,20 +33,20 @@ namespace Vha.Net.Events
         private readonly UInt32 _characterID = 0;
         private readonly string _character;
         private readonly bool _online = false;
-        private readonly bool _temporary = false;
+        private readonly string _tag = "";
 
         /// <summary>
         /// Event argument constructor
         /// </summary>
         /// <param name="characterID">The character id of the character</param>
         /// <param name="status">The status of the character</param>
-        /// <param name="temporary">Whether the character is a temporary friend</param>
-        public FriendStatusEventArgs(UInt32 characterID, string character, bool status, bool temporary)
+        /// <param name="group">A string associated with this specific friendslist entry</param>
+        public FriendStatusEventArgs(UInt32 characterID, string character, bool status, string tag)
         {
             this._characterID = characterID;
             this._character = character;
             this._online = status;
-            this._temporary = temporary;
+            this._tag = tag;
         }
 
         /// <summary>
@@ -61,11 +61,15 @@ namespace Vha.Net.Events
         /// <summary>
         /// Whether the character is a temporary friend
         /// </summary>
-        public bool Temporary { get { return this._temporary; } }
+        public bool Temporary { get { return this._tag == "\0"; } }
+        /// <summary>
+        /// A string associated with this specific friendslist entry
+        /// </summary>
+        public string Tag { get { return this._tag; } }
         /// <summary>
         /// Returns combined friend data
         /// </summary>
         /// <returns>A new instance of Friend</returns>
-        public Friend GetFriend() { return new Friend(this.CharacterID, this.Character, this.Online, this.Temporary); }
+        public Friend GetFriend() { return new Friend(this.CharacterID, this.Character, this.Online, this.Tag, this.Temporary); }
     }
 }

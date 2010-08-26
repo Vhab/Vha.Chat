@@ -38,8 +38,9 @@ namespace Vha.Chat.UI
 {
     public partial class ChatForm : BaseForm
     {
-        protected ChatTreeNode _online = new ChatTreeNode(MessageType.Character, "Online");
-        protected ChatTreeNode _offline = new ChatTreeNode(MessageType.Character, "Offline");
+        protected ChatTreeNode _onlineFriends = new ChatTreeNode(MessageType.Character, "Online");
+        protected ChatTreeNode _offlineFriends = new ChatTreeNode(MessageType.Character, "Offline");
+        protected ChatTreeNode _recentFriends = new ChatTreeNode(MessageType.Character, "Recent");
         protected ChatTreeNode _channels = new ChatTreeNode(MessageType.Channel, "Channels");
         protected ChatTreeNode _privateChannels = new ChatTreeNode(MessageType.PrivateChannel, "Private Channels");
         protected ChatTreeNode _guests = new ChatTreeNode(MessageType.Character, "Guests");
@@ -72,8 +73,9 @@ namespace Vha.Chat.UI
             this._context.FriendRemovedEvent += new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
             this._context.FriendUpdatedEvent += new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
             
-            this._tree.Nodes.Add(this._online);
-            this._tree.Nodes.Add(this._offline);
+            this._tree.Nodes.Add(this._onlineFriends);
+            this._tree.Nodes.Add(this._offlineFriends);
+            this._tree.Nodes.Add(this._recentFriends);
             this._tree.Nodes.Add(this._channels);
             this._tree.Nodes.Add(this._privateChannels);
             this._tree.Nodes.Add(this._guests);
@@ -234,8 +236,9 @@ namespace Vha.Chat.UI
             {
                 // - Clear tree sections
                 this._channels.Nodes.Clear();
-                this._online.Nodes.Clear();
-                this._offline.Nodes.Clear();
+                this._onlineFriends.Nodes.Clear();
+                this._offlineFriends.Nodes.Clear();
+                this._recentFriends.Nodes.Clear();
                 this._guests.Nodes.Clear();
                 this._privateChannels.Nodes.Clear();
                 // Update buttons
@@ -424,15 +427,20 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            if (args.Friend.Online)
+            string icon = args.Friend.Online ? "CharacterOnline" : "CharacterOffline";
+            if (args.Friend.Temporary)
             {
-                this._online.AddNode(args.Friend.Name, "CharacterOnline");
-                if (this._online.Nodes.Count == 1)
-                    this._online.Expand();
+                this._recentFriends.AddNode(args.Friend.Name, icon);
+            }
+            else if (args.Friend.Online)
+            {
+                this._onlineFriends.AddNode(args.Friend.Name, icon);
+                if (this._onlineFriends.Nodes.Count == 1)
+                    this._onlineFriends.Expand();
             }
             else
             {
-                this._offline.AddNode(args.Friend.Name, "CharacterOffline");
+                this._offlineFriends.AddNode(args.Friend.Name, icon);
             }
         }
 
@@ -445,8 +453,9 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            this._offline.RemoveNode(args.Friend.Name);
-            this._online.RemoveNode(args.Friend.Name);
+            this._offlineFriends.RemoveNode(args.Friend.Name);
+            this._onlineFriends.RemoveNode(args.Friend.Name);
+            this._recentFriends.RemoveNode(args.Friend.Name);
         }
 
 
@@ -459,17 +468,26 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            if (args.Friend.Online)
+            // Remove from all lists
+            this._onlineFriends.RemoveNode(args.Friend.Name);
+            this._offlineFriends.RemoveNode(args.Friend.Name);
+            this._recentFriends.RemoveNode(args.Friend.Name);
+            // Determine icon
+            string icon = args.Friend.Online ? "CharacterOnline" : "CharacterOffline";
+            // Add to appropriate list
+            if (args.Friend.Temporary)
             {
-                this._offline.RemoveNode(args.Friend.Name);
-                this._online.AddNode(args.Friend.Name, "CharacterOnline");
-                if (this._online.Nodes.Count == 1)
-                    this._online.Expand();
+                this._recentFriends.AddNode(args.Friend.Name, icon);
+            }
+            else if (args.Friend.Online)
+            {
+                this._onlineFriends.AddNode(args.Friend.Name, icon);
+                if (this._onlineFriends.Nodes.Count == 1)
+                    this._onlineFriends.Expand();
             }
             else
             {
-                this._online.RemoveNode(args.Friend.Name);
-                this._offline.AddNode(args.Friend.Name, "CharacterOffline");
+                this._offlineFriends.AddNode(args.Friend.Name, icon);
             }
         }
         #endregion
@@ -598,7 +616,9 @@ namespace Vha.Chat.UI
             // Set as selected node
             this._tree.SelectedNode = e.Node;
             // Show menu
-            if (e.Node.Parent == this._online || e.Node.Parent == this._offline)
+            if (e.Node.Parent == this._onlineFriends ||
+                e.Node.Parent == this._offlineFriends ||
+                e.Node.Parent == this._recentFriends)
             {
                 // Character menu
                 this._contextMenu.Show(new MessageTarget(MessageType.Character, target));

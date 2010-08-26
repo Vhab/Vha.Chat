@@ -904,8 +904,6 @@ namespace Vha.Chat
 
         void _chat_FriendStatusEvent(Vha.Net.Chat chat, FriendStatusEventArgs e)
         {
-            // Ignore temporary friends
-            if (e.Temporary) return;
             // Ignore invalid friends
             if (string.IsNullOrEmpty(e.Character)) return;
             // Handle friend update

@@ -30,7 +30,7 @@ namespace Vha.Chat.Commands
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckChannel(message, true)) return false;
-            context.Chat.SendChannelUpdate(message, ChannelFlags.Muted);
+            context.Chat.SendChannelUpdate(message, ChannelFlags.Muted, "");
             return true;
         }
 

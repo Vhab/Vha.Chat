@@ -973,6 +973,10 @@ namespace Vha.Chat
             // Dispatch message
             MessageSource source = new MessageSource(MessageType.Character, null, e.Character, e.Outgoing);
             this.Write(source, MessageClass.PrivateMessage, e.Message);
+            // Add to recent friends
+            Friend friend = this.GetFriend(e.Character);
+            if (friend != null) return;
+            this.Chat.SendFriendAdd(e.CharacterID, "\0");
         }
 
         void _chat_SystemMessageEvent(Vha.Net.Chat chat, SystemMessageEventArgs e)

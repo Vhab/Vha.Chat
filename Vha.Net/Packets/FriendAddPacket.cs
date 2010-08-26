@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.Net
 * Copyright (C) 2005-2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
@@ -20,26 +20,17 @@
 
 using System;
 using System.Net;
-using Vha.Common;
 
 namespace Vha.Net.Packets
 {
-    internal class FriendStatusPacket : Packet
+    internal class FriendAddPacket : Packet
     {
-        internal FriendStatusPacket(Packet.Type type, byte[] data) : base(type, data) { }
-
-        override protected void BytesToData(byte[] data)
+        internal FriendAddPacket(Packet.Type type, byte[] data) : base(type, data) { }
+        internal FriendAddPacket(UInt32 characterID, string group)
+            : base(Packet.Type.FRIEND_ADD)
         {
-            if (data == null || data.Length < 10) { return; }
-
-            int offset = 0;
-            this.AddData(PopUnsignedInteger(ref data, ref offset));
-            this.AddData(PopInteger(ref data, ref offset));
-            this.AddData(PopString(ref data, ref offset).ToString());
+            this.AddData(NetConvert.HostToNetworkOrder(characterID));
+            this.AddData(group);
         }
-
-        internal UInt32 CharacterID { get { return (UInt32)this.Data[0]; } }
-        internal bool Online { get { return Convert.ToBoolean(this.Data[1]); } }
-        internal string Tag { get { return (string)this.Data[2]; } }
     }
 }

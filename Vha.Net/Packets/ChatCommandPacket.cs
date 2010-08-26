@@ -27,7 +27,7 @@ namespace Vha.Net.Packets
     internal class ChatCommandPacket : Packet
     {
         internal ChatCommandPacket(Packet.Type type, byte[] data) : base(type, data) { }
-        internal ChatCommandPacket(params string[] commands)
+        internal ChatCommandPacket(UInt32 windowId, params string[] commands)
             : base(Packet.Type.CHAT_COMMAND)
         {
             this.AddData(IPAddress.HostToNetworkOrder((short)commands.Length));
@@ -35,7 +35,7 @@ namespace Vha.Net.Packets
             {
                 this.AddData(new NetString(command));
             }
-            this.AddData(IPAddress.HostToNetworkOrder((int)1));
+            this.AddData(NetConvert.HostToNetworkOrder(windowId));
         }
     }
 }

@@ -796,7 +796,7 @@ namespace Vha.Net
                             ((FriendStatusPacket)packet).CharacterID,
                             this.GetCharacterName(((FriendStatusPacket)packet).CharacterID),
                             ((FriendStatusPacket)packet).Online,
-                            ((FriendStatusPacket)packet).Temporary
+                            ((FriendStatusPacket)packet).Tag
                             ));
                         break;
                     case Packet.Type.CHANNEL_STATUS:
@@ -1448,14 +1448,21 @@ namespace Vha.Net
 		/// Add a friend. (standard priority)
 		/// </summary>
         /// <param name="character"></param>
-        public void SendFriendAdd(string character)
+        public void SendFriendAdd(string character) { this.SendFriendAdd(character, ""); }
+        public void SendFriendAdd(UInt32 characterID) { this.SendFriendAdd(characterID, ""); }
+        /// <summary>
+        /// Add a friend. (standard priority)
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="group">A group to place this friend in. You can use the value "\0" to mark temporary friends.</param>
+        public void SendFriendAdd(string character, string group) { this.SendFriendAdd(this.GetCharacterID(character), group); }
+        public void SendFriendAdd(UInt32 characterID, string group)
         {
-            if (string.IsNullOrEmpty(character)) return;
-            this.Debug("Adding character to friendslist: " + character, "[Bot]");
-
-            ChatCommandPacket p = new ChatCommandPacket("addbuddy", character);
+            if (characterID == this._id || characterID == 0)
+                return;
+            this.Debug("Adding character to friendslist: " + this.GetCharacterName(characterID), "[Bot]");
+            FriendAddPacket p = new FriendAddPacket(characterID, group);
             p.Priority = PacketPriority.Standard;
-
             this.SendPacket(p);
         }
 
@@ -1463,31 +1470,33 @@ namespace Vha.Net
 		/// Remove friend. (standard priority)
 		/// </summary>
         /// <param name="character"></param>
-        public void SendFriendRemove(string character)
+        public void SendFriendRemove(string character) { this.SendFriendRemove(this.GetCharacterID(character)); }
+        public void SendFriendRemove(UInt32 characterID)
         {
-            if (string.IsNullOrEmpty(character)) return;
-            this.Debug("Removing character from friendslist: " + character, "[Bot]");
-
-            ChatCommandPacket p = new ChatCommandPacket("rembuddy", character);
+            if (characterID == this._id || characterID == 0)
+                return;
+            this.Debug("Removing character from friendslist: " + this.GetCharacterName(characterID), "[Bot]");
+            FriendRemovePacket p = new FriendRemovePacket(characterID);
             p.Priority = PacketPriority.Standard;
-
             this.SendPacket(p);
         }
 
         /// <summary>
         /// Send a /cc command. (standard priority)
         /// </summary>
+        /// <param name="windowId"></param>
         /// <param name="command"></param>
-        public void SendChatCommand(string command) { SendChatCommand(command.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries)); }
+        public void SendChatCommand(UInt32 windowId, string command) { this.SendChatCommand(windowId, command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)); }
         /// <summary>
         /// Send a /cc command. (standard priority)
         /// </summary>
+        /// <param name="windowId"></param>
         /// <param name="arguments"></param>
-        public void SendChatCommand(params string[] arguments)
+        public void SendChatCommand(UInt32 windowId, params string[] arguments)
         {
             this.Debug("Sending command: /cc " + string.Join(" ", arguments), "[Bot]");
 
-            ChatCommandPacket p = new ChatCommandPacket(arguments);
+            ChatCommandPacket p = new ChatCommandPacket(windowId, arguments);
             p.Priority = PacketPriority.Standard;
             this.SendPacket(p);
         }

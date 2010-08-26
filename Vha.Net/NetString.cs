@@ -41,7 +41,7 @@ namespace Vha.Net
         }
         public NetString(byte[] data, int offset, short length)
         {
-            if (data == null || data.Length - offset < 3) { return; }
+            if (data == null || data.Length - offset - length < 0) { return; }
             this._length = length;
             this._value = NetString.Encoding.GetString(data, offset, this._length);
         }

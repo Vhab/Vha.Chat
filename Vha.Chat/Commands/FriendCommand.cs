@@ -32,12 +32,14 @@ namespace Vha.Chat.Commands
             {
                 if (!context.Input.CheckCharacter(args[1], true)) return false;
                 context.Chat.SendFriendAdd(args[1]);
+                context.Write(MessageClass.Internal, "Adding '" + args[1] + "' to your friends list");
                 return true;
             }
             else if (args[0].ToLower() == "remove")
             {
                 if (!context.Input.CheckCharacter(args[1], true)) return false;
                 context.Chat.SendFriendRemove(args[1]);
+                context.Write(MessageClass.Internal, "Removing '" + args[1] + "' from your friends list");
                 return true;
             }
             else

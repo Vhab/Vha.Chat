@@ -234,7 +234,7 @@ namespace Vha.Net.Packets
 				return null;
 
 			short len = PopShort(ref data, ref offset);
-            if (len < 0)
+            if (len <= 0)
                 return new byte[0];
 			byte[] ret = new byte[len];
 			Array.Copy(data, offset, ret, 0, len);

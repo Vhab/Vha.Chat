@@ -29,7 +29,7 @@ namespace Vha.Chat.Commands
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (!context.Input.CheckConnection(true)) return false;
-            context.Chat.SendChatCommand(args);
+            context.Chat.SendChatCommand(0, args);
             return true;
         }
 

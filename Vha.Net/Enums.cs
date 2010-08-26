@@ -54,14 +54,6 @@ namespace Vha.Net
         NoVoice = 0x20,
         SendCriteria = 0x40,
         GroupOnName = 0x80,
-        Custom1 = 0x10000,
-        Custom2 = 0x20000,
-        Custom3 = 0x40000,
-        Custom4 = 0x80000,
-        Custom5 = 0x100000,
-        Custom6 = 0x200000,
-        Custom7 = 0x400000,
-        Custom8 = 0x800000,
         Muted = 0x1000000,
     }
 

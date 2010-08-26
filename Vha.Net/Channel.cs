@@ -30,19 +30,22 @@ namespace Vha.Net
         private readonly String _name = null;
         private readonly ChannelType _type = ChannelType.Unknown;
         private readonly ChannelFlags _flags;
+        private readonly string _tag;
 
-        public Channel(BigInteger id, String name, ChannelType type, ChannelFlags flags)
+        public Channel(BigInteger id, String name, ChannelType type, ChannelFlags flags, string tag)
         {
             this._id = id;
             this._name = name;
             this._type = type;
             this._flags = flags;
+            this._tag = tag;
         }
 
         public BigInteger ID { get { return this._id; } }
         public String Name { get { return this._name; } }
         public ChannelType Type { get { return this._type; } }
         public ChannelFlags Flags { get { return this._flags; } }
+        public string Tag { get { return this._tag; } }
         public override string ToString() { return this._name; }
 
         public int CompareTo(Channel channel)
@@ -57,6 +60,8 @@ namespace Vha.Net
                 return this.Type.CompareTo(channel.Type);
             if (this.Flags != channel.Flags)
                 return this.Flags.CompareTo(channel.Flags);
+            if (string.Compare(this.Tag, channel.Tag, StringComparison.Ordinal) != 0)
+                return string.Compare(this.Tag, channel.Tag, StringComparison.Ordinal);
             return 0;
         }
 

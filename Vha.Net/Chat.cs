@@ -806,7 +806,8 @@ namespace Vha.Net
                             ((ChannelStatusPacket)packet).ID,
                             ((ChannelStatusPacket)packet).Name,
                             ((ChannelStatusPacket)packet).Flags,
-                            ((ChannelStatusPacket)packet).ChannelType
+                            ((ChannelStatusPacket)packet).ChannelType,
+                            ((ChannelStatusPacket)packet).Tag
                             ));
                         break;
                     case Packet.Type.PRIVATE_CHANNEL_CLIENTJOIN:
@@ -1018,7 +1019,11 @@ namespace Vha.Net
 
         protected virtual void OnFriendStatusEvent(FriendStatusEventArgs e)
         {
-            this.Debug("Friend status received: " + e.Character + " (ID:" + e.CharacterID + " Online:" + e.Online.ToString() + " Temporary:" + e.Temporary.ToString() + ")", "[Database]");
+            this.Debug("Friend status received: " + e.Character +
+                " (ID:" + e.CharacterID +
+                " Online:" + e.Online.ToString() +
+                " Temporary:" + e.Temporary.ToString() +
+                ")", "[Database]");
 
             if (this.FriendStatusEvent != null)
                 this.FriendStatusEvent(this, e);
@@ -1404,17 +1409,17 @@ namespace Vha.Net
 		/// </summary>
 		/// <param name="channel">Name of channel to (un)mute</param>
         /// <param name="mute">the updated set of channel flags</param>
-        public void SendChannelUpdate(string channel, ChannelFlags flags) { this.SendChannelUpdate(this.GetChannelID(channel), flags); }
+        public void SendChannelUpdate(string channel, ChannelFlags flags, string tag) { this.SendChannelUpdate(this.GetChannelID(channel), flags, tag); }
 		/// <summary>
 		/// Mute or unmute a channel
 		/// </summary>
 		/// <param name="channelID">ID of channel to (un)mute</param>
 		/// <param name="flags">the updated set of channel flags</param>
-        public void SendChannelUpdate(BigInteger channelID, ChannelFlags flags)
+        public void SendChannelUpdate(BigInteger channelID, ChannelFlags flags, string tag)
         {
-            this.Debug("Updating channel " + this.GetChannelName(channelID) + " with flags=" + flags.ToString(), "[Bot]");
+            this.Debug("Updating channel " + this.GetChannelName(channelID) + " with flags=" + flags.ToString() + " and tag=" + tag, "[Bot]");
 
-            ChannelUpdatePacket p = new ChannelUpdatePacket(channelID, flags);
+            ChannelUpdatePacket p = new ChannelUpdatePacket(channelID, flags, tag);
             p.Priority = PacketPriority.Standard;
             this.SendPacket(p);
         }

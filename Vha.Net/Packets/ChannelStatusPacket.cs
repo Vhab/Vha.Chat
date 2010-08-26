@@ -35,11 +35,13 @@ namespace Vha.Net.Packets
             this.AddData(PopChannelID(ref data, ref offset));
             this.AddData(PopString(ref data, ref offset).ToString());
             this.AddData(PopUnsignedInteger(ref data, ref offset));
+            this.AddData(PopString(ref data, ref offset).ToString());
         }
 
         internal BigInteger ID { get { return (BigInteger)this.Data[0]; } }
         internal String Name { get { return (String)this.Data[1]; } }
         internal byte ChannelType { get { return ((BigInteger)this.Data[0]).GetBytes()[0]; } }
         internal ChannelFlags Flags { get { return (ChannelFlags)((UInt32)this.Data[2]); } }
+        internal string Tag { get { return (string)this.Data[3]; } }
     }
 }

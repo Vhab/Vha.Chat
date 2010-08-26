@@ -58,8 +58,10 @@ namespace Vha.Net
                 return this.Name.CompareTo(friend.Name);
             if (this.Online != friend.Online)
                 return this.Online.CompareTo(friend.Online);
-            if (this.Tag != friend.Tag)
-                return this.Tag.CompareTo(friend.Tag);
+            if (string.Compare(this.Tag, friend.Tag, StringComparison.Ordinal) != 0)
+                return string.Compare(this.Tag, friend.Tag, StringComparison.Ordinal);
+            if (this.Temporary != friend.Temporary)
+                return this.Tag.CompareTo(friend.Temporary);
             return 0;
         }
 

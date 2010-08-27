@@ -229,23 +229,23 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Application.ico" />
-    <None Include="Bootstrap.html">
+    <Content Include="Bootstrap.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="Resources\CharacterDeleteBitmap.png" />
     <None Include="Resources\CharacterAddBitmap.png" />
     <None Include="Resources\CharacterDisabledBitmap.png" />
     <None Include="Resources\CharacterInformationBitmap.png" />
     <None Include="Resources\PopupBitmap.png" />
-    <None Include="Credits.txt">
+    <Content Include="Credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="License.txt">
+    </Content>
+    <Content Include="License.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Configuration.xml">
+    </Content>
+    <Content Include="Configuration.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="Resources\OutputControl.html" />
     <None Include="Resources\OptionsBigBitmap.png" />
     <None Include="Resources\OptionsIcon.ico" />

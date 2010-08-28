@@ -16,7 +16,7 @@ using System;
 [assembly: AssemblyTitle("Vha.Common")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Vha.Chat Development Team")]
 [assembly: AssemblyProduct("Vha.Common")]
 [assembly: AssemblyCopyright("Copyright ©  2005-2010 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]

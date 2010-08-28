@@ -247,6 +247,7 @@
     <Content Include="Bootstrap.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Installer.nsi" />
     <None Include="PostBuild.bat" />
     <None Include="Resources\CharacterDeleteBitmap.png" />
     <None Include="Resources\CharacterAddBitmap.png" />

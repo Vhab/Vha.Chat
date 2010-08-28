@@ -16,7 +16,7 @@ using System;
 [assembly: AssemblyTitle("Vha.Chat")]
 [assembly: AssemblyDescription("A simple stand alone chat client for Anarchy Online")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Vha.Chat Developmnet Team")]
+[assembly: AssemblyCompany("Vha.Chat Development Team")]
 [assembly: AssemblyProduct("Vha.Chat")]
 [assembly: AssemblyCopyright("Copyright ©  2009-2010 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]

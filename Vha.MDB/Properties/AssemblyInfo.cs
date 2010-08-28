@@ -14,9 +14,9 @@ using System;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Vha.MDB")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A library for decoding Anarchy Online's (AO) template messages and reading AO's .mdb and .ldb files")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Vha.Chat Development Team")]
 [assembly: AssemblyProduct("Vha.MDB")]
 [assembly: AssemblyCopyright("Copyright ©  2005-2010 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]

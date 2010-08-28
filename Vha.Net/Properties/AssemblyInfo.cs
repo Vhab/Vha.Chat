@@ -14,9 +14,9 @@ using System;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Vha.Net")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A network library compatible with Anarchy Online's chat server")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Vha.Chat Development Team")]
 [assembly: AssemblyProduct("Vha.Net")]
 [assembly: AssemblyCopyright("Copyright ©  2005-2010 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]

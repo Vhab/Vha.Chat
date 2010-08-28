@@ -14,9 +14,9 @@ using System;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Vha.AOML")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A library for parsing and converting Anarchy Online's Markup Language (AOML)")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Vha.Chat Development Team")]
 [assembly: AssemblyProduct("Vha.AOML")]
 [assembly: AssemblyCopyright("Copyright ©  2010 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]

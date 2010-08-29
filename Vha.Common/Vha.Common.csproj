@@ -36,15 +36,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigInteger.cs" />
-    <Compile Include="Data\Character.cs" />
-    <Compile Include="Data\Organization.cs" />
-    <Compile Include="Item.cs" />
+    <Compile Include="Data\AO\CharacterName.cs" />
+    <Compile Include="Data\AO\CharacterOrganization.cs" />
+    <Compile Include="Data\AO\CharacterStats.cs" />
+    <Compile Include="Data\AO\OrganizationMember.cs" />
+    <Compile Include="Data\Base.cs" />
+    <Compile Include="Data\AO\Character.cs" />
+    <Compile Include="Data\AO\Organization.cs" />
     <Compile Include="Base85.cs" />
-    <Compile Include="Colors.cs" />
+    <Compile Include="Data\AODevs\FileV1.cs" />
+    <Compile Include="Data\AODevs\LinkV1.cs" />
+    <Compile Include="Data\AODevs\MemberV1.cs" />
+    <Compile Include="Data\AODevs\PackageV1.cs" />
+    <Compile Include="Data\AODevs\PageV1.cs" />
+    <Compile Include="Data\AODevs\ReferenceV1.cs" />
+    <Compile Include="Data\AODevs\RepositoryV1.cs" />
+    <Compile Include="Data\AODevs\RootV1.cs" />
+    <Compile Include="Data\AODevs\VersionV1.cs" />
     <Compile Include="Format.cs" />
-    <Compile Include="HTML.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextWindow.cs" />
     <Compile Include="TimeStamp.cs" />
     <Compile Include="Web.cs" />
     <Compile Include="XML.cs" />

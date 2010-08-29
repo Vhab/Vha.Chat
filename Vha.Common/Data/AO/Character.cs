@@ -25,7 +25,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data
+namespace Vha.Common.Data.AO
 {
     [XmlRoot("character")]
     public class Character
@@ -66,67 +66,6 @@ namespace Vha.Common.Data
             if (this.Name != null)
                 return this.Name.ToString();
             return "";
-        }
-    }
-
-    public class CharacterName
-    {
-        [XmlElement("firstname")]
-        public string Firstname;
-        [XmlElement("nick")]
-        public string Nickname;
-        [XmlElement("lastname")]
-        public string Lastname;
-
-        public override string ToString()
-        {
-            string result = "";
-            if (this.Firstname != null && this.Firstname != string.Empty)
-                result += this.Firstname + " ";
-
-            result += string.Format("\"{0}\"", this.Nickname);
-
-            if (this.Lastname != null && this.Lastname != string.Empty)
-                result += " " + this.Lastname;
-
-            return result;
-        }
-    }
-
-    public class CharacterStats
-    {
-        [XmlElement("level", Type = typeof(Int32))]
-        public Int32 Level;
-        [XmlElement("breed")]
-        public string Breed;
-        [XmlElement("gender")]
-        public string Gender;
-        [XmlElement("faction")]
-        public string Faction;
-        [XmlElement("profession")]
-        public string Profession;
-        [XmlElement("profession_title")]
-        public string Title;
-        [XmlElement("defender_rank")]
-        public string DefenderRank;
-        [XmlElement("defender_rank_id", Type = typeof(Int32))]
-        public Int32 DefenderLevel = 0;
-    }
-
-    public class CharacterOrganization
-    {
-        [XmlElement("organization_id", Type = typeof(Int32))]
-        public Int32 ID = 0;
-        [XmlElement("organization_name")]
-        public string Name;
-        [XmlElement("rank")]
-        public string Rank;
-        [XmlElement("rank_id", Type = typeof(Int32))]
-        public Int32 RankID = 0;
-
-        public override string ToString()
-        {
-            return this.Rank + " of " + this.Name;
         }
     }
 }

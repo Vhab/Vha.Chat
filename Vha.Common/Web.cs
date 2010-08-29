@@ -154,6 +154,96 @@ namespace Vha.Common
             return source;
         }
 
+        private enum StripState
+        {
+            Text,
+            InsideTag,
+            InsideString
+        }
+
+        public static string StripTags(string text)
+        {
+            text = text.Replace("\r", "");
+            text = text.Replace("\t", " ");
+            while (text.Contains("  "))
+            {
+                text = text.Replace("  ", " ");
+            }
+
+            char[] charText = text.ToCharArray();
+            string strippedText = String.Empty;
+            StripState state = StripState.Text;
+            int readFrom = 0;
+
+            for (int i = 0; i < charText.Length; i++)
+            {
+                switch (charText[i])
+                {
+                    case '>':
+                        if (state == StripState.InsideTag)
+                        {
+                            state = StripState.Text;
+                            readFrom = i + 1;
+                        }
+                        break;
+                    case '"':
+                        if (state == StripState.InsideTag)
+                        {
+                            state = StripState.InsideString;
+                            break;
+                        }
+                        if (state == StripState.InsideString)
+                        {
+                            state = StripState.InsideTag;
+                        }
+                        break;
+                    case '<':
+                        if (state == StripState.Text || state == StripState.InsideTag)
+                        {
+                            strippedText += text.Substring(readFrom, i - readFrom);
+                            readFrom = i;
+                            state = StripState.InsideTag;
+                            break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            strippedText += text.Substring(readFrom);
+            return strippedText;
+        }
+
+        /// <summary>
+        /// Replace a selection of risky characters with their html-safe equelants.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string EscapeHtml(string text)
+        {
+            text = text.Replace("&", "&amp;");
+            text = text.Replace("\"", "&quot;");
+            text = text.Replace("'", "&#039;");
+            text = text.Replace("<", "&lt;");
+            text = text.Replace(">", "&gt;");
+            return text;
+        }
+
+        /// <summary>
+        /// Replace html-safe codes with their actual character values 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string UnescapeHtml(string text)
+        {
+            text = text.Replace("&amp;", "&");
+            text = text.Replace("&quot;", "\"");
+            text = text.Replace("&#039;", "'");
+            text = text.Replace("&lt;", "<");
+            text = text.Replace("&gt;", ">");
+            return text;
+        }
+
         private class Limit
         {
             public string Domain;

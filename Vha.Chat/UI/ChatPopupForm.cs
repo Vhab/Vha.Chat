@@ -142,11 +142,11 @@ namespace Vha.Chat.UI
                 // Handle the input
                 if (this._inputBox.Text.StartsWith(this._context.Input.Prefix))
                 {
-                    this._context.Input.Command(HTML.EscapeString(this._inputBox.Text));
+                    this._context.Input.Command(Web.EscapeHtml(this._inputBox.Text));
                     this._inputBox.Text = "";
                     return;
                 }
-                this._context.Input.Send(this._target, HTML.EscapeString(this._inputBox.Text), false);
+                this._context.Input.Send(this._target, Web.EscapeHtml(this._inputBox.Text), false);
                 this._inputBox.Text = "";
             }
         }

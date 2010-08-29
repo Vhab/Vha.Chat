@@ -149,7 +149,7 @@ namespace Vha.AOML.Formatting
 
         public override string OnText(TextElement element)
         {
-            return HTML.EscapeString(element.Text);
+            return Web.EscapeHtml(element.Text);
         }
 
         public override string OnUnderlineOpen(UnderlineElement element)

@@ -23,51 +23,10 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data
+namespace Vha.Common.Data.AO
 {
-    [XmlRoot("organization")]
-    public class Organization
-    {
-        [XmlElement("id", Type = typeof(Int32))]
-        public Int32 ID;
-        [XmlElement("name")]
-        public string Name;
-        [XmlElement("side")]
-        public string Faction;
-        [XmlElement("last_updated")]
-        public string LastUpdated;
-        [XmlElement("members")]
-        public OrganizationMembers Members;
-        [XmlIgnore]
-        public OrganizationMember Leader
-        {
-            get
-            {
-                foreach (OrganizationMember member in this.Members.Items)
-                    if (member.RankID == 0)
-                        return member;
-                return null;
-            }
-        }
-    }
-    public class OrganizationMembers
-    {
-        [XmlElement("member")]
-        public OrganizationMember[] Items;
-
-        public OrganizationMember GetMember(string nickname)
-        {
-            foreach (OrganizationMember member in this.Items)
-                if (member.Nickname.ToLower() == nickname.ToLower())
-                    return member;
-            return null;
-        }
-    }
-
     public class OrganizationMember
     {
         [XmlElement("firstname")]

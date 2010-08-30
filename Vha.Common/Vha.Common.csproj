@@ -51,7 +51,7 @@
     <Compile Include="Data\AODevs\PageV1.cs" />
     <Compile Include="Data\AODevs\ReferenceV1.cs" />
     <Compile Include="Data\AODevs\RepositoryV1.cs" />
-    <Compile Include="Data\AODevs\RootV1.cs" />
+    <Compile Include="Data\AODevs\ProjectV1.cs" />
     <Compile Include="Data\AODevs\VersionV1.cs" />
     <Compile Include="Format.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

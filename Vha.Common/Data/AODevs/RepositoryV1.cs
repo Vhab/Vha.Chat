@@ -29,7 +29,7 @@ namespace Vha.Common.Data.AODevs
     public class RepositoryV1 : ReferenceV1
     {
         [XmlAttribute("Type")]
-        public string Type;
+        public string RepositoryType;
 
         [XmlAttribute("Label")]
         public string Label;

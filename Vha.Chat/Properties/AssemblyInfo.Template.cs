@@ -37,5 +37,5 @@ using System;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.2.0.$WCREV$")]
-[assembly: AssemblyFileVersion("1.2.0.$WCREV$")]
+[assembly: AssemblyVersion("1.2.1.$WCREV$")]
+[assembly: AssemblyFileVersion("1.2.1.$WCREV$")]

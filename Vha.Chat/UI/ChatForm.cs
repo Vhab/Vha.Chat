@@ -344,8 +344,6 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-            // Ignore other characters leaving
-            if (args.Character != context.Character) return;
             // Update list
             this._privateChannels.RemoveNode(args.Channel.Name);
         }
@@ -359,9 +357,6 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
-
-            // Ignore other characters joining
-            if (args.Character != context.Character) return;
             // Update list
             this._privateChannels.AddNode(args.Channel.Name, "Character");
             if (this._privateChannels.Nodes.Count == 1)

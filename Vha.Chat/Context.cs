@@ -815,6 +815,7 @@ namespace Vha.Chat
 
                 }
                 // Handle the local character
+                else
                 {
                     bool joined = false;
                     bool left = false;

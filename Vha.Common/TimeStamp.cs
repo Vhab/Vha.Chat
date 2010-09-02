@@ -32,10 +32,11 @@ namespace Vha.Common
         /// Converts a DateTime to UnixTimeStamp. Assumes the time it has been given is GMT
         /// </summary>
         /// <param name="time"></param>
+        /// <param name="assumeUtc">Whether to assume the time value is UTC</param>
         /// <returns>UnixTimeStamp</returns>
-        public static Int64 FromDateTime(DateTime time)
+        public static Int64 FromDateTime(DateTime time, bool assumeUtc)
         {
-            time = time.ToUniversalTime();
+            if (!assumeUtc) time = time.ToUniversalTime();
             TimeSpan span = time - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             return Convert.ToInt64(span.TotalSeconds);
         }
@@ -55,6 +56,6 @@ namespace Vha.Common
         /// <summary>
         /// Returns the current time in UnixTimeStamp format as GMT
         /// </summary>
-        public static Int64 Now { get { return FromDateTime(DateTime.Now); } }
+        public static Int64 Now { get { return FromDateTime(DateTime.Now, false); } }
     }
 }

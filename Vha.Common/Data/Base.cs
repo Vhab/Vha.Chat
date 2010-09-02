@@ -103,6 +103,8 @@ namespace Vha.Common.Data
                     if (_types.ContainsKey(type))
                         dataType = _types[type];
                 }
+                if (dataType == null)
+                    return null;
                 // Read data
                 Base data = (Base)XML.FromStream(dataType, stream, false);
                 if (data == null)

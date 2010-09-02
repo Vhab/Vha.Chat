@@ -32,10 +32,9 @@ namespace Vha.Common.Data.AODevs
         [XmlAttribute("Name")]
         public string Name;
 
-        [XmlArray]
-        [XmlArrayItem("Link", typeof(LinkV1))]
-        [XmlArrayItem("File", typeof(FileV1))]
-        [XmlArrayItem("Repository", typeof(RepositoryV1))]
+        [XmlElement(ElementName = "Link", Type = typeof(LinkV1)),
+        XmlElement(ElementName = "File", Type = typeof(FileV1)),
+        XmlElement(ElementName = "Repository", Type = typeof(RepositoryV1))]
         public List<ReferenceV1> References = new List<ReferenceV1>();
     }
 }

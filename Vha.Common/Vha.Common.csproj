@@ -61,6 +61,7 @@
     <Compile Include="XMLCache.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\AODevs\ProjectV1.xsd" />
     <None Include="Vha.Common.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

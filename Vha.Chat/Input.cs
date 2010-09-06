@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Text;
 using Vha.Chat.Commands;
 using Vha.Common;
+using Vha.Net;
 
 namespace Vha.Chat
 {
@@ -95,6 +96,21 @@ namespace Vha.Chat
             return false;
         }
 
+        public bool CheckChannelWritable(string channel, bool output)
+        {
+            if (!CheckConnection(output)) return false;
+            Channel chan = this._context.GetChannel(channel);
+            if (chan != null && (chan.Flags & ChannelFlags.CantSend) == ChannelFlags.None) return true;
+            if (output)
+            {
+                if (chan == null)
+                    this._context.Write(MessageClass.Error, "Unknown channel: " + channel);
+                else
+                    this._context.Write(MessageClass.Error, "Unable to send messages to: " + chan.Name);
+            }
+            return false;
+        }
+
         public bool CheckPrivateChannel(string channel, bool output)
         {
             if (!CheckConnection(output)) return false;
@@ -143,7 +159,7 @@ namespace Vha.Chat
                     this._context.Chat.SendPrivateMessage(target.Target, message);
                     break;
                 case MessageType.Channel:
-                    if (!this.CheckChannel(target.Target, true)) return false;
+                    if (!this.CheckChannelWritable(target.Target, true)) return false;
                     this._context.Chat.SendChannelMessage(target.Target, message);
                     break;
                 case MessageType.PrivateChannel:

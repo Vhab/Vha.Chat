@@ -36,7 +36,8 @@ namespace Vha.Chat.UI
 {
     public partial class AuthenticationForm : Form
     {
-        protected StatusForm _status = null;
+        protected StatusForm _statusForm = null;
+        protected SelectionForm _selectionForm = null;
         protected Context _context = null;
 
         public AuthenticationForm(Context context)
@@ -104,14 +105,14 @@ namespace Vha.Chat.UI
                 return;
             }
             // Create status dialog
-            this._status = new StatusForm();
-            this._status.SetMessage("Initializing...");
+            this._statusForm = new StatusForm();
+            this._statusForm.SetMessage("Initializing...");
             // Connect
             Dimension dimension = (Dimension)this._server.SelectedItem;
             this._context.Connect(dimension.Name, this._account.Text, this._password.Text);
             // Show dialog
-            DialogResult result = this._status.ShowDialog();
-            this._status = null;
+            DialogResult result = this._statusForm.ShowDialog();
+            this._statusForm = null;
             if (result == DialogResult.Abort)
                 this._context.Disconnect();
         }
@@ -136,26 +137,27 @@ namespace Vha.Chat.UI
             // Early out
             if (args.Characters.Length == 0)
                 return;
-            if (this._status == null)
+            if (this._statusForm == null)
                 return;
             // Hide current form
-            this._status.DialogResult = DialogResult.OK;
-            this._status.Hide();
-            this._status = null;
+            this._statusForm.DialogResult = DialogResult.OK;
+            this._statusForm.Hide();
+            this._statusForm = null;
             this.Hide();
             // Show character selection dialog
-            SelectionForm form = new SelectionForm(context, args.Characters);
-            DialogResult result = form.ShowDialog();
+            this._selectionForm = new SelectionForm(context, args.Characters);
+            DialogResult result = this._selectionForm.ShowDialog();
             if (result == DialogResult.OK)
             {
                 // Select character
-                args.Character = form.Character;
+                args.Character = this._selectionForm.Character;
             }
             else
             {
                 // Return to authentication screen
                 this.Show();
             }
+            this._selectionForm = null;
         }
 
         private void _context_StateEvent(Context context, StateEventArgs args)
@@ -172,15 +174,15 @@ namespace Vha.Chat.UI
             switch (args.State)
             {
                 case ContextState.Connecting:
-                    if (this._status != null)
-                        this._status.SetMessage("Connecting...");
+                    if (this._statusForm != null)
+                        this._statusForm.SetMessage("Connecting...");
                     break;
                 case ContextState.CharacterSelection:
                     // Hide status form
-                    if (this._status != null)
+                    if (this._statusForm != null)
                     {
-                        this._status.DialogResult = DialogResult.OK;
-                        this._status.Hide();
+                        this._statusForm.DialogResult = DialogResult.OK;
+                        this._statusForm.Hide();
                     }
                     // Display main form
                     this.Hide();
@@ -189,17 +191,25 @@ namespace Vha.Chat.UI
                     Program.ApplicationContext.MainForm.Show();
                     break;
                 case ContextState.Disconnected:
-                    if (this._status == null) break;
-                    if (this._status.Message == "Connecting...")
-                        this._status.SetMessage("Failed to connect!");
+                    // Hide character selection form
+                    Form selectionForm = this._selectionForm;
+                    if (selectionForm != null)
+                    {
+                        selectionForm.DialogResult = DialogResult.Cancel;
+                        selectionForm.Hide();
+                    }
+                    // Update status form
+                    if (this._statusForm == null) break;
+                    if (this._statusForm.Message == "Connecting...")
+                        this._statusForm.SetMessage("Failed to connect!");
                     break;
             }
         }
 
         private void _context_ErrorEvent(Context context, ErrorEventArgs args)
         {
-            if (this._status != null)
-                this._status.SetMessage(args.Message);
+            if (this._statusForm != null)
+                this._statusForm.SetMessage(args.Message);
         }
         #endregion
     }

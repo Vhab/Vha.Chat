@@ -311,7 +311,7 @@ namespace Vha.Chat
             lock (this)
             {
                 if (this.State == ContextState.Disconnected)
-                    throw new InvalidOperationException("Not expecting a call to Context.Disconnect");
+                    return;
                 if (!this._disconnecting)
                 {
                     this._chat.Disconnect(true);

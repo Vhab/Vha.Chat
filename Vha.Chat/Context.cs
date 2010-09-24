@@ -948,7 +948,7 @@ namespace Vha.Chat
             {
                 MDB.Message parsedMessage = null;
                 try { parsedMessage = MDB.Parser.Decode(e.Message); }
-                catch (Exception ex) { } // Errors are fine here, if it's not a valid message, we'll display the original
+                catch (Exception) { } // Errors are fine here, if it's not a valid message, we'll display the original
                 if (parsedMessage != null && !string.IsNullOrEmpty(parsedMessage.Value))
                     message = parsedMessage.Value;
             }

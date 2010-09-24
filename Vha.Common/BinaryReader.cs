@@ -51,6 +51,10 @@ namespace Vha.Common
             : this(Encoding.UTF8, data, endianness) { }
         public BinaryReader(Encoding encoding, byte[] data, Endianness endianness)
         {
+            if (encoding == null)
+                throw new ArgumentNullException("encoding");
+            if (data == null)
+                throw new ArgumentNullException("data");
             this._encoding = encoding;
             this._data = data;
             this._endianness = endianness;
@@ -128,6 +132,11 @@ namespace Vha.Common
         public UInt64 ReadUInt64()
         {
             return Binary.ReadUInt64(ref this._data, ref this._offset, this._endianness);
+        }
+
+        public string ReadString()
+        {
+            return Binary.ReadString(ref this._data, ref this._offset, this._encoding, this._endianness);
         }
         #endregion
     }

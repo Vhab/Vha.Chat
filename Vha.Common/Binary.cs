@@ -178,5 +178,16 @@ namespace Vha.Common
             byte[] bytes = BitConverter.GetBytes(value);
             return Convert(bytes, 0, bytes.Length, endianness);
         }
+
+        public static byte[] WriteString(string value, Encoding encoding, Endianness endianness)
+        {
+            int length = encoding.GetByteCount(value);
+            if (length > UInt16.MaxValue)
+                throw new ArgumentException("string byte length exceeds " + UInt16.MaxValue);
+            byte[] bytes = new byte[length + 2];
+            WriteUInt16(length, endianness).CopyTo(bytes, 0);
+            encoding.GetBytes(value, 0, value.Length, bytes, 2);
+            return bytes;
+        }
     }
 }

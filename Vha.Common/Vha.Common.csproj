@@ -36,6 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigInteger.cs" />
+    <Compile Include="Binary.cs" />
+    <Compile Include="BinaryReader.cs" />
+    <Compile Include="BinaryWriter.cs" />
     <Compile Include="Data\AO\CharacterName.cs" />
     <Compile Include="Data\AO\CharacterOrganization.cs" />
     <Compile Include="Data\AO\CharacterStats.cs" />

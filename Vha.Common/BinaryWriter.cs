@@ -130,6 +130,11 @@ namespace Vha.Common
         {
             this.WriteBytes(Binary.WriteUInt64(value, this._endianness));
         }
+
+        public void WriteString(string value)
+        {
+            this.WriteBytes(Binary.WriteString(value, this._encoding, this._endianness));
+        }
         #endregion
     }
 }

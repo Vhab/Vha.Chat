@@ -24,25 +24,25 @@
 
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public enum ReferenceTypeV1
+    public enum ReferenceType
     {
         Link,
         File,
         Repository
     }
 
-    public abstract class ReferenceV1
+    public abstract class Reference
     {
         [XmlIgnore]
-        public ReferenceTypeV1 Type { get { return this._type; } }
+        public ReferenceType Type { get { return this._type; } }
 
-        protected ReferenceV1(ReferenceTypeV1 type)
+        protected Reference(ReferenceType type)
         {
             this._type = type;
         }
 
-        private ReferenceTypeV1 _type;
+        private ReferenceType _type;
     }
 }

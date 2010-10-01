@@ -22,19 +22,36 @@
 * THE SOFTWARE.
 */
 
+using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public class MemberV1
+    public class Package
     {
-        [XmlAttribute("Position")]
-        public string Position;
-
         [XmlAttribute("Name")]
         public string Name;
 
-        [XmlAttribute("Server")]
-        public string Server;
+        [XmlIgnore]
+        public DateTime Date = DateTime.MinValue;
+
+        [XmlAttribute("Date")]
+        public string DateWrapper
+        {
+            set { this.Date = DateTime.Parse(value); }
+            get
+            {
+                if (this.Date == DateTime.MinValue) return null;
+                return string.Format(
+                    "{0:00}-{1:00}-{2:0000}",
+                    this.Date.Day, this.Date.Month, this.Date.Year);
+            }
+        }
+
+        [XmlElement(ElementName = "Link", Type = typeof(Link)),
+        XmlElement(ElementName = "File", Type = typeof(File)),
+        XmlElement(ElementName = "Repository", Type = typeof(Repository))]
+        public List<Reference> References = new List<Reference>();
     }
 }

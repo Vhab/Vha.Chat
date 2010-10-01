@@ -24,14 +24,17 @@
 
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public class PageV1
+    public class Member
     {
-        [XmlAttribute("Label")]
-        public string Label;
+        [XmlAttribute("Position")]
+        public string Position;
 
-        [XmlText]
-        public string Text;
+        [XmlAttribute("Name")]
+        public string Name;
+
+        [XmlAttribute("Server")]
+        public string Server;
     }
 }

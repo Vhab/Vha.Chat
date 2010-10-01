@@ -31,6 +31,7 @@
         <xsd:element ref="Repository" maxOccurs="1" minOccurs="1"/>
       </xsd:choice>
       <xsd:attribute name="Name" use="required" type="xsd:string"/>
+      <xsd:attribute name="Date" use="optional" type="xsd:date"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="Link">
@@ -43,7 +44,6 @@
     <xsd:complexType>
       <xsd:attribute name="Label" use="required" type="xsd:string"/>
       <xsd:attribute name="Url" use="required" type="xsd:string"/>
-      <xsd:attribute name="Date" use="required" type="xsd:date"/>
     </xsd:complexType>
   </xsd:element>
   <xsd:element name="Repository">
@@ -96,7 +96,7 @@
           </xsd:complexType>
         </xsd:element>
       </xsd:all>
-      <xsd:attribute name="Name" use="required" fixed="Project" type="xsd:string"/>
+      <xsd:attribute name="Name" fixed="Project" use="required" type="xsd:string"/>
       <xsd:attribute name="Version" fixed="1" use="required" type="xsd:integer"/>
     </xsd:complexType>
   </xsd:element>

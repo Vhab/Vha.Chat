@@ -22,52 +22,21 @@
 * THE SOFTWARE.
 */
 
-using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    [XmlRoot("Root")]
-    public class ProjectV1 : Base
+    public class Repository : Reference
     {
-        [XmlElement("Name")]
-        public string ProjectName;
+        [XmlAttribute("Type")]
+        public string RepositoryType;
 
-        [XmlElement("Tagline")]
-        public string Tagline;
+        [XmlAttribute("Label")]
+        public string Label;
 
-        [XmlElement("Description")]
-        public string Description;
+        [XmlAttribute("Url")]
+        public string Url;
 
-        [XmlElement("License")]
-        public string License;
-
-        [XmlArray("Pages")]
-        [XmlArrayItem("Page")]
-        public List<PageV1> Pages = new List<PageV1>();
-
-        [XmlArray("Staff")]
-        [XmlArrayItem("Member")]
-        public List<MemberV1> Staff = new List<MemberV1>();
-
-        [XmlArray("Links")]
-        [XmlArrayItem("Link")]
-        public List<LinkV1> Links = new List<LinkV1>();
-
-        [XmlArray("Versions")]
-        [XmlArrayItem("Version")]
-        public List<VersionV1> Versions = new List<VersionV1>();
-
-        [XmlArray("Packages")]
-        [XmlArrayItem("Package")]
-        public List<PackageV1> Packages = new List<PackageV1>();
-
-        #region Implement Base
-        public ProjectV1()
-            : base("Project", 1, false, typeof(ProjectV1))
-        { }
-
-        public override Base Upgrade() { return null; }
-        #endregion
+        public Repository() : base(ReferenceType.Repository) { }
     }
 }

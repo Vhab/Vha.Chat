@@ -25,16 +25,49 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public class PackageV1
+    [XmlRoot("Root")]
+    public class Project : Base
     {
-        [XmlAttribute("Name")]
-        public string Name;
+        [XmlElement("Name")]
+        public string ProjectName;
 
-        [XmlElement(ElementName = "Link", Type = typeof(LinkV1)),
-        XmlElement(ElementName = "File", Type = typeof(FileV1)),
-        XmlElement(ElementName = "Repository", Type = typeof(RepositoryV1))]
-        public List<ReferenceV1> References = new List<ReferenceV1>();
+        [XmlElement("Tagline")]
+        public string Tagline;
+
+        [XmlElement("Description")]
+        public string Description;
+
+        [XmlElement("License")]
+        public string License;
+
+        [XmlArray("Pages")]
+        [XmlArrayItem("Page")]
+        public List<Page> Pages = new List<Page>();
+
+        [XmlArray("Staff")]
+        [XmlArrayItem("Member")]
+        public List<Member> Staff = new List<Member>();
+
+        [XmlArray("Links")]
+        [XmlArrayItem("Link")]
+        public List<Link> Links = new List<Link>();
+
+        [XmlArray("Versions")]
+        [XmlArrayItem("Version")]
+        public List<Version> Versions = new List<Version>();
+
+        [XmlArray("Packages")]
+        [XmlArrayItem("Package")]
+        public List<Package> Packages = new List<Package>();
+
+        #region Implement Base
+        public Project()
+            : base("Project", 1, false, typeof(Project))
+        { }
+
+        public override Base Upgrade() { return null; }
+        #endregion
     }
 }

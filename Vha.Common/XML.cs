@@ -43,7 +43,7 @@ namespace Vha.Common
             }
         }
 
-        
+
 
         /// <summary>
         /// Reads an xml file and deserializes it into object T
@@ -238,6 +238,42 @@ namespace Vha.Common
                 return false;
             }
         }
+
+        /// <summary>
+        /// Serialize object to a string
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string ToString(Type type, Object obj)
+        {
+            if (obj == null) throw new ArgumentNullException("obj");
+            MemoryStream stream = null;
+            StreamWriter writer = null;
+            StreamReader reader = null;
+            try
+            {
+                stream = new MemoryStream();
+                writer = new StreamWriter(stream);
+                reader = new StreamReader(stream);
+                GetSerializer(type).Serialize(writer, obj);
+                stream.Seek(0, SeekOrigin.Begin);
+                return reader.ReadToEnd();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                if (writer != null)
+                    writer.Close();
+                if (reader != null)
+                    reader.Close();
+                if (stream != null)
+                    stream.Close();
+            }
+        }
     }
 
     public static class XML<T> where T : class
@@ -333,9 +369,19 @@ namespace Vha.Common
         /// <param name="writer"></param>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static bool ToXmlWriter(XmlWriter writer, Object obj)
+        public static bool ToXmlWriter(XmlWriter writer, T obj)
         {
             return XML.ToXmlWriter(writer, typeof(T), obj);
+        }
+
+        /// <summary>
+        /// Serialize object to a string
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string ToString(T obj)
+        {
+            return XML.ToString(typeof(T), obj);
         }
     }   
 }

@@ -24,9 +24,9 @@
 
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public class LinkV1 : ReferenceV1
+    public class Link : Reference
     {
         [XmlAttribute("Label")]
         public string Label;
@@ -34,6 +34,6 @@ namespace Vha.Common.Data.AODevs
         [XmlAttribute("Url")]
         public string Url;
 
-        public LinkV1() : base(ReferenceTypeV1.Link) { }
+        public Link() : base(ReferenceType.Link) { }
     }
 }

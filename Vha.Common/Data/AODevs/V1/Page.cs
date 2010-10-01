@@ -24,19 +24,14 @@
 
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public class RepositoryV1 : ReferenceV1
+    public class Page
     {
-        [XmlAttribute("Type")]
-        public string RepositoryType;
-
         [XmlAttribute("Label")]
         public string Label;
 
-        [XmlAttribute("Url")]
-        public string Url;
-
-        public RepositoryV1() : base(ReferenceTypeV1.Repository) { }
+        [XmlText]
+        public string Text;
     }
 }

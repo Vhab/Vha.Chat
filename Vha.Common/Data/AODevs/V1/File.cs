@@ -22,12 +22,11 @@
 * THE SOFTWARE.
 */
 
-using System;
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public class FileV1 : ReferenceV1
+    public class File : Reference
     {
         [XmlAttribute("Label")]
         public string Label;
@@ -35,9 +34,6 @@ namespace Vha.Common.Data.AODevs
         [XmlAttribute("Url")]
         public string Url;
 
-        [XmlAttribute(DataType = "date")]
-        public DateTime Date;
-
-        public FileV1() : base(ReferenceTypeV1.File) { }
+        public File() : base(ReferenceType.File) { }
     }
 }

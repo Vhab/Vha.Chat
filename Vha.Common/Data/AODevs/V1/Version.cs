@@ -24,9 +24,9 @@
 
 using System.Xml.Serialization;
 
-namespace Vha.Common.Data.AODevs
+namespace Vha.Common.Data.AODevs.V1
 {
-    public class VersionV1
+    public class Version
     {
         [XmlAttribute("Type")]
         public string Type;

@@ -47,15 +47,6 @@
     <Compile Include="Data\AO\Character.cs" />
     <Compile Include="Data\AO\Organization.cs" />
     <Compile Include="Base85.cs" />
-    <Compile Include="Data\AODevs\V1\File.cs" />
-    <Compile Include="Data\AODevs\V1\Link.cs" />
-    <Compile Include="Data\AODevs\V1\Member.cs" />
-    <Compile Include="Data\AODevs\V1\Package.cs" />
-    <Compile Include="Data\AODevs\V1\Page.cs" />
-    <Compile Include="Data\AODevs\V1\Reference.cs" />
-    <Compile Include="Data\AODevs\V1\Repository.cs" />
-    <Compile Include="Data\AODevs\V1\Project.cs" />
-    <Compile Include="Data\AODevs\V1\Version.cs" />
     <Compile Include="Format.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeStamp.cs" />
@@ -64,7 +55,6 @@
     <Compile Include="XMLCache.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\AODevs\V1\Project.xsd" />
     <None Include="Vha.Common.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

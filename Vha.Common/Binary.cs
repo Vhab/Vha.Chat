@@ -62,6 +62,11 @@ namespace Vha.Common
             return data[offset++];
         }
 
+        public static char ReadChar(ref byte[] data, ref int offset)
+        {
+            return System.Convert.ToChar(ReadByte(ref data, ref offset));
+        }
+
         public static Int16 ReadInt16(ref byte[] data, ref int offset, Endianness endianness)
         {
             byte[] bytes = Convert(data, offset, 2, endianness);
@@ -132,6 +137,11 @@ namespace Vha.Common
         public static string ReadString(ref byte[] data, ref int offset, Encoding encoding, Endianness endianness)
         {
             UInt16 length = ReadUInt16(ref data, ref offset, endianness);
+            return ReadString(ref data, ref offset, length, encoding);
+        }
+
+        public static string ReadString(ref byte[] data, ref int offset, int length, Encoding encoding)
+        {
             if (offset + length > data.Length) throw new IndexOutOfRangeException("offset + length > data.Length");
             return encoding.GetString(data, offset, length);
         }

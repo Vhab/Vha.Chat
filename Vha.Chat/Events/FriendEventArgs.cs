@@ -33,13 +33,18 @@ namespace Vha.Chat.Events
         /// </summary>
         public readonly Friend Friend;
         /// <summary>
+        /// The character's state before this event occured
+        /// </summary>
+        public readonly Friend PreviousFriend;
+        /// <summary>
         /// Whether this friend has just been added
         /// </summary>
         public readonly bool Added;
 
-        public FriendEventArgs(Friend friend, bool added)
+        public FriendEventArgs(Friend friend, Friend previousFriend, bool added)
         {
             this.Friend = friend;
+            this.PreviousFriend = previousFriend;
             this.Added = added;
         }
     }

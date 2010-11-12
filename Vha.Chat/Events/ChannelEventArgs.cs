@@ -33,13 +33,18 @@ namespace Vha.Chat.Events
         /// </summary>
         public readonly Channel Channel;
         /// <summary>
+        /// The channel's state before state before this event occurred
+        /// </summary>
+        public readonly Channel PreviousChannel;
+        /// <summary>
         /// Whether we just joined this channel
         /// </summary>
         public readonly bool Joined;
 
-        public ChannelEventArgs(Channel channel, bool joined)
+        public ChannelEventArgs(Channel channel, Channel previousChannel, bool joined)
         {
             this.Channel = channel;
+            this.PreviousChannel = previousChannel;
             this.Joined = joined;
         }
     }

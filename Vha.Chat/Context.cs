@@ -754,12 +754,14 @@ namespace Vha.Chat
         void _chat_ChannelStatusEvent(Vha.Net.Chat chat, ChannelStatusEventArgs e)
         {
             Channel channel = e.GetChannel();
+            Channel previousChannel = null;
             bool joined, updated;
             lock (this._channels)
             {
                 joined = !this._channels.ContainsKey(e.ID);
                 if (joined) this._channels.Add(e.ID, channel);
                 updated = !this._channels[e.ID].Equals(channel);
+                if (updated) previousChannel = this._channels[e.ID];
                 this._channels[e.ID] = channel;
             }
             // Detect organization
@@ -770,9 +772,9 @@ namespace Vha.Chat
             }
             // Fire events
             if (this.ChannelJoinEvent != null && joined)
-                this.ChannelJoinEvent(this, new ChannelEventArgs(channel, true));
+                this.ChannelJoinEvent(this, new ChannelEventArgs(channel, previousChannel, true));
             if (this.ChannelUpdatedEvent != null && updated)
-                this.ChannelUpdatedEvent(this, new ChannelEventArgs(channel, false));
+                this.ChannelUpdatedEvent(this, new ChannelEventArgs(channel, previousChannel, false));
         }
 
         void _chat_PrivateChannelStatusEvent(Vha.Net.Chat chat, PrivateChannelStatusEventArgs e)
@@ -900,7 +902,7 @@ namespace Vha.Chat
                 }
             }
             if (this.FriendRemovedEvent != null && removed)
-                this.FriendRemovedEvent(this, new FriendEventArgs(friend, false));
+                this.FriendRemovedEvent(this, new FriendEventArgs(friend, friend, false));
         }
 
         void _chat_FriendStatusEvent(Vha.Net.Chat chat, FriendStatusEventArgs e)
@@ -909,18 +911,20 @@ namespace Vha.Chat
             if (string.IsNullOrEmpty(e.Character)) return;
             // Handle friend update
             Friend friend = e.GetFriend();
+            Friend previousFriend = null;
             bool added, updated;
             lock (this._friends)
             {
                 added = !this._friends.ContainsKey(e.CharacterID);
                 if (added) this._friends.Add(e.CharacterID, friend);
                 updated = !this._friends[e.CharacterID].Equals(friend);
+                if (updated) previousFriend = this._friends[e.CharacterID];
                 this._friends[e.CharacterID] = friend;
             }
             if (this.FriendAddedEvent != null && added)
-                this.FriendAddedEvent(this, new FriendEventArgs(friend, true));
+                this.FriendAddedEvent(this, new FriendEventArgs(friend, previousFriend, true));
             if (this.FriendUpdatedEvent != null && updated)
-                this.FriendUpdatedEvent(this, new FriendEventArgs(friend, false));
+                this.FriendUpdatedEvent(this, new FriendEventArgs(friend, previousFriend, false));
         }
 
         void _chat_PrivateChannelMessageEvent(Vha.Net.Chat chat, PrivateChannelMessageEventArgs e)
@@ -948,7 +952,7 @@ namespace Vha.Chat
             {
                 MDB.Message parsedMessage = null;
                 try { parsedMessage = MDB.Parser.Decode(e.Message); }
-                catch (Exception ex) { } // Errors are fine here, if it's not a valid message, we'll display the original
+                catch (Exception) { } // Errors are fine here, if it's not a valid message, we'll display the original
                 if (parsedMessage != null && !string.IsNullOrEmpty(parsedMessage.Value))
                     message = parsedMessage.Value;
             }

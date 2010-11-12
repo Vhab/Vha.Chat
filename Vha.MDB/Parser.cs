@@ -64,23 +64,18 @@ namespace Vha.MDB
         /// <returns></returns>
         public static Message Decode(Byte[] data, Reader reader)
         {
-            MemoryStream stream = new MemoryStream(data);
-            try
-            {
-                // Check header
-                if (stream.ReadByte() != Convert.ToChar('&'))
-                    throw new ArgumentException("Expecting valid template message header");
-                // Read header
-                int categoryId = Base85.Decode(Read(stream, 5));
-                int entryId = Base85.Decode(Read(stream, 5));
-                // Read message
-                Message message = Decode(categoryId, entryId, stream, reader);
-                return message;
-            }
-            finally
-            {
-                stream.Close();
-            }
+            int offset = 0;
+            // Check header
+            if (Binary.ReadByte(ref data, ref offset) != Convert.ToChar('&'))
+                throw new ArgumentException("Expecting valid template message header");
+            // Read header
+            int categoryId = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
+            int entryId = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
+            // Read message
+            byte[] moreData = new byte[data.Length - offset];
+            Array.Copy(data, offset, moreData, 0, data.Length - offset);
+            Message message = Decode(categoryId, entryId, moreData, reader);
+            return message;
         }
         /// <summary>
         /// Decodes a template message without header
@@ -92,75 +87,50 @@ namespace Vha.MDB
         /// <returns></returns>
         public static Message Decode(int categoryId, int entryId, Byte[] data, Reader reader)
         {
-            MemoryStream stream = new MemoryStream(data);
-            try
-            {
-                Message message = Decode(categoryId, entryId, stream, reader);
-                return message;
-            }
-            finally
-            {
-                stream.Close();
-            }
-        }
-        /// <summary>
-        /// Decodes a template message without header
-        /// </summary>
-        /// <param name="categoryId"></param>
-        /// <param name="entryId"></param>
-        /// <param name="stream"></param>
-        /// <param name="reader"></param>
-        /// <returns></returns>
-        public static Message Decode(int categoryId, int entryId, Stream stream, Reader reader)
-        {
             // Create reader
             if (reader == null)
                 reader = new Reader();
             // Create 'empty' message
             Message descrambledMessage = new Message(categoryId, entryId);
             // And here the real magic happens!
+            int offset = 0;
             while (true)
             {
-                if (stream.Position >= stream.Length)
+                // Finished reading data
+                if (offset >= data.Length)
                     break;
 
-                char type = Convert.ToChar(stream.ReadByte());
+                char type = Binary.ReadChar(ref data, ref offset);
                 switch (type)
                 {
-                    case 'S':
-                        Byte[] strSizeBuffer = new Byte[2];
-                        stream.Read(strSizeBuffer, 0, 2);
-                        Int16 strSize = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(strSizeBuffer, 0));
-                        String str = Read(stream, strSize);
+                    case 'S': // Long string
+                        String str = Binary.ReadString(ref data, ref offset, Encoding.UTF8, Endianness.BigEndian);
                         descrambledMessage.Append(new Argument(str));
                         break;
-                    case 's': // String
-                        Int32 textSize = stream.ReadByte();
-                        String text = Read(stream, textSize - 1);
+                    case 's': // Short string
+                        Int32 textSize = Binary.ReadByte(ref data, ref offset);
+                        String text = Binary.ReadString(ref data, ref offset, textSize - 1, Encoding.UTF8);
                         descrambledMessage.Append(new Argument(text));
                         break;
                     case 'I': // Raw Integer
-                        Byte[] rawIntegerBuffer = new Byte[4];
-                        stream.Read(rawIntegerBuffer, 0, 4);
-                        Int32 rawInteger = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(rawIntegerBuffer, 0));
+                        Int32 rawInteger = Binary.ReadInt32(ref data, ref offset, Endianness.BigEndian);
                         descrambledMessage.Append(new Argument(rawInteger));
                         break;
                     case 'i': // Integer
-                        Int32 integer = Base85.Decode(Read(stream, 5));
+                        Int32 integer = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
                         descrambledMessage.Append(new Argument(integer));
                         break;
                     case 'u': // Unsigned Integer
-                        UInt32 unsignedInteger = (UInt32)Base85.Decode(Read(stream, 5));
+                        UInt32 unsignedInteger = (UInt32)Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
                         descrambledMessage.Append(new Argument(unsignedInteger));
                         break;
                     case 'f': // Float
-                        Single single = (Single)Base85.Decode(Read(stream, 5));
-                        descrambledMessage.Append(new Argument(single));
-                        break;
+                        // TODO: figure out syntax and implement properly
+                        throw new NotImplementedException("Float types are not yet supported by this parser");
                     case 'R': // Reference, Category ID and Entry ID
                         String referenceMessage = string.Empty;
-                        Int32 referenceCategoryID = Base85.Decode(Read(stream, 5));
-                        Int32 referenceEntryID = Base85.Decode(Read(stream, 5));
+                        Int32 referenceCategoryID = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
+                        Int32 referenceEntryID = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
                         if (reader != null)
                         {
                             Entry referenceEntry = reader.GetEntry(referenceCategoryID, referenceEntryID);
@@ -175,14 +145,13 @@ namespace Vha.MDB
                         descrambledMessage.Append(reference);
                         break;
                     case 'F': // Recursive, Complete new message
-                        Int32 recursiveSize = stream.ReadByte();
-                        String recursiveText = Read(stream, recursiveSize - 1);
-                        descrambledMessage.Append(new Argument(Decode(recursiveText, reader)));
+                        Int32 recursiveSize = Binary.ReadByte(ref data, ref offset);
+                        byte[] recursiveData = new byte[recursiveSize];
+                        Array.Copy(data, offset, recursiveData, 0, recursiveSize);
+                        descrambledMessage.Append(new Argument(Decode(recursiveData, reader)));
                         break;
                     case 'l': // System submessage
-                        Byte[] systemBuffer = new Byte[4];
-                        stream.Read(systemBuffer, 0, 4);
-                        Int32 systemEntryID = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(systemBuffer, 0));
+                        Int32 systemEntryID = Binary.ReadInt32(ref data, ref offset, Endianness.BigEndian);
                         string systemMessage = "";
                         if (reader != null)
                         {
@@ -210,15 +179,6 @@ namespace Vha.MDB
                 }
             }
             return descrambledMessage;
-        }
-
-        private static string Read(Stream stream, Int32 length)
-        {
-            if (stream.Length < stream.Position + length)
-                throw new Exception("Trying to read beyond stream size! Size=" + stream.Length + " Position=" + stream.Position + " Length=" + length);
-            byte[] buffer = new byte[length];
-            stream.Read(buffer, 0, length);
-            return Encoding.UTF8.GetString(buffer);
         }
 
         public static string PrintfToFormatString(string text)

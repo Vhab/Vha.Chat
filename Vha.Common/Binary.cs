@@ -143,7 +143,9 @@ namespace Vha.Common
         public static string ReadString(ref byte[] data, ref int offset, int length, Encoding encoding)
         {
             if (offset + length > data.Length) throw new IndexOutOfRangeException("offset + length > data.Length");
-            return encoding.GetString(data, offset, length);
+            string value = encoding.GetString(data, offset, length);
+            offset += length;
+            return value;
         }
 
         public static byte[] WriteInt16(Int16 value, Endianness endianness)

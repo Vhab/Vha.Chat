@@ -35,6 +35,20 @@ namespace Vha.MDB
     public static class Parser
     {
         /// <summary>
+        /// Specifies which encoding method is used during string encoding/decoding operations
+        /// </summary>
+        public static Encoding Encoding
+        {
+            get { return _encoding; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException();
+                _encoding = value;
+            }
+        }
+
+        /// <summary>
         /// Decodes a template message with header
         /// </summary>
         /// <param name="scrambled"></param>
@@ -54,7 +68,7 @@ namespace Vha.MDB
             if (scrambled.EndsWith("~"))
                 scrambled = scrambled.Substring(0, scrambled.Length - 1);
 
-            return Decode(Encoding.UTF8.GetBytes(scrambled), reader);
+            return Decode(_encoding.GetBytes(scrambled), reader);
         }
         /// <summary>
         /// Decodes a template message with header
@@ -69,8 +83,8 @@ namespace Vha.MDB
             if (Binary.ReadByte(ref data, ref offset) != Convert.ToChar('&'))
                 throw new ArgumentException("Expecting valid template message header");
             // Read header
-            int categoryId = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
-            int entryId = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
+            Int32 categoryId = (Int32)_readBase85(ref data, ref offset);
+            Int32 entryId = (Int32)_readBase85(ref data, ref offset);
             // Read message
             byte[] moreData = new byte[data.Length - offset];
             Array.Copy(data, offset, moreData, 0, data.Length - offset);
@@ -104,12 +118,12 @@ namespace Vha.MDB
                 switch (type)
                 {
                     case 'S': // Long string
-                        String str = Binary.ReadString(ref data, ref offset, Encoding.UTF8, Endianness.BigEndian);
+                        String str = _readString(ref data, ref offset);
                         descrambledMessage.Append(new Argument(str));
                         break;
                     case 's': // Short string
                         Int32 textSize = Binary.ReadByte(ref data, ref offset);
-                        String text = Binary.ReadString(ref data, ref offset, textSize - 1, Encoding.UTF8);
+                        String text = _readString(ref data, ref offset, textSize - 1);
                         descrambledMessage.Append(new Argument(text));
                         break;
                     case 'I': // Raw Integer
@@ -117,20 +131,25 @@ namespace Vha.MDB
                         descrambledMessage.Append(new Argument(rawInteger));
                         break;
                     case 'i': // Integer
-                        Int32 integer = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
+                        Int32 integer = (Int32)_readBase85(ref data, ref offset);
                         descrambledMessage.Append(new Argument(integer));
                         break;
                     case 'u': // Unsigned Integer
-                        UInt32 unsignedInteger = (UInt32)Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
+                        UInt32 unsignedInteger = _readBase85(ref data, ref offset);
                         descrambledMessage.Append(new Argument(unsignedInteger));
                         break;
                     case 'f': // Float
-                        // TODO: figure out syntax and implement properly
-                        throw new NotImplementedException("Float types are not yet supported by this parser");
+                        // Need to do some tricks here to convert Base85 binary to float
+                        UInt32 floatAsInteger = _readBase85(ref data, ref offset);
+                        byte[] floatAsBytes = Binary.WriteUInt32(floatAsInteger, Binary.LocalEndianness);
+                        int floatOffset = 0;
+                        float floatValue = Binary.ReadFloat(ref floatAsBytes, ref floatOffset, Binary.LocalEndianness);
+                        descrambledMessage.Append(new Argument(floatValue));
+                        break;
                     case 'R': // Reference, Category ID and Entry ID
                         String referenceMessage = string.Empty;
-                        Int32 referenceCategoryID = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
-                        Int32 referenceEntryID = Base85.Decode(Binary.ReadString(ref data, ref offset, 5, Encoding.UTF8));
+                        Int32 referenceCategoryID = (Int32)_readBase85(ref data, ref offset);
+                        Int32 referenceEntryID = (Int32)_readBase85(ref data, ref offset);
                         if (reader != null)
                         {
                             Entry referenceEntry = reader.GetEntry(referenceCategoryID, referenceEntryID);
@@ -208,5 +227,24 @@ namespace Vha.MDB
             }
             return text;
         }
+
+        #region Internal
+        private static Encoding _encoding = Encoding.UTF8;
+
+        private static UInt32 _readBase85(ref byte[] data, ref int offset)
+        {
+            return (UInt32)Binary.ReadNumber(ref data, ref offset, 5, 85, 33, Endianness.BigEndian);
+        }
+
+        private static string _readString(ref byte[] data, ref int offset)
+        {
+            return Binary.ReadString(ref data, ref offset, _encoding, Endianness.BigEndian);
+        }
+
+        private static string _readString(ref byte[] data, ref int offset, int length)
+        {
+            return Binary.ReadString(ref data, ref offset, length, _encoding);
+        }
+        #endregion
     }
 }

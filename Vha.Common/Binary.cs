@@ -37,6 +37,16 @@ namespace Vha.Common
 
     public static class Binary
     {
+        public static Endianness LocalEndianness
+        {
+            get
+            {
+                if (BitConverter.IsLittleEndian)
+                    return Endianness.LittleEndian;
+                return Endianness.BigEndian;
+            }
+        }
+
         public static byte[] Convert(byte[] data, int offset, int length, Endianness endianness)
         {
             // Check input
@@ -134,6 +144,20 @@ namespace Vha.Common
             return BitConverter.ToUInt64(bytes, 0);
         }
 
+        public static float ReadFloat(ref byte[] data, ref int offset, Endianness endianness)
+        {
+            byte[] bytes = Convert(data, offset, 4, endianness);
+            offset += 4;
+            return BitConverter.ToSingle(bytes, 0);
+        }
+
+        public static double ReadDouble(ref byte[] data, ref int offset, Endianness endianness)
+        {
+            byte[] bytes = Convert(data, offset, 8, endianness);
+            offset += 8;
+            return BitConverter.ToDouble(bytes, 0);
+        }
+
         public static string ReadString(ref byte[] data, ref int offset, Encoding encoding, Endianness endianness)
         {
             UInt16 length = ReadUInt16(ref data, ref offset, endianness);
@@ -146,6 +170,20 @@ namespace Vha.Common
             string value = encoding.GetString(data, offset, length);
             offset += length;
             return value;
+        }
+
+        public static UInt64 ReadNumber(ref byte[] data, ref int offset, int length, int radix, int radixOffset, Endianness endianness)
+        {
+            byte[] bytes = Convert(data, offset, length, endianness);
+            UInt64 total = 0;
+            for (int i = length - 1; i >= 0; i--)
+            {
+                int value = (int)bytes[i] - radixOffset;
+                value = Math.Min(value, radix - 1);
+                value = Math.Max(value, 0);
+                total = (total * (UInt64)radix) + (UInt64)value;
+            }
+            return total;
         }
 
         public static byte[] WriteInt16(Int16 value, Endianness endianness)
@@ -186,6 +224,18 @@ namespace Vha.Common
         }
 
         public static byte[] WriteUInt64(UInt64 value, Endianness endianness)
+        {
+            byte[] bytes = BitConverter.GetBytes(value);
+            return Convert(bytes, 0, bytes.Length, endianness);
+        }
+
+        public static byte[] WriteFloat(float value, Endianness endianness)
+        {
+            byte[] bytes = BitConverter.GetBytes(value);
+            return Convert(bytes, 0, bytes.Length, endianness);
+        }
+
+        public static byte[] WriteDouble(double value, Endianness endianness)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return Convert(bytes, 0, bytes.Length, endianness);

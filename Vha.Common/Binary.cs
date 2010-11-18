@@ -175,6 +175,7 @@ namespace Vha.Common
         public static UInt64 ReadNumber(ref byte[] data, ref int offset, int length, int radix, int radixOffset, Endianness endianness)
         {
             byte[] bytes = Convert(data, offset, length, endianness);
+            offset += length;
             UInt64 total = 0;
             for (int i = length - 1; i >= 0; i--)
             {

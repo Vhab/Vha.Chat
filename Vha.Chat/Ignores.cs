@@ -31,6 +31,22 @@ namespace Vha.Chat
     public class Ignores
     {
         /// <summary>
+        /// Fires because of modifications to the configuration or from the outside.
+        /// This event means the entire ignore list has been reloaded and any number of characters may have been added or removed.
+        /// </summary>
+        public event Handler ReloadedEvent;
+
+        /// <summary>
+        /// Fires when a character is added to the ignore list
+        /// </summary>
+        public event Handler<IgnoreEventArgs> AddedEvent;
+
+        /// <summary>
+        /// Fires when a character is removed from the ignore list
+        /// </summary>
+        public event Handler<IgnoreEventArgs> RemovedEvent;
+
+        /// <summary>
         /// Whether it's currently sensible to query the ignore list
         /// </summary>
         public bool Active
@@ -128,6 +144,9 @@ namespace Vha.Chat
                 // Save changes
                 this._save();
             }
+            // Fire event
+            if (this.AddedEvent != null)
+                this.AddedEvent(this._context, new IgnoreEventArgs(character, characterID, true));
         }
 
         public void Remove(string character)
@@ -153,18 +172,18 @@ namespace Vha.Chat
                             continue;
                         changed = true;
                         this._data.Entries.Remove(entry);
+                        // Remove from cache by id
+                        this._ignored.Remove(entry.CharacterID);
                         break;
                     }
                 }
                 while (changed);
-                // Remove from cache by id
-                if (this._ignored.ContainsKey(characterID))
-                {
-                    this._ignored.Remove(characterID);
-                }
                 // Save changes
                 this._save();
             }
+            // Fire event
+            if (this.RemovedEvent != null)
+                this.RemovedEvent(this._context, new IgnoreEventArgs(character, characterID, false));
         }
 
         public IgnoreResult Toggle(string character)
@@ -219,6 +238,7 @@ namespace Vha.Chat
             this._watcher.LoadedEvent += new WatcherHandler(_watcher_LoadedEvent);
             this._watcher.Load();
             this._data = (IgnoresV1)this._watcher.Data;
+            this._context.Options.ModifiedEvent += new Handler<Options>(_options_ModifiedEvent);
         }
 
         #region Private
@@ -240,6 +260,9 @@ namespace Vha.Chat
                     this._ignored.Add(entry.CharacterID, entry.Character);
                 }
             }
+            // Fire event
+            if (this.ReloadedEvent != null)
+                this.ReloadedEvent(this._context);
         }
 
         private void _save()
@@ -281,6 +304,12 @@ namespace Vha.Chat
         {
             this._data = (IgnoresV1)watcher.Data;
             // The data has been modified from the outside
+            this._rebuild();
+        }
+
+        void _options_ModifiedEvent(Context context, Options args)
+        {
+            // Rebuild in case ignore method was changed
             this._rebuild();
         }
         #endregion

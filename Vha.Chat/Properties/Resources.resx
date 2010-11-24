@@ -181,6 +181,9 @@
   <data name="EnterBitmap" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\EnterBitmap.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="IgnoresBitmap" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\IgnoresBitmap.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="LeaveBitmap" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\LeaveBitmap.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

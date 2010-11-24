@@ -648,11 +648,6 @@ namespace Vha.Chat
                     return;
                 }
             }
-            // Dispatch state change event
-            ContextState previousState = this._state;
-            this._state = ContextState.CharacterSelection;
-            if (this.StateEvent != null)
-                this.StateEvent(this, new StateEventArgs(this._state, previousState));
         }
 
         void _chat_LoginErrorEvent(Vha.Net.Chat chat, LoginErrorEventArgs e)
@@ -711,6 +706,10 @@ namespace Vha.Chat
                 // Handle state change
                 switch (state)
                 {
+                    case ContextState.CharacterSelection:
+                        this._character = this._chat.Character;
+                        this._characterID = this._chat.ID;
+                        break;
                     case ContextState.Disconnected:
                         lock (this._messageHistory)
                             this._messageHistory.Clear();

@@ -40,6 +40,7 @@ namespace Vha.Chat.UI
             this._options = new System.Windows.Forms.ToolStripButton();
             this._about = new System.Windows.Forms.ToolStripButton();
             this._buttons = new System.Windows.Forms.ToolStrip();
+            this._ignores = new System.Windows.Forms.ToolStripButton();
             this._container = new System.Windows.Forms.SplitContainer();
             this._buttons.SuspendLayout();
             this._container.Panel1.SuspendLayout();
@@ -58,7 +59,7 @@ namespace Vha.Chat.UI
             this._tree.Location = new System.Drawing.Point(2, 2);
             this._tree.Name = "_tree";
             this._tree.SelectedImageIndex = 0;
-            this._tree.Size = new System.Drawing.Size(177, 518);
+            this._tree.Size = new System.Drawing.Size(174, 518);
             this._tree.TabIndex = 3;
             this._tree.DoubleClick += new System.EventHandler(this._tree_DoubleClick);
             this._tree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this._tree_NodeMouseClick);
@@ -90,7 +91,7 @@ namespace Vha.Chat.UI
             this._outputBox.MinimumSize = new System.Drawing.Size(20, 20);
             this._outputBox.Name = "_outputBox";
             this._outputBox.ScriptErrorsSuppressed = true;
-            this._outputBox.Size = new System.Drawing.Size(586, 491);
+            this._outputBox.Size = new System.Drawing.Size(589, 491);
             this._outputBox.TabIndex = 4;
             this._outputBox.Url = new System.Uri("about:blank", System.UriKind.Absolute);
             // 
@@ -102,7 +103,7 @@ namespace Vha.Chat.UI
             this._inputBox.Location = new System.Drawing.Point(150, 499);
             this._inputBox.Multiline = true;
             this._inputBox.Name = "_inputBox";
-            this._inputBox.Size = new System.Drawing.Size(438, 21);
+            this._inputBox.Size = new System.Drawing.Size(441, 21);
             this._inputBox.TabIndex = 0;
             this._inputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this._inputBox_KeyDown);
             this._inputBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this._inputBox_KeyPress);
@@ -171,6 +172,7 @@ namespace Vha.Chat.UI
             this._buttons.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._connect,
             this._disconnect,
+            this._ignores,
             this._options,
             this._about});
             this._buttons.Location = new System.Drawing.Point(0, 0);
@@ -178,6 +180,16 @@ namespace Vha.Chat.UI
             this._buttons.Padding = new System.Windows.Forms.Padding(6);
             this._buttons.Size = new System.Drawing.Size(782, 32);
             this._buttons.TabIndex = 2;
+            // 
+            // _ignores
+            // 
+            this._ignores.Image = global::Vha.Chat.Properties.Resources.IgnoresBitmap;
+            this._ignores.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._ignores.Margin = new System.Windows.Forms.Padding(0);
+            this._ignores.Name = "_ignores";
+            this._ignores.Size = new System.Drawing.Size(82, 20);
+            this._ignores.Text = "Ignore List";
+            this._ignores.Click += new System.EventHandler(this._ignores_Click);
             // 
             // _container
             // 
@@ -201,7 +213,7 @@ namespace Vha.Chat.UI
             this._container.Panel2.Controls.Add(this._tree);
             this._container.Panel2.Padding = new System.Windows.Forms.Padding(2);
             this._container.Size = new System.Drawing.Size(774, 522);
-            this._container.SplitterDistance = 590;
+            this._container.SplitterDistance = 593;
             this._container.SplitterWidth = 3;
             this._container.TabIndex = 5;
             this._container.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this._container_SplitterMoved);
@@ -242,6 +254,7 @@ namespace Vha.Chat.UI
         private System.Windows.Forms.ToolStrip _buttons;
         private System.Windows.Forms.ImageList _icons;
         private System.Windows.Forms.SplitContainer _container;
+        private System.Windows.Forms.ToolStripButton _ignores;
 
     }
 }

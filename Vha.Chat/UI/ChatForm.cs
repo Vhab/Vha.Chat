@@ -673,6 +673,12 @@ namespace Vha.Chat.UI
             options.ShowDialog();
         }
 
+        private void _ignores_Click(object sender, EventArgs e)
+        {
+            Form ignores = new IgnoresForm(this._context);
+            ignores.ShowDialog();
+        }
+
         private void _container_SplitterMoved(object sender, SplitterEventArgs e)
         {
             if (this._context == null || !this._initialized) return;

@@ -19,32 +19,29 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Vha.Chat;
-using Vha.Net;
 
 namespace Vha.Chat.Events
 {
-    public class FriendEventArgs
+    public class IgnoreEventArgs
     {
         /// <summary>
-        /// The character who triggered this event
+        /// The name of the character.
+        /// Note this name may not match the original entry if the name was changed on the server.
         /// </summary>
-        public readonly Friend Friend;
+        public readonly string Character;
         /// <summary>
-        /// The character's state before this event occured
+        /// The id of the character
         /// </summary>
-        public readonly Friend PreviousFriend;
+        public readonly UInt32 CharacterID;
         /// <summary>
-        /// Whether this friend has just been added
+        /// Whether this character was added to the ignore list
         /// </summary>
         public readonly bool Added;
 
-        public FriendEventArgs(Friend friend, Friend previousFriend, bool added)
+        public IgnoreEventArgs(string character, UInt32 characterID, bool added)
         {
-            this.Friend = friend;
-            this.PreviousFriend = previousFriend;
+            this.Character = character;
+            this.CharacterID = characterID;
             this.Added = added;
         }
     }

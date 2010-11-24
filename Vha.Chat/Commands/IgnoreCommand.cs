@@ -29,23 +29,6 @@ namespace Vha.Chat.Commands
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
             if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
-            // Display ignore list
-            if (args[0].ToLower() == "list")
-            {
-                string[] characters = context.Ignores.GetCharacters();
-                if (context.Ignores.Count == 0)
-                {
-                    context.Write(MessageClass.Internal, "Your ignore list is empty");
-                }
-                else
-                {
-                    context.Write(
-                       MessageClass.Internal,
-                       "The following characters are on your ignore list: " +
-                       string.Join(", ", characters));
-                }
-                return true;
-            }
             // Add ignore
             if (!context.Input.CheckCharacter(args[0], true)) return false;
             string character = Format.UppercaseFirst(args[0]);
@@ -63,11 +46,11 @@ namespace Vha.Chat.Commands
             : base(
                 "Ignore character", // Name
                 new string[] { "ignore" }, // Triggers
-                new string[] { "ignore [character]", "ignore list" }, // Usage
-                new string[] { "ignore Vhab", "ignore list" }, // Examples
+                new string[] { "ignore [character]" }, // Usage
+                new string[] { "ignore Vhab" }, // Examples
                 // Description
                 "The ignore command allows you to prevent characters from sending messages to you.\n" +
-                "Once a character has been put on ignore, (s)he no longer is able to contact you in any way through the chat server."
+                "Once a character has been put on ignore, (s)he is no longer able to contact you in any way through the chat server."
             )
         { }
     }

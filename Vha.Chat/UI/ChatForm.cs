@@ -408,6 +408,15 @@ namespace Vha.Chat.UI
                     new object[] { context, args });
                 return;
             }
+            // Check if the channel was renamed
+            if (args.PreviousChannel != null && args.PreviousChannel.Name != args.Channel.Name)
+            {
+                // Let's pretend we joined a new channel
+                this._channels.RemoveNode(args.PreviousChannel.Name);
+                this._context_ChannelJoinEvent(context, args);
+                return;
+            }
+            // Update the channel
             TreeNode node = this._channels.GetNode(args.Channel.Name);
             if ((args.Channel.Flags & ChannelFlags.Muted) != 0) node.ImageKey = node.SelectedImageKey = "ChannelDisabled";
             else node.ImageKey = node.SelectedImageKey = "Channel";
@@ -662,6 +671,12 @@ namespace Vha.Chat.UI
         {
             Form options = new OptionsForm(this._context);
             options.ShowDialog();
+        }
+
+        private void _ignores_Click(object sender, EventArgs e)
+        {
+            Form ignores = new IgnoresForm(this._context);
+            ignores.ShowDialog();
         }
 
         private void _container_SplitterMoved(object sender, SplitterEventArgs e)

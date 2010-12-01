@@ -50,6 +50,7 @@ namespace Vha.Chat.UI
             this._info.MaximumLines = 0;
             this._info.Write("{0}", element, TextStyle.Default, false);
             this._info.InnerPadding = new Padding(7, 6, 7, 7);
+            this._info.EnableImages = true;
             this._info.Initialize(context.Platform != Platform.DotNet);
         }
     }

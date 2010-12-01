@@ -30,6 +30,9 @@ namespace Vha.Chat.UI.Controls
 {
     public class OutputControlFormatter : Formatter
     {
+        public static readonly string IconUrlTemplate = "http://static.aodevs.com/icon/{0}";
+        public static readonly string GuiTextureUrlTemplate = "http://static.aodevs.com/texture/gui/{0}";
+
         public override string OnOpen() { return ""; }
         public override string OnClose() { return ""; }
         public override string OnBeforeElement(Element element) { return ""; }
@@ -81,7 +84,23 @@ namespace Vha.Chat.UI.Controls
 
         public override string OnImage(ImageElement element)
         {
-            return "";
+            if (!this._images) return "";
+            // Obtain URL to the image
+            string url = "";
+            switch (element.ImageType)
+            {
+                case ImageType.RDB:
+                    url = string.Format(IconUrlTemplate, element.Image);
+                    break;
+                case ImageType.TDB:
+                    url = string.Format(GuiTextureUrlTemplate, element.Image);
+                    break;
+                default:
+                    // Unsupported image type
+                    return "";
+            }
+            // Construct image tag
+            return string.Format("<img src=\"{0}\" />", url);
         }
 
         public override string OnLinkOpen(LinkElement element)
@@ -186,17 +205,19 @@ namespace Vha.Chat.UI.Controls
             return "</u>";
         }
 
-        public OutputControlFormatter(OutputControlCache cache, TextStyle style)
+        public OutputControlFormatter(OutputControlCache cache, TextStyle style, bool images)
         {
             if (cache == null)
                 throw new ArgumentNullException();
             this._cache = cache;
             this._style = style;
+            this._images = images;
         }
 
         #region Internal
         private OutputControlCache _cache = null;
         private TextStyle _style;
+        private bool _images;
 
         private Color _invert(Color c)
         {

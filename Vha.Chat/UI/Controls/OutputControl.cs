@@ -113,6 +113,15 @@ namespace Vha.Chat.UI.Controls
             get { return this._contextMenu; }
             set { this._contextMenu = value; }
         }
+
+        /// <summary>
+        /// Whether icons and gui images are enabled on this control
+        /// </summary>
+        public bool EnableImages
+        {
+            get { return this._enableImages; }
+            set { this._enableImages = value; }
+        }
         #endregion
 
         #region Events
@@ -160,7 +169,7 @@ namespace Vha.Chat.UI.Controls
             string html = template;
             if (element != null)
             {
-                OutputControlFormatter formatter = new OutputControlFormatter(this._cache, style);
+                OutputControlFormatter formatter = new OutputControlFormatter(this._cache, style, this.EnableImages);
                 html = string.Format(template, formatter.Format(element));
             }
             // Write output to control
@@ -184,6 +193,7 @@ namespace Vha.Chat.UI.Controls
         private Dominizer _dominizer = new Dominizer();
         private Queue<WriteBuffer> _buffer = new Queue<WriteBuffer>();
         private bool _useBootstrap = false;
+        private bool _enableImages = true;
 
         private void _updateProperties()
         {

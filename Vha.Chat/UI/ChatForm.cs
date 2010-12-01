@@ -85,6 +85,7 @@ namespace Vha.Chat.UI
             this._outputBox.Context = context;
             this._outputBox.BackgroundColor = this.BackColor;
             this._outputBox.ForegroundColor = this.ForeColor;
+            this._outputBox.EnableImages = false;
             this._outputBox.ClickedEvent += new OutputControlHandler<OutputControlClickedEventArgs>(_outputBox_ClickedEvent);
             this._outputBox.Initialize(context.Platform != Platform.DotNet);
 

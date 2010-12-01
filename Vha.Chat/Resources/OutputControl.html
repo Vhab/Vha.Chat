@@ -59,6 +59,9 @@
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript">
+    var isAtBottom = true;
+    var isScrollAnimating = false;
+  
     function setForegroundColor(color) { $('body').css('color', color); }
     function setBackgroundColor(color) { $('body').css('background-color', color); }
     function setPadding(top, right, bottom, left)
@@ -75,14 +78,35 @@
         if (maximumLines <= 0) return;
         while ($('body').children().size() > maximumLines)
         {
+            // Adjust scroll position if not at bottom
+            if (!isAtBottom) {
+                var height = $('body').children().first().height();
+                $(window).scrollTop($(window).scrollTop() - height);
+            }
+            // Remove top element
             $('body').children().first().remove();
         }
     }
     
     function scrollToBottom()
     {
-        window.scrollBy(0, 1000);
+        // Don't scroll if the scrolled back up
+        if (!isAtBottom) return;
+        // Scroll to bottom
+        $(window).scrollTop($(document).height());
     }
+    
+    $(function () {
+        // Setup scroll callback
+        $(window).scroll(function () {
+            // Detect bottom
+            if ($(window).height() + $(window).scrollTop() >= $(document).height()) {
+                isAtBottom = true;
+            } else {
+                isAtBottom = false;
+            }
+        });
+    });
 </script>
 </head>
 <body>

@@ -234,7 +234,15 @@ namespace Vha.Chat
         {
             this._context = context;
             this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);
-            this._watcher = new Watcher(new IgnoresV1(), this._context.Configuration.OptionsPath + Path.DirectorySeparatorChar + this._context.Configuration.IgnoresFile);
+            if (!this._context.Configuration.ReadOnly)
+            {
+                string path = this._context.Configuration.OptionsPath + Path.DirectorySeparatorChar + this._context.Configuration.IgnoresFile;
+                this._watcher = new Watcher(new IgnoresV1(), path);
+            }
+            else
+            {
+                this._watcher = new Watcher(new IgnoresV1());
+            }
             this._watcher.LoadedEvent += new WatcherHandler(_watcher_LoadedEvent);
             this._watcher.Load();
             this._data = (IgnoresV1)this._watcher.Data;

@@ -228,8 +228,16 @@ namespace Vha.Chat
         internal Options(Context context)
         {
             // Load data
-            string path = context.Configuration.OptionsPath + Path.DirectorySeparatorChar + context.Configuration.OptionsFile;
-            this._watcher = new Watcher(new OptionsV1(), path);
+            if (!context.Configuration.ReadOnly)
+            {
+                string path = context.Configuration.OptionsPath + Path.DirectorySeparatorChar + context.Configuration.OptionsFile;
+                this._watcher = new Watcher(new OptionsV1(), path);
+            }
+            else
+            {
+                // Start in read-only mode with default settings
+                this._watcher = new Watcher(new OptionsV1());
+            }
             this._watcher.LoadedEvent += new WatcherHandler(_watcher_LoadedEvent);
             this._watcher.Load();
             // And the rest...

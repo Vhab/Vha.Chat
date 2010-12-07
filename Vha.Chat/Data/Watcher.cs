@@ -29,6 +29,11 @@ namespace Vha.Chat.Data
     public class Watcher
     {
         /// <summary>
+        /// Whether this watcher is currently in 'virtual mode'.
+        /// This means no actual file is being read or written.
+        /// </summary>
+        public bool VirtualMode { get { return this._virtualMode; } }
+        /// <summary>
         /// The directory this watcher is currently observing
         /// </summary>
         public string Directory { get { return this._directory; } }
@@ -57,11 +62,14 @@ namespace Vha.Chat.Data
         /// </summary>
         public void Save()
         {
-            lock (this)
+            if (!this._virtualMode)
             {
-                this._watcher.EnableRaisingEvents = false;
-                this._data.Save(this._path);
-                this._watcher.EnableRaisingEvents = true;
+                lock (this)
+                {
+                    this._watcher.EnableRaisingEvents = false;
+                    this._data.Save(this._path);
+                    this._watcher.EnableRaisingEvents = true;
+                }
             }
             if (this.SavedEvent != null)
                 this.SavedEvent(this);
@@ -71,21 +79,25 @@ namespace Vha.Chat.Data
         /// </summary>
         public void Load()
         {
-            lock (this)
+            if (!this._virtualMode)
             {
-                Base data = Base.Load(this._path);
-                if (data == null) return;
-                if (data.Type != this._data.Type)
+                lock (this)
                 {
-                    throw new InvalidOperationException(
-                        "Watcher loaded data file of type '" +
-                        data.Type.ToString() +
-                        "' but was expecting data of type '" +
-                        this._data.Type.ToString() +
-                        "' for file: " + this.File);
+                    Base data = Base.Load(this._path);
+                    if (data == null) return;
+                    if (data.Type != this._data.Type)
+                    {
+                        throw new InvalidOperationException(
+                            "Watcher loaded data file of type '" +
+                            data.Type.ToString() +
+                            "' but was expecting data of type '" +
+                            this._data.Type.ToString() +
+                            "' for file: " + this.File);
+                    }
+                    this._data = data;
                 }
-                this._data = data;
             }
+            // Dispatch event
             if (this.LoadedEvent != null)
                 this.LoadedEvent(this);
         }
@@ -116,8 +128,19 @@ namespace Vha.Chat.Data
             this.Save();
         }
 
+        public Watcher(Base data)
+        {
+            this._virtualMode = true;
+            this._directory = "";
+            this._file = "";
+            this._path = "";
+            this._data = data;
+            this._watcher = null;
+        }
+
         public Watcher(Base data, string path)
         {
+            this._virtualMode = false;
             this._directory = Path.GetDirectoryName(path);
             this._file = Path.GetFileName(path);
             this._path = path;
@@ -129,6 +152,7 @@ namespace Vha.Chat.Data
         }
 
         #region Internal
+        private bool _virtualMode;
         private string _directory;
         private string _file;
         private string _path;

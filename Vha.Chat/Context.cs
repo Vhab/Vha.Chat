@@ -570,10 +570,13 @@ namespace Vha.Chat
             while (configuration.CanUpgrade) configuration = configuration.Upgrade();
             this._configuration = new Configuration(configuration);
 
-            // Ensure the options directory exists
-            if (!Directory.Exists(this.Configuration.OptionsPath))
+            if (!this.Configuration.ReadOnly)
             {
-                Directory.CreateDirectory(this.Configuration.OptionsPath);
+                // Ensure the options directory exists
+                if (!Directory.Exists(this.Configuration.OptionsPath))
+                {
+                    Directory.CreateDirectory(this.Configuration.OptionsPath);
+                }
             }
 
             // Initialize objects

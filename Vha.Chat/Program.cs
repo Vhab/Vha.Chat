@@ -55,7 +55,7 @@ namespace Vha.Chat
                     "Vha.Chat was unable to obtain the required execution permissions.\n" +
                     "This might be because you're attempting to run this application from a network drive or due to specific restrictions setup on your machine.\n\n" +
                     "This application will now close.",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             // Fix working directory
@@ -67,6 +67,14 @@ namespace Vha.Chat
             }
             // Create context
             Context context = new Context();
+            // Check for readonly mode
+            if (context.Configuration.ReadOnly)
+            {
+                MessageBox.Show(
+                    "Vha.Chat was unable to obtain the required filesystem permissions.\n" +
+                    "All preferences will be lost when you close this application.",
+                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             // Initialize Windows.Forms application
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);

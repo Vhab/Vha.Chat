@@ -59,6 +59,9 @@ namespace Vha.Chat.UI
             this._proxyUsername = new System.Windows.Forms.TextBox();
             this._proxyAddress = new System.Windows.Forms.TextBox();
             this._proxyType = new System.Windows.Forms.ComboBox();
+            this._miscOptions = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this._donateVisible = new System.Windows.Forms.CheckBox();
             this._topBackground.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._icon)).BeginInit();
             this._chatOptions.SuspendLayout();
@@ -67,6 +70,7 @@ namespace Vha.Chat.UI
             ((System.ComponentModel.ISupportInitialize)(this._maximumHistory)).BeginInit();
             this._proxyOptions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._proxyPort)).BeginInit();
+            this._miscOptions.SuspendLayout();
             this.SuspendLayout();
             // 
             // _seperator
@@ -115,7 +119,7 @@ namespace Vha.Chat.UI
             // 
             this._cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancel.Location = new System.Drawing.Point(246, 386);
+            this._cancel.Location = new System.Drawing.Point(246, 447);
             this._cancel.Name = "_cancel";
             this._cancel.Size = new System.Drawing.Size(75, 23);
             this._cancel.TabIndex = 12;
@@ -126,7 +130,7 @@ namespace Vha.Chat.UI
             // _reset
             // 
             this._reset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._reset.Location = new System.Drawing.Point(12, 386);
+            this._reset.Location = new System.Drawing.Point(12, 447);
             this._reset.Name = "_reset";
             this._reset.Size = new System.Drawing.Size(75, 23);
             this._reset.TabIndex = 14;
@@ -137,7 +141,7 @@ namespace Vha.Chat.UI
             // _save
             // 
             this._save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._save.Location = new System.Drawing.Point(327, 386);
+            this._save.Location = new System.Drawing.Point(327, 447);
             this._save.Name = "_save";
             this._save.Size = new System.Drawing.Size(75, 23);
             this._save.TabIndex = 13;
@@ -410,11 +414,41 @@ namespace Vha.Chat.UI
             this._proxyType.TabIndex = 7;
             this._proxyType.SelectedIndexChanged += new System.EventHandler(this._proxyType_SelectedIndexChanged);
             // 
+            // _miscOptions
+            // 
+            this._miscOptions.Controls.Add(this._donateVisible);
+            this._miscOptions.Controls.Add(this.label11);
+            this._miscOptions.Location = new System.Drawing.Point(13, 383);
+            this._miscOptions.Name = "_miscOptions";
+            this._miscOptions.Size = new System.Drawing.Size(389, 45);
+            this._miscOptions.TabIndex = 15;
+            this._miscOptions.TabStop = false;
+            this._miscOptions.Text = "Misc";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(9, 20);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(103, 13);
+            this.label11.TabIndex = 0;
+            this.label11.Text = "Show donate button";
+            // 
+            // _donateVisible
+            // 
+            this._donateVisible.AutoSize = true;
+            this._donateVisible.Location = new System.Drawing.Point(188, 19);
+            this._donateVisible.Name = "_donateVisible";
+            this._donateVisible.Size = new System.Drawing.Size(15, 14);
+            this._donateVisible.TabIndex = 1;
+            this._donateVisible.UseVisualStyleBackColor = true;
+            // 
             // OptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(414, 421);
+            this.ClientSize = new System.Drawing.Size(414, 482);
+            this.Controls.Add(this._miscOptions);
             this.Controls.Add(this._proxyOptions);
             this.Controls.Add(this._chatOptions);
             this.Controls.Add(this._save);
@@ -441,6 +475,8 @@ namespace Vha.Chat.UI
             this._proxyOptions.ResumeLayout(false);
             this._proxyOptions.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._proxyPort)).EndInit();
+            this._miscOptions.ResumeLayout(false);
+            this._miscOptions.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -477,5 +513,8 @@ namespace Vha.Chat.UI
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.GroupBox _miscOptions;
+        private System.Windows.Forms.CheckBox _donateVisible;
+        private System.Windows.Forms.Label label11;
     }
 }

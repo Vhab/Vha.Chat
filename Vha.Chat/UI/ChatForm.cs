@@ -215,6 +215,8 @@ namespace Vha.Chat.UI
             // Update AomlBox settings
             this._outputBox.MaximumTexts = args.MaximumTexts;
             this._outputBox.MaximumLines = args.MaximumMessages;
+            // Update donate button
+            this._donate.Visible = args.DonateVisible;
         }
 
         void _context_StateEvent(Context context, StateEventArgs args)
@@ -686,6 +688,22 @@ namespace Vha.Chat.UI
             OptionsSize size = this._context.Options.GetSize("ChatForm", "Splitter", true);
             size.Size = this._container.SplitterDistance;
         }
+        
+        private void _donate_Click(object sender, EventArgs e)
+        {
+            string email = "paypal@vhabion.net";
+            string description = "Vha.Chat%20appreciation%20donation";
+            string country = "US";
+            string currency = "EUR";
+
+            string url = string.Format(
+                "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business={0}&lc={1}&item_name={2}&currency_code={3}&bn=PP%2dDonationsBF",
+                email, country, description, currency);
+
+            System.Diagnostics.Process.Start(url);
+        }
         #endregion
+
+        
     }
 }

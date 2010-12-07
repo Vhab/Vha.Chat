@@ -96,6 +96,11 @@ namespace Vha.Chat
             get { return this._options.LastAccount; }
             set { this._options.LastAccount = value; this.Touch(); }
         }
+        public bool DonateVisible
+        {
+            get { return this._options.DonateVisible; }
+            set { this._options.DonateVisible = value; this.Touch(); }
+        }
 
         public OptionsWindow[] Windows
         {

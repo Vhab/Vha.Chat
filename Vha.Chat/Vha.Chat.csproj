@@ -260,6 +260,7 @@
     <Content Include="Configuration.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\DonateBitmap.png" />
     <None Include="Resources\OutputControl.html" />
     <None Include="Resources\OptionsBigBitmap.png" />
     <None Include="Resources\OptionsIcon.ico" />

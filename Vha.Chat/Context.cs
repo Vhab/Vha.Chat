@@ -537,7 +537,7 @@ namespace Vha.Chat
         private List<UInt32> _guests;
         private Dictionary<MessageTarget, List<MessageEventArgs>> _messageHistory;
 
-        internal Context()
+        internal Context(Configuration configuration)
         {
             // Detect platform
             this._platform = Platform.DotNet;
@@ -564,11 +564,8 @@ namespace Vha.Chat
                     break;
             } 
 
-            // Read initial configuration
-            Data.Base configuration = Data.Base.Load("Configuration.xml");
-            if (configuration == null) configuration = new Data.ConfigurationV1();
-            while (configuration.CanUpgrade) configuration = configuration.Upgrade();
-            this._configuration = new Configuration(configuration);
+            // Store initial configuration
+            this._configuration = configuration;
 
             if (!this.Configuration.ReadOnly)
             {

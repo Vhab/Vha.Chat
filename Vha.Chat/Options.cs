@@ -230,7 +230,7 @@ namespace Vha.Chat
             // Load data
             if (!context.Configuration.ReadOnly)
             {
-                string path = context.Configuration.OptionsPath + Path.DirectorySeparatorChar + context.Configuration.OptionsFile;
+                string path = context.Configuration.OptionsFilePath;
                 this._watcher = new Watcher(new OptionsV1(), path);
             }
             else

@@ -236,7 +236,7 @@ namespace Vha.Chat
             this._context.StateEvent += new Handler<StateEventArgs>(_context_StateEvent);
             if (!this._context.Configuration.ReadOnly)
             {
-                string path = this._context.Configuration.OptionsPath + Path.DirectorySeparatorChar + this._context.Configuration.IgnoresFile;
+                string path = this._context.Configuration.IgnoresFilePath;
                 this._watcher = new Watcher(new IgnoresV1(), path);
             }
             else

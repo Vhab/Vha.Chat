@@ -19,15 +19,13 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 using System.IO;
-using Vha.Chat;
-using Vha.Chat.UI;
-using Vha.Common;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
+using System.Windows.Forms;
+using Vha.Chat.Data;
+using Vha.Chat.UI;
 
 namespace Vha.Chat
 {
@@ -58,6 +56,14 @@ namespace Vha.Chat
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            // Initialize Windows.Forms application
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(true);
+#if !DEBUG
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
+#endif
+
             // Fix working directory
             string path = Assembly.GetExecutingAssembly().Location;
             if (path.LastIndexOf(Path.DirectorySeparatorChar) > 0)
@@ -65,23 +71,50 @@ namespace Vha.Chat
                 path = Path.GetDirectoryName(path);
                 Environment.CurrentDirectory = path;
             }
-            // Create context
-            Context context = new Context();
-            // Check for readonly mode
-            if (context.Configuration.ReadOnly)
+
+            // Load initial configuration
+            Data.Base data = Data.Base.Load("Configuration.xml");
+            if (data == null) data = new Data.ConfigurationV1();
+            while (data.CanUpgrade) data = data.Upgrade();
+            if (data.Type != typeof(ConfigurationV1))
+                throw new ArgumentException("Unexpected data type in Configuration.xml: " + data.Type.ToString());
+            ConfigurationV1 configData = (ConfigurationV1)data;
+
+            // Detect folders
+            string defaultPath = Path.GetFullPath(configData.OptionsPath);
+            bool defaultOptionsExists = File.Exists(defaultPath + Path.DirectorySeparatorChar + configData.OptionsFile);
+            string appDataPath = string.Format("{1}{0}{2}",
+                Path.DirectorySeparatorChar, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vha.Chat");
+            bool appDataOptionsExists = File.Exists(appDataPath + Path.DirectorySeparatorChar + configData.OptionsFile);
+
+            // Determine default folder
+            if (defaultOptionsExists)
             {
-                MessageBox.Show(
-                    "Vha.Chat was unable to obtain the required filesystem permissions.\n" +
-                    "All preferences will be lost when you close this application.",
-                    "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                configData.OptionsPath = defaultPath;
             }
-            // Initialize Windows.Forms application
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(true);
+            else if (appDataOptionsExists)
+            {
+                configData.OptionsPath = appDataPath;
+            }
+            else
+            {
+                // Show directory selection form
+                DirectorySelectionForm form = new DirectorySelectionForm(
+                    configData, defaultPath, appDataPath);
+                Application.Run(form);
+                // Guess the user didn't like Vha.Chat :(
+                if (form.DialogResult != DialogResult.OK)
+                    return;
+            }
+
+            // Create context
+            Configuration configuration = new Configuration(configData);
+            Context context = new Context(configuration);
+            context.Options.Save();
 #if !DEBUG
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
             context.ExceptionEvent += new Handler<Exception>(UnhandledException);
 #endif
+
             // Start application
             ApplicationContext = new ApplicationContext();
             ApplicationContext.MainForm = new AuthenticationForm(context);

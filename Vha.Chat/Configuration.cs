@@ -31,67 +31,31 @@ namespace Vha.Chat
     /// </summary>
     public class Configuration
     {
-        public readonly bool ReadOnly;
-        public readonly string OptionsPath;
-        public readonly string OptionsFile;
-        public readonly string IgnoresFile;
-        public readonly Dimension[] Dimensions;
+        public bool ReadOnly { get { return this._readOnly; } }
+        public string OptionsPath { get { return this._optionsPath; } }
+        public string OptionsFile { get { return this._optionsFile; } }
+        public string OptionsFilePath { get { return this._optionsPath + Path.DirectorySeparatorChar + this._optionsFile; } }
+        public string IgnoresFile { get { return this._ignoresFile; } }
+        public string IgnoresFilePath { get { return this._optionsPath + Path.DirectorySeparatorChar + this._ignoresFile; } }
+        public Dimension[] Dimensions { get { return this._dimensions; } }
 
-        public Configuration(Base data)
+        public Configuration(ConfigurationV1 config)
         {
-            // A little bit of sanity
-            if (data == null)
-                throw new ArgumentNullException("data");
-            if (data.Type != typeof(ConfigurationV1))
-                throw new ArgumentException("Invalid config data type: " + data.Type.ToString());
-            // Store values
-            ConfigurationV1 config = (ConfigurationV1)data;
-            this.OptionsFile = config.OptionsFile;
-            this.IgnoresFile = config.IgnoresFile;
-            this.Dimensions = config.Dimensions.ConvertAll<Dimension>(
+            if (config.OptionsPath == null)
+            {
+                this._optionsPath = "";
+                this._readOnly = true;
+            }
+            else
+            {
+                this._optionsPath = config.OptionsPath;
+                this._readOnly = false;
+            }
+            this._optionsFile = config.OptionsFile;
+            this._ignoresFile = config.IgnoresFile;
+            this._dimensions = config.Dimensions.ConvertAll<Dimension>(
                 new Converter<ConfigurationV1Dimension,Dimension>(this._convertDimension))
                 .ToArray();
-            // Test options path before storing
-            try
-            {
-                string path = Path.GetFullPath(config.OptionsPath);
-                FileIOPermission permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
-                permission.Demand();
-                // Permission granted
-                this.OptionsPath = path;
-                this.ReadOnly = false;
-                return;
-            }
-            catch (SecurityException)
-            {
-                // Fail if path is absolute
-                if (Path.IsPathRooted(config.OptionsPath))
-                {
-                    // Path is absolute, fail
-                    this.OptionsPath = "";
-                    this.ReadOnly = true;
-                    return;
-                }
-            }
-            // Try AppData path
-            try
-            {
-                string path = string.Format("{1}{0}{2}{0}{3}",
-                    Path.DirectorySeparatorChar,
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "Vha.Chat",
-                    config.OptionsPath);
-                FileIOPermission permission = new FileIOPermission(FileIOPermissionAccess.Write, path);
-                permission.Demand();
-                // Permission granted
-                this.OptionsPath = path;
-                this.ReadOnly = false;
-            }
-            catch (SecurityException)
-            {
-                this.OptionsPath = "";
-                this.ReadOnly = true;
-            }
         }
 
         public Dimension GetDimension(string name)
@@ -101,6 +65,12 @@ namespace Vha.Chat
                     return dim;
             return null;
         }
+
+        private bool _readOnly;
+        private string _optionsPath;
+        private string _optionsFile;
+        private string _ignoresFile;
+        private Dimension[] _dimensions;
 
         private Dimension _convertDimension(ConfigurationV1Dimension dimension)
         {

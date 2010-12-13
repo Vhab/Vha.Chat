@@ -998,7 +998,7 @@ namespace Vha.Chat
                     return;
             }
             // Failed to get the entry
-            if (string.IsNullOrEmpty(message.Value))
+            if (message == null || string.IsNullOrEmpty(message.Value))
             {
                 this.Write(MessageClass.Error, "Unknown system message " + e.CategoryID + ":" + e.MessageID);
                 return;

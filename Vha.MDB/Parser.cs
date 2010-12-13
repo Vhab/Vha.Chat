@@ -111,6 +111,8 @@ namespace Vha.MDB
             while (true)
             {
                 // Finished reading data
+                if (data == null)
+                    break;
                 if (offset >= data.Length)
                     break;
 

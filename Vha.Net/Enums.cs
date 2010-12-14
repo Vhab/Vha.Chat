@@ -36,12 +36,17 @@ namespace Vha.Net
     public enum ChannelType
     {
         Unknown = 0,
-        Announcements = 12,
-        General = 135,
+        Admin = 1,
+        Team = 2 | 0x80,
         Organization = 3,
-        Shopping = 356,
+        Leaders = 4,
+        GM = 5,
+        Shopping = 6 | 0x80,
+        General = 7 | 0x80,
         Towers = 10,
-        Leaders = 4
+        Announcements = 12,
+        Raid = 15 | 0x80,
+        Battlestation = 16 | 0x80
     }
 
     [Flags]

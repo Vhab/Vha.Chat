@@ -73,12 +73,17 @@ namespace Vha.Chat
         PrivateChannel,
         // Public channels
         UnknownChannel,
-        AnnouncementsChannel,
-        GeneralChannel,
+        AdminChannel,
+        TeamChannel,
         OrganizationChannel,
-        ShoppingChannel,
-        TowersChannel,
         LeadersChannel,
+        GMChannel,
+        ShoppingChannel,
+        GeneralChannel,
+        TowersChannel,
+        AnnouncementsChannel,
+        RaidChannel,
+        BattlestationChannel
     }
 
     public enum MessageType

@@ -169,7 +169,13 @@ namespace Vha.AOML
             // - Determine type
             ImageType type = ImageType.RDB;
             if (parts[0].ToLower() == "rdb") type = ImageType.RDB;
-            else if (parts[0].ToLower() == "tdb") type = ImageType.TDB;
+            else if (parts[0].ToLower() == "tdb")
+            {
+                type = ImageType.TDB;
+                string prefix = "id:";
+                if (parts[1].StartsWith(prefix))
+                    parts[1] = parts[1].Substring(prefix.Length);
+            }
             else return null;
             // Return image
             return new ImageElement(type, parts[1]);

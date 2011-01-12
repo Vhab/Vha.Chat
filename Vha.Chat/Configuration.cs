@@ -23,6 +23,7 @@ using System.IO;
 using System.Security;
 using System.Security.Permissions;
 using Vha.Chat.Data;
+using Vha.Chat.UI.Controls;
 
 namespace Vha.Chat
 {
@@ -37,6 +38,7 @@ namespace Vha.Chat
         public string OptionsFilePath { get { return this._optionsPath + Path.DirectorySeparatorChar + this._optionsFile; } }
         public string IgnoresFile { get { return this._ignoresFile; } }
         public string IgnoresFilePath { get { return this._optionsPath + Path.DirectorySeparatorChar + this._ignoresFile; } }
+        public OutputControlInitializationMode OutputMode { get { return this._outputMode; } }
         public Dimension[] Dimensions { get { return this._dimensions; } }
 
         public Configuration(ConfigurationV1 config)
@@ -53,6 +55,7 @@ namespace Vha.Chat
             }
             this._optionsFile = config.OptionsFile;
             this._ignoresFile = config.IgnoresFile;
+            this._outputMode = config.OutputMode;
             this._dimensions = config.Dimensions.ConvertAll<Dimension>(
                 new Converter<ConfigurationV1Dimension,Dimension>(this._convertDimension))
                 .ToArray();
@@ -70,6 +73,7 @@ namespace Vha.Chat
         private string _optionsPath;
         private string _optionsFile;
         private string _ignoresFile;
+        private OutputControlInitializationMode _outputMode;
         private Dimension[] _dimensions;
 
         private Dimension _convertDimension(ConfigurationV1Dimension dimension)

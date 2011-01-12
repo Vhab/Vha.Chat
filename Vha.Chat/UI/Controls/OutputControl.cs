@@ -26,11 +26,32 @@ using System.Web;
 using System.Windows.Forms;
 using Vha.AOML;
 using Vha.AOML.DOM;
+using Vha.Common;
 
 namespace Vha.Chat.UI.Controls
 {
     public delegate void OutputControlHandler(OutputControl sender);
     public delegate void OutputControlHandler<T>(OutputControl sender, T e);
+
+    public enum OutputControlInitializationMode
+    {
+        /// <summary>
+        /// Attempt to detect the optimal boot method
+        /// </summary>
+        Detect,
+        /// <summary>
+        /// Directly load the template into the control
+        /// </summary>
+        Direct,
+        /// <summary>
+        /// Delay the template loading by navigating to 'about:blank' first
+        /// </summary>
+        Delayed,
+        /// <summary>
+        /// Delay the template loading by first loading 'Bootstrap.html'
+        /// </summary>
+        External
+    }
 
     public class OutputControl : WebBrowser
     {
@@ -41,10 +62,8 @@ namespace Vha.Chat.UI.Controls
         public string Template { get { return Properties.Resources.OutputControl; } }
         /// <summary>
         /// Gets the initialization mode.
-        /// If set to true, this control will first initialize Bootstrap.html.
-        /// If set to false, it will load the template directly.
         /// </summary>
-        public bool UseBootstrap { get { return this._useBootstrap; } }
+        public OutputControlInitializationMode InitializationMode { get { return this._initializationMode; } }
         /// <summary>
         /// Gets or sets the background color
         /// </summary>
@@ -131,17 +150,34 @@ namespace Vha.Chat.UI.Controls
         #endregion
 
         #region Methods
-        public void Initialize(bool useBootstrap)
+        public void Initialize(OutputControlInitializationMode initializationMode)
         {
-            this._useBootstrap = useBootstrap;
-            if (this._useBootstrap)
+            if (initializationMode == OutputControlInitializationMode.Detect)
             {
-                string path = "file://" + System.Environment.CurrentDirectory + Path.DirectorySeparatorChar;
-                this.Navigate(new System.Uri(path + "Bootstrap.html", System.UriKind.Absolute));
+                // When running on mono, use the bootstrap.html method
+                if (Platform.Runtime == Runtime.Mono)
+                    this._initializationMode = OutputControlInitializationMode.External;
+                else
+                    this._initializationMode = OutputControlInitializationMode.Delayed;
             }
             else
             {
-                this.DocumentText = this.Template;
+                // Use the configured initialization mode
+                this._initializationMode = initializationMode;
+            }
+            // Initialize
+            switch (this._initializationMode)
+            {
+                case OutputControlInitializationMode.Direct:
+                    this.DocumentText = this.Template;
+                    break;
+                case OutputControlInitializationMode.Delayed:
+                    this.Navigate("about:blank");
+                    break;
+                case OutputControlInitializationMode.External:
+                    string path = "file://" + System.Environment.CurrentDirectory + Path.DirectorySeparatorChar;
+                    this.Navigate(new System.Uri(path + "Bootstrap.html", System.UriKind.Absolute));
+                    break;
             }
         }
 
@@ -180,7 +216,9 @@ namespace Vha.Chat.UI.Controls
         }
         #endregion
 
-        public OutputControl() : base() { }
+        public OutputControl()
+            : base()
+        { }
 
         #region Internal
         private System.Drawing.Color _backgroundColor = System.Drawing.Color.White;
@@ -192,7 +230,7 @@ namespace Vha.Chat.UI.Controls
         private OutputControlCache _cache = new OutputControlCache();
         private Dominizer _dominizer = new Dominizer();
         private Queue<WriteBuffer> _buffer = new Queue<WriteBuffer>();
-        private bool _useBootstrap = false;
+        private OutputControlInitializationMode _initializationMode;
         private bool _enableImages = true;
 
         private void _updateProperties()
@@ -219,9 +257,14 @@ namespace Vha.Chat.UI.Controls
         protected override void OnDocumentCompleted(WebBrowserDocumentCompletedEventArgs e)
         {
             // Load template
-            if (this._useBootstrap)
+            switch (this._initializationMode)
             {
-                this._execute("Write", this.Template);
+                case OutputControlInitializationMode.Delayed:
+                    this.Document.Write(this.Template);
+                    break;
+                case OutputControlInitializationMode.External:
+                    this._execute("Write", this.Template);
+                    break;
             }
             // Setup properties
             this._updateProperties();

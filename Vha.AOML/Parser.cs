@@ -332,6 +332,7 @@ namespace Vha.AOML
             e.Add("font");
             e.Add("a");
             e.Add("u");
+            e.Add("i");
             this._inlineElements = e;
             e = new List<string>();
             e.Add("div");

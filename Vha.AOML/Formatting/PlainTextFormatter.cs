@@ -66,6 +66,8 @@ namespace Vha.AOML.Formatting
         }
         public override string OnUnderlineOpen(UnderlineElement element) { return ""; }
         public override string OnUnderlineClose(UnderlineElement element) { return ""; }
+        public override string OnItalicOpen(ItalicElement element) { return ""; }
+        public override string OnItalicClose(ItalicElement element) { return ""; }
 
         #region internal
         private enum State

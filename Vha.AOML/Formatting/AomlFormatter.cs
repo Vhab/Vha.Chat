@@ -161,5 +161,15 @@ namespace Vha.AOML.Formatting
         {
             return "</u>";
         }
+
+        public override string OnItalicOpen(ItalicElement element)
+        {
+            return "<i>";
+        }
+
+        public override string OnItalicClose(ItalicElement element)
+        {
+            return "</i>";
+        }
     }
 }

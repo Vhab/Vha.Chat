@@ -205,6 +205,16 @@ namespace Vha.Chat.UI.Controls
             return "</u>";
         }
 
+        public override string OnItalicOpen(ItalicElement element)
+        {
+            return "<i>";
+        }
+
+        public override string OnItalicClose(ItalicElement element)
+        {
+            return "</i>";
+        }
+
         public OutputControlFormatter(OutputControlCache cache, TextStyle style, bool images)
         {
             if (cache == null)

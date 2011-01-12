@@ -46,10 +46,22 @@ namespace Vha.Common.Data.AO
         {
             get
             {
+                OrganizationMember retMember = null;
                 foreach (OrganizationMember member in this.Members)
+                {
                     if (member.RankID == 0)
-                        return member;
-                return null;
+                    {
+                        // If we have already assigned a leader, and we stumble across another one; there's multiple leaders. Return null.
+                        if (retMember != null)
+                            return null;
+                        retMember = member;
+                    }
+                    // If this member doesn't have rank 0, and retMember is set, break the loop
+                    else if (retMember != null)
+                        break;
+                }
+                // Return the chosen member
+                return retMember;
             }
         }
 

@@ -39,12 +39,12 @@ namespace Vha.Common.Data.AO
         public override string ToString()
         {
             string result = "";
-            if (this.Firstname != null && this.Firstname != string.Empty)
+            if (!string.IsNullOrEmpty(this.Firstname))
                 result += this.Firstname + " ";
 
             result += string.Format("\"{0}\"", this.Nickname);
 
-            if (this.Lastname != null && this.Lastname != string.Empty)
+            if (!string.IsNullOrEmpty(this.Lastname))
                 result += " " + this.Lastname;
 
             return result;

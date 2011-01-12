@@ -48,7 +48,17 @@ namespace Vha.Common.Data.AO
         {
             get
             {
-                return (this.Name != null && this.Stats != null && this.Stats.Level > 0 && this.Stats.Profession != null && this.Stats.Profession != string.Empty);
+                if (this.Name == null)
+                    return false;
+                if (String.IsNullOrEmpty(this.Name.Nickname))
+                    return false;
+                if (this.Stats == null)
+                    return false;
+                if (this.Stats.Level == 0)
+                    return false;
+                if (String.IsNullOrEmpty(this.Stats.Profession))
+                    return false;
+                return true;
             }
         }
 
@@ -57,7 +67,11 @@ namespace Vha.Common.Data.AO
         {
             get
             {
-                return (this.Organization != null && this.Organization.Name != null && this.Organization.Name != string.Empty);
+                if (this.Organization == null)
+                    return false;
+                if (String.IsNullOrEmpty(this.Organization.Name))
+                    return false;
+                return true;
             }
         }
 

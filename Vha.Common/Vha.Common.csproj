@@ -69,6 +69,7 @@
     <Compile Include="Data\AO\Character.cs" />
     <Compile Include="Data\AO\Organization.cs" />
     <Compile Include="Format.cs" />
+    <Compile Include="Platform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeStamp.cs" />
     <Compile Include="Web.cs" />

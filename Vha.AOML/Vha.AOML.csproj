@@ -72,6 +72,7 @@
     <Compile Include="DOM\ElementCollection.cs" />
     <Compile Include="DOM\ElementLink.cs" />
     <Compile Include="DOM\ImageElement.cs" />
+    <Compile Include="DOM\ItalicElement.cs" />
     <Compile Include="DOM\ItemLink.cs" />
     <Compile Include="DOM\Link.cs" />
     <Compile Include="DOM\LinkElement.cs" />

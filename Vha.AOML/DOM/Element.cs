@@ -32,6 +32,7 @@ namespace Vha.AOML.DOM
         Color,
         Align,
         Underline,
+        Italic,
         Link,
         Image,
         Break

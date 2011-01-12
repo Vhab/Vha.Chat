@@ -84,6 +84,11 @@ namespace Vha.AOML
                                 elements.Peek().Children.Add(element);
                                 if (!open.Closed) elements.Push(element);
                                 break;
+                            case "i":
+                                element = new ItalicElement();
+                                elements.Peek().Children.Add(element);
+                                if (!open.Closed) elements.Push(element);
+                                break;
                             case "center":
                             case "left":
                             case "right":
@@ -124,6 +129,9 @@ namespace Vha.AOML
                             case "u":
                                 if (elements.Peek().Type == ElementType.Underline) break;
                                 throw new ArgumentException("Unexpected 'u' closing tag");
+                            case "i":
+                                if (elements.Peek().Type == ElementType.Italic) break;
+                                throw new ArgumentException("Unexpected 'i' closing tag");
                             case "div":
                             case "center":
                             case "left":

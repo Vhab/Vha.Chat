@@ -40,7 +40,10 @@ namespace Vha.Common.Data.AO
 
         public override string ToString()
         {
-            return this.Rank + " of " + this.Name;
+            // Replace values with N/A if they're null or empty.
+            return String.Format("{0} of {1}", 
+                (String.IsNullOrEmpty(this.Rank) ? "N/A" : this.Rank),
+                (String.IsNullOrEmpty(this.Name) ? "N/A" : this.Name));
         }
     }
 }

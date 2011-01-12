@@ -119,6 +119,10 @@ namespace Vha.AOML.Formatting
 
         public override string OnUnderlineClose(UnderlineElement element) { return ""; }
 
+        public override string OnItalicOpen(ItalicElement element) { return ""; }
+
+        public override string OnItalicClose(ItalicElement element) { return ""; }
+
         public TextFormatter() { this._prefix.Push(""); }
         public TextFormatter(string prefix) { this._prefix.Push(prefix); }
 

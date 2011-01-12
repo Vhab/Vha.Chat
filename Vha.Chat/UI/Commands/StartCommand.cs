@@ -38,7 +38,7 @@ namespace Vha.Chat.UI.Commands
                 context.Write(MessageClass.Error, "The start command only supports urls starting with http:// or https://");
                 return false;
             }
-            switch (context.OS)
+            switch (Platform.OS)
             {
                 case OS.Windows:
                     System.Diagnostics.Process.Start(message);
@@ -47,7 +47,7 @@ namespace Vha.Chat.UI.Commands
                     System.Diagnostics.Process.Start("xdg-open", message);
                     return true;
                 default:
-                    context.Write(MessageClass.Error, "This command is not yet available on " + context.OS.ToString() + ". We apologize for the inconvenience.");
+                    context.Write(MessageClass.Error, "This command is not yet available on " + Platform.OS.ToString() + ". We apologize for the inconvenience.");
                     return false;
             }
             

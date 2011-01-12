@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using Vha.Chat.UI.Controls;
 
 namespace Vha.Chat.Data
 {
@@ -31,6 +32,7 @@ namespace Vha.Chat.Data
         public string OptionsPath = ".";
         public string OptionsFile = "Options.xml";
         public string IgnoresFile = "Ignores.xml";
+        public OutputControlInitializationMode OutputMode = OutputControlInitializationMode.Detect;
         [XmlElement("Dimension")]
         public List<ConfigurationV1Dimension> Dimensions;
 

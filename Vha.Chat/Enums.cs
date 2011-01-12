@@ -73,12 +73,17 @@ namespace Vha.Chat
         PrivateChannel,
         // Public channels
         UnknownChannel,
-        AnnouncementsChannel,
-        GeneralChannel,
+        AdminChannel,
+        TeamChannel,
         OrganizationChannel,
-        ShoppingChannel,
-        TowersChannel,
         LeadersChannel,
+        GMChannel,
+        ShoppingChannel,
+        GeneralChannel,
+        TowersChannel,
+        AnnouncementsChannel,
+        RaidChannel,
+        BattlestationChannel
     }
 
     public enum MessageType
@@ -185,31 +190,5 @@ namespace Vha.Chat
         Socks4,
         Socks4a,
         Socks5
-    }
-
-    public enum Platform
-    {
-        DotNet,
-        Mono
-    }
-
-    public enum OS
-    {
-        /// <summary>
-        /// Microsoft Windows
-        /// </summary>
-        Windows,
-        /// <summary>
-        /// Unix or a variation of it (including Linux, FreeBSD, etc)
-        /// </summary>
-        Unix,
-        /// <summary>
-        /// Apple MacOS
-        /// </summary>
-        MacOS,
-        /// <summary>
-        /// Running on an unknown other platform
-        /// </summary>
-        Unknown
     }
 }

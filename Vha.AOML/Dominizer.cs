@@ -84,6 +84,11 @@ namespace Vha.AOML
                                 elements.Peek().Children.Add(element);
                                 if (!open.Closed) elements.Push(element);
                                 break;
+                            case "i":
+                                element = new ItalicElement();
+                                elements.Peek().Children.Add(element);
+                                if (!open.Closed) elements.Push(element);
+                                break;
                             case "center":
                             case "left":
                             case "right":
@@ -124,6 +129,9 @@ namespace Vha.AOML
                             case "u":
                                 if (elements.Peek().Type == ElementType.Underline) break;
                                 throw new ArgumentException("Unexpected 'u' closing tag");
+                            case "i":
+                                if (elements.Peek().Type == ElementType.Italic) break;
+                                throw new ArgumentException("Unexpected 'i' closing tag");
                             case "div":
                             case "center":
                             case "left":
@@ -169,7 +177,13 @@ namespace Vha.AOML
             // - Determine type
             ImageType type = ImageType.RDB;
             if (parts[0].ToLower() == "rdb") type = ImageType.RDB;
-            else if (parts[0].ToLower() == "tdb") type = ImageType.TDB;
+            else if (parts[0].ToLower() == "tdb")
+            {
+                type = ImageType.TDB;
+                string prefix = "id:";
+                if (parts[1].StartsWith(prefix))
+                    parts[1] = parts[1].Substring(prefix.Length);
+            }
             else return null;
             // Return image
             return new ImageElement(type, parts[1]);

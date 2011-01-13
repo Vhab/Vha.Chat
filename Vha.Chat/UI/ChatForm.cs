@@ -691,16 +691,7 @@ namespace Vha.Chat.UI
         
         private void _donate_Click(object sender, EventArgs e)
         {
-            string email = "paypal@vhabion.net";
-            string description = "Vha.Chat%20appreciation%20donation";
-            string country = "US";
-            string currency = "EUR";
-
-            string url = string.Format(
-                "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business={0}&lc={1}&item_name={2}&currency_code={3}&bn=PP%2dDonationsBF",
-                email, country, description, currency);
-
-            System.Diagnostics.Process.Start(url);
+            this._context.Input.Command("donate");
         }
         #endregion
 

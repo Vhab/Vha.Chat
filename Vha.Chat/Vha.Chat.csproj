@@ -67,6 +67,7 @@
     <Compile Include="Commands\CCCommand.cs" />
     <Compile Include="Commands\ColorsCommand.cs" />
     <Compile Include="Commands\CrashCommand.cs" />
+    <Compile Include="Commands\DonateCommand.cs" />
     <Compile Include="Commands\FriendCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\IgnoreCommand.cs" />

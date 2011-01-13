@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Security;
 using System.Security.Permissions;
+using System.Threading;
 using System.Windows.Forms;
 using Vha.Chat.Data;
 
@@ -38,8 +39,20 @@ namespace Vha.Chat.UI
             this._appDataPath = appDataPath;
 
             this._configuration.OptionsPath = null;
-            this._defaultDirectory.Enabled = this._testDirectory(localPath);
-            this._appData.Enabled = this._testDirectory(appDataPath);
+
+            // Ensure this is the only process checking these directories
+            Mutex mutex = new Mutex(false, "VhaChat_DirectoryCheck");
+            mutex.WaitOne();
+            try
+            {
+                this._defaultDirectory.Enabled = this._testDirectory(localPath);
+                this._appData.Enabled = this._testDirectory(appDataPath);
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+                mutex = null;
+            }
         }
 
         private ConfigurationV1 _configuration;

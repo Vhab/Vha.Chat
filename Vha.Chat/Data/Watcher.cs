@@ -20,6 +20,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 
 namespace Vha.Chat.Data
 {
@@ -67,7 +68,15 @@ namespace Vha.Chat.Data
                 lock (this)
                 {
                     this._watcher.EnableRaisingEvents = false;
-                    this._data.Save(this._path);
+                    this._mutex.WaitOne();
+                    try
+                    {
+                        this._data.Save(this._path);
+                    }
+                    finally
+                    {
+                        this._mutex.ReleaseMutex();
+                    }
                     this._watcher.EnableRaisingEvents = true;
                 }
             }
@@ -83,18 +92,26 @@ namespace Vha.Chat.Data
             {
                 lock (this)
                 {
-                    Base data = Base.Load(this._path);
-                    if (data == null) return;
-                    if (data.Type != this._data.Type)
+                    this._mutex.WaitOne();
+                    try
                     {
-                        throw new InvalidOperationException(
-                            "Watcher loaded data file of type '" +
-                            data.Type.ToString() +
-                            "' but was expecting data of type '" +
-                            this._data.Type.ToString() +
-                            "' for file: " + this.File);
+                        Base data = Base.Load(this._path);
+                        if (data == null) return;
+                        if (data.Type != this._data.Type)
+                        {
+                            throw new InvalidOperationException(
+                                "Watcher loaded data file of type '" +
+                                data.Type.ToString() +
+                                "' but was expecting data of type '" +
+                                this._data.Type.ToString() +
+                                "' for file: " + this.File);
+                        }
+                        this._data = data;
                     }
-                    this._data = data;
+                    finally
+                    {
+                        this._mutex.ReleaseMutex();
+                    }
                 }
             }
             // Dispatch event
@@ -140,6 +157,7 @@ namespace Vha.Chat.Data
 
         public Watcher(Base data, string path)
         {
+            if (data == null) throw new ArgumentNullException();
             this._virtualMode = false;
             this._directory = Path.GetDirectoryName(path);
             this._file = Path.GetFileName(path);
@@ -149,6 +167,7 @@ namespace Vha.Chat.Data
             this._watcher.NotifyFilter = NotifyFilters.LastWrite;
             this._watcher.Changed += new FileSystemEventHandler(_watcher_Changed);
             this._watcher.EnableRaisingEvents = true;
+            this._mutex = new Mutex(false, "VhaChat_Data_" + data.Name);
         }
 
         #region Internal
@@ -158,6 +177,7 @@ namespace Vha.Chat.Data
         private string _path;
         private Base _data;
         private FileSystemWatcher _watcher;
+        private Mutex _mutex;
 
         private void _watcher_Changed(object sender, FileSystemEventArgs e)
         {

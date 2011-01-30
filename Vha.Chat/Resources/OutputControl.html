@@ -100,8 +100,9 @@
         // Scroll to bottom
         $(window).scrollTop($(document).height());
     }
-    
-    $(function () {
+
+    function setup()
+    {
         // Setup scroll callback
         $(window).scroll(function () {
             // Detect bottom
@@ -111,9 +112,9 @@
                 isAtBottom = false;
             }
         });
-    });
+    }
 </script>
 </head>
-<body>
+<body onLoad="setup()">
 </body>
 </html>

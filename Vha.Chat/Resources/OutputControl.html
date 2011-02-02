@@ -66,11 +66,26 @@
 <script type="text/javascript">
     var isAtBottom = true;
     var isScrollAnimating = false;
+
+    function isLoaded()
+    {
+        if (typeof jQuery == "undefined") return false;
+        return true;
+    }
   
-    function setForegroundColor(color) { $('body').css('color', color); }
-    function setBackgroundColor(color) { $('body').css('background-color', color); }
+    function setForegroundColor(color)
+    {
+        if (!isLoaded()) return;
+        $('body').css('color', color);
+    }
+    function setBackgroundColor(color)
+    {
+        if (!isLoaded()) return;
+        $('body').css('background-color', color);
+    }
     function setPadding(top, right, bottom, left)
     {
+        if (!isLoaded()) return;
         $('body').css('paddingTop', top);
         $('body').css('paddingRight', right);
         $('body').css('paddingBottom', bottom);
@@ -79,6 +94,7 @@
     
     function write(html, maximumLines)
     {
+        if (!isLoaded()) return;
         $('body').append(html);
         if (maximumLines <= 0) return;
         while ($('body').children().size() > maximumLines)
@@ -95,6 +111,7 @@
     
     function scrollToBottom()
     {
+        if (!isLoaded()) return;
         // Don't scroll if the scrolled back up
         if (!isAtBottom) return;
         // Scroll to bottom
@@ -103,6 +120,11 @@
 
     function setup()
     {
+        // Detect if jQuery failed to load
+        if (!isLoaded()) {
+            document.body.innerHTML = "Failed to load jQuery";
+            return;
+        }
         // Setup scroll callback
         $(window).scroll(function () {
             // Detect bottom

@@ -158,7 +158,7 @@ namespace Vha.Chat.UI.Controls
                 if (Platform.Runtime == Runtime.Mono)
                     this._initializationMode = OutputControlInitializationMode.External;
                 else
-                    this._initializationMode = OutputControlInitializationMode.Delayed;
+                    this._initializationMode = OutputControlInitializationMode.Direct;
             }
             else
             {
@@ -196,7 +196,7 @@ namespace Vha.Chat.UI.Controls
         public void Write(string template, Element element, TextStyle style, bool scroll)
         {
             // Queue messages if the control isn't ready yet
-            if (this.Document == null || this.Document.Body == null)
+            if (!this._initialized)
             {
                 this._buffer.Enqueue(new WriteBuffer(template, element, style, scroll));
                 return;
@@ -232,6 +232,7 @@ namespace Vha.Chat.UI.Controls
         private Queue<WriteBuffer> _buffer = new Queue<WriteBuffer>();
         private OutputControlInitializationMode _initializationMode;
         private bool _enableImages = true;
+        private bool _initialized = false;
 
         private void _updateProperties()
         {
@@ -256,6 +257,7 @@ namespace Vha.Chat.UI.Controls
         #region Internal overrides
         protected override void OnDocumentCompleted(WebBrowserDocumentCompletedEventArgs e)
         {
+            if (this._initialized) return;
             // Load template
             switch (this._initializationMode)
             {
@@ -274,6 +276,7 @@ namespace Vha.Chat.UI.Controls
             this.Document.MouseUp -= new HtmlElementEventHandler(OnMouseUp);
             this.Document.MouseUp += new HtmlElementEventHandler(OnMouseUp);
             // Trigger event
+            this._initialized = true;
             base.OnDocumentCompleted(e);
             // Clear buffer
             if (this.Document != null && this.Document.Body != null)

@@ -53,7 +53,9 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._outputBox.BackgroundColor = System.Drawing.Color.White;
             this._outputBox.Context = null;
+            this._outputBox.EnableImages = false;
             this._outputBox.ForegroundColor = System.Drawing.Color.Black;
+            this._outputBox.InnerPadding = new System.Windows.Forms.Padding(0);
             this._outputBox.IsWebBrowserContextMenuEnabled = false;
             this._outputBox.Location = new System.Drawing.Point(5, 5);
             this._outputBox.MaximumLines = 0;

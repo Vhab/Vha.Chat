@@ -47,7 +47,6 @@ namespace Vha.Chat.UI
             this._info.MaximumTexts = 50;
             this._info.MinimumSize = new System.Drawing.Size(20, 20);
             this._info.Name = "_info";
-            this._info.ScriptErrorsSuppressed = true;
             this._info.Size = new System.Drawing.Size(374, 374);
             this._info.TabIndex = 0;
             // 

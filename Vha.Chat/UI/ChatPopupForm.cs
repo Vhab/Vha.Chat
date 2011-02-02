@@ -45,7 +45,9 @@ namespace Vha.Chat.UI
             this._target = target;
             this._context = context;
             this._context.MessageEvent += new Handler<MessageEventArgs>(_context_MessageEvent);
+            this._context.Options.SavedEvent += new Handler<Options>(_context_SavedEvent);
 
+            // Setup output control
             this._contextMenu = new ChatContextMenu(this, context);
             this._outputBox.ContextMenu = this._contextMenu;
             this._outputBox.Context = context;
@@ -53,10 +55,26 @@ namespace Vha.Chat.UI
             this._outputBox.ForegroundColor = this.ForeColor;
             this._outputBox.Initialize(context.Configuration.OutputMode);
 
+            // Force options update manually
+            this._context_SavedEvent(this._context, this._context.Options);
+
             // Preload output window with messages
             MessageEventArgs[] messages = context.GetHistory(target);
             foreach (MessageEventArgs message in messages)
                 _context_MessageEvent(context, message);
+        }
+
+        private void _context_SavedEvent(Context context, Options args)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<Options>(_context_SavedEvent),
+                    new object[] { context, args });
+                return;
+            }
+            this._outputBox.MaximumTexts = args.MaximumTexts;
+            this._outputBox.MaximumLines = args.MaximumMessages;
         }
 
         private void ChatPopupForm_FormClosed(object sender, FormClosedEventArgs e)

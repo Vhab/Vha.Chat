@@ -84,7 +84,7 @@ namespace Vha.Chat.UI
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._outputBox.BackgroundColor = System.Drawing.Color.White;
             this._outputBox.Context = null;
-            this._outputBox.EnableImages = true;
+            this._outputBox.EnableImages = false;
             this._outputBox.ForegroundColor = System.Drawing.Color.Black;
             this._outputBox.InnerPadding = new System.Windows.Forms.Padding(0);
             this._outputBox.IsWebBrowserContextMenuEnabled = false;
@@ -93,7 +93,6 @@ namespace Vha.Chat.UI
             this._outputBox.MaximumTexts = 50;
             this._outputBox.MinimumSize = new System.Drawing.Size(20, 20);
             this._outputBox.Name = "_outputBox";
-            this._outputBox.ScriptErrorsSuppressed = true;
             this._outputBox.Size = new System.Drawing.Size(590, 491);
             this._outputBox.TabIndex = 4;
             // 

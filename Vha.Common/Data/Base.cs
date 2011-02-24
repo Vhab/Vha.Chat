@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Xml.Schema;
 using System.IO;
 
 namespace Vha.Common.Data
@@ -43,33 +44,46 @@ namespace Vha.Common.Data
         [XmlIgnore]
         public Type Type { get { return this._type; } }
 
+        [XmlAttribute("schemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+        public string XsiSchemaLocation { get; set; }
+        [XmlAttribute("noNamespaceSchemaLocation", Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+        public string XsiNoNamespaceSchemaLocation { get; set; }
+
         public abstract Base Upgrade();
 
         #region Static methods
-        public static void Register(string name, int version, Type type)
+        public static void Register(string name, int version, Type type) { Register(name, version, type, null, null); }
+        public static void Register(string name, int version, Type type, string xsdNamespace, string xsdSchema)
         {
+            string id = name + "_" + version.ToString();
+            Registration r = new Registration();
+            r.Name = name;
+            r.Version = version;
+            r.Type = type;
+            r.Namespace = xsdNamespace;
+            r.Schema = xsdSchema;
             lock (_types)
             {
-                string id = name + "_" + version.ToString();
-                if (_types.ContainsKey(id)) _types[id] = type;
-                else _types.Add(id, type);
+                if (_types.ContainsKey(id))
+                    throw new ArgumentException("A type has already been registered for " + name + " v" + version);
+                _types.Add(id, r);
             }
         }
 
         public static void Unregister(string name, int version)
         {
+            string id = name + "_" + version.ToString();
             lock (_types)
             {
-                string id = name + "_" + version.ToString();
                 if (_types.ContainsKey(id)) _types.Remove(id);
             }
         }
 
         public static bool IsRegistered(string name, int version)
         {
+            string id = name + "_" + version.ToString();
             lock (_types)
             {
-                string id = name + "_" + version.ToString();
                 return _types.ContainsKey(id);
             }
         }
@@ -84,37 +98,74 @@ namespace Vha.Common.Data
             XmlReader reader = null;
             try
             {
-                // Start reading XML
+                // Start reading XML header
                 reader = XmlReader.Create(stream);
                 if (reader.ReadToFollowing("Root") == false)
-                    return null;
+                    throw new ArgumentException("Unable to locate root element");
                 // Determine the type of the XML file
                 string name = reader.GetAttribute("Name");
                 string version = reader.GetAttribute("Version");
+                reader.Close();
                 // XML file doesn't meet our expected format
                 if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(version))
-                    return null;
+                    throw new ArgumentException("Unable to locate Name or Version attribute");
                 string type = name + "_" + version;
+                
                 // Load file as known type
-                stream.Seek(0, SeekOrigin.Begin);
-                Type dataType = null;
+                Registration registration = null;
                 lock (_types)
                 {
                     if (_types.ContainsKey(type))
-                        dataType = _types[type];
+                        registration = _types[type];
                 }
-                if (dataType == null)
-                    return null;
-                // Read data
-                Base data = (Base)XML.FromStream(dataType, stream, false);
+                if (registration == null)
+                    throw new ArgumentException("No registered data class for type " + name + " v" + version);
+                // Verify document
+                if (!string.IsNullOrEmpty(registration.Schema))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    XmlReaderSettings readerSettings = new XmlReaderSettings();
+                    readerSettings.ConformanceLevel = ConformanceLevel.Document;
+                    // Configure XSD validation
+                    readerSettings.ValidationType = ValidationType.Schema;
+                    readerSettings.Schemas.Add(registration.Namespace, registration.Schema);
+                    readerSettings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings;
+                    // Validate document
+                    stream.Seek(0, SeekOrigin.Begin);
+                    reader = XmlReader.Create(stream, readerSettings);
+                    while (reader.Read()) { }
+                    reader.Close();
+                }
+                // Deserialize
+                stream.Seek(0, SeekOrigin.Begin);
+                reader = XmlReader.Create(stream);
+                XmlSerializer serializer = XML.GetSerializer(registration.Type);
+                ErrorCatcher errorCatcher = new ErrorCatcher();
+                serializer.UnknownAttribute += new XmlAttributeEventHandler(errorCatcher.OnUnknownAttribute);
+                serializer.UnknownElement += new XmlElementEventHandler(errorCatcher.OnUnknownElement);
+                serializer.UnknownNode += new XmlNodeEventHandler(errorCatcher.OnUnknownNode);
+                Base data = (Base)serializer.Deserialize(reader);
+                // Verify output
+                if (errorCatcher.Exceptions.Count > 0)
+                    throw errorCatcher.Exceptions[0];
                 if (data == null)
                     return null;
                 // Upgrade data if needed
                 while (data.CanUpgrade)
                     data = data.Upgrade();
+                // Apply XSD information
+                if (!string.IsNullOrEmpty(registration.Namespace) && !string.IsNullOrEmpty(registration.Schema))
+                {
+                    // TODO: figure out a way to set the 'xmlns' attribute
+                    data.XsiSchemaLocation = registration.Namespace + " " + registration.Schema;
+                }
+                else if (!string.IsNullOrEmpty(registration.Schema))
+                {
+                    data.XsiNoNamespaceSchemaLocation = registration.Schema;
+                }
+                // Everything went right, pfew
                 return data;
             }
-            catch (Exception) { return null; }
             finally
             {
                 // Close anything left open
@@ -123,7 +174,7 @@ namespace Vha.Common.Data
             }
         }
 
-        private static Dictionary<string, Type> _types = new Dictionary<string, Type>();
+        private static Dictionary<string, Registration> _types = new Dictionary<string, Registration>();
         #endregion
 
         #region Internal
@@ -142,6 +193,32 @@ namespace Vha.Common.Data
             this._version = version;
             this._canUpgrade = canUpgrade;
             this._type = type;
+        }
+
+        private class Registration
+        {
+            public string Name;
+            public int Version;
+            public Type Type;
+            public string Namespace;
+            public string Schema;
+        }
+
+        private class ErrorCatcher
+        {
+            public List<Exception> Exceptions = new List<Exception>();
+            public void OnUnknownAttribute(object sender, XmlAttributeEventArgs e)
+            {
+                Exceptions.Add(new Exception("Unexpected attribute " + e.Attr.Name + " at " + e.LineNumber + ":" + e.LinePosition));
+            }
+            public void OnUnknownElement(object sender, XmlElementEventArgs e)
+            {
+                Exceptions.Add(new Exception("Unexpected element " + e.Element.Name + " at " + e.LineNumber + ":" + e.LinePosition));
+            }
+            public void OnUnknownNode(object sender, XmlNodeEventArgs e)
+            {
+                Exceptions.Add(new Exception("Unexpected node " + e.Name + " at " + e.LineNumber + ":" + e.LinePosition));
+            }
         }
         #endregion
     }

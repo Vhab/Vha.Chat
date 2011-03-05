@@ -46,6 +46,8 @@ namespace Vha.AOML.Formatting
         public abstract string OnText(TextElement element);
         public abstract string OnUnderlineOpen(UnderlineElement element);
         public abstract string OnUnderlineClose(UnderlineElement element);
+        public abstract string OnItalicOpen(ItalicElement element);
+        public abstract string OnItalicClose(ItalicElement element);
 
         public string Format(Element element)
         {
@@ -97,6 +99,10 @@ namespace Vha.AOML.Formatting
                     UnderlineElement underline = (UnderlineElement)element;
                     result.Append(this.OnUnderlineOpen(underline));
                     break;
+                case ElementType.Italic:
+                    ItalicElement italic = (ItalicElement)element;
+                    result.Append(this.OnItalicOpen(italic));
+                    break;
             }
             // Process children
             if (element.Children != null)
@@ -128,6 +134,10 @@ namespace Vha.AOML.Formatting
                 case ElementType.Underline:
                     UnderlineElement underline = (UnderlineElement)element;
                     result.Append(this.OnUnderlineClose(underline));
+                    break;
+                case ElementType.Italic:
+                    ItalicElement italic = (ItalicElement)element;
+                    result.Append(this.OnItalicClose(italic));
                     break;
             }
             result.Append(this.OnAfterElement(element));

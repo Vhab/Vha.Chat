@@ -1,0 +1,4 @@
+[submodule "Vha.Common"]
+	path = Vha.Common
+	url = ../vha.common
+

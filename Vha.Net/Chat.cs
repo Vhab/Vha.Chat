@@ -1143,7 +1143,7 @@ namespace Vha.Net
 
         protected virtual void OnLoginSeedEvent(LoginSeedEventArgs e)
         {
-            this.Debug("Logging in with account: " + this._account, "[Auth]");
+            this.Debug("Logging in with account: " + this._account.Substring(0,2)+"*"+this._account.Substring(this._account.Length-2, 1), "[Auth]");
             this.SendPacket(new LoginSeedPacket(this._account, this._password, e.Seed));
             this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Login));
             if (this.LoginSeedEvent != null)

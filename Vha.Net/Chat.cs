@@ -125,10 +125,6 @@ namespace Vha.Net
 		/// My character ID
 		/// </summary>
         public UInt32 ID { get { return this._id; } }
-        /// <summary>
-        /// My account name
-        /// </summary>
-		public string Account { get { return this._account; } }
 		/// <summary>
 		/// My character name
 		/// </summary>
@@ -1668,10 +1664,10 @@ namespace Vha.Net
 
         public override string ToString()
         {
-            string str = this.Account;
+			string str = String.Empty;
             if (!string.IsNullOrEmpty(this.Character))
-                str += ":" + this.Character;
-            str += "@" + this._serverAddress + ":" + this._port;
+                str += this.Character + "@";
+            str += this._serverAddress + ":" + this._port;
             return str;
         }
 

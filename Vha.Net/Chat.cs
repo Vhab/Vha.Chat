@@ -113,6 +113,11 @@ namespace Vha.Net
         private ManualResetEvent _lookupReset;
         private System.Timers.Timer _pingTimer;
         private DateTime _lastPong = DateTime.Now;
+		/// <summary>
+		/// Friendly name of dimension for shorter debug output
+		/// </summary>
+		private string _dimensionFriendlyName;
+
         /// <summary>
         /// Proxy server. new Uri("http://proxyserver:port/") for a HTTP proxy supporting Connect().
         /// new Uri("socks4://userid@proxyserver:port/") for a Socks v4 connection.
@@ -162,6 +167,17 @@ namespace Vha.Net
 		/// Number of entries in the fast outgoing queue
 		/// </summary>
         public int FastQueueCount { get { return this._fastQueue.Count; } }
+
+		/// <summary>
+		/// Used for debug messages
+		/// </summary>
+		public string DimensionFriendlyName { 
+			get { 
+				if (!String.IsNullOrEmpty(this._dimensionFriendlyName))
+					return this._dimensionFriendlyName;
+				return String.Format("{0}:{1}", this._serverAddress, this._port);
+			} 
+			set { this._dimensionFriendlyName = value; } }
 		#endregion
 
 		#region Constructors
@@ -332,7 +348,7 @@ namespace Vha.Net
                 this._closing = false;
                 this._prepareChat();
 
-                this.Debug("Connecting to dimension: " + this._serverAddress + ":" + this._port, "[Auth]");
+                this.Debug(String.Format("Connecting to dimension: {0}:{1}", this._serverAddress, this._port), "[Auth]");
 
                 bool connected = false; // Set this to true when a connection is successfull.
                 if (this._proxy != null)
@@ -348,7 +364,7 @@ namespace Vha.Net
                             {
                                 this._socket = np.Socket;
                                 connected = true;
-                                this.Debug("Connected to " + this._serverAddress.ToString() + ":" + this._port + " through " + np.ToString(), "[Socket]");
+                                this.Debug("Connected to " + this.DimensionFriendlyName + " through " + np.ToString(), "[Socket]");
                             }
                         }
                         else
@@ -363,7 +379,7 @@ namespace Vha.Net
                         else if (np.Socket == null)
                             this.Debug("Failed connecting to proxy server " + np.ToString(), "[Socket]");
                         else
-                            this.Debug("Failed connecting to " + this._serverAddress + ":" + this._port.ToString() + " through " + np.ToString(), "[Socket]");
+                            this.Debug("Failed connecting to " + this.DimensionFriendlyName.ToString() + " through " + np.ToString(), "[Socket]");
                     }
                 }
                 else
@@ -1667,7 +1683,7 @@ namespace Vha.Net
 			string str = String.Empty;
             if (!string.IsNullOrEmpty(this.Character))
                 str += this.Character + "@";
-            str += this._serverAddress + ":" + this._port;
+            str += this.DimensionFriendlyName;
             return str;
         }
 

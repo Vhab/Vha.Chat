@@ -1693,7 +1693,7 @@ namespace Vha.Net
 			string str = String.Empty;
             if (!string.IsNullOrEmpty(this.Character))
                 str += this.Character + "@";
-            str += this.DimensionFriendlyName;
+			str += this.DimensionFriendlyName;
             return str;
         }
 
@@ -1703,7 +1703,10 @@ namespace Vha.Net
                 this.DebugEvent(this, new DebugEventArgs(this.ToString(), cat + " " + msg));
 			while (cat.Length < this._debugCategoryWidth)
 				cat += " ";
-            Trace.WriteLine("[" + this.ToString() + "] " + cat + " " + msg);
+			string tag = "[" + this.ToString() + "]";
+			while (tag.Length < 27)
+				tag += " ";
+            Trace.WriteLine(tag + cat + " " + msg);
         }
 
         private class ParsePacketData

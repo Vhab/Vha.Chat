@@ -36,6 +36,7 @@ namespace Vha.Net.Events
         private readonly string _character;
         private readonly string _message = null;
         private ChannelType _type = ChannelType.Unknown;
+		private readonly bool _outgoing = false;
 
         /// <summary>
         /// Constructor for channel message events
@@ -45,7 +46,7 @@ namespace Vha.Net.Events
         /// <param name="characterID">character id</param>
         /// <param name="character">character name</param>
         /// <param name="message">message</param>
-        public ChannelMessageEventArgs(BigInteger channelID, string channel, UInt32 characterID, string character, string message, ChannelType type)
+        public ChannelMessageEventArgs(BigInteger channelID, string channel, UInt32 characterID, string character, string message, ChannelType type, bool outgoing)
         {
             this._channelID = channelID;
             this._channel = channel;
@@ -53,6 +54,7 @@ namespace Vha.Net.Events
             this._character = character;
             this._message = message;
             this._type = type;
+			this._outgoing = outgoing;
         }
 
         public BigInteger ChannelID { get { return this._channelID; } }
@@ -61,5 +63,7 @@ namespace Vha.Net.Events
         public string Character { get { return this._character; } }
         public string Message { get { return this._message; } }
         public ChannelType Type { get { return this._type; } }
+		public bool Outgoing { get { return this._outgoing; } }
+
     }
 }

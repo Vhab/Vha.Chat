@@ -34,7 +34,8 @@ namespace Vha.Net.Events
         private readonly UInt32 _characterID = 0;
         private readonly string _character;
         private readonly string _message = null;
-        private bool _outgoing = false;
+        private bool _local = false;
+		private bool _outgoing = false;
 
         /// <summary>
         /// private channel message event message constructor
@@ -42,14 +43,15 @@ namespace Vha.Net.Events
         /// <param name="channelID">The id of the private chat channel</param>
         /// <param name="characterID">The character id of the sender</param>
         /// <param name="message">Message containing text and click links</param>
-        public PrivateChannelMessageEventArgs(UInt32 channelID, string channel, UInt32 characterID, string character, string message, bool outgoing)
+        public PrivateChannelMessageEventArgs(UInt32 channelID, string channel, UInt32 characterID, string character, string message, bool local, bool outgoing)
         {
             this._channelID = channelID;
             this._channel = channel;
             this._characterID = characterID;
             this._character = character;
             this._message = message;
-            this._outgoing = outgoing;
+            this._local = local;
+			this._outgoing = outgoing;
         }
 
         /// <summary>
@@ -72,7 +74,11 @@ namespace Vha.Net.Events
         /// <summary>
         /// Whether the message is from the bot's own private channel
         /// </summary>
-        public bool Outgoing { get { return this._outgoing; } }
+        public bool Local { get { return this._local; } }
+		/// <summary>
+		/// Wether the message is sent by the bot or not
+		/// </summary>
+		public bool Outgoing { get { return this._outgoing; } }
         /// <summary>
         /// Returns the combined private channel data
         /// </summary>

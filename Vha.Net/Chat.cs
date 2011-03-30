@@ -96,6 +96,7 @@ namespace Vha.Net
         private List<Thread> _threads;
         private Thread _receiveThread;
         private Thread _sendThread;
+		
 		/// <summary>
 		/// This event is signaled whenever something is added to the send queue.
 		/// </summary>
@@ -117,6 +118,10 @@ namespace Vha.Net
 		/// Friendly name of dimension for shorter debug output
 		/// </summary>
 		private string _dimensionFriendlyName;
+		/// <summary>
+		/// This much column width is reserved for the debug outputs category width
+		/// </summary>
+		private int _debugCategoryWidth = 15;
 
         /// <summary>
         /// Proxy server. new Uri("http://proxyserver:port/") for a HTTP proxy supporting Connect().
@@ -126,6 +131,11 @@ namespace Vha.Net
 		#endregion
 
 		#region Public attributes
+		/// <summary>
+		/// Debugging: This much collumn width is reserved for the category in tracer output.
+		/// </summary>
+		public int DebugCategoryWidth { get { return this._debugCategoryWidth; } set { this._debugCategoryWidth = value; } }
+
 		/// <summary>
 		/// My character ID
 		/// </summary>
@@ -522,7 +532,7 @@ namespace Vha.Net
 		// Receive Thread
         private void _runReceiver()
         {
-            this.Debug("Started", "[ReceiveThread]");
+            this.Debug("Started", "[RcvThrd]");
             try
             {
                 while (true)
@@ -578,7 +588,7 @@ namespace Vha.Net
             }
             catch (SocketException ex)
             {
-                this.Debug("Network error: " + ex.ToString(), "[ReceiveThread]");
+                this.Debug("Network error: " + ex.ToString(), "[RcvThrd]");
             }
             finally
             {
@@ -600,14 +610,14 @@ namespace Vha.Net
                     }
                 }
                 // And we're done!
-                this.Debug("Stopped!", "[ReceiveThread]");
+                this.Debug("Stopped!", "[RcvThrd]");
                 this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
         }
         // Send Thread
         private void _runSender()
         {
-            this.Debug("Started", "[SendThread]");
+            this.Debug("Started", "[SndThrd]");
             try
             {
                 while (this._sendThread_ResetEvent.WaitOne())
@@ -657,15 +667,15 @@ namespace Vha.Net
             }
             catch (ThreadAbortException)
             {
-                this.Debug("Thread aborted", "[SendThread]");
+                this.Debug("Thread aborted", "[SndThrd]");
             }
             catch (SocketException ex)
             {
-                this.Debug("Network error: " + ex.ToString(), "[SendThread]");
+                this.Debug("Network error: " + ex.ToString(), "[SndThrd]");
             }
             finally
             {
-                this.Debug("Stopped!", "[SendThread]");
+                this.Debug("Stopped!", "[SndThrd]");
                 this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Disconnected));
             }
         }
@@ -1691,6 +1701,8 @@ namespace Vha.Net
         {
             if (this.DebugEvent != null)
                 this.DebugEvent(this, new DebugEventArgs(this.ToString(), cat + " " + msg));
+			while (cat.Length < this._debugCategoryWidth)
+				cat += " ";
             Trace.WriteLine("[" + this.ToString() + "] " + cat + " " + msg);
         }
 

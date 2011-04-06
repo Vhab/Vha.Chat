@@ -118,10 +118,6 @@ namespace Vha.Net
 		/// Friendly name of dimension for shorter debug output
 		/// </summary>
 		private string _dimensionFriendlyName;
-		/// <summary>
-		/// This much column width is reserved for the debug outputs category width
-		/// </summary>
-		private int _debugCategoryWidth = 15;
 
 		/// <summary>
 		/// Proxy server. new Uri("http://proxyserver:port/") for a HTTP proxy supporting Connect().
@@ -131,11 +127,6 @@ namespace Vha.Net
 		#endregion
 
 		#region Public attributes
-		/// <summary>
-		/// Debugging: This much collumn width is reserved for the category in tracer output.
-		/// </summary>
-		public int DebugCategoryWidth { get { return this._debugCategoryWidth; } set { this._debugCategoryWidth = value; } }
-
 		/// <summary>
 		/// My character ID
 		/// </summary>
@@ -1696,6 +1687,7 @@ namespace Vha.Net
 		public override string ToString()
 		{
 			string str = String.Empty;
+
 			if (!string.IsNullOrEmpty(this.Character))
 				str += this.Character + "@";
 			str += this.DimensionFriendlyName;
@@ -1706,12 +1698,8 @@ namespace Vha.Net
 		{
 			if (this.DebugEvent != null)
 				this.DebugEvent(this, new DebugEventArgs(this.ToString(), cat + " " + msg));
-			while (cat.Length < this._debugCategoryWidth)
-				cat += " ";
-			string tag = "[" + this.ToString() + "]";
-			while (tag.Length < 27)
-				tag += " ";
-			Trace.WriteLine(tag + cat + " " + msg);
+
+			Trace.WriteLine(String.Format("[{0,35}] {1,15}  {2}", this, cat, msg));
 		}
 
 		private class ParsePacketData

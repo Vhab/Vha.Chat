@@ -182,6 +182,11 @@ namespace Vha.Net
 			}
 			set { this._dimensionFriendlyName = value; }
 		}
+
+        /// <summary>
+        /// Local IP to bind to.
+        /// </summary>
+        IPEndPoint LocalIpEndpoint { public get; private set; }
 		#endregion
 
 		#region Constructors
@@ -396,6 +401,8 @@ namespace Vha.Net
 						{
 							IPEndPoint ipe = new IPEndPoint(addy, this._port);
 							Socket tempSocket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                            if (this.LocalIpEndpoint != null)
+                                tempSocket.Bind(this.LocalIpEndpoint);
 							tempSocket.Connect(ipe);
 
 							if (tempSocket.Connected)

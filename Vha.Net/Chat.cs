@@ -186,42 +186,26 @@ namespace Vha.Net
         /// <summary>
         /// Local IP to bind to.
         /// </summary>
-        IPEndPoint LocalIpEndpoint { public get; private set; }
+        public IPEndPoint LocalIpEndpoint { get; set; }
 		#endregion
 
 		#region Constructors
 		/// <summary>
 		/// </summary>
-		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
-		public Chat(Uri connectionString)
-		{
-			UriBuilder ub = new UriBuilder(connectionString);
-			this._serverAddress = ub.Host;
-			this._port = ub.Port;
-			this._account = ub.UserName;
-			this._password = ub.Password;
-			if (!string.IsNullOrEmpty(ub.Path))
-				this._character = Format.UppercaseFirst(ub.Path.Substring(1)); //Start at 1 to remove the initial /
-			this._proxy = null;
-		}
-
-		/// <summary>
-		/// </summary>
-		/// <param name="ConnectionString">ao://user:pass@serverhost:port/Charactername</param>
+		/// <param name="connectionString">ao://user:pass@serverhost:port/Charactername</param>
 		/// <param name="proxy">The proxy server this connection should be tunnelled through</param>
-		public Chat(Uri connectionString, Uri proxy)
-			: this(connectionString)
+        /// <param name="localIpEndpoint">Connections will bind to this local IP address</param>
+		public Chat(Uri connectionString, Uri proxy=null, IPEndPoint localIpEndpoint=null)
 		{
-			this._proxy = proxy;
-		}
-
-		public Chat(string server, int port, string account, string password)
-		{
-			this._serverAddress = server;
-			this._port = port;
-			this._account = account;
-			this._password = password;
-			this._proxy = null;
+            UriBuilder ub = new UriBuilder(connectionString);
+            this._serverAddress = ub.Host;
+            this._port = ub.Port;
+            this._account = ub.UserName;
+            this._password = ub.Password;
+            if (!string.IsNullOrEmpty(ub.Path))
+                this._character = Format.UppercaseFirst(ub.Path.Substring(1)); //Start at 1 to remove the initial /
+            this._proxy = proxy;
+            this.LocalIpEndpoint = localIpEndpoint;
 		}
 
 		/// <summary>
@@ -231,47 +215,19 @@ namespace Vha.Net
 		/// <param name="port"></param>
 		/// <param name="account"></param>
 		/// <param name="password"></param>
-		/// <param name="proxy">The proxy server this connection should be tunnelled through</param>
-		public Chat(string server, int port, string account, string password, Uri proxy)
+        /// <param name="character">Character to log in with, or null</param>
+		/// <param name="proxy">The proxy server this connection should be tunnelled through, or null</param>
+        /// <param name="localIpEndpoint">Connections will bind to this local IP address, or null</param>
+        public Chat(string server, int port, string account, string password, string character=null, Uri proxy=null, IPEndPoint localIpEndpoint = null)
 		{
-			if (proxy == null)
-				throw new ArgumentNullException();
 			this._serverAddress = server;
 			this._port = port;
 			this._account = account;
 			this._password = password;
+            if (!String.IsNullOrEmpty(character))
+                this._character = Format.UppercaseFirst(character);
 			this._proxy = proxy;
-		}
-
-		public Chat(string server, int port, string account, string password, string character)
-		{
-			this._serverAddress = server;
-			this._port = port;
-			this._account = account;
-			this._password = password;
-			this._character = Format.UppercaseFirst(character);
-			this._proxy = null;
-		}
-
-		/// <summary>
-		/// Initializes a new Chat instance
-		/// </summary>
-		/// <param name="server"></param>
-		/// <param name="port"></param>
-		/// <param name="account"></param>
-		/// <param name="password"></param>
-		/// <param name="character"></param>
-		/// <param name="proxy">The proxy server this connection should be tunnelled through</param>
-		public Chat(string server, int port, string account, string password, string character, Uri proxy)
-		{
-			if (proxy == null)
-				throw new ArgumentNullException();
-			this._serverAddress = server;
-			this._port = port;
-			this._account = account;
-			this._password = password;
-			this._character = Format.UppercaseFirst(character);
-			this._proxy = proxy;
+            this.LocalIpEndpoint = localIpEndpoint;
 		}
 		#endregion
 

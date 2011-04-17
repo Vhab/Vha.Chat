@@ -1,6 +1,6 @@
 /*
 * Vha.Net
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Copyright (C) 2005-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ namespace Vha.Net.Events
         private readonly string _character;
         private readonly string _message = null;
         private bool _local = false;
-		private bool _outgoing = false;
+        private bool _outgoing = false;
 
         /// <summary>
         /// private channel message event message constructor
@@ -51,7 +51,7 @@ namespace Vha.Net.Events
             this._character = character;
             this._message = message;
             this._local = local;
-			this._outgoing = outgoing;
+            this._outgoing = outgoing;
         }
 
         /// <summary>
@@ -75,10 +75,10 @@ namespace Vha.Net.Events
         /// Whether the message is from the bot's own private channel
         /// </summary>
         public bool Local { get { return this._local; } }
-		/// <summary>
-		/// Wether the message is sent by the bot or not
-		/// </summary>
-		public bool Outgoing { get { return this._outgoing; } }
+        /// <summary>
+        /// Wether the message is sent by the bot or not
+        /// </summary>
+        public bool Outgoing { get { return this._outgoing; } }
         /// <summary>
         /// Returns the combined private channel data
         /// </summary>

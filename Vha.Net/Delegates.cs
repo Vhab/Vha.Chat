@@ -1,6 +1,6 @@
 /*
 * Vha.Net
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Copyright (C) 2005-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -41,10 +41,10 @@ namespace Vha.Net
     public delegate void PrivateMessageEventHandler(Chat chat, PrivateMessageEventArgs e);
 
     public delegate void VicinityMessageEventHandler(Chat chat, VicinityMessageEventArgs e);
-    
+
     public delegate void ChannelStatusEventHandler(Chat chat, ChannelStatusEventArgs e);
     public delegate void ChannelMessageEventHandler(Chat chat, ChannelMessageEventArgs e);
-    
+
     public delegate void LoginOKEventHandler(Chat chat, EventArgs e);
     public delegate void LoginSeedEventHandler(Chat chat, LoginSeedEventArgs e);
     public delegate void LoginCharlistEventHandler(Chat chat, LoginChararacterListEventArgs e);

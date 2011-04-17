@@ -1,6 +1,6 @@
 /*
 * Vha.Net
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Copyright (C) 2005-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -23,16 +23,16 @@ using System.Net;
 
 namespace Vha.Net.Packets
 {
-	internal class EmptyPacket : Packet
-	{
-		internal EmptyPacket(Packet.Type type): base(type) {}
-		internal override byte[] GetBytes()
-		{
-			if (this.PacketType == Packet.Type.PRIVATE_CHANNEL_KICKALL)
-				return new byte[0];
-			else
-				return (new NetString(string.Empty)).GetBytes();
-		}
+    internal class EmptyPacket : Packet
+    {
+        internal EmptyPacket(Packet.Type type) : base(type) { }
+        internal override byte[] GetBytes()
+        {
+            if (this.PacketType == Packet.Type.PRIVATE_CHANNEL_KICKALL)
+                return new byte[0];
+            else
+                return (new NetString(string.Empty)).GetBytes();
+        }
 
-	}
+    }
 }

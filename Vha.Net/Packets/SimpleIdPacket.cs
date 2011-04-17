@@ -1,6 +1,6 @@
 /*
 * Vha.Net
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Copyright (C) 2005-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,8 @@ namespace Vha.Net.Packets
     internal class SimpleIdPacket : Packet
     {
         internal SimpleIdPacket(Packet.Type type, byte[] data) : base(type, data) { }
-        internal SimpleIdPacket(Packet.Type type, UInt32 id) : base(type)
+        internal SimpleIdPacket(Packet.Type type, UInt32 id)
+            : base(type)
         {
             this.AddData(NetConvert.HostToNetworkOrder(id));
         }

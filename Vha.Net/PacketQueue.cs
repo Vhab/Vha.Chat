@@ -1,6 +1,6 @@
 /*
 * Vha.Net
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Copyright (C) 2005-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -26,8 +26,8 @@ using Vha.Net.Packets;
 
 namespace Vha.Net
 {
-	internal class PacketQueue
-	{
+    internal class PacketQueue
+    {
         private Queue<Packet> _queueLow = new Queue<Packet>();
         private Queue<Packet> _queueNormal = new Queue<Packet>();
         private Queue<Packet> _queueHigh = new Queue<Packet>();
@@ -39,17 +39,17 @@ namespace Vha.Net
             lastAction = DateTime.Now;
         }
 
-		public Packet Dequeue()
-		{
+        public Packet Dequeue()
+        {
             lastAction = DateTime.Now;
 
-			lock(this._queueHigh)
-			{
-				if (this._queueHigh.Count > 0)
-				{
+            lock (this._queueHigh)
+            {
+                if (this._queueHigh.Count > 0)
+                {
                     return this._queueHigh.Dequeue();
-				}
-			}
+                }
+            }
             lock (this._queueNormal)
             {
                 if (this._queueNormal.Count > 0)
@@ -64,12 +64,12 @@ namespace Vha.Net
                     return this._queueLow.Dequeue();
                 }
             }
-			return null;
-		}
+            return null;
+        }
         public void Enqueue(PacketPriority order, Packet item)
-		{
+        {
             if (item == null)
-				return;
+                return;
 
             if (!Enum.IsDefined(typeof(PacketPriority), order))
                 order = PacketPriority.Standard;
@@ -95,9 +95,9 @@ namespace Vha.Net
                     }
                     break;
             }
-		}
-		public Int32 Count
-		{
+        }
+        public Int32 Count
+        {
             get
             {
                 Int32 count = this._queueHigh.Count;
@@ -105,7 +105,7 @@ namespace Vha.Net
                 count += this._queueLow.Count;
                 return count;
             }
-		}
+        }
 
         public bool Available
         {
@@ -122,5 +122,5 @@ namespace Vha.Net
                 }
             }
         }
-	}
+    }
 }

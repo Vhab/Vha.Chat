@@ -1,6 +1,6 @@
 /*
 * Vha.Net
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Copyright (C) 2005-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -43,26 +43,26 @@ namespace Vha.Net.Events
             this._local = local;
         }
 
-		/// <summary>
-		/// ID of the owner of the private channel the event occurs in.
-		/// </summary>
+        /// <summary>
+        /// ID of the owner of the private channel the event occurs in.
+        /// </summary>
         public UInt32 ChannelID { get { return this._channelID; } }
-		/// <summary>
-		/// Name of the owner of the private channel the event occurs in.
-		/// </summary>
-		public string Channel { get { return this._channel; } }
+        /// <summary>
+        /// Name of the owner of the private channel the event occurs in.
+        /// </summary>
+        public string Channel { get { return this._channel; } }
         /// <summary>
         /// ID of the character who is triggering this event.
         /// </summary>
-		public UInt32 CharacterID { get { return this._characterID; } }
-		/// <summary>
+        public UInt32 CharacterID { get { return this._characterID; } }
+        /// <summary>
         /// Name of the character who is triggering this event.
-		/// </summary>
+        /// </summary>
         public string Character { get { return this._character; } }
         /// <summary>
         /// Whether someone has joined or left this channel. True if the character has joined, false when the character left.
         /// </summary>
-		public bool Join { get { return this._join; } }
+        public bool Join { get { return this._join; } }
         /// <summary>
         /// Whether this channel is owned by our character.
         /// </summary>

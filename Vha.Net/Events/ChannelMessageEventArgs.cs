@@ -1,6 +1,6 @@
 /*
 * Vha.Net
-* Copyright (C) 2005-2010 Remco van Oosterhout
+* Copyright (C) 2005-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@ namespace Vha.Net.Events
         private readonly string _character;
         private readonly string _message = null;
         private ChannelType _type = ChannelType.Unknown;
-		private readonly bool _outgoing = false;
+        private readonly bool _outgoing = false;
 
         /// <summary>
         /// Constructor for channel message events
@@ -54,7 +54,7 @@ namespace Vha.Net.Events
             this._character = character;
             this._message = message;
             this._type = type;
-			this._outgoing = outgoing;
+            this._outgoing = outgoing;
         }
 
         public BigInteger ChannelID { get { return this._channelID; } }
@@ -63,7 +63,7 @@ namespace Vha.Net.Events
         public string Character { get { return this._character; } }
         public string Message { get { return this._message; } }
         public ChannelType Type { get { return this._type; } }
-		public bool Outgoing { get { return this._outgoing; } }
+        public bool Outgoing { get { return this._outgoing; } }
 
     }
 }

@@ -261,7 +261,7 @@ namespace Vha.Chat
                     uri.UserName = proxy.Username;
                     uri.Password = proxy.Password;
                     // Create proxyfied chat
-                    this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password, uri.Uri);
+                    this._chat = new Vha.Net.Chat(dim.Address, dim.Port, account, password, null, uri.Uri);
                 }
                 // Set initial settings
                 this._chat.AutoReconnect = false;

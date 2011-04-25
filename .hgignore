@@ -1,0 +1,7 @@
+syntax: glob
+BasicBot/bin/*
+BasicBot/obj/*
+*.suo
+Vha.Chat/Properties/AssemblyInfo.cs
+Vha.Chat/bin/*
+Vha.Chat/obj/*

@@ -349,7 +349,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>"$(ProjectDir)PreBuild.bat" "$(ProjectDir)"</PreBuildEvent>
+    <PreBuildEvent>"$(ProjectDir)PreBuild.bat" "$(ProjectDir)" $(ConfigurationName)</PreBuildEvent>
     <PostBuildEvent>"$(ProjectDir)PostBuild.bat" "$(ProjectDir)" $(ConfigurationName)</PostBuildEvent>
   </PropertyGroup>
 </Project>

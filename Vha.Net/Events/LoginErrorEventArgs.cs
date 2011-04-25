@@ -29,11 +29,10 @@ namespace Vha.Net.Events
     /// </summary>
     public class LoginErrorEventArgs : EventArgs
     {
-        private readonly String _error = null;
         public LoginErrorEventArgs(String error)
         {
-            this._error = error;
+            this.Error = error;
         }
-        public String Error { get { return this._error; } }
+        public String Error { get; private set; }
     }
 }

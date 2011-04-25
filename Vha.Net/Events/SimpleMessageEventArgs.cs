@@ -29,11 +29,10 @@ namespace Vha.Net.Events
     /// </summary>
     public class SimpleMessageEventArgs : EventArgs
     {
-        private readonly String _message = null;
         public SimpleMessageEventArgs(String message)
         {
-            this._message = message;
+            this.Message = message;
         }
-        public String Message { get { return this._message; } }
+        public String Message { get; private set; }
     }
 }

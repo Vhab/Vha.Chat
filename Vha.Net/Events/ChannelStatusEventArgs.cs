@@ -30,13 +30,6 @@ namespace Vha.Net.Events
     /// </summary>
     public class ChannelStatusEventArgs : EventArgs
     {
-        private readonly BigInteger _id = 0;
-        private readonly String _name = null;
-        private readonly ChannelFlags _flags = 0;
-        private readonly byte _typeID = 0;
-        private readonly ChannelType _type = ChannelType.Unknown;
-        private readonly string _tag = "";
-
         /// <summary>
         /// constructor for channel mute events
         /// </summary>
@@ -46,48 +39,48 @@ namespace Vha.Net.Events
         /// <param name="channelType">channel type</param>
         public ChannelStatusEventArgs(BigInteger id, String name, ChannelFlags flags, byte channelType, string tag)
         {
-            this._id = id;
-            this._name = name;
-            this._flags = flags;
-            this._typeID = channelType;
+            this.ID = id;
+            this.Name = name;
+            this.Flags = flags;
+            this.TypeID = channelType;
             if (Enum.IsDefined(typeof(ChannelType), (int)channelType))
-                this._type = (ChannelType)channelType;
-            this._tag = tag;
+                this.Type = (ChannelType)channelType;
+            this.Tag = tag;
         }
 
         /// <summary>
         /// The 5-byte channel id
         /// </summary>
-        public BigInteger ID { get { return this._id; } }
+        public BigInteger ID { get; private set; }
 
         /// <summary>
         /// The channel name
         /// </summary>
-        public String Name { get { return this._name; } }
+        public String Name { get; private set; }
 
         /// <summary>
         /// Channel flags
         /// </summary>
-        public ChannelFlags Flags { get { return this._flags; } }
+        public ChannelFlags Flags { get; private set; }
 
         /// <summary>
         /// Channel type ID
         /// </summary>
-        public byte TypeID { get { return this._typeID; } }
+        public byte TypeID { get; private set; }
 
         /// <summary>
         /// Channel type
         /// </summary>
-        public ChannelType Type { get { return this._type; } }
+        public ChannelType Type { get; private set; }
 
         /// <summary>
         /// A string value associated with this channel
         /// </summary>
-        public string Tag { get { return this._tag; } }
+        public string Tag { get; private set; }
 
         /// <summary>
         /// Returns combined channel data
         /// </summary>
-        public Channel GetChannel() { return new Channel(this._id, this._name, this._type, this._flags, this._tag); }
+        public Channel GetChannel() { return new Channel(this.ID, this.Name, this.Type, this.Flags, this.Tag); }
     }
 }

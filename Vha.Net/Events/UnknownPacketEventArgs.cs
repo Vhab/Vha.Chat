@@ -31,26 +31,20 @@ namespace Vha.Net.Events
     public class UnknownPacketEventArgs : EventArgs
     {
         /// <summary>
-        /// Private member to store the message.
-        /// </summary>
-        private readonly String _text = null;
-        private readonly UInt16 _type = 0;
-
-        /// <summary>
         /// Constructor for creating event args
         /// </summary>
         /// <param name="message"></param>
         public UnknownPacketEventArgs(UInt16 type, String message)
         {
-            this._type = type;
-            this._text = message;
+            this.PacketType = type;
+            this.Message = message;
         }
 
         /// <summary>
         /// Message from unknown event
         /// </summary>
         /// <value>returns the message</value>
-        public String Message { get { return this._text; } }
-        public UInt16 PacketType { get { return this._type; } }
+        public String Message { get; private set; }
+        public UInt16 PacketType { get; private set; }
     }
 }

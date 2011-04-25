@@ -30,11 +30,9 @@ namespace Vha.Net.Events
     /// </summary>
     public class PrivateChannelRequestEventArgs : EventArgs
     {
-        private readonly Chat _chat = null;
-        private readonly UInt32 _characterID = 0;
-        private readonly string _character;
-        private bool _replied = false;
 
+        private Chat _chat;
+        private bool _replied = false;
         /// <summary>
         /// Constructor for private channel requests
         /// </summary>
@@ -43,43 +41,45 @@ namespace Vha.Net.Events
         public PrivateChannelRequestEventArgs(Chat chat, UInt32 characterID, string character)
         {
             this._chat = chat;
-            this._characterID = characterID;
-            this._character = character;
+            this.CharacterID = characterID;
+            this.Character = character;
         }
 
         /// <summary>
         /// The character id
         /// </summary>
-        public UInt32 CharacterID { get { return this._characterID; } }
+        public UInt32 CharacterID { get; private set; }
         /// <summary>
         /// The character inviting us
         /// </summary>
-        public String Character { get { return this._character; } }
+        public String Character { get; private set; }
         /// <summary>
         /// Returns the combined private channel data
         /// </summary>
         /// <returns></returns>
         public PrivateChannel GetPrivateChannel()
         {
-            return new PrivateChannel(this._characterID, this._character, false);
+            return new PrivateChannel(this.CharacterID, this.Character, false);
         }
         /// <summary>
         /// Accept this request
         /// </summary>
         public void Accept()
         {
-            if (this._replied) return;
+            if (this._replied) 
+                return;
             this._replied = true;
-            this._chat.SendPacket(new PrivateChannelStatusPacket(this._characterID, true));
+            this._chat.SendPacket(new PrivateChannelStatusPacket(this.CharacterID, true));
         }
         /// <summary>
         /// Decline this request
         /// </summary>
         public void Decline()
         {
-            if (this._replied) return;
+            if (this._replied) 
+                return;
             this._replied = true;
-            this._chat.SendPacket(new PrivateChannelStatusPacket(this._characterID, false));
+            this._chat.SendPacket(new PrivateChannelStatusPacket(this.CharacterID, false));
         }
     }
 }

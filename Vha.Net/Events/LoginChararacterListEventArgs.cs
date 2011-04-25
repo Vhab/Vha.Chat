@@ -29,11 +29,10 @@ namespace Vha.Net.Events
     /// </summary>
     public class LoginChararacterListEventArgs : EventArgs
     {
-        private readonly LoginCharacter[] _characters = null;
         public LoginChararacterListEventArgs(LoginCharacter[] characterList)
         {
-            this._characters = characterList;
+            this.CharacterList = characterList;
         }
-        public LoginCharacter[] CharacterList { get { return this._characters; } }
+        public LoginCharacter[] CharacterList { get; private set; }
     }
 }

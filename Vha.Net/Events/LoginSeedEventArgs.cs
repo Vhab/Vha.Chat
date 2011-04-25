@@ -29,11 +29,10 @@ namespace Vha.Net.Events
     /// </summary>
     public class LoginSeedEventArgs : EventArgs
     {
-        private readonly String _seed = null;
         public LoginSeedEventArgs(String seed)
         {
-            this._seed = seed;
+            this.Seed = seed;
         }
-        public String Seed { get { return this._seed; } }
+        public String Seed { get; private set; }
     }
 }

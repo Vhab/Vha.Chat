@@ -30,14 +30,6 @@ namespace Vha.Net.Events
     /// </summary>
     public class ChannelMessageEventArgs : EventArgs
     {
-        private readonly BigInteger _channelID = 0;
-        private readonly string _channel;
-        private readonly UInt32 _characterID = 0;
-        private readonly string _character;
-        private readonly string _message = null;
-        private ChannelType _type = ChannelType.Unknown;
-        private readonly bool _outgoing = false;
-
         /// <summary>
         /// Constructor for channel message events
         /// </summary>
@@ -48,22 +40,22 @@ namespace Vha.Net.Events
         /// <param name="message">message</param>
         public ChannelMessageEventArgs(BigInteger channelID, string channel, UInt32 characterID, string character, string message, ChannelType type, bool outgoing)
         {
-            this._channelID = channelID;
-            this._channel = channel;
-            this._characterID = characterID;
-            this._character = character;
-            this._message = message;
-            this._type = type;
-            this._outgoing = outgoing;
+            this.ChannelID = channelID;
+            this.Channel = channel;
+            this.CharacterID = characterID;
+            this.Character = character;
+            this.Message = message;
+            this.Type = type;
+            this.Outgoing = outgoing;
         }
 
-        public BigInteger ChannelID { get { return this._channelID; } }
-        public string Channel { get { return this._channel; } }
-        public UInt32 CharacterID { get { return this._characterID; } }
-        public string Character { get { return this._character; } }
-        public string Message { get { return this._message; } }
-        public ChannelType Type { get { return this._type; } }
-        public bool Outgoing { get { return this._outgoing; } }
+        public BigInteger ChannelID { get; private set; }
+        public string Channel { get; private set; }
+        public UInt32 CharacterID { get; private set; }
+        public string Character { get; private set; }
+        public string Message { get; private set; }
+        public ChannelType Type { get; private set; }
+        public bool Outgoing { get; private set; }
 
     }
 }

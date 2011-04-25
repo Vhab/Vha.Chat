@@ -29,14 +29,6 @@ namespace Vha.Net.Events
     /// </summary>
     public class PrivateChannelMessageEventArgs : EventArgs
     {
-        private readonly UInt32 _channelID = 0;
-        private readonly string _channel;
-        private readonly UInt32 _characterID = 0;
-        private readonly string _character;
-        private readonly string _message = null;
-        private bool _local = false;
-        private bool _outgoing = false;
-
         /// <summary>
         /// private channel message event message constructor
         /// </summary>
@@ -45,47 +37,47 @@ namespace Vha.Net.Events
         /// <param name="message">Message containing text and click links</param>
         public PrivateChannelMessageEventArgs(UInt32 channelID, string channel, UInt32 characterID, string character, string message, bool local, bool outgoing)
         {
-            this._channelID = channelID;
-            this._channel = channel;
-            this._characterID = characterID;
-            this._character = character;
-            this._message = message;
-            this._local = local;
-            this._outgoing = outgoing;
+            this.ChannelID = channelID;
+            this.Channel = channel;
+            this.CharacterID = characterID;
+            this.Character = character;
+            this.Message = message;
+            this.Local = local;
+            this.Outgoing = outgoing;
         }
 
         /// <summary>
         /// ID of the channel where the message originated
         /// </summary>
-        public UInt32 ChannelID { get { return this._channelID; } }
-        public string Channel { get { return this._channel; } }
+        public UInt32 ChannelID { get; private set; }
+        public string Channel { get; private set; }
         /// <summary>
         /// ID of the sender
         /// </summary>
-        public UInt32 CharacterID { get { return this._characterID; } }
+        public UInt32 CharacterID { get; private set; }
         /// <summary>
         /// Name of the sender
         /// </summary>
-        public string Character { get { return this._character; } }
+        public string Character { get; private set; }
         /// <summary>
         /// Message contents containing text and click links
         /// </summary>
-        public string Message { get { return this._message; } }
+        public string Message { get; private set; }
         /// <summary>
         /// Whether the message is from the bot's own private channel
         /// </summary>
-        public bool Local { get { return this._local; } }
+        public bool Local { get; private set; }
         /// <summary>
         /// Wether the message is sent by the bot or not
         /// </summary>
-        public bool Outgoing { get { return this._outgoing; } }
+        public bool Outgoing { get; private set; }
         /// <summary>
         /// Returns the combined private channel data
         /// </summary>
         /// <returns></returns>
         public PrivateChannel GetPrivateChannel()
         {
-            return new PrivateChannel(this._channelID, this._channel, this._outgoing);
+            return new PrivateChannel(this.ChannelID, this.Channel, this.Outgoing);
         }
     }
 }

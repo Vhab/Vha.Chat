@@ -29,23 +29,20 @@ namespace Vha.Net.Events
     /// </summary>
     public class CharacterIDEventArgs : EventArgs
     {
-        private readonly UInt32 _characterID = 0;
-        private readonly string _character;
-
         /// <summary>
         /// Event class constructor
         /// </summary>
         /// <param name="characterID">the character id</param>
         public CharacterIDEventArgs(UInt32 characterID, string character)
         {
-            this._characterID = characterID;
-            this._character = character;
+            this.CharacterID = characterID;
+            this.Character = character;
         }
 
         /// <summary>
         /// The character id
         /// </summary>
-        public UInt32 CharacterID { get { return this._characterID; } }
-        public String Character { get { return this._character; } }
+        public UInt32 CharacterID { get; private set; }
+        public String Character { get; private set; }
     }
 }

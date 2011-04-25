@@ -27,11 +27,10 @@ namespace Vha.Net.Events
 {
     public class StateChangeEventArgs : EventArgs
     {
-        private readonly ChatState _state;
         public StateChangeEventArgs(ChatState state)
         {
-            this._state = state;
+            this.State = state;
         }
-        public ChatState State { get { return this._state; } }
+        public ChatState State { get; private set; }
     }
 }

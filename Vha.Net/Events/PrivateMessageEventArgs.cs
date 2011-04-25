@@ -29,11 +29,6 @@ namespace Vha.Net.Events
     /// </summary>
     public class PrivateMessageEventArgs : EventArgs
     {
-        private readonly UInt32 _characterID = 0;
-        private readonly string _character;
-        private readonly string _msg = null;
-        private readonly bool _outgoing = false;
-
         /// <summary>
         /// Private message message event argument constructor
         /// </summary>
@@ -42,24 +37,24 @@ namespace Vha.Net.Events
         /// <param name="VoiceCommand">voice blob in the message, if any</param>
         public PrivateMessageEventArgs(UInt32 characterID, string character, string message, bool outgoing)
         {
-            this._characterID = characterID;
-            this._character = character;
-            this._msg = message;
-            this._outgoing = outgoing;
+            this.CharacterID = characterID;
+            this.Character = character;
+            this.Message = message;
+            this.Outgoing = outgoing;
         }
 
         /// <summary>
         /// The character id of the sender.
         /// </summary>
-        public UInt32 CharacterID { get { return this._characterID; } }
-        public string Character { get { return this._character; } }
+        public UInt32 CharacterID { get; private set; }
+        public string Character { get; private set; }
         /// <summary>
         /// The originating message containing any text and click links.
         /// </summary>
-        public string Message { get { return this._msg; } }
+        public string Message { get; private set; }
         /// <summary>
         /// Whether the message is an outgoing or incomming message
         /// </summary>
-        public bool Outgoing { get { return this._outgoing; } }
+        public bool Outgoing { get; private set; }
     }
 }

@@ -29,20 +29,18 @@ namespace Vha.Net.Events
     /// </summary>
     public class AmdMuxInfoEventArgs : EventArgs
     {
-        private readonly BigInteger _msg = null;
-
         /// <summary>
         /// Class constructor
         /// </summary>
         /// <param name="message">An unknown message</param>
         public AmdMuxInfoEventArgs(BigInteger message)
         {
-            this._msg = message;
+            this.Message = message;
         }
 
         /// <summary>
         /// An unknown message
         /// </summary>
-        public BigInteger Message { get { return this._msg; } }
+        public BigInteger Message { get; private set; }
     }
 }

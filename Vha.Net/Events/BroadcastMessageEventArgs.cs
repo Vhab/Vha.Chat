@@ -29,9 +29,6 @@ namespace Vha.Net.Events
     /// </summary>
     public class BroadcastMessageEventArgs : EventArgs
     {
-        private readonly string _str = null;
-        private readonly string _message = null;
-
         /// <summary>
         /// The event argument constructor
         /// </summary>
@@ -39,17 +36,17 @@ namespace Vha.Net.Events
         /// <param name="message">the text of the message</param>
         public BroadcastMessageEventArgs(String str, string message)
         {
-            this._str = str;
-            this._message = message;
+            this.UnknownString = str;
+            this.Message = message;
         }
 
         /// <summary>
         /// An unknown string
         /// </summary>
-        public String UnknownString { get { return this._str; } }
+        public String UnknownString { get; private set; }
         /// <summary>
         /// The text of the message containing text and click links.
         /// </summary>
-        public string Message { get { return this._message; } }
+        public string Message { get; private set; }
     }
 }

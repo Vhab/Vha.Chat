@@ -26,14 +26,12 @@ namespace Vha.Net.Events
 {
     public class ForwardEventArgs : EventArgs
     {
-        private readonly Int32 _id1 = 0;
-        private readonly Int32 _id2 = 0;
         public ForwardEventArgs(Int32 id1, Int32 id2)
         {
-            this._id1 = id1;
-            this._id2 = id2;
+            this.ID1 = id1;
+            this.ID2 = id2;
         }
-        public Int32 ID1 { get { return this._id1; } }
-        public Int32 ID2 { get { return this._id2; } }
+        public Int32 ID1 { get; private set; }
+        public Int32 ID2 { get; private set; }
     }
 }

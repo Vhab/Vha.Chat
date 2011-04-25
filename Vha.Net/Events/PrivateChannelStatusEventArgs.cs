@@ -26,54 +26,47 @@ namespace Vha.Net.Events
 {
     public class PrivateChannelStatusEventArgs : EventArgs
     {
-        private readonly UInt32 _channelID = 0;
-        private readonly string _channel;
-        private readonly UInt32 _characterID = 0;
-        private readonly string _character;
-        private readonly bool _join = false;
-        private readonly bool _local = false;
-
         public PrivateChannelStatusEventArgs(UInt32 channelID, string channel, UInt32 characterID, string character, bool join, bool local)
         {
-            this._channelID = channelID;
-            this._channel = channel;
-            this._characterID = characterID;
-            this._character = character;
-            this._join = join;
-            this._local = local;
+            this.ChannelID = channelID;
+            this.Channel = channel;
+            this.CharacterID = characterID;
+            this.Character = character;
+            this.Join = join;
+            this.Local = local;
         }
 
         /// <summary>
         /// ID of the owner of the private channel the event occurs in.
         /// </summary>
-        public UInt32 ChannelID { get { return this._channelID; } }
+        public UInt32 ChannelID { get; private set; }
         /// <summary>
         /// Name of the owner of the private channel the event occurs in.
         /// </summary>
-        public string Channel { get { return this._channel; } }
+        public string Channel { get; private set; }
         /// <summary>
         /// ID of the character who is triggering this event.
         /// </summary>
-        public UInt32 CharacterID { get { return this._characterID; } }
+        public UInt32 CharacterID { get; private set; }
         /// <summary>
         /// Name of the character who is triggering this event.
         /// </summary>
-        public string Character { get { return this._character; } }
+        public string Character { get; private set; }
         /// <summary>
         /// Whether someone has joined or left this channel. True if the character has joined, false when the character left.
         /// </summary>
-        public bool Join { get { return this._join; } }
+        public bool Join { get; private set; }
         /// <summary>
         /// Whether this channel is owned by our character.
         /// </summary>
-        public bool Local { get { return this._local; } }
+        public bool Local { get; private set; }
         /// <summary>
         /// Returns the combined private channel data
         /// </summary>
         /// <returns></returns>
         public PrivateChannel GetPrivateChannel()
         {
-            return new PrivateChannel(this._channelID, this._channel, this._local);
+            return new PrivateChannel(this.ChannelID, this.Channel, this.Local);
         }
     }
 }

@@ -30,11 +30,6 @@ namespace Vha.Net.Events
     /// </summary>
     public class FriendStatusEventArgs : EventArgs
     {
-        private readonly UInt32 _characterID = 0;
-        private readonly string _character;
-        private readonly bool _online = false;
-        private readonly string _tag = "";
-
         /// <summary>
         /// Event argument constructor
         /// </summary>
@@ -43,29 +38,29 @@ namespace Vha.Net.Events
         /// <param name="group">A string associated with this specific friendslist entry</param>
         public FriendStatusEventArgs(UInt32 characterID, string character, bool status, string tag)
         {
-            this._characterID = characterID;
-            this._character = character;
-            this._online = status;
-            this._tag = tag;
+            this.CharacterID = characterID;
+            this.Character = character;
+            this.Online = status;
+            this.Tag = tag;
         }
 
         /// <summary>
         /// ID of the character
         /// </summary>
-        public UInt32 CharacterID { get { return this._characterID; } }
-        public string Character { get { return this._character; } }
+        public UInt32 CharacterID { get; private set; }
+        public string Character { get; private set; }
         /// <summary>
         /// Whether the character is online or not
         /// </summary>
-        public bool Online { get { return this._online; } }
+        public bool Online { get; private set; }
         /// <summary>
         /// Whether the character is a temporary friend
         /// </summary>
-        public bool Temporary { get { return this._tag == "\0"; } }
+        public bool Temporary { get { return this.Tag == "\0"; } }
         /// <summary>
         /// A string associated with this specific friendslist entry
         /// </summary>
-        public string Tag { get { return this._tag; } }
+        public string Tag { get; private set; }
         /// <summary>
         /// Returns combined friend data
         /// </summary>

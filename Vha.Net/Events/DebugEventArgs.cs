@@ -26,16 +26,13 @@ namespace Vha.Net.Events
 {
     public class DebugEventArgs : EventArgs
     {
-        private readonly string _bot = null;
-        private readonly string _message = null;
-
         public DebugEventArgs(string bot, string message)
         {
-            this._message = message;
-            this._bot = bot;
+            this.Message = message;
+            this.Bot = bot;
         }
 
-        public string Message { get { return this._message; } }
-        public string Bot { get { return this._bot; } }
+        public string Message { get; private set; }
+        public string Bot { get; private set; }
     }
 }

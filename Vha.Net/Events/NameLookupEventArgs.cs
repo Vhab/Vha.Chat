@@ -30,9 +30,6 @@ namespace Vha.Net.Events
     /// </summary>
     public class NameLookupEventArgs : EventArgs
     {
-        private readonly UInt32 _characterID = 0;
-        private readonly String _name = null;
-
         /// <summary>
         /// Constructor for name lookup events
         /// </summary>
@@ -40,18 +37,18 @@ namespace Vha.Net.Events
         /// <param name="name">the name of the character</param>
         public NameLookupEventArgs(UInt32 characterID, String name)
         {
-            this._characterID = characterID;
-            this._name = Format.UppercaseFirst(name);
+            this.CharacterID = characterID;
+            this.Name = Format.UppercaseFirst(name);
         }
 
         /// <summary>
         /// The character id
         /// </summary>
-        public UInt32 CharacterID { get { return this._characterID; } }
+        public UInt32 CharacterID { get; private set; }
 
         /// <summary>
         /// The character name
         /// </summary>
-        public String Name { get { return this._name; } }
+        public String Name { get; private set; }
     }
 }

@@ -1,2 +1,2 @@
 cd /D %~1
-SubWCRev.exe . ".\Properties\AssemblyInfo.template.cs" ".\Properties\AssemblyInfo.cs" -f
+"../Vha.Build/bin/%2/Vha.Build.exe" template -inputFile="Properties/AssemblyInfo.Template.cs" -outputFile="Properties/AssemblyInfo.cs"

@@ -492,13 +492,8 @@ namespace Vha.Net
             this.Debug("Started", "[RcvThrd]");
             try
             {
-                while (true)
+                while (!this._closing && this._socket.Connected)
                 {
-                    if (this._closing) break;
-                    if (!_socket.Connected)
-                    {
-                        break;
-                    }
                     byte[] buffer = new byte[4];
                     int receivedBytes = 0;
                     try
@@ -512,34 +507,34 @@ namespace Vha.Net
                     }
                     Packet.Type type = (Packet.Type)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
                     short length = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 2));
+                    ParsePacketData packetData;
                     if (length == 0)
                     {
-                        ParsePacketData packetData = new ParsePacketData(type, length, null);
+                        packetData = new ParsePacketData(type, length, null);
                         if (this.UseThreadPool)
                             ThreadPool.QueueUserWorkItem(new WaitCallback(this._parsePacket), packetData);
                         else
                             this._parsePacket(packetData, true);
+                        Thread.Sleep(0);
+                        continue;
                     }
-                    else
+                    buffer = new byte[length];
+                    int bytesLeft = length;
+                    while (bytesLeft > 0)
                     {
-                        buffer = new byte[length];
-                        int bytesLeft = length;
-                        while (bytesLeft > 0)
+                        try
                         {
-                            try
-                            {
-                                receivedBytes = this._socket.Receive(buffer, length - bytesLeft, bytesLeft, 0);
-                            }
-                            catch (ObjectDisposedException) { throw new SocketException(); }
-                            bytesLeft -= receivedBytes;
-                            Thread.Sleep(10);
+                            receivedBytes = this._socket.Receive(buffer, length - bytesLeft, bytesLeft, 0);
                         }
-                        ParsePacketData packetData = new ParsePacketData(type, length, buffer);
-                        if (this.UseThreadPool == false || packetData.Type == Packet.Type.NAME_LOOKUP)
-                            this._parsePacket(packetData, true);
-                        else
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(this._parsePacket), packetData);
+                        catch (ObjectDisposedException) { throw new SocketException(); }
+                        bytesLeft -= receivedBytes;
+                        Thread.Sleep(10);
                     }
+                    packetData = new ParsePacketData(type, length, buffer);
+                    if (this.UseThreadPool == false || packetData.Type == Packet.Type.NAME_LOOKUP)
+                        this._parsePacket(packetData, true);
+                    else
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(this._parsePacket), packetData);
                     Thread.Sleep(0);
                 }
             }
@@ -579,47 +574,46 @@ namespace Vha.Net
             {
                 while (this._sendThread_ResetEvent.WaitOne())
                 {
-                    if (this._closing) break;
-                    if (this._socket == null || this._socket.Connected == false)
+                    if (this._closing || this._socket == null || this._socket.Connected == false)
                     {
                         break;
                     }
-                    if (this._fastQueue.Available || this._slowQueue.Available)
+                    //If neither queue is available, sleep 100ms and try again.
+                    if (!this._fastQueue.Available && !this._slowQueue.Available)
                     {
-                        Packet packet;
-                        if (this._slowQueue.Available)
-                        {
-                            packet = this._slowQueue.Dequeue();
-                        }
-                        else
-                        {
-                            packet = this._fastQueue.Dequeue();
-                        }
-                        byte[] data = packet.GetBytes();
-                        short len = (short)data.Length;
-                        byte[] buffer = new byte[len + 4];
-                        BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)packet.PacketType)).CopyTo(buffer, 0);
-                        BitConverter.GetBytes(IPAddress.HostToNetworkOrder(len)).CopyTo(buffer, 2);
-                        data.CopyTo(buffer, 4);
-                        try
-                        {
-                            _socket.Send(buffer, buffer.Length, 0);
-                        }
-                        catch (ObjectDisposedException) { throw new SocketException(); }
-                        if (packet.PacketType == Packet.Type.PRIVATE_MESSAGE)
-                        {
-                            PrivateMessagePacket msg = (PrivateMessagePacket)packet;
-                            this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetCharacterName(msg.CharacterID), msg.Message, true));
-                        }
-                        if (this._fastQueue.Count > 0 || this._slowQueue.Count > 0) //If there is still something in queue, sleep for predefined delay..
-                            Thread.Sleep((int)this.FastPacketDelay);
-                        else //If there's nothing more in the queues, reset our resetevent.
-                            this._sendThread_ResetEvent.Reset();
+                        Thread.Sleep(100);
+                        continue;
+                    }
+
+                    Packet packet;
+                    if (this._slowQueue.Available)
+                    {
+                        packet = this._slowQueue.Dequeue();
                     }
                     else
                     {
-                        Thread.Sleep(100);
+                        packet = this._fastQueue.Dequeue();
                     }
+                    byte[] data = packet.GetBytes();
+                    short len = (short)data.Length;
+                    byte[] buffer = new byte[len + 4];
+                    BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)packet.PacketType)).CopyTo(buffer, 0);
+                    BitConverter.GetBytes(IPAddress.HostToNetworkOrder(len)).CopyTo(buffer, 2);
+                    data.CopyTo(buffer, 4);
+                    try
+                    {
+                        _socket.Send(buffer, buffer.Length, 0);
+                    }
+                    catch (ObjectDisposedException) { throw new SocketException(); }
+                    if (packet.PacketType == Packet.Type.PRIVATE_MESSAGE)
+                    {
+                        PrivateMessagePacket msg = (PrivateMessagePacket)packet;
+                        this.OnPrivateMessageEvent(new PrivateMessageEventArgs(msg.CharacterID, this.GetCharacterName(msg.CharacterID), msg.Message, true));
+                    }
+                    if (this._fastQueue.Count > 0 || this._slowQueue.Count > 0) //If there is still something in queue, sleep for predefined delay..
+                        Thread.Sleep((int)this.FastPacketDelay);
+                    else //If there's nothing more in the queues, reset our resetevent.
+                        this._sendThread_ResetEvent.Reset();
                 }
             }
             catch (ThreadAbortException)

@@ -1120,7 +1120,7 @@ namespace Vha.Net
                 this.SendLoginCharacter(character);
                 return;
             }
-            this.Debug(String.Format("Character list received: {1}. Awaiting character selection", this._character, characterslist), "[Auth]");
+            this.Debug(String.Format("Character list received: {0}. Awaiting character selection", characterslist), "[Auth]");
         }
 
         protected virtual void OnLoginErrorEvent(LoginErrorEventArgs e)

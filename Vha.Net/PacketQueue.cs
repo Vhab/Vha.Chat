@@ -32,7 +32,7 @@ namespace Vha.Net
         private Queue<Packet> _queueNormal = new Queue<Packet>();
         private Queue<Packet> _queueHigh = new Queue<Packet>();
         private DateTime lastAction;
-        public double Delay = 0;
+        public int Delay = 0;
 
         public PacketQueue()
         {

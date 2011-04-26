@@ -40,8 +40,8 @@ namespace Vha.Net
         public int ReconnectDelay = 5000;
         public int PingInterval = 60000;
         public int PingTimeout = 120000;
-        public double FastPacketDelay = 10;
-        public double SlowPacketDelay = 2200;
+        public int FastPacketDelay = 10;
+        public int SlowPacketDelay = 2200;
         public bool IgnoreCharacterLoggedIn = true;
         public bool UseThreadPool = true;
         /// <summary>
@@ -578,10 +578,10 @@ namespace Vha.Net
                     {
                         break;
                     }
-                    //If neither queue is available, sleep 100ms and try again.
+                    //If neither queue is available: sleep for FastQueueDelay, then try again.
                     if (!this._fastQueue.Available && !this._slowQueue.Available)
                     {
-                        Thread.Sleep(100);
+                        Thread.Sleep(this._fastQueue.Delay);
                         continue;
                     }
 

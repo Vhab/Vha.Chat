@@ -189,6 +189,25 @@ namespace Vha.Net
         public IPEndPoint LocalIpEndpoint { get; set; }
         #endregion
 
+        #region Public Accessors
+        /// <summary>
+        /// Anonymized string based on account name
+        /// </summary>
+        public string AccountMask
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(this._account))
+                    return String.Empty;
+
+                if (this._account.Length<=4)
+                    return this._account.Substring(0,1)+"*";
+
+                return String.Format("{0}*{1}", this._account.Substring(0, 2), this._account.Substring(this._account.Length - 2, 1));
+            }
+        }
+        #endregion
+
         #region Constructors
         /// <summary>
         /// </summary>
@@ -1122,7 +1141,7 @@ namespace Vha.Net
 
         protected virtual void OnLoginSeedEvent(LoginSeedEventArgs e)
         {
-            this.Debug("Logging in with account: " + this._account.Substring(0, 2) + "*" + this._account.Substring(this._account.Length - 2, 1), "[Auth]");
+            this.Debug("Logging in with account: "+this.AccountMask, "[Auth]");
             this.SendPacket(new LoginSeedPacket(this._account, this._password, e.Seed));
             this.OnStateChangeEvent(new StateChangeEventArgs(ChatState.Login));
             if (this.LoginSeedEvent != null)

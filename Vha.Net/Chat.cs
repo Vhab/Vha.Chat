@@ -511,7 +511,7 @@ namespace Vha.Net
             this.Debug("Started", "[RcvThrd]");
             try
             {
-                while (!this._closing && this._socket.Connected)
+                while (this._socket!=null && !this._closing && this._socket.Connected)
                 {
                     byte[] buffer = new byte[4];
                     int receivedBytes = 0;

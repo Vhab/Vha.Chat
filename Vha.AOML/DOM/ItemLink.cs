@@ -46,9 +46,9 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Initializes a new instance of ItemLink
         /// </summary>
-        /// <param name="command">The low id of the item</param>
-        /// <param name="command">The high id of the item</param>
-        /// <param name="command">The quality of the item</param>
+        /// <param name="lowID">The low id of the item</param>
+        /// <param name="highID">The high id of the item</param>
+        /// <param name="quality">The quality of the item</param>
         public ItemLink(UInt32 lowID, UInt32 highID, UInt32 quality)
             : base(LinkType.Item)
         {

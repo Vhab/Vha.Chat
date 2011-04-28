@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.AOML
 * Copyright (C) 2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
@@ -23,35 +23,33 @@ using System;
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// A link to an element tree to be shown.
-    /// Commonly known as text://
+    /// A link to an Anarchy Online character.
+    /// Commonly known as user://
     /// </summary>
-    public class ElementLink : Link
+    public class UserLink : Link
     {
         /// <summary>
-        /// Returns the element tree which should be shown
+        /// Returns the character the link refers at
         /// </summary>
-        public readonly Element Element;
+        public readonly string Character;
 
         /// <summary>
-        /// Initializes a new instance of ElementLink
+        /// Initializes a new instance of UserLink
         /// </summary>
-        /// <param name="element">The element tree which should be shown</param>
-        public ElementLink(Element element)
-            : base(LinkType.Element)
+        /// <param name="character">The character</param>
+        public UserLink(string character)
+            : base(LinkType.User)
         {
-            if (element == null)
-                throw new ArgumentNullException();
-            this.Element = element;
+            this.Character = character;
         }
 
         /// <summary>
-        /// Creates a clone of this ElementLink
+        /// Creates a clone of this UserLink
         /// </summary>
-        /// <returns>A new ElementLink</returns>
+        /// <returns>A new UserLink</returns>
         public override Link Clone()
         {
-            return new ElementLink(this.Element);
+            return new UserLink(this.Character);
         }
     }
 }

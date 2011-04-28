@@ -131,6 +131,10 @@ namespace Vha.AOML.Formatting
                     href = string.Format("itemref://{0}/{1}/{2}",
                         item.LowID, item.HighID, item.Quality);
                     break;
+                case LinkType.User:
+                    UserLink user = (UserLink)element.Link;
+                    href = "user://" + user.Character;
+                    break;
                 case LinkType.Other:
                     OtherLink other = (OtherLink)element.Link;
                     href = other.Uri.ToString(); // Leave empty as it's potentially harmful

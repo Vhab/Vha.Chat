@@ -96,6 +96,10 @@ namespace Vha.AOML.Formatting
                         "lid=" + item.LowID.ToString() +
                         " hid=" + item.HighID.ToString() +
                         " ql=" + item.Quality.ToString() + "\n";
+                case LinkType.User:
+                    UserLink user = (UserLink)element.Link;
+                    return this._prefix.Peek() +
+                        "character=" + user.Character + "\n";
                 case LinkType.Other:
                     OtherLink other = (OtherLink)element.Link;
                     return this._prefix.Peek() +

@@ -80,6 +80,7 @@
     <Compile Include="DOM\OtherLink.cs" />
     <Compile Include="DOM\TextElement.cs" />
     <Compile Include="DOM\UnderlineElement.cs" />
+    <Compile Include="DOM\UserLink.cs" />
     <Compile Include="Formatting\AomlFormatter.cs" />
     <Compile Include="Formatting\Formatter.cs" />
     <Compile Include="Formatting\PlainTextFormatter.cs" />

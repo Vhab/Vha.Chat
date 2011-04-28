@@ -245,6 +245,9 @@ namespace Vha.AOML
                     case "chatcmd":
                         link = new CommandLink(argument);
                         break;
+                    case "user":
+                        link = new UserLink(argument);
+                        break;
                     default:
                         link = new OtherLink(href);
                         break;

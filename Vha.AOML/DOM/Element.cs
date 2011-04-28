@@ -95,6 +95,34 @@ namespace Vha.AOML.DOM
         }
 
         /// <summary>
+        /// Recursively checks if this element has a parent of the specified type
+        /// </summary>
+        /// <param name="type">The type to check against</param>
+        /// <returns>True if this elements has a parent of the specified type</returns>
+        public bool HasParent(ElementType type)
+        {
+            if (this.Parent == null) return false;
+            if (this.Parent.Type == type) return true;
+            return this.Parent.HasParent(type);
+        }
+
+        /// <summary>
+        /// Recursively checks if this element has a parent of the specified type
+        /// </summary>
+        /// <param name="type">The type to check against</param>
+        /// <returns>True if this elements has a parent of the specified type</returns>
+        public bool HasChild(ElementType type)
+        {
+            if (this.SupportsChildren == false) return false;
+            foreach (Element child in this.Children)
+            {
+                if (child.Type == type) return true;
+                if (child.HasChild(type)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Returns a clone of the current element, including all its children.
         /// The cloned element will not be attached to any element. Its parent value will always default to null.
         /// </summary>

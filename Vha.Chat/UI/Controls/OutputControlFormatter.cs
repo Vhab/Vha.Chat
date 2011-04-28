@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using Vha.AOML.Formatting;
 using Vha.AOML.DOM;
 using Vha.Common;
@@ -112,8 +113,8 @@ namespace Vha.Chat.UI.Controls
             {
                 case LinkType.Command:
                     CommandLink command = (CommandLink)element.Link;
-                    href = "chatcmd://" + command.Command;
-                    title = command.Command;
+                    href = "chatcmd://" + HttpUtility.UrlEncode(command.Command);
+                    title = Web.EscapeHtml(command.Command);
                     break;
                 case LinkType.Element:
                     ElementLink link = (ElementLink)element.Link;

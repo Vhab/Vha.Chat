@@ -236,11 +236,11 @@ namespace Vha.Common
         /// <returns></returns>
         public static string UnescapeHtml(string text)
         {
-            text = text.Replace("&amp;", "&");
-            text = text.Replace("&quot;", "\"");
-            text = text.Replace("&#039;", "'");
-            text = text.Replace("&lt;", "<");
             text = text.Replace("&gt;", ">");
+            text = text.Replace("&lt;", "<");
+            text = text.Replace("&#039;", "'");
+            text = text.Replace("&quot;", "\"");
+            text = text.Replace("&amp;", "&");
             return text;
         }
 

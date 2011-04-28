@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using Vha.AOML.Formatting;
 using Vha.AOML.DOM;
 using Vha.Common;
@@ -68,6 +69,8 @@ namespace Vha.Chat.UI.Controls
 
         public override string OnColorOpen(ColorElement element)
         {
+            if (element.HasParent(ElementType.Link))
+                return "";
             if (this._style == TextStyle.Strip)
                 return "<span>";
             Color color = element.Color;
@@ -79,6 +82,8 @@ namespace Vha.Chat.UI.Controls
 
         public override string OnColorClose(ColorElement element)
         {
+            if (element.HasParent(ElementType.Link))
+                return "";
             return "</span>";
         }
 
@@ -112,8 +117,8 @@ namespace Vha.Chat.UI.Controls
             {
                 case LinkType.Command:
                     CommandLink command = (CommandLink)element.Link;
-                    href = "chatcmd://" + command.Command;
-                    title = command.Command;
+                    href = "chatcmd://" + HttpUtility.UrlEncode(command.Command);
+                    title = Web.EscapeHtml(command.Command);
                     break;
                 case LinkType.Element:
                     ElementLink link = (ElementLink)element.Link;
@@ -128,7 +133,12 @@ namespace Vha.Chat.UI.Controls
                 case LinkType.Other:
                     OtherLink other = (OtherLink)element.Link;
                     href = other.Uri.ToString();
-                    title = href;
+                    title = Web.EscapeHtml(href);
+                    break;
+                case LinkType.Invalid:
+                    InvalidLink invalid = (InvalidLink)element.Link;
+                    href = ""; // Leave link empty as it's potentially harmfull
+                    title = Web.EscapeHtml(invalid.Raw);
                     break;
             }
             // Handle 'no-style' links
@@ -161,7 +171,7 @@ namespace Vha.Chat.UI.Controls
                     style = " class=\"NoStyle\"";
                 }
             }
-            return string.Format("<a href=\"{0}\" title=\"{1}\"{2}>", href, title, style);
+            return string.Format("<a href=\"{0}\" title=\"{1}\"{2}>", href, Web.EscapeHtml(title), style);
         }
 
         public override string OnLinkClose(LinkElement element)

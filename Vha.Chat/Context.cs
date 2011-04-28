@@ -574,6 +574,7 @@ namespace Vha.Chat
             this.Input.RegisterCommand(new MuteCommand());
             this.Input.RegisterCommand(new OrganizationCommand());
             this.Input.RegisterCommand(new TellCommand());
+            this.Input.RegisterCommand(new RawCommand());
             this.Input.RegisterCommand(new ReplyCommand(this));
             this.Input.RegisterCommand(new TextCommand());
             this.Input.RegisterCommand(new UnignoreCommand());

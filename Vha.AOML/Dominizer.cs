@@ -211,7 +211,7 @@ namespace Vha.AOML
             string argument = href.Substring(index + 3);
             Link link = null;
             // Verify header
-            Regex validCharacters = new Regex("$[a-zA-Z]+^");
+            Regex validCharacters = new Regex("^[a-zA-Z]+$");
             if (!validCharacters.IsMatch(type))
             {
                 // Invalid link

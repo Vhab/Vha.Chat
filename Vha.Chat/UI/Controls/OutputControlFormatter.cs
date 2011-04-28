@@ -128,7 +128,12 @@ namespace Vha.Chat.UI.Controls
                 case LinkType.Other:
                     OtherLink other = (OtherLink)element.Link;
                     href = other.Uri.ToString();
-                    title = href;
+                    title = Web.EscapeHtml(href);
+                    break;
+                case LinkType.Invalid:
+                    InvalidLink invalid = (InvalidLink)element.Link;
+                    href = ""; // Leave link empty as it's potentially harmfull
+                    title = Web.EscapeHtml(invalid.Raw);
                     break;
             }
             // Handle 'no-style' links
@@ -161,7 +166,7 @@ namespace Vha.Chat.UI.Controls
                     style = " class=\"NoStyle\"";
                 }
             }
-            return string.Format("<a href=\"{0}\" title=\"{1}\"{2}>", href, title, style);
+            return string.Format("<a href=\"{0}\" title=\"{1}\"{2}>", href, Web.EscapeHtml(title), style);
         }
 
         public override string OnLinkClose(LinkElement element)

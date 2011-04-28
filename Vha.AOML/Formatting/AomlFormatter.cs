@@ -133,7 +133,10 @@ namespace Vha.AOML.Formatting
                     break;
                 case LinkType.Other:
                     OtherLink other = (OtherLink)element.Link;
-                    href = other.Uri.ToString();
+                    href = other.Uri.ToString(); // Leave empty as it's potentially harmful
+                    break;
+                case LinkType.Invalid:
+                    href = ""; // Leave empty as it's potentially harmful
                     break;
             }
             if (!element.Stylized)

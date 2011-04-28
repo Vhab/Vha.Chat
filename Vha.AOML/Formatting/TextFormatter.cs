@@ -100,6 +100,10 @@ namespace Vha.AOML.Formatting
                     OtherLink other = (OtherLink)element.Link;
                     return this._prefix.Peek() +
                         "uri=" + other.Uri.ToString() + "\n";
+                case LinkType.Invalid:
+                    InvalidLink invalid = (InvalidLink)element.Link;
+                    return this._prefix.Peek() +
+                        "uri=" + invalid.Raw + "\n";
                 default:
                     return this._prefix.Peek() +
                         "unknown LinkType: " +

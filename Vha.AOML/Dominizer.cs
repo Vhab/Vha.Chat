@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Vha.AOML.DOM;
 using Vha.Common;
 
@@ -209,34 +210,45 @@ namespace Vha.AOML
             string type = href.Substring(0, index).ToLower();
             string argument = href.Substring(index + 3);
             Link link = null;
-            switch (type)
+            // Verify header
+            Regex validCharacters = new Regex("$[a-zA-Z]+^");
+            if (!validCharacters.IsMatch(type))
             {
-                case "text":
-                    link = new ElementLink(Parse(argument));
-                    break;
-                case "charref":
-                    index = argument.IndexOf("/");
-                    if (index < 0) break;
-                    index = argument.IndexOf("/", index + 1);
-                    if (index <= 0) break;
-                    argument = argument.Substring(index + 1);
-                    link = new ElementLink(Parse(argument));
-                    break;
-                case "itemref":
-                    string[] parts = argument.Split('/');
-                    if (parts.Length != 3) break;
-                    uint lowId, highId, ql;
-                    if (!uint.TryParse(parts[0], out lowId)) break;
-                    if (!uint.TryParse(parts[1], out highId)) break;
-                    if (!uint.TryParse(parts[2], out ql)) break;
-                    link = new ItemLink(lowId, highId, ql);
-                    break;
-                case "chatcmd":
-                    link = new CommandLink(argument);
-                    break;
-                default:
-                    link = new OtherLink(href);
-                    break;
+                // Invalid link
+                link = new InvalidLink(href);
+            }
+            else
+            {
+                // Generate link
+                switch (type)
+                {
+                    case "text":
+                        link = new ElementLink(Parse(argument));
+                        break;
+                    case "charref":
+                        index = argument.IndexOf("/");
+                        if (index < 0) break;
+                        index = argument.IndexOf("/", index + 1);
+                        if (index <= 0) break;
+                        argument = argument.Substring(index + 1);
+                        link = new ElementLink(Parse(argument));
+                        break;
+                    case "itemref":
+                        string[] parts = argument.Split('/');
+                        if (parts.Length != 3) break;
+                        uint lowId, highId, ql;
+                        if (!uint.TryParse(parts[0], out lowId)) break;
+                        if (!uint.TryParse(parts[1], out highId)) break;
+                        if (!uint.TryParse(parts[2], out ql)) break;
+                        link = new ItemLink(lowId, highId, ql);
+                        break;
+                    case "chatcmd":
+                        link = new CommandLink(argument);
+                        break;
+                    default:
+                        link = new OtherLink(href);
+                        break;
+                }
             }
             if (link == null) return new ContainerElement();
             string style = node.GetAttribute("style");

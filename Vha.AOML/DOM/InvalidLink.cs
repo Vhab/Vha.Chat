@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Vha.AOML
 * Copyright (C) 2010 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
@@ -18,39 +18,35 @@
 * USA
 */
 
+using System;
+using System.Collections.Generic;
+using System.Text;
+
 namespace Vha.AOML.DOM
 {
     /// <summary>
-    /// Identifies the type of a link
+    /// A link to something different than the other implementations of Link
     /// </summary>
-    public enum LinkType
-    {
-        Command,
-        Element,
-        Item,
-        Other,
-        Invalid
-    }
-
-    /// <summary>
-    /// Base class for all links
-    /// </summary>
-    public abstract class Link
+    public class InvalidLink : Link
     {
         /// <summary>
-        /// Returns the type of this link
+        /// A link
         /// </summary>
-        public LinkType Type { get { return this._type; } }
+        public readonly string Raw;
 
-        public abstract Link Clone();
-
-        #region internal
-        private LinkType _type;
-        
-        internal Link(LinkType type)
+        public InvalidLink(string raw)
+            : base(LinkType.Invalid)
         {
-            this._type = type;
+            this.Raw = raw;
         }
-        #endregion
+
+        /// <summary>
+        /// Creates a clone of this OtherLink
+        /// </summary>
+        /// <returns>A new OtherLink</returns>
+        public override Link Clone()
+        {
+            return new InvalidLink(this.Raw);
+        }
     }
 }

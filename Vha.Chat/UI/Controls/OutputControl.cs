@@ -313,6 +313,7 @@ namespace Vha.Chat.UI.Controls
             // Get element
             HtmlDocument document = (HtmlDocument)sender;
             HtmlElement element = document.GetElementFromPoint(e.ClientMousePosition);
+            while (element != null && element.TagName.ToLower() != "a") element = element.Parent;
             if (element == null || element.TagName.ToLower() != "a") return;
             // Get href
             string href = element.GetAttribute("href").Trim('/');

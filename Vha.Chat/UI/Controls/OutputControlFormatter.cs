@@ -69,6 +69,8 @@ namespace Vha.Chat.UI.Controls
 
         public override string OnColorOpen(ColorElement element)
         {
+            if (element.HasParent(ElementType.Link))
+                return "";
             if (this._style == TextStyle.Strip)
                 return "<span>";
             Color color = element.Color;
@@ -80,6 +82,8 @@ namespace Vha.Chat.UI.Controls
 
         public override string OnColorClose(ColorElement element)
         {
+            if (element.HasParent(ElementType.Link))
+                return "";
             return "</span>";
         }
 

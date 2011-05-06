@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<Configuration>
-	<Server>213.244.186.133</Server>
-	<Port>7002</Port>
-	<Username>account</Username>
-	<Password>pass</Password>
-	<Character>Character</Character>
-	<Owner>Owner</Owner>
-</Configuration>

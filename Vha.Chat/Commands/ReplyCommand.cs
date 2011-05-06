@@ -29,17 +29,25 @@ namespace Vha.Chat.Commands
     {
         public override bool Process(Context context, string trigger, string message, string[] args)
         {
-            if (!context.Input.CheckArguments(trigger, args.Length, 1, true)) return false;
             if (string.IsNullOrEmpty(this._character))
             {
                 context.Write(MessageClass.Error, "You can't send a reply if you haven't received any private messages yet");
                 return false;
             }
-            // Reply
-            context.Input.Send(
-                new MessageTarget(MessageType.Character, this._character),
-                message, false);
-            return true;
+            if (args.Length > 0)
+            {
+                // Reply
+                context.Input.Send(
+                    new MessageTarget(MessageType.Character, this._character),
+                    message, false);
+                return true;
+            }
+            else
+            {
+                // Emulate zero-argument tell
+                context.Input.Command("tell " + this._character);
+                return true;
+            }
         }
 
         public ReplyCommand(Context context)

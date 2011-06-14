@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builder.cs" />
     <Compile Include="Dominizer.cs" />
     <Compile Include="CloseNode.cs" />
     <Compile Include="ContentNode.cs" />

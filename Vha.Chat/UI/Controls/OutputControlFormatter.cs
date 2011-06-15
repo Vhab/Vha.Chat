@@ -120,9 +120,9 @@ namespace Vha.Chat.UI.Controls
                     href = "chatcmd://" + HttpUtility.UrlEncode(command.Command);
                     title = Web.EscapeHtml(command.Command);
                     break;
-                case LinkType.Element:
-                    ElementLink link = (ElementLink)element.Link;
-                    href = "text://" + this._cache.CacheElement(link.Element).ToString();
+                case LinkType.Window:
+                    WindowLink window = (WindowLink)element.Link;
+                    href = "text://" + this._cache.CacheElement(window.Element).ToString();
                     break;
                 case LinkType.Item:
                     ItemLink item = (ItemLink)element.Link;

@@ -86,8 +86,8 @@ namespace Vha.AOML.Formatting
                     CommandLink command = (CommandLink)element.Link;
                     return this._prefix.Peek() +
                         "command=" + command.Command + "\n";
-                case LinkType.Element:
-                    ElementLink el = (ElementLink)element.Link;
+                case LinkType.Window:
+                    WindowLink el = (WindowLink)element.Link;
                     Formatter f = new TextFormatter(this._prefix.Peek() + "| ");
                     return f.Format(el.Element);                    
                 case LinkType.Item:

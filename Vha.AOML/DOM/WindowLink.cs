@@ -26,7 +26,7 @@ namespace Vha.AOML.DOM
     /// A link to an element tree to be shown.
     /// Commonly known as text://
     /// </summary>
-    public class ElementLink : Link
+    public class WindowLink : Link
     {
         /// <summary>
         /// Returns the element tree which should be shown
@@ -37,8 +37,8 @@ namespace Vha.AOML.DOM
         /// Initializes a new instance of ElementLink
         /// </summary>
         /// <param name="element">The element tree which should be shown</param>
-        public ElementLink(Element element)
-            : base(LinkType.Element)
+        public WindowLink(Element element)
+            : base(LinkType.Window)
         {
             if (element == null)
                 throw new ArgumentNullException();
@@ -51,7 +51,7 @@ namespace Vha.AOML.DOM
         /// <returns>A new ElementLink</returns>
         public override Link Clone()
         {
-            return new ElementLink(this.Element);
+            return new WindowLink(this.Element);
         }
     }
 }

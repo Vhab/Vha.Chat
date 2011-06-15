@@ -71,7 +71,6 @@
     <Compile Include="DOM\ContainerElement.cs" />
     <Compile Include="DOM\Element.cs" />
     <Compile Include="DOM\ElementCollection.cs" />
-    <Compile Include="DOM\ElementLink.cs" />
     <Compile Include="DOM\ImageElement.cs" />
     <Compile Include="DOM\InvalidLink.cs" />
     <Compile Include="DOM\ItalicElement.cs" />
@@ -82,6 +81,7 @@
     <Compile Include="DOM\TextElement.cs" />
     <Compile Include="DOM\UnderlineElement.cs" />
     <Compile Include="DOM\UserLink.cs" />
+    <Compile Include="DOM\WindowLink.cs" />
     <Compile Include="Formatting\AomlFormatter.cs" />
     <Compile Include="Formatting\Formatter.cs" />
     <Compile Include="Formatting\PlainTextFormatter.cs" />

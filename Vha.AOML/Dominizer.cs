@@ -223,7 +223,7 @@ namespace Vha.AOML
                 switch (type)
                 {
                     case "text":
-                        link = new ElementLink(Parse(argument));
+                        link = new WindowLink(Parse(argument));
                         break;
                     case "charref":
                         index = argument.IndexOf("/");
@@ -231,7 +231,7 @@ namespace Vha.AOML
                         index = argument.IndexOf("/", index + 1);
                         if (index <= 0) break;
                         argument = argument.Substring(index + 1);
-                        link = new ElementLink(Parse(argument));
+                        link = new WindowLink(Parse(argument));
                         break;
                     case "itemref":
                         string[] parts = argument.Split('/');

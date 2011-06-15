@@ -26,7 +26,7 @@ namespace Vha.AOML.DOM
     public enum LinkType
     {
         Command,
-        Element,
+        Window,
         Item,
         User,
         Other,

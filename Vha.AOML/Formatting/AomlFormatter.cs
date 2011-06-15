@@ -118,13 +118,13 @@ namespace Vha.AOML.Formatting
                     CommandLink command = (CommandLink)element.Link;
                     href = "chatcmd://" + command.Command;
                     break;
-                case LinkType.Element:
-                    ElementLink link = (ElementLink)element.Link;
+                case LinkType.Window:
+                    WindowLink window = (WindowLink)element.Link;
                     Formatter f = null;
                     if (this.Style == AomlFormatterStyle.DoubleQuote)
                         f = new AomlFormatter(AomlFormatterStyle.SingleQuote);
                     else f = new PlainTextFormatter();
-                    href = "text://" + f.Format(link.Element);
+                    href = "text://" + f.Format(window.Element);
                     break;
                 case LinkType.Item:
                     ItemLink item = (ItemLink)element.Link;

@@ -91,14 +91,14 @@ namespace Vha.AOML
             return this;
         }
 
-        public Builder BeginLink(Link link, bool stylized = false)
+        public Builder BeginLink(Link link, bool stylized = true)
         {
             if (link == null) throw new ArgumentNullException();
             this._push(new LinkElement(link, stylized));
             return this;
         }
 
-        public Builder Link(Link link, string text, bool stylized = false)
+        public Builder Link(Link link, string text, bool stylized = true)
         {
             this.BeginLink(link, stylized);
             this.Text(text);
@@ -106,13 +106,13 @@ namespace Vha.AOML
             return this;
         }
 
-        public Builder BeginCommandLink(string command, bool stylized = false)
+        public Builder BeginCommandLink(string command, bool stylized = true)
         {
             this.BeginLink(new CommandLink(command), stylized);
             return this;
         }
 
-        public Builder CommandLink(string command, string text, bool stylized = false)
+        public Builder CommandLink(string command, string text, bool stylized = true)
         {
             this.BeginCommandLink(command, stylized);
             this.Text(text);
@@ -120,28 +120,28 @@ namespace Vha.AOML
             return this;
         }
 
-        public Builder BeginElementLink(Element popupElement, bool stylized = false)
+        public Builder BeginWindowLink(Element popupElement, bool stylized = true)
         {
             if (popupElement == null) throw new ArgumentNullException();
-            this.BeginLink(new ElementLink(popupElement), stylized);
+            this.BeginLink(new WindowLink(popupElement), stylized);
             return this;
         }
 
-        public Builder ElementLink(Element popupElement, string text, bool stylized = false)
+        public Builder ElementLink(Element popupElement, string text, bool stylized = true)
         {
-            this.BeginElementLink(popupElement, stylized);
+            this.BeginWindowLink(popupElement, stylized);
             this.Text(text);
             this.End();
             return this;
         }
 
-        public Builder BeginOtherLink(string uri, bool stylized = false)
+        public Builder BeginOtherLink(string uri, bool stylized = true)
         {
             this.BeginLink(new OtherLink(uri), stylized);
             return this;
         }
 
-        public Builder OtherLink(string uri, string text, bool stylized = false)
+        public Builder OtherLink(string uri, string text, bool stylized = true)
         {
             this.BeginOtherLink(uri, stylized);
             this.Text(text);

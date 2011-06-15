@@ -127,7 +127,7 @@ namespace Vha.AOML
             return this;
         }
 
-        public Builder ElementLink(Element popupElement, string text, bool stylized = true)
+        public Builder WindowLink(Element popupElement, string text, bool stylized = true)
         {
             this.BeginWindowLink(popupElement, stylized);
             this.Text(text);

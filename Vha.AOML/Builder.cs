@@ -20,7 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Vha.AOML.DOM;
 using Vha.AOML.Formatting;
 
@@ -190,6 +189,12 @@ namespace Vha.AOML
                 throw new InvalidOperationException("There is no open element left to terminate");
             }
             this._depth.Pop();
+            return this;
+        }
+
+        public Builder Aoxml(string aoxml)
+        {
+            AOXML.ToBuilder(aoxml, this);
             return this;
         }
 

@@ -29,7 +29,7 @@ USA
   </xs:complexType>
 
   <xs:complexType name="Whitespace">
-    <xs:attribute name="count" type="xs:positiveInteger" />
+    <xs:attribute name="count" type="xs:positiveInteger" use="optional" />
   </xs:complexType>
 
   <xs:complexType name="Color">

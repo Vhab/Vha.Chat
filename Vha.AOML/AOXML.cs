@@ -61,7 +61,7 @@ namespace Vha.AOML
         private const String Whitespace = "whitespace";
         private const String Count = "count";
 
-        private static Regex spaceRemoveRegex = new Regex("[ ]{2,}", RegexOptions.None); 
+        private static Regex spaceRemoveRegex = new Regex("[ ]{2,}", RegexOptions.None);
 
         /// <summary>
         /// Transforms AOXML string into Vha.AOML.Builder.
@@ -181,7 +181,8 @@ namespace Vha.AOML
                     if (child is XmlText)
                     {
                         String value = (child as XmlText).Value;
-                        builder.Text(spaceRemoveRegex.Replace(value.Trim(), " "));
+                        value = value.Replace('\r', '\n').Replace('\n', ' ');
+                        builder.Text(spaceRemoveRegex.Replace(value, " "));
                     }
                     else if (child is XmlElement)
                     {
@@ -204,8 +205,7 @@ namespace Vha.AOML
             uint value;
             if (count == null)
             {
-                throw new AOXMLException(String.Format("'{0}' element without '{1}' attribute",
-                                                       Whitespace, Count));
+                value = 1;
             }
             else if (!uint.TryParse(count.Value, out value))
             {

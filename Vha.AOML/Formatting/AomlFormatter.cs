@@ -144,7 +144,7 @@ namespace Vha.AOML.Formatting
                     break;
             }
             if (!element.Stylized)
-                style = string.Format("{0}text-decoration:none{0}", this.Quote);
+                style = string.Format(" style={0}text-decoration:none{0}", this.Quote);
             return string.Format("<a href={0}{1}{0}{2}>",
                 this.Quote, href, style);
         }

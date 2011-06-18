@@ -60,7 +60,7 @@ namespace Vha.AOML
         private const String Style = "style";
 
         /// <summary>
-        /// Transforms AOXML string into Vha.AOML.Builder. 
+        /// Transforms AOXML string into Vha.AOML.Builder.
         /// Please refer to AOXML.xsd for AOXML format details.
         /// </summary>
         /// <param name="aoxml">AOXML string</param>
@@ -70,9 +70,29 @@ namespace Vha.AOML
         /// </exception>
         public static Builder ToBuilder(String aoxml)
         {
+            Builder builder = new Builder();
+            ToBuilder(aoxml, builder);
+            return builder;
+        }
+
+        /// <summary>
+        /// Transforms AOXML string into Vha.AOML.Builder.
+        /// Please refer to AOXML.xsd for AOXML format details.
+        /// </summary>
+        /// <param name="aoxml">AOXML string</param>
+        /// <param name="builder">A Builder instance to which the output will be written</param>
+        /// <exception cref="Vha.AOML.AOXMLException">
+        ///     Thrown when an invalid AOXML string is passed as argument"
+        /// </exception>
+        public static void ToBuilder(String aoxml, Builder builder)
+        {
             if (aoxml == null)
             {
                 throw new ArgumentNullException("aoxml");
+            }
+            if (builder == null)
+            {
+                throw new ArgumentNullException("builder");
             }
             XmlDocument doc = new XmlDocument();
             try
@@ -83,8 +103,7 @@ namespace Vha.AOML
             {
                 throw new AOXMLException("AOXML string is not a valid xml", ex);
             }
-            Builder builder = new Builder();
-            return ParseElement(doc.DocumentElement, builder, 0);
+            ParseElement(doc.DocumentElement, builder, 0);
         }
 
         private static Builder ParseElement(XmlElement node, Builder builder, int nesting)

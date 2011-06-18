@@ -61,7 +61,7 @@ namespace Vha.AOML
         private const String Whitespace = "whitespace";
         private const String Count = "count";
 
-        private static Regex spaceRemoveRegex = new Regex("[ ]{2,}", RegexOptions.None);
+        private static Regex whitespaceNormalizeRegex = new Regex(@"\s{2,}", RegexOptions.None);
 
         /// <summary>
         /// Transforms AOXML string into Vha.AOML.Builder.
@@ -99,6 +99,7 @@ namespace Vha.AOML
                 throw new ArgumentNullException("builder");
             }
             XmlDocument doc = new XmlDocument();
+            doc.PreserveWhitespace = true;
             try
             {
                 doc.LoadXml(aoxml);
@@ -110,7 +111,10 @@ namespace Vha.AOML
             ParseElement(doc.DocumentElement, builder, 0);
         }
 
-        private static Builder ParseElement(XmlElement node, Builder builder, int nesting)
+        private static bool ParseElement(XmlElement node, Builder builder, int nesting, 
+                                         bool trimStartDueToAdjacentSpace = false, 
+                                         bool rootSpecialTreatment = false,
+                                         bool firstElement = true, bool lastElement = true)
         {
             String name = node.LocalName;
             bool canHaveChildren = true;
@@ -118,12 +122,14 @@ namespace Vha.AOML
             {
                 case Aoxml:
                     HandleAoxml(builder, nesting);
+                    rootSpecialTreatment = true;
                     break;
                 case Window:
                     node = HandleWindow(node, builder, nesting);
                     break;
                 case Content:
                     HandleContent(node, builder, nesting);
+                    rootSpecialTreatment = true;
                     break;
                 case Underline:
                     builder.BeginUnderline();
@@ -176,17 +182,49 @@ namespace Vha.AOML
             }
             if (canHaveChildren)
             {
-                foreach (XmlNode child in node.ChildNodes)
+                bool localFirstElement = true;
+                for (int i = 0; i < node.ChildNodes.Count; i++)
                 {
-                    if (child is XmlText)
+                    XmlNode child = node.ChildNodes[i];
+                    if (child is XmlText || child is XmlWhitespace)
                     {
-                        String value = (child as XmlText).Value;
+                        bool trimStartDueToRootLeadingText = rootSpecialTreatment && firstElement && (i == 0);
+                        bool trimEndDueToRootTrailingText = rootSpecialTreatment && lastElement
+                                                              && (i == node.ChildNodes.Count - 1);
+                        String value = child.Value;
                         value = value.Replace('\r', '\n').Replace('\n', ' ');
-                        builder.Text(spaceRemoveRegex.Replace(value, " "));
+                        value = whitespaceNormalizeRegex.Replace(value, " ");
+                        if (trimStartDueToAdjacentSpace || trimStartDueToRootLeadingText)
+                        {
+                            value = value.TrimStart();
+                        }
+                        if (trimEndDueToRootTrailingText)
+                        {
+                            value = value.TrimEnd();
+                        }
+                        if (value != string.Empty)
+                        {
+                            builder.Text(value);
+                        }
+                        trimStartDueToAdjacentSpace = value.EndsWith(" ");
                     }
                     else if (child is XmlElement)
                     {
-                        ParseElement((child as XmlElement), builder, nesting);
+                        bool locaLastElement = true;
+                        for (int j = i + 1; j < node.ChildNodes.Count; j++)
+                        {
+                            if (node.ChildNodes[j] is XmlElement)
+                            {
+                                locaLastElement = false;
+                                break;
+                            }
+                        }
+                        trimStartDueToAdjacentSpace = ParseElement((child as XmlElement), builder, nesting,
+                                                                   trimStartDueToAdjacentSpace, 
+                                                                   rootSpecialTreatment && (localFirstElement || locaLastElement),
+                                                                   firstElement && localFirstElement,
+                                                                   lastElement && locaLastElement);
+                        localFirstElement = false;
                     }
                 }
                 builder.End();
@@ -196,7 +234,7 @@ namespace Vha.AOML
                 throw new AOXMLException(String.Format("Element '{0}' cannot have any children",
                                                        name));
             }
-            return builder;
+            return trimStartDueToAdjacentSpace;
         }
 
         private static void HandleWhitespace(XmlElement node, Builder builder)

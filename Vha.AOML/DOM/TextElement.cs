@@ -1,6 +1,6 @@
 /*
 * Vha.AOML
-* Copyright (C) 2010 Remco van Oosterhout
+* Copyright (C) 2010-2011 Remco van Oosterhout
 * See Credits.txt for all aknowledgements.
 *
 * This program is free software; you can redistribute it and/or modify

@@ -21,6 +21,8 @@
 using System;
 using System.Xml;
 using Vha.AOML.DOM;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Vha.AOML
 {
@@ -56,6 +58,10 @@ namespace Vha.AOML
         private const String User = "user";
         private const String Name = "name";
         private const String Style = "style";
+        private const String Whitespace = "whitespace";
+        private const String Count = "count";
+
+        private static Regex spaceRemoveRegex = new Regex("[ ]{2,}", RegexOptions.None); 
 
         /// <summary>
         /// Transforms AOXML string into Vha.AOML.Builder.
@@ -160,6 +166,10 @@ namespace Vha.AOML
                 case User:
                     HandleUser(node, builder, nesting);
                     break;
+                case Whitespace:
+                    HandleWhitespace(node, builder);
+                    canHaveChildren = false;
+                    break;
                 default:
                     throw new AOXMLException(String.Format("Encountered unknown element '{0}'",
                                                            name));
@@ -170,7 +180,8 @@ namespace Vha.AOML
                 {
                     if (child is XmlText)
                     {
-                        builder.Text((child as XmlText).Value.Trim());
+                        String value = (child as XmlText).Value;
+                        builder.Text(spaceRemoveRegex.Replace(value.Trim(), " "));
                     }
                     else if (child is XmlElement)
                     {
@@ -185,6 +196,23 @@ namespace Vha.AOML
                                                        name));
             }
             return builder;
+        }
+
+        private static void HandleWhitespace(XmlElement node, Builder builder)
+        {
+            XmlAttribute count = node.Attributes[Count];
+            uint value;
+            if (count == null)
+            {
+                throw new AOXMLException(String.Format("'{0}' element without '{1}' attribute",
+                                                       Whitespace, Count));
+            }
+            else if (!uint.TryParse(count.Value, out value))
+            {
+                throw new AOXMLException(String.Format("'{0}' attribute has invalid value {1}",
+                                                       Count, count.Value));
+            }
+            builder.Text(new string(' ', (int)value));
         }
 
         private static void HandleUser(XmlElement node, Builder builder, int nesting)

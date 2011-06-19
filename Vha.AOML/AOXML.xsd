@@ -93,6 +93,7 @@ USA
 
   <xs:group name="ElementsWithoutAnyLinks">
     <xs:choice>
+      <xs:element name="text" type="xs:string" />
       <xs:element name="i" type="MarkupWithoutAnyLinks" />
       <xs:element name="br">
         <xs:complexType />
@@ -115,6 +116,7 @@ USA
 
   <xs:group name="Elements">
     <xs:choice>
+      <xs:element name="text" type="xs:string" />
       <xs:element name="i" type="Markup" />
       <xs:element name="br">
         <xs:complexType />
@@ -139,6 +141,7 @@ USA
 
   <xs:group name="WindowElements">
     <xs:choice>
+      <xs:element name="text" type="xs:string" />
       <xs:element name="i" type="WindowMarkup" />
       <xs:element name="br">
         <xs:complexType />

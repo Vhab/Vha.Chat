@@ -60,6 +60,7 @@ namespace Vha.AOML
         private const String Style = "style";
         private const String Whitespace = "whitespace";
         private const String Count = "count";
+        private const String Text = "text";
 
         private static Regex whitespaceNormalizeRegex = new Regex(@"\s{2,}", RegexOptions.None);
 
@@ -118,6 +119,7 @@ namespace Vha.AOML
         {
             String name = node.LocalName;
             bool canHaveChildren = true;
+            bool isText = false;
             switch (name)
             {
                 case Aoxml:
@@ -176,6 +178,9 @@ namespace Vha.AOML
                     HandleWhitespace(node, builder);
                     canHaveChildren = false;
                     break;
+                case Text:
+                    isText = true;
+                    break;
                 default:
                     throw new AOXMLException(String.Format("Encountered unknown element '{0}'",
                                                            name));
@@ -210,6 +215,11 @@ namespace Vha.AOML
                     }
                     else if (child is XmlElement)
                     {
+                        if (isText)
+                        {
+                            throw new AOXMLException(String.Format("{0} element can only have text as child",
+                                                                   Text));
+                        }
                         bool locaLastElement = true;
                         for (int j = i + 1; j < node.ChildNodes.Count; j++)
                         {
@@ -227,7 +237,10 @@ namespace Vha.AOML
                         localFirstElement = false;
                     }
                 }
-                builder.End();
+                if (!isText)
+                {
+                    builder.End();
+                }
             }
             else if (node.ChildNodes.Count > 0)
             {

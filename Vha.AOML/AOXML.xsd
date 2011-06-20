@@ -38,7 +38,6 @@ USA
         <xs:restriction base="xs:string">
           <xs:pattern value="#([a-fA-F0-9]){6}" />
           <xs:pattern value="([^#]){1}([a-zA-Z0-9])+" />
-          <xs:pattern value="@.+" />
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>

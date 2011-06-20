@@ -23,6 +23,7 @@ using System.Xml;
 using Vha.AOML.DOM;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace Vha.AOML
 {
@@ -61,6 +62,9 @@ namespace Vha.AOML
         private const String Whitespace = "whitespace";
         private const String Count = "count";
         private const String Text = "text";
+
+        private static List<String> StartBlockElements = new List<String> { Block, Left, Center, Right, Break };
+        private static List<String> EmptyElements = new List<String> { Break, Image, Whitespace };
 
         private static Regex whitespaceNormalizeRegex = new Regex(@"\s{2,}", RegexOptions.None);
 
@@ -109,29 +113,121 @@ namespace Vha.AOML
             {
                 throw new AOXMLException("AOXML string is not a valid xml", ex);
             }
-            ParseElement(doc.DocumentElement, builder, 0);
+            FixAdjacentWhitespaces(FixBlockWhitespaces(doc.DocumentElement));
+            ParseElement(doc.DocumentElement, builder);
         }
 
-        private static bool ParseElement(XmlElement node, Builder builder, int nesting, 
-                                         bool trimStartDueToAdjacentSpace = false, 
-                                         bool rootSpecialTreatment = false,
-                                         bool firstElement = true, bool lastElement = true)
+        private static List<XmlCharacterData> FixBlockWhitespaces(XmlElement root)
+        {
+            //all the leaf text elements in the curent block
+            List<XmlCharacterData> textElements = new List<XmlCharacterData>();
+            for (int i = 0; i < root.ChildNodes.Count; i++)
+            {
+                XmlNode child = root.ChildNodes[i];
+                if (child is XmlCharacterData)
+                {
+                    textElements.Add(child as XmlCharacterData);
+                }
+                else if (child is XmlElement)
+                {
+                    if ((child as XmlElement).LocalName == Window)
+                    {
+                        //special treatment for <window> ans it contains two children
+                        XmlElement content = GetChild((child as XmlElement), Content);
+                        if (content == null)
+                        {
+                            throw new AOXMLException(String.Format("'{0}' element without '{1}' element child",
+                                                                   Window, Content));
+                        }
+                        FixAdjacentWhitespaces(FixBlockWhitespaces(content));
+                        XmlElement link = GetChild((child as XmlElement), Link);
+                        if (link == null)
+                        {
+                            throw new AOXMLException(String.Format("'{0}' element without '{1}' element child",
+                                                                   Window, Link));
+                        }
+                        textElements.AddRange(FixBlockWhitespaces(link));
+                    }
+                    else
+                    {
+                        //we stumbled on a new blocks start
+                        if (StartBlockElements.Contains((child as XmlElement).LocalName))
+                        {
+                            FixAdjacentWhitespaces(textElements);
+                            FixAdjacentWhitespaces(FixBlockWhitespaces((child as XmlElement)));
+                            textElements.Clear();
+                        }
+                        else
+                        {
+                            textElements.AddRange(FixBlockWhitespaces(child as XmlElement));
+                        }
+                    }
+                }
+            }
+            return textElements;
+        }
+
+        private static void FixAdjacentWhitespaces(List<XmlCharacterData> textElements)
+        {
+            //normalize spaces inside text elements
+            foreach (var text in textElements)
+            {
+                text.Value = text.Value.Replace('\r', '\n').Replace('\n', ' ');
+                text.Value = whitespaceNormalizeRegex.Replace(text.Value, " ");
+            }
+            //normalize spaces spanning between text elements
+            int lastNonEmpty = 0;
+            for (int i = 1; i < textElements.Count; i++)
+            {
+                if (textElements[lastNonEmpty].Value.EndsWith(" "))
+                {
+                    textElements[i].Value = textElements[i].Value.TrimStart();
+                }
+                if (!String.IsNullOrEmpty(textElements[i].Value))
+                {
+                    lastNonEmpty = i;
+                }
+            }
+            //fix is so there is no leading spaces
+            for (int i = 0; i < textElements.Count; i++)
+            {
+                if (textElements[i].Value.StartsWith(" "))
+                {
+                    textElements[i].Value = textElements[i].Value.TrimStart();
+                }
+                if (!String.IsNullOrEmpty(textElements[i].Value))
+                {
+                    break;
+                }
+            }
+            //fix that there are no trailing spaces
+            for (int i = textElements.Count - 1; i >= 0; i--)
+            {
+                if (textElements[i].Value.EndsWith(" "))
+                {
+                    textElements[i].Value = textElements[i].Value.TrimEnd();
+                }
+                if (!String.IsNullOrEmpty(textElements[i].Value))
+                {
+                    break;
+                }
+            }
+        }
+
+        private static void ParseElement(XmlElement node, Builder builder, int windowNesting = 0)
         {
             String name = node.LocalName;
-            bool canHaveChildren = true;
             bool isText = false;
             switch (name)
             {
                 case Aoxml:
-                    HandleAoxml(builder, nesting);
-                    rootSpecialTreatment = true;
+                    HandleAoxml(builder, windowNesting);
                     break;
                 case Window:
-                    node = HandleWindow(node, builder, nesting);
+                    node = HandleWindow(node, builder, windowNesting);
                     break;
                 case Content:
-                    HandleContent(node, builder, nesting);
-                    rootSpecialTreatment = true;
+                    HandleContent(node, builder, windowNesting);
                     break;
                 case Underline:
                     builder.BeginUnderline();
@@ -143,40 +239,37 @@ namespace Vha.AOML
                     HandleColor(node, builder);
                     break;
                 case Image:
-                    HandleImage(node, builder, nesting);
-                    canHaveChildren = false;
+                    HandleImage(node, builder, windowNesting);
                     break;
                 case Command:
-                    HandleCommand(node, builder, nesting);
+                    HandleCommand(node, builder, windowNesting);
                     break;
                 case Customlink:
-                    HandleCustomlink(node, builder, nesting);
+                    HandleCustomlink(node, builder, windowNesting);
                     break;
                 case Block:
-                    builder.BeginAlign(Alignment.Inherit);
+                    HandleAlign(node, builder, windowNesting, Alignment.Inherit);
                     break;
                 case Left:
-                    builder.BeginAlign(Alignment.Left);
+                    HandleAlign(node, builder, windowNesting, Alignment.Left);
                     break;
                 case Center:
-                    builder.BeginAlign(Alignment.Center);
+                    HandleAlign(node, builder, windowNesting, Alignment.Center);
                     break;
                 case Right:
-                    builder.BeginAlign(Alignment.Right);
+                    HandleAlign(node, builder, windowNesting, Alignment.Right);
                     break;
                 case Break:
                     builder.Break();
-                    canHaveChildren = false;
                     break;
                 case Item:
                     HandleItem(node, builder);
                     break;
                 case User:
-                    HandleUser(node, builder, nesting);
+                    HandleUser(node, builder, windowNesting);
                     break;
                 case Whitespace:
                     HandleWhitespace(node, builder);
-                    canHaveChildren = false;
                     break;
                 case Text:
                     isText = true;
@@ -185,33 +278,17 @@ namespace Vha.AOML
                     throw new AOXMLException(String.Format("Encountered unknown element '{0}'",
                                                            name));
             }
-            if (canHaveChildren)
+            if (!EmptyElements.Contains(name))
             {
-                bool localFirstElement = true;
                 for (int i = 0; i < node.ChildNodes.Count; i++)
                 {
                     XmlNode child = node.ChildNodes[i];
-                    if (child is XmlText || child is XmlWhitespace)
+                    if (child is XmlCharacterData)
                     {
-                        bool trimStartDueToRootLeadingText = rootSpecialTreatment && firstElement && (i == 0);
-                        bool trimEndDueToRootTrailingText = rootSpecialTreatment && lastElement
-                                                              && (i == node.ChildNodes.Count - 1);
-                        String value = child.Value;
-                        value = value.Replace('\r', '\n').Replace('\n', ' ');
-                        value = whitespaceNormalizeRegex.Replace(value, " ");
-                        if (trimStartDueToAdjacentSpace || trimStartDueToRootLeadingText)
+                        if (!String.IsNullOrEmpty((child as XmlCharacterData).Value))
                         {
-                            value = value.TrimStart();
+                            builder.Text((child as XmlCharacterData).Value);
                         }
-                        if (trimEndDueToRootTrailingText)
-                        {
-                            value = value.TrimEnd();
-                        }
-                        if (value != string.Empty)
-                        {
-                            builder.Text(value);
-                        }
-                        trimStartDueToAdjacentSpace = value.EndsWith(" ");
                     }
                     else if (child is XmlElement)
                     {
@@ -220,21 +297,7 @@ namespace Vha.AOML
                             throw new AOXMLException(String.Format("{0} element can only have text as child",
                                                                    Text));
                         }
-                        bool locaLastElement = true;
-                        for (int j = i + 1; j < node.ChildNodes.Count; j++)
-                        {
-                            if (node.ChildNodes[j] is XmlElement)
-                            {
-                                locaLastElement = false;
-                                break;
-                            }
-                        }
-                        trimStartDueToAdjacentSpace = ParseElement((child as XmlElement), builder, nesting,
-                                                                   trimStartDueToAdjacentSpace, 
-                                                                   rootSpecialTreatment && (localFirstElement || locaLastElement),
-                                                                   firstElement && localFirstElement,
-                                                                   lastElement && locaLastElement);
-                        localFirstElement = false;
+                        ParseElement((child as XmlElement), builder, windowNesting);
                     }
                 }
                 if (!isText)
@@ -247,7 +310,16 @@ namespace Vha.AOML
                 throw new AOXMLException(String.Format("Element '{0}' cannot have any children",
                                                        name));
             }
-            return trimStartDueToAdjacentSpace;
+        }
+
+        private static void HandleAlign(XmlElement node, Builder builder, int nesting, Alignment alignment)
+        {
+            if (nesting == 0)
+            {
+                throw new AOXMLException(String.Format("'{0}' element can only be inside window",
+                                                       node.LocalName));
+            }
+            builder.BeginAlign(alignment);
         }
 
         private static void HandleWhitespace(XmlElement node, Builder builder)

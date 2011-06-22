@@ -41,12 +41,16 @@ namespace Vha.Common.Data.AO
         public string Rank;
         [XmlElement("level", Type = typeof(Int32))]
         public Int32 Level;
+
         [XmlElement("profession")]
         public string Profession;
+        [XmlElement("profession_title")]
+        public string ProfessionTitle;
         [XmlElement("gender")]
         public string Gender;
         [XmlElement("breed")]
         public string Breed;
+        
         [XmlElement("defender_rank")]
         public string DefenderRank;
         [XmlElement("defender_rank_id", Type = typeof(Int32))]

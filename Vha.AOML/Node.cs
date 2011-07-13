@@ -38,12 +38,12 @@ namespace Vha.AOML
         /// <summary>
         /// Returns the type of this Node
         /// </summary>
-        public readonly NodeType Type;
+        public NodeType Type { get; private set; }
         /// <summary>
         /// The raw unparsed HTML that forms this node.
         /// This value is not garanteed to be filled and might be left empty.
         /// </summary>
-        public readonly string Raw;
+        public string Raw { get; private set; }
         /// <summary>
         /// Creates a clone of the current node
         /// </summary>

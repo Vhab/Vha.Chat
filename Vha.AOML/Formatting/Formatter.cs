@@ -51,7 +51,7 @@ namespace Vha.AOML.Formatting
 
         public string Format(Element element)
         {
-            if (element == null) return null;
+            if (element == null) { return null; }
             StringBuilder result = new StringBuilder();
             result.Append(this.OnOpen());
             this.Format(ref result, element);
@@ -62,7 +62,9 @@ namespace Vha.AOML.Formatting
         public void Format(ref StringBuilder result, Element element)
         {
             if (result == null || element == null)
+            {
                 throw new ArgumentNullException();
+            }
             // Open element
             result.Append(this.OnBeforeElement(element));
             switch (element.Type)

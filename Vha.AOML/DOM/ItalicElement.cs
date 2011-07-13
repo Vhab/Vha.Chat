@@ -42,7 +42,9 @@ namespace Vha.AOML.DOM
         {
             Element clone = new ItalicElement();
             foreach (Element child in this.Children)
+            {
                 clone.Children.Add(child.Clone());
+            }
             return clone;
         }
     }

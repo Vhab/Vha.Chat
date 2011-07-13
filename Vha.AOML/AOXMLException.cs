@@ -19,6 +19,7 @@
 */
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Vha.AOML
 {
@@ -26,11 +27,11 @@ namespace Vha.AOML
     public class AOXMLException : Exception
     {
         public AOXMLException() { }
+
         public AOXMLException(string message) : base(message) { }
+
         public AOXMLException(string message, Exception inner) : base(message, inner) { }
-        protected AOXMLException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
-            : base(info, context) { }
+
+        protected AOXMLException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

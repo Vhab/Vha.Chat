@@ -41,7 +41,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the alignment of this element's children
         /// </summary>
-        public readonly Alignment Alignment;
+        public Alignment Alignment { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of AlignElement
@@ -61,7 +61,9 @@ namespace Vha.AOML.DOM
         {
             Element clone = new AlignElement(this.Alignment);
             foreach (Element child in this.Children)
+            {
                 clone.Children.Add(child.Clone());
+            }
             return clone;
         }
     }

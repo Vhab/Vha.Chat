@@ -31,15 +31,24 @@ namespace Vha.AOML
     /// </summary>
     public class Dominizer
     {
-        public Parser Parser { get { return this._parser; } }
+        public Parser Parser { get; private set; }
+        
+        #region Constructors
+        public Dominizer()
+        {
+            this.Parser = new Parser();
+            this.Parser.Mode = ParserMode.Compatibility;
+            this.Parser.NewlineToBreak = true;
+        }
+        #endregion
 
         public Element Parse(string aoml)
         {
             ContainerElement container = new ContainerElement();
             // Parse AOML
-            NodeCollection nodes = this._parser.Parse(aoml);
-            this._parser.Sanitize(nodes);
-            this._parser.Balance(nodes);
+            NodeCollection nodes = this.Parser.Parse(aoml);
+            this.Parser.Sanitize(nodes);
+            this.Parser.Balance(nodes);
             // Transform AOML into a DOM tree
             Stack<Element> elements = new Stack<Element>();
             elements.Push(container);
@@ -73,22 +82,22 @@ namespace Vha.AOML
                             case "font":
                                 element = this.CreateFontElement(open);
                                 elements.Peek().Children.Add(element);
-                                if (!open.Closed) elements.Push(element);
+                                if (!open.Closed) { elements.Push(element); }
                                 break;
                             case "a":
                                 element = this.CreateLinkElement(open);
                                 elements.Peek().Children.Add(element);
-                                if (!open.Closed) elements.Push(element);
+                                if (!open.Closed) { elements.Push(element); }
                                 break;
                             case "u":
                                 element = new UnderlineElement();
                                 elements.Peek().Children.Add(element);
-                                if (!open.Closed) elements.Push(element);
+                                if (!open.Closed) { elements.Push(element); }
                                 break;
                             case "i":
                                 element = new ItalicElement();
                                 elements.Peek().Children.Add(element);
-                                if (!open.Closed) elements.Push(element);
+                                if (!open.Closed) { elements.Push(element); }
                                 break;
                             case "center":
                             case "left":
@@ -96,14 +105,20 @@ namespace Vha.AOML
                             case "div":
                                 Alignment alignment = Alignment.Inherit;
                                 if (open.Name == "center" || open.GetAttribute("align") == "center")
+                                {
                                     alignment = Alignment.Center;
+                                }
                                 else if (open.Name == "left" || open.GetAttribute("align") == "left")
+                                {
                                     alignment = Alignment.Left;
+                                }
                                 else if (open.Name == "right" || open.GetAttribute("align") == "right")
+                                {
                                     alignment = Alignment.Right;
+                                }
                                 element = new AlignElement(alignment);
                                 elements.Peek().Children.Add(element);
-                                if (!open.Closed) elements.Push(element);
+                                if (!open.Closed) { elements.Push(element); }
                                 break;
                             default:
                                 throw new ArgumentException("Unexpected tag: " + open.Name);
@@ -120,30 +135,32 @@ namespace Vha.AOML
                             case "img":
                                 throw new ArgumentException("Unexpected 'img' closing tag");
                             case "font":
-                                if (elements.Peek().Type == ElementType.Color) break;
-                                if (elements.Peek().Type == ElementType.Container) break;
+                                if (elements.Peek().Type == ElementType.Color) { break; }
+                                if (elements.Peek().Type == ElementType.Container) { break; }
                                 throw new ArgumentException("Unexpected 'font' closing tag");
                             case "a":
-                                if (elements.Peek().Type == ElementType.Link) break;
-                                if (elements.Peek().Type == ElementType.Container) break;
+                                if (elements.Peek().Type == ElementType.Link) { break; }
+                                if (elements.Peek().Type == ElementType.Container) { break; }
                                 throw new ArgumentException("Unexpected 'a' closing tag");
                             case "u":
-                                if (elements.Peek().Type == ElementType.Underline) break;
+                                if (elements.Peek().Type == ElementType.Underline) { break; }
                                 throw new ArgumentException("Unexpected 'u' closing tag");
                             case "i":
-                                if (elements.Peek().Type == ElementType.Italic) break;
+                                if (elements.Peek().Type == ElementType.Italic) { break; }
                                 throw new ArgumentException("Unexpected 'i' closing tag");
                             case "div":
                             case "center":
                             case "left":
                             case "right":
-                                if (elements.Peek().Type == ElementType.Align) break;
+                                if (elements.Peek().Type == ElementType.Align) { break; }
                                 throw new ArgumentException("Unexpected '" + close.Name + "' closing tag");
                             default:
                                 throw new ArgumentException("Unexpected tag: " + close.Name);
                         }
                         if (elements.Count <= 1)
+                        {
                             throw new ArgumentException("Unexpected closing tag");
+                        }
                         // Go 1 step back down in the tree
                         elements.Pop();
                         break;
@@ -153,39 +170,43 @@ namespace Vha.AOML
             }
             // Let's report our progress
             if (container.Children.Count == 0)
+            {
                 return null;
+            }
             if (container.Children.Count == 1)
+            {
                 return container.Children.ToArray()[0];
+            }
             return container;
         }
 
-        public Dominizer()
-        {
-            this._parser = new Parser();
-            this._parser.Mode = ParserMode.Compatibility;
-            this._parser.NewlineToBreak = true;
-        }
+       
 
         protected Element CreateImageElement(OpenNode node)
         {
             // Valid image?
             string src = node.GetAttribute("src");
-            if (string.IsNullOrEmpty(src)) return null;
-            if (!src.Contains("://")) return null;
+            if (string.IsNullOrEmpty(src)) { return null; }
+            if (!src.Contains("://")) { return null; }
             // Parse src value
             string[] parts = src.Split(new string[] { "://" }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length < 2) return null;
+            if (parts.Length < 2) { return null; }
             // - Determine type
             ImageType type = ImageType.RDB;
-            if (parts[0].ToLower() == "rdb") type = ImageType.RDB;
+            if (parts[0].ToLower() == "rdb")
+            {
+                type = ImageType.RDB;
+            }
             else if (parts[0].ToLower() == "tdb")
             {
                 type = ImageType.TDB;
                 string prefix = "id:";
                 if (parts[1].StartsWith(prefix))
+                {
                     parts[1] = parts[1].Substring(prefix.Length);
+                }
             }
-            else return null;
+            else { return null; }
             // Return image
             return new ImageElement(type, parts[1]);
         }
@@ -193,9 +214,9 @@ namespace Vha.AOML
         protected Element CreateFontElement(OpenNode node)
         {
             string color = node.GetAttribute("color");
-            if (string.IsNullOrEmpty(color)) return new ContainerElement();
+            if (string.IsNullOrEmpty(color)) { return new ContainerElement(); }
             Color c = Color.FromString(color);
-            if (c == null) return new ContainerElement();
+            if (c == null) { return new ContainerElement(); }
             return new ColorElement(c);
         }
 
@@ -203,10 +224,16 @@ namespace Vha.AOML
         {
             // Valid link?
             string href = node.GetAttribute("href");
-            if (string.IsNullOrEmpty(href) || !href.Contains("://")) return new ContainerElement();
+            if (string.IsNullOrEmpty(href) || !href.Contains("://"))
+            {
+                return new ContainerElement();
+            }
             // Parse link
             int index = href.IndexOf("://");
-            if (index <= 0) return new ContainerElement();
+            if (index <= 0)
+            {
+                return new ContainerElement();
+            }
             string type = href.Substring(0, index).ToLower();
             string argument = href.Substring(index + 3);
             Link link = null;
@@ -227,9 +254,9 @@ namespace Vha.AOML
                         break;
                     case "charref":
                         index = argument.IndexOf("/");
-                        if (index < 0) break;
+                        if (index < 0) { break; }
                         index = argument.IndexOf("/", index + 1);
-                        if (index <= 0) break;
+                        if (index <= 0) { break; }
                         argument = argument.Substring(index + 1);
                         link = new WindowLink(Parse(argument));
                         break;
@@ -237,9 +264,9 @@ namespace Vha.AOML
                         string[] parts = argument.Split('/');
                         if (parts.Length != 3) break;
                         uint lowId, highId, ql;
-                        if (!uint.TryParse(parts[0], out lowId)) break;
-                        if (!uint.TryParse(parts[1], out highId)) break;
-                        if (!uint.TryParse(parts[2], out ql)) break;
+                        if (!uint.TryParse(parts[0], out lowId)) { break; }
+                        if (!uint.TryParse(parts[1], out highId)) { break; }
+                        if (!uint.TryParse(parts[2], out ql)) { break; }
                         link = new ItemLink(lowId, highId, ql);
                         break;
                     case "chatcmd":
@@ -253,19 +280,20 @@ namespace Vha.AOML
                         break;
                 }
             }
-            if (link == null) return new ContainerElement();
+            if (link == null)
+            {
+                return new ContainerElement();
+            }
             string style = node.GetAttribute("style");
             if (style != null)
             {
                 style = style.Replace(" ", "").ToLower();
                 if (!style.Contains("text-decoration:none"))
+                {
                     style = null;
+                }
             }
             return new LinkElement(link, style == null);
         }
-        
-        #region Internal
-        private Parser _parser;
-        #endregion
     }
 }

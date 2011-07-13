@@ -29,7 +29,7 @@ namespace Vha.AOML
     {
         public Builder BeginAlign(Alignment alignment)
         {
-            this._push(new AlignElement(alignment));
+            this.Push(new AlignElement(alignment));
             return this;
         }
 
@@ -43,21 +43,24 @@ namespace Vha.AOML
 
         public Builder Break()
         {
-            this._add(new BreakElement());
+            this.Add(new BreakElement());
             return this;
         }
 
         public Builder BeginColor(Color color)
         {
             if (color == null) throw new ArgumentNullException();
-            this._push(new ColorElement(color));
+            this.Push(new ColorElement(color));
             return this;
         }
 
         public Builder BeginColor(string color)
         {
             DOM.Color c = DOM.Color.FromString(color);
-            if (c == null) throw new ArgumentException("Invalid color value: " + color);
+            if (c == null)
+            {
+                throw new ArgumentException("Invalid color value: " + color);
+            }
             this.BeginColor(c);
             return this;
         }
@@ -80,20 +83,20 @@ namespace Vha.AOML
 
         public Builder Begin()
         {
-            this._push(new ContainerElement());
+            this.Push(new ContainerElement());
             return this;
         }
 
         public Builder Image(ImageType type, string image)
         {
-            this._add(new ImageElement(type, image));
+            this.Add(new ImageElement(type, image));
             return this;
         }
 
         public Builder BeginLink(Link link, bool stylized = true)
         {
-            if (link == null) throw new ArgumentNullException();
-            this._push(new LinkElement(link, stylized));
+            if (link == null) { throw new ArgumentNullException(); }
+            this.Push(new LinkElement(link, stylized));
             return this;
         }
 
@@ -121,7 +124,7 @@ namespace Vha.AOML
 
         public Builder BeginWindowLink(Element popupElement, bool stylized = true)
         {
-            if (popupElement == null) throw new ArgumentNullException();
+            if (popupElement == null) { throw new ArgumentNullException(); }
             this.BeginLink(new WindowLink(popupElement), stylized);
             return this;
         }
@@ -150,7 +153,7 @@ namespace Vha.AOML
 
         public Builder BeginItalic()
         {
-            this._push(new ItalicElement());
+            this.Push(new ItalicElement());
             return this;
         }
 
@@ -164,7 +167,7 @@ namespace Vha.AOML
 
         public Builder BeginUnderline()
         {
-            this._push(new UnderlineElement());
+            this.Push(new UnderlineElement());
             return this;
         }
 
@@ -178,20 +181,25 @@ namespace Vha.AOML
 
         public Builder Text(string text)
         {
-            this._add(new TextElement(text));
+            this.Add(new TextElement(text));
             return this;
         }
 
         public Builder End()
         {
-            if (this._depth.Count == 0)
+            if (this.depth.Count == 0)
             {
                 throw new InvalidOperationException("There is no open element left to terminate");
             }
-            this._depth.Pop();
+            this.depth.Pop();
             return this;
         }
 
+        /// <summary>
+        /// Append AOXML to the current instance
+        /// </summary>
+        /// <param name="aoxml"></param>
+        /// <returns></returns>
         public Builder Aoxml(string aoxml)
         {
             AOXML.ToBuilder(aoxml, this);
@@ -200,8 +208,8 @@ namespace Vha.AOML
 
         public string Format(Formatter formatter)
         {
-            if (formatter == null) throw new ArgumentNullException();
-            return formatter.Format(this._root);
+            if (formatter == null) { throw new ArgumentNullException(); }
+            return formatter.Format(this.root);
         }
 
         /// <summary>
@@ -210,37 +218,46 @@ namespace Vha.AOML
         /// <returns>A copy of the output in AOML DOM format</returns>
         public Element Dominize()
         {
-            return this._root.Clone();
+            return this.root.Clone();
         }
 
         public void Reset()
         {
-            this._depth.Clear();
-            this._root = new ContainerElement();
+            this.depth.Clear();
+            this.root = new ContainerElement();
         }
 
         #region Internal
-        private Stack<Element> _depth = new Stack<Element>();
-        private ContainerElement _root = new ContainerElement();
-        private Element _top()
+        private Stack<Element> depth = new Stack<Element>();
+        private ContainerElement root = new ContainerElement();
+        
+        private Element top()
         {
-            if (this._depth.Count > 0) return this._depth.Peek();
-            return this._root;
+            if (this.depth.Count > 0) { return this.depth.Peek(); }
+            return this.root;
         }
-        private void _push(Element element)
+
+        private void Push(Element element)
         {
             if (element == null)
+            {
                 throw new ArgumentNullException();
+            }
             if (!element.SupportsChildren)
+            {
                 throw new InvalidOperationException("Unable to push an element which doesn't support children");
-            this._top().Children.Add(element);
-            this._depth.Push(element);
+            }
+            this.top().Children.Add(element);
+            this.depth.Push(element);
         }
-        private void _add(Element element)
+
+        private void Add(Element element)
         {
             if (element == null)
+            {
                 throw new ArgumentNullException();
-            this._top().Children.Add(element);
+            }
+            this.top().Children.Add(element);
         }
         #endregion
     }

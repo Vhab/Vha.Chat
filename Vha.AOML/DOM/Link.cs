@@ -41,16 +41,14 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the type of this link
         /// </summary>
-        public LinkType Type { get { return this._type; } }
+        public LinkType Type { get; private set; }
 
         public abstract Link Clone();
 
         #region internal
-        private LinkType _type;
-        
         internal Link(LinkType type)
         {
-            this._type = type;
+            this.Type = type;
         }
         #endregion
     }

@@ -32,7 +32,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// A link
         /// </summary>
-        public readonly Uri Uri;
+        public Uri Uri {get; private set; }
 
         public OtherLink(string uri)
             : base(LinkType.Other)

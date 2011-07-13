@@ -28,7 +28,7 @@ namespace Vha.AOML
         /// <summary>
         /// Returns the type of this AOML closing tag
         /// </summary>
-        public readonly string Name;
+        public string Name { get; private set; }
         /// <summary>
         /// Creates a clone of the current node
         /// </summary>

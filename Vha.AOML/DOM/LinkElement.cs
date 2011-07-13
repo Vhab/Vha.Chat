@@ -31,12 +31,12 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the action this element describes
         /// </summary>
-        public readonly Link Link;
+        public Link Link { get; private set; }
 
         /// <summary>
         /// Returns whether this link has to be stylized as a link
         /// </summary>
-        public readonly bool Stylized;
+        public bool Stylized { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of LinkElement
@@ -45,8 +45,7 @@ namespace Vha.AOML.DOM
         public LinkElement(Link link)
             : base(ElementType.Link, true)
         {
-            if (link == null)
-                throw new ArgumentNullException();
+            if (link == null) { throw new ArgumentNullException(); }
             this.Link = link;
         }
 
@@ -58,8 +57,7 @@ namespace Vha.AOML.DOM
         public LinkElement(Link link, bool stylized)
             : base(ElementType.Link, true)
         {
-            if (link == null)
-                throw new ArgumentNullException();
+            if (link == null) { throw new ArgumentNullException(); }
             this.Link = link;
             this.Stylized = stylized;
         }
@@ -72,7 +70,9 @@ namespace Vha.AOML.DOM
         {
             Element clone = new LinkElement(this.Link, this.Stylized);
             foreach (Element child in this.Children)
+            {
                 clone.Children.Add(child.Clone());
+            }
             return clone;
         }
     }

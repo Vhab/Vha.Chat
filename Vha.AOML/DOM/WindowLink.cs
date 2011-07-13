@@ -40,8 +40,7 @@ namespace Vha.AOML.DOM
         public WindowLink(Element element)
             : base(LinkType.Window)
         {
-            if (element == null)
-                throw new ArgumentNullException();
+            if (element == null) { throw new ArgumentNullException(); }
             this.Element = element;
         }
 

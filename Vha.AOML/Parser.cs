@@ -50,22 +50,17 @@ namespace Vha.AOML
         /// </summary>
         public ParserMode Mode
         {
-            get { return this._mode; }
+            get { return this.mode; }
             set
             {
-                this._mode = value;
-                this._regex = null;
+                this.mode = value;
+                this.regex = null;
             }
         }
-
         /// <summary>
         /// Whether to automatically convert newline symbols in a ContentNode to an OpenNode("br", "", true)
         /// </summary>
-        public bool NewlineToBreak
-        {
-            get { return this._newlineToBreak; }
-            set { this._newlineToBreak = value; }
-        }
+        public bool NewlineToBreak { get; set; }
 
         /// <summary>
         /// Parses an AOML string into open, close and content nodes
@@ -75,10 +70,10 @@ namespace Vha.AOML
         {
             NodeCollection nodes = new NodeCollection();
             // Create regular expression instance
-            Regex regex = this._regex;
-            if (this._regex == null)
+           
+            if (this.regex == null)
             {
-                regex = this._regex = new Regex(
+                this.regex = new Regex(
                    "[<]\\s*(?<closer>[/]?)\\s*" +
                    "(?<name>[a-z]+)" +
                    "(\\s+((?<attribute>[a-z_\\-]+)\\s*" +
@@ -91,16 +86,17 @@ namespace Vha.AOML
                    "\\s*(?<closed>[/]?)[>]",
                     RegexOptions.IgnoreCase|RegexOptions.Compiled|RegexOptions.Multiline);
             }
+
             // Some setup
-            int regexCloser = regex.GroupNumberFromName("closer");
-            int regexName = regex.GroupNumberFromName("name");
-            int regexAttribute = regex.GroupNumberFromName("attribute");
-            int regexValue = regex.GroupNumberFromName("value");
-            int regexClosed = regex.GroupNumberFromName("closed");
+            int regexCloser = this.regex.GroupNumberFromName("closer");
+            int regexName = this.regex.GroupNumberFromName("name");
+            int regexAttribute = this.regex.GroupNumberFromName("attribute");
+            int regexValue = this.regex.GroupNumberFromName("value");
+            int regexClosed = this.regex.GroupNumberFromName("closed");
             // Convert to unix line endings
             aoml = aoml.Replace("\r\n", "\n");
             // Parse AOML
-            MatchCollection matches = regex.Matches(aoml);
+            MatchCollection matches = this.regex.Matches(aoml);
             int offset = 0;
             foreach (Match match in matches)
             {
@@ -108,7 +104,7 @@ namespace Vha.AOML
                 if (match.Index > offset)
                 {
                     string content = aoml.Substring(offset, match.Index - offset);
-                    _addContent(nodes, content, content);
+                    AddContent(nodes, content, content);
                 }
                 offset = match.Index + match.Length;
                 // Extract tag
@@ -117,7 +113,7 @@ namespace Vha.AOML
                 if (string.IsNullOrEmpty(name))
                 {
                     // No name, let's assume it's just text
-                    _addContent(nodes, raw, raw);
+                    AddContent(nodes, raw, raw);
                     continue;
                 }
                 bool closer = !string.IsNullOrEmpty(match.Groups[regexCloser].Value);
@@ -146,7 +142,7 @@ namespace Vha.AOML
             if (offset < aoml.Length)
             {
                 string content = aoml.Substring(offset);
-                _addContent(nodes, content, content);
+                AddContent(nodes, content, content);
             }
             return nodes;
         }
@@ -157,16 +153,14 @@ namespace Vha.AOML
         /// </summary>
         public void Sanitize(NodeCollection nodes)
         {
-            if (nodes == null)
-                throw new ArgumentNullException();
+            if (nodes == null) { throw new ArgumentNullException(); }
             // Loop through all nodes
             nodes.Reset();
             Node node = null;
             while ((node = nodes.Next()) != null)
             {
                 // Skip content nodes
-                if (node.Type == NodeType.Content)
-                    continue;
+                if (node.Type == NodeType.Content) { continue; }
                 // Gather info
                 OpenNode openNode = null;
                 CloseNode closeNode = null;
@@ -179,7 +173,7 @@ namespace Vha.AOML
                     for (int i = 0; i < openNode.Count; i++)
                     {
                         string attr = openNode.GetAttributeName(i);
-                        if (!_validAttributes.Contains(attr))
+                        if (!validAttributes.Contains(attr))
                         {
                             openNode.RemoveAttribute(attr);
                             i--;
@@ -192,19 +186,23 @@ namespace Vha.AOML
                     name = closeNode.Name;
                 }
                 // Singular elements
-                if (_singularElements.Contains(name))
+                if (singularElements.Contains(name))
                 {
                     // Singular elements don't have closing nodes
                     if (closeNode != null)
+                    {
                         nodes.Remove(closeNode);
+                    }
                     // Singular elements are always self-closing
                     if (openNode != null)
+                    {
                         openNode.Closed = true;
+                    }
                     continue;
                 }
-                else if (_inlineElements.Contains(name) || _blockElements.Contains(name))
+                else if (inlineElements.Contains(name) || blockElements.Contains(name))
                 {
-                    if (openNode == null) continue;
+                    if (openNode == null) { continue; }
                     // Let's not use self-closing elements here
                     if (openNode.Closed)
                     {
@@ -214,7 +212,7 @@ namespace Vha.AOML
                     continue;
                 }
                 // Replace node as content node
-                this._replaceContent(nodes, node, node.Raw, node.Raw);
+                this.ReplaceContent(nodes, node, node.Raw, node.Raw);
             }
             // And we're done!
             nodes.Reset();
@@ -226,8 +224,7 @@ namespace Vha.AOML
         /// </summary>
         public void Balance(NodeCollection nodes)
         {
-            if (nodes == null)
-                throw new ArgumentNullException();
+            if (nodes == null) { throw new ArgumentNullException(); }
             // Fill in missing elements
             List<string> nameStack = new List<string>();
             nodes.Reset();
@@ -238,7 +235,7 @@ namespace Vha.AOML
                 {
                     case NodeType.Open:
                         OpenNode openNode = (OpenNode)node;
-                        if (openNode.Closed) continue;
+                        if (openNode.Closed) { continue; }
                         nameStack.Insert(0, openNode.Name);
                         break;
                     case NodeType.Close:
@@ -272,13 +269,13 @@ namespace Vha.AOML
                 {
                     case NodeType.Open:
                         OpenNode on = (OpenNode)node;
-                        if (on.Closed) continue;
+                        if (on.Closed) { continue; }
                         nodeStack.Insert(0, on);
                         break;
                     case NodeType.Close:
                         // A bit of setup
                         CloseNode closeNode = (CloseNode)node;
-                        bool block = _blockElements.Contains(closeNode.Name);
+                        bool block = blockElements.Contains(closeNode.Name);
                         // Find matching OpenNode
                         OpenNode openNode = null;
                         foreach (OpenNode o in nodeStack)
@@ -321,47 +318,53 @@ namespace Vha.AOML
             nodes.Reset();
         }
 
+        #region Constructors
         public Parser()
         {
+            // Default values
+            this.NewlineToBreak = false;
+
             // Create lists
-            List<string> e = new List<string>();
-            e.Add("br");
-            e.Add("img");
-            this._singularElements = e;
-            e = new List<string>();
-            e.Add("font");
-            e.Add("a");
-            e.Add("u");
-            e.Add("i");
-            this._inlineElements = e;
-            e = new List<string>();
-            e.Add("div");
-            e.Add("center");
-            e.Add("left");
-            e.Add("right");
-            this._blockElements = e;
-            e = new List<string>();
-            e.Add("color");
-            e.Add("align");
-            e.Add("href");
-            e.Add("style");
-            e.Add("src");
-            this._validAttributes = e;
+            this.singularElements = new List<string>(new string[] { 
+                "br",
+                "img" });
+            this.inlineElements = new List<string>(new string[] {
+                "font",
+                "a",
+                "u",
+                "i"
+            });
+            this.blockElements = new List<string>(new string[]{
+                "div",
+                "center",
+                "left",
+                "right"
+            });
+            this.validAttributes = new List<string>(new string[] {
+                "color",
+                "align",
+                "href",
+                "style",
+                "src"
+            });   
         }
+        #endregion
 
         #region Internal
-        private Regex _regex = null;
-        private ParserMode _mode = ParserMode.Normal;
-        private bool _newlineToBreak = false;
-        private List<string> _singularElements;
-        private List<string> _inlineElements;
-        private List<string> _blockElements;
-        private List<string> _validAttributes;
+        private Regex regex = null;
+        private ParserMode mode = ParserMode.Normal;
+        private List<string> singularElements;
+        private List<string> inlineElements;
+        private List<string> blockElements;
+        private List<string> validAttributes;
 
-        private Node[] _createContent(string content, string raw)
+        private Node[] CreateContent(string content, string raw)
         {
             List<Node> nodes = new List<Node>();
-            if (string.IsNullOrEmpty(content)) nodes.ToArray();
+            if (string.IsNullOrEmpty(content))
+            {
+                return nodes.ToArray();
+            }
             if (this.NewlineToBreak)
             {
                 string[] contentParts = content.Split('\n');
@@ -371,7 +374,9 @@ namespace Vha.AOML
                 {
                     nodes.Add(new ContentNode(c, raw.Length > i ? rawParts[i] : ""));
                     if (i + 1 < contentParts.Length)
+                    {
                         nodes.Add(new OpenNode("br", raw.Length > i ? "\n" : "", true));
+                    }
                     i++;
                 }
             }
@@ -382,20 +387,30 @@ namespace Vha.AOML
             return nodes.ToArray();
         }
 
-        private void _addContent(NodeCollection nodes, string content, string raw)
+        private void AddContent(NodeCollection nodes, string content, string raw)
         {
             if (nodes == null)
+            {
                 throw new ArgumentNullException();
-            Node[] nn = _createContent(content, raw);
-            foreach (Node n in nn) nodes.Add(n);
+            }
+            Node[] nn = CreateContent(content, raw);
+            foreach (Node n in nn)
+            {
+                nodes.Add(n);
+            }
         }
 
-        private void _replaceContent(NodeCollection nodes, Node target, string content, string raw)
+        private void ReplaceContent(NodeCollection nodes, Node target, string content, string raw)
         {
             if (nodes == null || target == null)
+            {
                 throw new ArgumentNullException();
-            Node[] nn = _createContent(content, raw);
-            foreach (Node n in nn) nodes.InsertBefore(target, n);
+            }
+            Node[] nn = CreateContent(content, raw);
+            foreach (Node n in nn)
+            {
+                nodes.InsertBefore(target, n);
+            }
             nodes.Remove(target);
         }
         #endregion

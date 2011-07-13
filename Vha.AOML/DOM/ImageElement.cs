@@ -38,12 +38,12 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the type of the image
         /// </summary>
-        public readonly ImageType ImageType;
+        public ImageType ImageType { get; private set; }
         
         /// <summary>
         /// Returns the string identifying the image
         /// </summary>
-        public readonly string Image;
+        public string Image { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of ImageElement

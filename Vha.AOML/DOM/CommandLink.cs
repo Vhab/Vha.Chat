@@ -29,7 +29,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the command which should be executed
         /// </summary>
-        public readonly string Command;
+        public string Command { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of CommandLink

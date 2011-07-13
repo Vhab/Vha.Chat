@@ -28,27 +28,23 @@ namespace Vha.AOML
     /// </summary>
     public class OpenNode : Node
     {
+        #region Public accessors & properties
         /// <summary>
         /// Returns the type of this AOML opening tag
         /// </summary>
-        public readonly string Name;
-
+        public string Name {get; private set; }
         /// <summary>
         /// Returns whether this element is automatically closed
         /// </summary>
-        public bool Closed
-        {
-            get { return this._closed; }
-            internal set { this._closed = value; }
-        }
-        
+        public bool Closed { get; internal set; }
         /// <summary>
         /// Returns the amount of attributes contained within this node
         /// </summary>
         public int Count
         {
-            get { return this._attributes.Count; }
+            get { return this.attributes.Count; }
         }
+        #endregion
 
         /// <summary>
         /// Returns whether this node contains the specified attribute
@@ -57,7 +53,7 @@ namespace Vha.AOML
         /// <returns>Whether the specified attribute exists within this node</returns>
         public bool HasAttribute(string name)
         {
-            return this._attributes.ContainsKey(name.ToLower());
+            return this.attributes.ContainsKey(name.ToLower());
         }
 
         /// <summary>
@@ -69,7 +65,7 @@ namespace Vha.AOML
         {
             if (HasAttribute(name) == false) return null;
             name = name.ToLower();
-            return this._attributes[name];
+            return this.attributes[name];
         }
 
         /// <summary>
@@ -80,11 +76,15 @@ namespace Vha.AOML
         public string GetAttributeName(int index)
         {
             if (index < 0 || index >= this.Count)
+            {
                 throw new IndexOutOfRangeException();
-            foreach (string name in this._attributes.Keys)
+            }
+            foreach (string name in this.attributes.Keys)
             {
                 if (index == 0)
+                {
                     return name;
+                }
                 index--;
             }
             return null;
@@ -106,30 +106,31 @@ namespace Vha.AOML
         }
 
         #region Internal
-        private Dictionary<string, string> _attributes;
-        private bool _closed;
+        private Dictionary<string, string> attributes;
 
         internal OpenNode(string name, string raw, bool closed)
             : base(NodeType.Open, raw)
         {
             this.Name = name.ToLower();
-            this._closed = closed;
-            this._attributes = new Dictionary<string, string>();
+            this.Closed = closed;
+            this.attributes = new Dictionary<string, string>();
         }
 
         internal void AddAttribute(string name, string value)
         {
             name = name.ToLower();
-            if (this._attributes.ContainsKey(name))
-                this._attributes[name] = value;
-            else this._attributes.Add(name, value);
+            if (this.attributes.ContainsKey(name))
+            {
+                this.attributes[name] = value;
+            }
+            else this.attributes.Add(name, value);
         }
 
         internal void RemoveAttribute(string name)
         {
-            if (HasAttribute(name) == false) return;
+            if (HasAttribute(name) == false) { return; }
             name = name.ToLower();
-            this._attributes.Remove(name);
+            this.attributes.Remove(name);
         }
         #endregion
     }

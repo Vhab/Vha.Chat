@@ -31,17 +31,17 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the low id of the item which should be shown
         /// </summary>
-        public readonly UInt32 LowID;
+        public UInt32 LowID { get; private set; }
 
         /// <summary>
         /// Returns the high id of the item which should be shown
         /// </summary>
-        public readonly UInt32 HighID;
+        public UInt32 HighID { get; private set; }
 
         /// <summary>
         /// Returns the quality of the item which should be shown
         /// </summary>
-        public readonly UInt32 Quality;
+        public UInt32 Quality { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of ItemLink

@@ -28,7 +28,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the text contained within this element
         /// </summary>
-        public readonly string Text;
+        public string Text { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of TextElement

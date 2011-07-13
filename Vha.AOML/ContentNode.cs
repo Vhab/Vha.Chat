@@ -28,7 +28,7 @@ namespace Vha.AOML
         /// <summary>
         /// Returns the text content associated with this node
         /// </summary>
-        public readonly string Value;
+        public string Value { get; private set; }
         /// <summary>
         /// Creates a clone of the current node
         /// </summary>

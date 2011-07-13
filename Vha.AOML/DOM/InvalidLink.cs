@@ -32,7 +32,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// A link
         /// </summary>
-        public readonly string Raw;
+        public string Raw { get; private set; }
 
         public InvalidLink(string raw)
             : base(LinkType.Invalid)

@@ -31,7 +31,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the character the link refers at
         /// </summary>
-        public readonly string Character;
+        public string Character { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of UserLink

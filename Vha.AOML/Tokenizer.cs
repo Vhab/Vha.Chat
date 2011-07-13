@@ -40,7 +40,7 @@ namespace Vha.AOML
             while (offset < aoml.Length)
             {
                 // Check for identifiers
-                Match identifier = this._identifierRegex.Match(aoml, offset);
+                Match identifier = this.identifierRegex.Match(aoml, offset);
                 if (identifier != null)
                 {
                     tokens.Add(TokenType.Identifier, identifier.Value, ref offset);
@@ -84,8 +84,8 @@ namespace Vha.AOML
             return tokens;
         }
 
-        #region Internal
-        private Regex _identifierRegex = new Regex("^[a-z][a-z0-9_\\-]*", RegexOptions.IgnoreCase);
+        #region Private
+        private Regex identifierRegex = new Regex("^[a-z][a-z0-9_\\-]*", RegexOptions.IgnoreCase);
         #endregion
     }
 }

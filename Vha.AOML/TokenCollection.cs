@@ -27,6 +27,12 @@ namespace Vha.AOML
 {
     public class TokenCollection : IEnumerable<Token>
     {
+        #region Private members
+        private List<Token> tokens = new List<Token>();
+        private int current = 0;
+        #endregion
+
+        #region Public accessors
         /// <summary>
         /// Returns the amount of tokens currently contained within this object
         /// </summary>
@@ -34,8 +40,11 @@ namespace Vha.AOML
         {
             get
             {
-                if (this._tokens == null) return 0;
-                return this._tokens.Count;
+                if (this.tokens == null)
+                {
+                    return 0;
+                }
+                return this.tokens.Count;
             }
         }
 
@@ -45,12 +54,18 @@ namespace Vha.AOML
         /// </summary>
         public int Current
         {
-            get { return this._current; }
+            get { return this.current; }
             set
             {
-                if (value < 0) throw new ArgumentException("Expecting value greater than zero");
-                if (value > this.Count) throw new ArgumentException("Expecting value smaller or equal to Count");
-                this._current = value;
+                if (value < 0)
+                {
+                    throw new ArgumentException("Expecting value greater than zero");
+                }
+                if (value > this.Count)
+                {
+                    throw new ArgumentException("Expecting value smaller or equal to Count");
+                }
+                this.current = value;
             }
         }
 
@@ -58,14 +73,16 @@ namespace Vha.AOML
         /// Returns the remaining about of tokens that can be obtained with Next().
         /// </summary>
         public int Remaining { get { return this.Count - this.Current; } }
+        #endregion
+
 
         /// <summary>
         /// Returns the Tokenizer to its initial state before Load was called
         /// </summary>
         public void Clear()
         {
-            this._tokens.Clear();
-            this._current = 0;
+            this.tokens.Clear();
+            this.current = 0;
         }
 
         /// <summary>
@@ -73,7 +90,7 @@ namespace Vha.AOML
         /// </summary>
         public void Reset()
         {
-            this._current = 0;
+            this.current = 0;
         }
 
         /// <summary>
@@ -82,10 +99,10 @@ namespace Vha.AOML
         /// <returns>The next Token or null if the end is reached</returns>
         public Token Next()
         {
-            if (this.Count == 0) return null;
-            if (this.Current == this.Count) return null;
-            Token token = this._tokens[this._current];
-            this._current++;
+            if (this.Count == 0) { return null; }
+            if (this.Current == this.Count) { return null; }
+            Token token = this.tokens[this.current];
+            this.current++;
             return token;
         }
 
@@ -96,10 +113,10 @@ namespace Vha.AOML
         /// <returns>The next Token or null if the end is reached</returns>
         public Token Peek(int count)
         {
-            int offset = this._current + count;
-            if (offset + 1 >= this.Count) return null;
-            if (offset < 0) return null;
-            return this._tokens[offset];
+            int offset = this.current + count;
+            if (offset + 1 >= this.Count) { return null; }
+            if (offset < 0) { return null; }
+            return this.tokens[offset];
         }
 
         /// <summary>
@@ -107,7 +124,10 @@ namespace Vha.AOML
         /// </summary>
         /// <param name="type">The type of Token to search for</param>
         /// <returns>The distance to the requested Token or -1 if the Token wasn't found</returns>
-        public int Find(TokenType type) { return this.Find(type, 0); }
+        public int Find(TokenType type)
+        {
+            return this.Find(type, 0);
+        }
 
         /// <summary>
         /// Finds the next occurrence of a Token of the specified type
@@ -122,7 +142,9 @@ namespace Vha.AOML
             while ((next = this.Peek(distance)) != null)
             {
                 if (next.Type == type)
+                {
                     return distance;
+                }
                 distance++;
             }
             return -1;
@@ -142,9 +164,15 @@ namespace Vha.AOML
             {
                 tokens--;
                 Token token = null;
-                if (peek) token = this.Peek(count);
-                else token = this.Next();
-                if (token == null) break;
+                if (peek)
+                {
+                    token = this.Peek(count);
+                }
+                else
+                {
+                    token = this.Next();
+                }
+                if (token == null) { break; }
                 value.Append(token.Value);
                 count++;
             }
@@ -164,19 +192,19 @@ namespace Vha.AOML
             if (type == TokenType.WhiteSpace || type == TokenType.Text)
             {
                 // Only when there actually is another token to merge
-                if (this._tokens.Count > 0)
+                if (this.tokens.Count > 0)
                 {
                     // Only when the type matches
-                    Token top = this._tokens[this._tokens.Count - 1];
+                    Token top = this.tokens[this.tokens.Count - 1];
                     if (top.Type == type)
                     {
-                        this._tokens[this._tokens.Count - 1] = new Token(type, top.Value + value);
+                        this.tokens[this.tokens.Count - 1] = new Token(type, top.Value + value);
                         return;
                     }
                 }
             }
             // Can't merge, just add a new token
-            this._tokens.Add(new Token(type, value));
+            this.tokens.Add(new Token(type, value));
         }
 
         /// <summary>
@@ -185,7 +213,7 @@ namespace Vha.AOML
         /// <returns>An enumerator</returns>
         IEnumerator<Token> IEnumerable<Token>.GetEnumerator()
         {
-            return this._tokens.GetEnumerator();
+            return this.tokens.GetEnumerator();
         }
 
         /// <summary>
@@ -194,12 +222,9 @@ namespace Vha.AOML
         /// <returns>An enumerator</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this._tokens.GetEnumerator();
+            return this.tokens.GetEnumerator();
         }
 
-        #region Internal
-        private List<Token> _tokens = new List<Token>();
-        private int _current = 0;
-        #endregion
+        
     }
 }

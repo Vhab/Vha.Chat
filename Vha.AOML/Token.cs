@@ -45,13 +45,13 @@ namespace Vha.AOML
         /// <summary>
         /// Returns the type of this token
         /// </summary>
-        public readonly TokenType Type;
+        public TokenType Type { get; private set; }
 
         /// <summary>
         /// Returns the value of this token.
         /// Returns null if no value is associated with this token type.
         /// </summary>
-        public readonly string Value;
+        public string Value { get; private set; }
 
         /// <summary>
         /// Initializes a new token

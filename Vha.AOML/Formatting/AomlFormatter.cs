@@ -42,9 +42,13 @@ namespace Vha.AOML.Formatting
             get
             {
                 if (this.Style == AomlFormatterStyle.DoubleQuote)
+                {
                     return "\"";
+                }
                 if (this.Style == AomlFormatterStyle.SingleQuote)
+                {
                     return "'";
+                }
                 return null;
             }
         }
@@ -66,9 +70,12 @@ namespace Vha.AOML.Formatting
         public override string OnAlignOpen(AlignElement element)
         {
             if (element.Alignment == Alignment.Inherit)
+            {
                 return "<div>";
+            }
             return string.Format("<div align={0}{1}{0}>",
-                this.Quote, element.Alignment.ToString().ToLower());
+                this.Quote, 
+                element.Alignment.ToString().ToLower());
         }
 
         public override string OnAlignClose(AlignElement element)
@@ -94,7 +101,10 @@ namespace Vha.AOML.Formatting
         public override string OnColorOpen(ColorElement element)
         {
             return string.Format("<font color={0}#{1:X2}{2:X2}{3:X2}{0}>",
-                this.Quote, element.Color.Red, element.Color.Green, element.Color.Blue);
+                this.Quote, 
+                element.Color.Red, 
+                element.Color.Green, 
+                element.Color.Blue);
         }
 
         public override string OnColorClose(ColorElement element)
@@ -105,7 +115,9 @@ namespace Vha.AOML.Formatting
         public override string OnImage(ImageElement element)
         {
             return string.Format("<img src={0}{1}://{2}{0}>",
-                this.Quote, element.ImageType.ToString(), element.Image);
+                this.Quote, 
+                element.ImageType.ToString(), 
+                element.Image);
         }
 
         public override string OnLinkOpen(LinkElement element)
@@ -122,14 +134,21 @@ namespace Vha.AOML.Formatting
                     WindowLink window = (WindowLink)element.Link;
                     Formatter f = null;
                     if (this.Style == AomlFormatterStyle.DoubleQuote)
+                    {
                         f = new AomlFormatter(AomlFormatterStyle.SingleQuote);
-                    else f = new PlainTextFormatter();
+                    }
+                    else
+                    {
+                        f = new PlainTextFormatter();
+                    }
                     href = "text://" + f.Format(window.Element);
                     break;
                 case LinkType.Item:
                     ItemLink item = (ItemLink)element.Link;
                     href = string.Format("itemref://{0}/{1}/{2}",
-                        item.LowID, item.HighID, item.Quality);
+                        item.LowID, 
+                        item.HighID, 
+                        item.Quality);
                     break;
                 case LinkType.User:
                     UserLink user = (UserLink)element.Link;
@@ -144,9 +163,13 @@ namespace Vha.AOML.Formatting
                     break;
             }
             if (!element.Stylized)
+            {
                 style = string.Format(" style={0}text-decoration:none{0}", this.Quote);
+            }
             return string.Format("<a href={0}{1}{0}{2}>",
-                this.Quote, href, style);
+                this.Quote, 
+                href, 
+                style);
         }
 
         public override string OnLinkClose(LinkElement element)

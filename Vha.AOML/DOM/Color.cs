@@ -33,18 +33,19 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the red component of this color in a range of 0 to 256
         /// </summary>
-        public readonly Byte Red;
+        public Byte Red { get; private set; }
 
         /// <summary>
         /// Returns the green component of this color in a range of 0 to 256
         /// </summary>
-        public readonly Byte Green;
+        public Byte Green { get; private set; }
 
         /// <summary>
         /// Returns the blue component of this color in a range of 0 to 256
         /// </summary>
-        public readonly Byte Blue;
+        public Byte Blue { get; private set; }
 
+        #region Constructors
         /// <summary>
         /// Initializes a new color
         /// </summary>
@@ -74,12 +75,12 @@ namespace Vha.AOML.DOM
         /// <param name="color">The desired color</param>
         public Color(Color color)
         {
-            if (color == null)
-                throw new ArgumentNullException();
+            if (color == null) { throw new ArgumentNullException(); }
             this.Red = color.Red;
             this.Green = color.Green;
             this.Blue = color.Blue;
         }
+        #endregion
 
         /// <summary>
         /// Creates a new color from an HTML formatted color string.
@@ -90,24 +91,24 @@ namespace Vha.AOML.DOM
         public static Color FromString(string color)
         {
             // Load TextColors.xml
-            if (_colors == null)
+            if (colors == null)
             {
                 MemoryStream stream = new MemoryStream(Properties.Resources.TextColors);
                 XmlDocument xml = new XmlDocument();
                 xml.Load(stream);
                 Dictionary<string, string> dictionary = new Dictionary<string, string>();
                 // Fetch colors
-                XmlNodeList colors = xml.GetElementsByTagName("HTMLColor");
-                foreach (XmlNode node in colors)
+                XmlNodeList rawColors = xml.GetElementsByTagName("HTMLColor");
+                foreach (XmlNode node in rawColors)
                 {
                     // Some safety
-                    if (node.Attributes["color"] == null) continue;
-                    if (node.Attributes["name"] == null) continue;
+                    if (node.Attributes["color"] == null) { continue; }
+                    if (node.Attributes["name"] == null) { continue; }
                     dictionary.Add(
                         node.Attributes["name"].Value.ToLower(),
                         node.Attributes["color"].Value.ToLower());
                 }
-                _colors = dictionary;
+                colors = dictionary;
             }
             // Check for # prefix
             if (color.StartsWith("#"))
@@ -118,15 +119,24 @@ namespace Vha.AOML.DOM
             if (color.StartsWith("0x"))
             {
                 color = color.Substring(2);
-                if (color.Length == 8) return FromHex(color.Substring(2));
-                else if (color.Length == 6) return FromHex(color);
-                else return null;
+                if (color.Length == 8)
+                {
+                    return FromHex(color.Substring(2));
+                }
+                else if (color.Length == 6)
+                {
+                    return FromHex(color);
+                }
+                else
+                {
+                    return null;
+                }
             }
             // Fetch named color
             color = color.ToLower();
-            if (_colors.ContainsKey(color))
+            if (colors.ContainsKey(color))
             {
-                return FromString(_colors[color]);
+                return FromString(colors[color]);
             }
             return null;
         }
@@ -161,7 +171,7 @@ namespace Vha.AOML.DOM
         }
 
         #region Internal
-        private static Dictionary<string, string> _colors = null;
+        private static Dictionary<string, string> colors = null;
         #endregion
     }
 }

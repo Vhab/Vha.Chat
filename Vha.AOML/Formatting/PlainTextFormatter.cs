@@ -30,27 +30,32 @@ namespace Vha.AOML.Formatting
     /// </summary>
     public class PlainTextFormatter : Formatter
     {
-        public override string OnOpen() { return ""; }
-        public override string OnClose() { return ""; }
-        public override string OnBeforeElement(Element element) { return ""; }
-        public override string OnAfterElement(Element element) { return ""; }
-
         public override string OnAlignOpen(AlignElement element)
         {
             string result = "";
-            if (this._state == State.Text) result = "\n";
-            this._state = State.Alignment;
+            if (this.state == State.Text) { result = "\n"; }
+            this.state = State.Alignment;
             return result;
         }
 
         public override string OnAlignClose(AlignElement element)
         {
             string result = "";
-            if (this._state == State.Text) result = "\n";
-            this._state = State.Alignment;
+            if (this.state == State.Text) result = "\n";
+            this.state = State.Alignment;
             return result;
         }
 
+        public override string OnText(TextElement element)
+        {
+            this.state = State.Text;
+            return element.Text;
+        }
+
+        public override string OnOpen() { return ""; }
+        public override string OnClose() { return ""; }
+        public override string OnBeforeElement(Element element) { return ""; }
+        public override string OnAfterElement(Element element) { return ""; }
         public override string OnBreak(BreakElement element) { return "\n"; }
         public override string OnContainerOpen(ContainerElement element) { return ""; }
         public override string OnContainerClose(ContainerElement element) { return ""; }
@@ -59,11 +64,6 @@ namespace Vha.AOML.Formatting
         public override string OnImage(ImageElement element) { return ""; }
         public override string OnLinkOpen(LinkElement element) { return ""; }
         public override string OnLinkClose(LinkElement element) { return ""; }
-        public override string OnText(TextElement element)
-        {
-            this._state = State.Text;
-            return element.Text;
-        }
         public override string OnUnderlineOpen(UnderlineElement element) { return ""; }
         public override string OnUnderlineClose(UnderlineElement element) { return ""; }
         public override string OnItalicOpen(ItalicElement element) { return ""; }
@@ -76,7 +76,7 @@ namespace Vha.AOML.Formatting
             Alignment,
             Text
         }
-        private State _state = State.Start;
+        private State state = State.Start;
         #endregion
     }
 }

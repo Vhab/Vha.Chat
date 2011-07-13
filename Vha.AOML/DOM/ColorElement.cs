@@ -31,7 +31,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the color of this (and child) elements in HTML color format
         /// </summary>
-        public readonly Color Color;
+        public Color Color { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of ColorElement
@@ -40,8 +40,7 @@ namespace Vha.AOML.DOM
         public ColorElement(Color color)
             : base(ElementType.Color, true)
         {
-            if (color == null)
-                throw new ArgumentNullException();
+            if (color == null) { throw new ArgumentNullException(); }
             this.Color = color;
         }
 
@@ -53,7 +52,9 @@ namespace Vha.AOML.DOM
         {
             Element clone = new ColorElement(this.Color);
             foreach (Element child in this.Children)
+            {
                 clone.Children.Add(child.Clone());
+            }
             return clone;
         }
     }

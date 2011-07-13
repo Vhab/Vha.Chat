@@ -46,24 +46,21 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the type of this element
         /// </summary>
-        public ElementType Type { get { return this._type; } }
-
+        public ElementType Type { get; private set; }
         /// <summary>
         /// Returns a collection of all children of this element.
         /// If this element doesn't support children, this member will return null.
         /// </summary>
-        public ElementCollection Children { get { return this._children; } }
-
+        public ElementCollection Children { get; private set; }
         /// <summary>
         /// Returns the parent of this element.
         /// If this element is not a child of any element, this member will return null.
         /// </summary>
-        public Element Parent { get { return this._parent; } }
-
+        public Element Parent { get; private set; }
         /// <summary>
         /// Returns true if this element supports children
         /// </summary>
-        public bool SupportsChildren { get { return this._supportsChildren; } }
+        public bool SupportsChildren { get; private set; }
 
         /// <summary>
         /// Recursively checks if the given element is a parent of this element
@@ -72,8 +69,8 @@ namespace Vha.AOML.DOM
         /// <returns>True if the given element is a parent of this element</returns>
         public bool IsParent(Element element)
         {
-            if (this.Parent == null) return false;
-            if (element == this.Parent) return true;
+            if (this.Parent == null) { return false; }
+            if (element == this.Parent) { return true; }
             return this.Parent.IsParent(element);
         }
 
@@ -84,12 +81,14 @@ namespace Vha.AOML.DOM
         /// <returns>True if the given element is a child of this element</returns>
         public bool IsChild(Element element)
         {
-            if (this.SupportsChildren == false) return false;
-            if (this.Children.Contains(element)) return true;
+            if (this.SupportsChildren == false) { return false; }
+            if (this.Children.Contains(element)) { return true; }
             foreach (Element child in this.Children)
             {
                 if (child.IsChild(element))
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -101,8 +100,8 @@ namespace Vha.AOML.DOM
         /// <returns>True if this elements has a parent of the specified type</returns>
         public bool HasParent(ElementType type)
         {
-            if (this.Parent == null) return false;
-            if (this.Parent.Type == type) return true;
+            if (this.Parent == null) { return false; }
+            if (this.Parent.Type == type) { return true; }
             return this.Parent.HasParent(type);
         }
 
@@ -113,11 +112,11 @@ namespace Vha.AOML.DOM
         /// <returns>True if this elements has a parent of the specified type</returns>
         public bool HasChild(ElementType type)
         {
-            if (this.SupportsChildren == false) return false;
+            if (this.SupportsChildren == false) { return false; }
             foreach (Element child in this.Children)
             {
-                if (child.Type == type) return true;
-                if (child.HasChild(type)) return true;
+                if (child.Type == type) { return true; }
+                if (child.HasChild(type)) { return true; }
             }
             return false;
         }
@@ -130,17 +129,14 @@ namespace Vha.AOML.DOM
         public abstract Element Clone();
 
         #region Internal
-        private ElementType _type;
-        private ElementCollection _children = null;
-        private Element _parent = null;
-        private bool _supportsChildren;
-
         internal Element(ElementType type, bool supportsChildren)
         {
-            this._type = type;
-            this._supportsChildren = supportsChildren;
+            this.Type = type;
+            this.SupportsChildren = supportsChildren;
             if (supportsChildren)
-                this._children = new ElementCollection(this);
+            {
+                this.Children = new ElementCollection(this);
+            }
         }
 
         /// <summary>
@@ -152,19 +148,27 @@ namespace Vha.AOML.DOM
         internal void OnAttach(Element parent)
         {
             if (parent == this)
+            {
                 throw new InvalidOperationException("Can't attach an element to itself");
-            if (this._parent != null)
+            }
+            if (this.Parent != null)
+            {
                 throw new InvalidOperationException("Not expecting to be attached. This element already has a parent");
+            }
             if (parent.SupportsChildren == false)
+            {
                 throw new InvalidOperationException("Not expecting to be attached. The supplied parent doesn't support children");
+            }
             if (parent.Children.Contains(this))
             {
-                this._parent = parent;
+                this.Parent = parent;
                 throw new InvalidOperationException("Not expecting to be attached. This element already is attached to the parent");
             }
             if (this.IsChild(parent))
+            {
                 throw new InvalidOperationException("Not expecting to be attached. Can not attach this element to one of its children");
-            this._parent = parent;
+            }
+            this.Parent = parent;
         }
 
         /// <summary>
@@ -174,11 +178,15 @@ namespace Vha.AOML.DOM
         /// <exception cref="System.InvalidOperationException">Thrown when detaching this element would result in an invalid state</exception>
         internal void OnDetach()
         {
-            if (this._parent == null)
+            if (this.Parent == null)
+            {
                 throw new InvalidOperationException("Not expecting to be detached. This element has no parent");
-            if (this._parent.Children.Contains(this))
+            }
+            if (this.Parent.Children.Contains(this))
+            {
                 throw new InvalidOperationException("Not expecting to be detached. This element is still a child of its parent");
-            this._parent = null;
+            }
+            this.Parent = null;
         }
         #endregion
     }

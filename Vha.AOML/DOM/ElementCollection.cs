@@ -32,7 +32,7 @@ namespace Vha.AOML.DOM
         /// <summary>
         /// Returns the amount of elements currently contained in this collection.
         /// </summary>
-        public int Count { get { return this._elements.Count; } }
+        public int Count { get { return this.Elements.Count; } }
 
         /// <summary>
         /// Adds an element.
@@ -41,8 +41,8 @@ namespace Vha.AOML.DOM
         /// <exception cref="System.InvalidOperationException">Thrown when attaching the given element would result in an invalid state</exception>
         public void Add(Element element)
         {
-            element.OnAttach(this._parent);
-            this._elements.Add(element);
+            element.OnAttach(this.Parent);
+            this.Elements.Add(element);
         }
 
         /// <summary>
@@ -54,11 +54,11 @@ namespace Vha.AOML.DOM
         /// <exception cref="System.IndexOutOfRangeException">Thrown when the given index is invalid</exception>
         public void Insert(int index, Element element)
         {
-            element.OnAttach(this._parent);
+            element.OnAttach(this.Parent);
             try
             {
                 // Attempt to insert this element
-                this._elements.Insert(index, element);
+                this.Elements.Insert(index, element);
             }
             catch (IndexOutOfRangeException)
             {
@@ -79,7 +79,7 @@ namespace Vha.AOML.DOM
             {
                 throw new InvalidOperationException("Not expecting to be detached. Given element is not attached to this element");
             }
-            this._elements.Remove(element);
+            this.Elements.Remove(element);
             element.OnDetach();
         }
 
@@ -91,8 +91,8 @@ namespace Vha.AOML.DOM
         /// <exception cref="System.IndexOutOfRangeException">Thrown when the given index is invalid</exception>
         public void RemoveAt(int index)
         {
-            Element element = this._elements[index];
-            this._elements.RemoveAt(index);
+            Element element = this.Elements[index];
+            this.Elements.RemoveAt(index);
             element.OnDetach();
         }
         
@@ -103,7 +103,7 @@ namespace Vha.AOML.DOM
         /// <returns>Returns true if the given element is part of this collection</returns>
         public bool Contains(Element element)
         {
-            return this._elements.Contains(element);
+            return this.Elements.Contains(element);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Vha.AOML.DOM
         /// <returns>A new array containing the elements contained in this collection</returns>
         public Element[] ToArray()
         {
-            return this._elements.ToArray();
+            return this.Elements.ToArray();
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Vha.AOML.DOM
         /// <returns>An enumerator</returns>
         IEnumerator<Element> IEnumerable<Element>.GetEnumerator()
         {
-            return this._elements.GetEnumerator();
+            return this.Elements.GetEnumerator();
         }
 
         /// <summary>
@@ -130,16 +130,17 @@ namespace Vha.AOML.DOM
         /// <returns>An enumerator</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this._elements.GetEnumerator();
+            return this.Elements.GetEnumerator();
         }
 
         #region Internal
-        internal List<Element> _elements;
-        internal Element _parent;
+        internal List<Element> Elements { get; private set; }
+        internal Element Parent { get; private set; }
+
         internal ElementCollection(Element parent)
         {
-            this._parent = parent;
-            this._elements = new List<Element>();
+            this.Parent = parent;
+            this.Elements = new List<Element>();
         }
         #endregion
     }

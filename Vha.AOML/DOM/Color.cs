@@ -90,26 +90,7 @@ namespace Vha.AOML.DOM
         /// <returns>A new color or null for failure</returns>
         public static Color FromString(string color)
         {
-            // Load TextColors.xml
-            if (colors == null)
-            {
-                MemoryStream stream = new MemoryStream(Properties.Resources.TextColors);
-                XmlDocument xml = new XmlDocument();
-                xml.Load(stream);
-                Dictionary<string, string> dictionary = new Dictionary<string, string>();
-                // Fetch colors
-                XmlNodeList rawColors = xml.GetElementsByTagName("HTMLColor");
-                foreach (XmlNode node in rawColors)
-                {
-                    // Some safety
-                    if (node.Attributes["color"] == null) { continue; }
-                    if (node.Attributes["name"] == null) { continue; }
-                    dictionary.Add(
-                        node.Attributes["name"].Value.ToLower(),
-                        node.Attributes["color"].Value.ToLower());
-                }
-                colors = dictionary;
-            }
+            InitializeDefaultColorDictionary();
             // Check for # prefix
             if (color.StartsWith("#"))
             {
@@ -134,12 +115,90 @@ namespace Vha.AOML.DOM
             }
             // Fetch named color
             color = color.ToLower();
-            if (colors.ContainsKey(color))
+            if (customColors.ContainsKey(color))
             {
-                return FromString(colors[color]);
+                return FromString(customColors[color]);
+            }
+            if (defaultColors.ContainsKey(color))
+            {
+                return FromString(defaultColors[color]);
             }
             return null;
         }
+
+        /// <summary>
+        /// Defines a custom color
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="color">#RRGGBB or alias. If alias: Set to the current value of that alias.</param>
+        public static void DefineColor(string name, string color)
+        {
+            // Color alias
+            if (!color.StartsWith("#") && FromString(color) == null)
+            {
+                throw new ArgumentException("name: {0} color: {1} - Color alias is not defined");
+            }
+            lock (customColors)
+            {
+                customColors[name] = color;
+            }
+        }
+
+        /// <summary>
+        /// Defines a custom color
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="color"></param>
+        public static void DefineColor(string name, Color color)
+        {
+            // Color alias
+            if (color == null || String.IsNullOrEmpty(color.ToString()))
+            {
+                throw new ArgumentException("name: {0} - Color is null or empty");
+            }
+            lock (customColors)
+            {
+                customColors[name] = "#" + color.ToString();
+            }
+        }
+
+        public static void UndefineColor(string name)
+        {
+            lock (customColors)
+            {
+                customColors.Remove(name);
+            }
+        }
+
+        /// <summary>
+        /// Initializes the color dictionary
+        /// </summary>
+        private static void InitializeDefaultColorDictionary()
+        {
+            lock (defaultColors)
+            {
+                if (defaultColors.Count > 0) { return; }
+                // Load TextColors.xml
+
+                MemoryStream stream = new MemoryStream(Properties.Resources.TextColors);
+                XmlDocument xml = new XmlDocument();
+                xml.Load(stream);
+                Dictionary<string, string> dictionary = new Dictionary<string, string>();
+                // Fetch colors
+                XmlNodeList rawColors = xml.GetElementsByTagName("HTMLColor");
+                foreach (XmlNode node in rawColors)
+                {
+                    // Some safety
+                    if (node.Attributes["color"] == null) { continue; }
+                    if (node.Attributes["name"] == null) { continue; }
+                    dictionary.Add(
+                        node.Attributes["name"].Value.ToLower(),
+                        node.Attributes["color"].Value.ToLower());
+                }
+                defaultColors = dictionary;
+            }
+        }
+
 
         /// <summary>
         /// Creates a new color from a 6-digit hex string
@@ -171,7 +230,8 @@ namespace Vha.AOML.DOM
         }
 
         #region Internal
-        private static Dictionary<string, string> colors = null;
+        private static Dictionary<string, string> defaultColors = new Dictionary<string,string>(StringComparer.InvariantCultureIgnoreCase);
+        private static Dictionary<string, string> customColors = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         #endregion
     }
 }

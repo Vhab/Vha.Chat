@@ -124,7 +124,7 @@ namespace Vha.AOML
             for (int i = 0; i < root.ChildNodes.Count; i++)
             {
                 XmlNode child = root.ChildNodes[i];
-                if (child is XmlCharacterData)
+                if (child is XmlCharacterData && !(child is XmlComment))
                 {
                     textElements.Add(child as XmlCharacterData);
                 }
@@ -283,7 +283,7 @@ namespace Vha.AOML
                 for (int i = 0; i < node.ChildNodes.Count; i++)
                 {
                     XmlNode child = node.ChildNodes[i];
-                    if (child is XmlCharacterData)
+                    if (child is XmlCharacterData && !(child is XmlComment))
                     {
                         if (!String.IsNullOrEmpty((child as XmlCharacterData).Value))
                         {

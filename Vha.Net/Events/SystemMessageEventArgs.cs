@@ -46,7 +46,7 @@ namespace Vha.Net.Events
         public UInt32 ClientID { get; private set; }
         public UInt32 WindowID { get; private set; }
         public UInt32 MessageID { get; private set; }
-        public UInt32 CategoryID { get; private set; } // Hardcoded MDB category ID
+        public UInt32 CategoryID { get { return 2000; } } // Hardcoded MDB category ID
         public Byte[] Arguments { get; private set; }
         public SystemMessageType Type { get; private set; }
         public string Notice { get; private set; }

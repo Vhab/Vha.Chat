@@ -63,6 +63,11 @@ namespace Vha.AOML
         public bool NewlineToBreak { get; set; }
 
         /// <summary>
+        /// Whether to automatically convert invalid element nodes to content nodes
+        /// </summary>
+        public bool InvalidElementsToContent { get; set; }
+
+        /// <summary>
         /// Parses an AOML string into open, close and content nodes
         /// </summary>
         /// <param name="aoml">The aoml string to be parsed</param>
@@ -212,7 +217,16 @@ namespace Vha.AOML
                     continue;
                 }
                 // Replace node as content node
-                this.ReplaceContent(nodes, node, node.Raw, node.Raw);
+                if (this.InvalidElementsToContent)
+                {
+                    // Replace node as content
+                    this.ReplaceContent(nodes, node, node.Raw, node.Raw);
+                }
+                else
+                {
+                    // Remove node
+                    this.ReplaceContent(nodes, node, "", "");
+                }
             }
             // And we're done!
             nodes.Reset();
@@ -323,6 +337,7 @@ namespace Vha.AOML
         {
             // Default values
             this.NewlineToBreak = false;
+            this.InvalidElementsToContent = true;
 
             // Create lists
             this.singularElements = new List<string>(new string[] { 

@@ -39,6 +39,7 @@ namespace Vha.AOML
             this.Parser = new Parser();
             this.Parser.Mode = ParserMode.Compatibility;
             this.Parser.NewlineToBreak = true;
+            this.Parser.InvalidElementsToContent = false;
         }
         #endregion
 

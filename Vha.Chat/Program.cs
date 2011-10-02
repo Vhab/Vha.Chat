@@ -36,6 +36,10 @@ namespace Vha.Chat
         /// </summary>
         public static ApplicationContext ApplicationContext;
         /// <summary>
+        /// Returns the directory configuration files and error logs are written to
+        /// </summary>
+        private static string ApplicationConfigDirectory = "";
+        /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
@@ -115,6 +119,9 @@ namespace Vha.Chat
             context.ExceptionEvent += new Handler<Exception>(UnhandledException);
 #endif
 
+            // Store config directory
+            ApplicationConfigDirectory = configData.OptionsPath;
+
             // Start application
             ApplicationContext = new ApplicationContext();
             ApplicationContext.MainForm = new AuthenticationForm(context);
@@ -136,9 +143,10 @@ namespace Vha.Chat
         private static void UnhandledException(Exception ex)
         {
             LogException(ex, 0);
-            MessageBox.Show("An exception has occurred. This application will now close.\n" +
+            MessageBox.Show("An unhandled exception has occurred. This application will now close.\n\n" +
                 "The full error message has been written to error.log.\n" +
-                "Please assist us in fixing this bug and report this error at http://forums.vhabot.net/.",
+                "You can find this file in the following directory:\n" + ApplicationConfigDirectory + ".\n\n" +
+                "Please assist us in fixing this bug and report this error at http://aodevs.com/forums/.",
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(1);
         }
@@ -147,7 +155,8 @@ namespace Vha.Chat
         {
             try
             {
-                FileStream stream = File.Open("error.log", FileMode.Append, FileAccess.Write);
+                string logFile = Path.Combine(ApplicationConfigDirectory, "error.log");
+                FileStream stream = File.Open(logFile, FileMode.Append, FileAccess.Write);
                 StreamWriter writer = new StreamWriter(stream);
                 if (depth == 0)
                 {

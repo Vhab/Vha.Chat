@@ -3,3 +3,4 @@ syntax: glob
 Vha.Chat/Properties/AssemblyInfo.cs
 Vha.Chat/bin/*
 Vha.Chat/obj/*
+*.sln.docstates

@@ -276,7 +276,17 @@ namespace Vha.AOML
                         link = new UserLink(argument);
                         break;
                     default:
-                        link = new OtherLink(href);
+                        try
+                        {
+                            // Attempt to create an 'OtherLink'
+                            // this operation will throw an exception if the 'href' is significantly malformed
+                            link = new OtherLink(href);
+                        }
+                        catch (UriFormatException)
+                        {
+                            // The 'href' is malformed, store as InvalidLink
+                            link = new InvalidLink(href);
+                        }
                         break;
                 }
             }

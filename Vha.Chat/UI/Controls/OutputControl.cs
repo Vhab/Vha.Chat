@@ -88,12 +88,24 @@ namespace Vha.Chat.UI.Controls
                 this._updateProperties();
             }
         }
+        /// <summary>
+        /// Gets or set the content padding value
+        /// </summary>
         public Padding InnerPadding
         {
             get { return this._padding; }
             set
             {
                 this._padding = value;
+                this._updateProperties();
+            }
+        }
+        public int TextSize
+        {
+            get { return this._textSize; }
+            set
+            {
+                this._textSize = value;
                 this._updateProperties();
             }
         }
@@ -214,6 +226,14 @@ namespace Vha.Chat.UI.Controls
             if (scroll)
                 this._execute("scrollToBottom");
         }
+
+        /// <summary>
+        /// Clear the contents of this control
+        /// </summary>
+        public void Clear()
+        {
+            this._execute("clear");
+        }
         #endregion
 
         public OutputControl()
@@ -223,6 +243,7 @@ namespace Vha.Chat.UI.Controls
         #region Internal
         private System.Drawing.Color _backgroundColor = System.Drawing.Color.White;
         private System.Drawing.Color _foregroundColor = System.Drawing.Color.Black;
+        private int _textSize = 11;
         private Padding _padding = new Padding(0);
         private int _maximumLines = 0;
         private Context _context = null;
@@ -246,6 +267,8 @@ namespace Vha.Chat.UI.Controls
             // Padding
             Padding p = this.InnerPadding;
             this._execute("setPadding", p.Top, p.Right, p.Bottom, p.Left);
+            // Text size
+            this._execute("setTextSize", this.TextSize);
         }
 
         private void _execute(string command, params object[] arguments)
@@ -344,6 +367,17 @@ namespace Vha.Chat.UI.Controls
                     if (!int.TryParse(argument, out i)) return;
                     Element el = this._cache.GetElement(i);
                     if (el == null) return;
+                    // Check if we should reuse an existing form
+                    if (this._context.Options.InfoWindowBehavior == InfoWindowBehavior.UseExisting)
+                    {
+                        InfoForm targetForm = InfoForm.LatestActiveForm;
+                        if (targetForm != null)
+                        {
+                            targetForm.ReplaceContent(el);
+                            return; // Return before creating a new form
+                        }
+                    }
+                    // Create new form
                     Utils.InvokeShow(Program.ApplicationContext.MainForm, new InfoForm(this._context, Program.ApplicationContext.MainForm, el));
                     return;
                 case "chatcmd":

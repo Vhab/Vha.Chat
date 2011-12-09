@@ -37,18 +37,20 @@ namespace Vha.Chat.UI
             this._reset = new System.Windows.Forms.Button();
             this._save = new System.Windows.Forms.Button();
             this._chatOptions = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this._chatTextSize = new System.Windows.Forms.NumericUpDown();
             this._ignoreMethod = new System.Windows.Forms.ComboBox();
             this._panelPosition = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this._textStyle = new System.Windows.Forms.ComboBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this._maximumTexts = new System.Windows.Forms.NumericUpDown();
             this._maximumMessages = new System.Windows.Forms.NumericUpDown();
             this._maximumHistory = new System.Windows.Forms.NumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
+            this._maximumTexts = new System.Windows.Forms.NumericUpDown();
             this._proxyOptions = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -60,23 +62,31 @@ namespace Vha.Chat.UI
             this._proxyAddress = new System.Windows.Forms.TextBox();
             this._proxyType = new System.Windows.Forms.ComboBox();
             this._miscOptions = new System.Windows.Forms.GroupBox();
-            this.label11 = new System.Windows.Forms.Label();
             this._donateVisible = new System.Windows.Forms.CheckBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this._infoWindowOptions = new System.Windows.Forms.GroupBox();
+            this._infoWindowBehavior = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this._infoWindowTextSize = new System.Windows.Forms.NumericUpDown();
             this._topBackground.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._icon)).BeginInit();
             this._chatOptions.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._maximumTexts)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._chatTextSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._maximumMessages)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._maximumHistory)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maximumTexts)).BeginInit();
             this._proxyOptions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._proxyPort)).BeginInit();
             this._miscOptions.SuspendLayout();
+            this._infoWindowOptions.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._infoWindowTextSize)).BeginInit();
             this.SuspendLayout();
             // 
             // _seperator
             // 
-            this._seperator.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._seperator.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._seperator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this._seperator.Location = new System.Drawing.Point(-2, 44);
             this._seperator.Name = "_seperator";
@@ -85,8 +95,8 @@ namespace Vha.Chat.UI
             // 
             // _topBackground
             // 
-            this._topBackground.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._topBackground.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._topBackground.BackColor = System.Drawing.SystemColors.Window;
             this._topBackground.Controls.Add(this._icon);
             this._topBackground.Controls.Add(this._title);
@@ -119,10 +129,10 @@ namespace Vha.Chat.UI
             // 
             this._cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancel.Location = new System.Drawing.Point(246, 447);
+            this._cancel.Location = new System.Drawing.Point(246, 550);
             this._cancel.Name = "_cancel";
             this._cancel.Size = new System.Drawing.Size(75, 23);
-            this._cancel.TabIndex = 12;
+            this._cancel.TabIndex = 17;
             this._cancel.Text = "Cancel";
             this._cancel.UseVisualStyleBackColor = true;
             this._cancel.Click += new System.EventHandler(this._cancel_Click);
@@ -130,10 +140,10 @@ namespace Vha.Chat.UI
             // _reset
             // 
             this._reset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._reset.Location = new System.Drawing.Point(12, 447);
+            this._reset.Location = new System.Drawing.Point(12, 550);
             this._reset.Name = "_reset";
             this._reset.Size = new System.Drawing.Size(75, 23);
-            this._reset.TabIndex = 14;
+            this._reset.TabIndex = 18;
             this._reset.Text = "Reset";
             this._reset.UseVisualStyleBackColor = true;
             this._reset.Click += new System.EventHandler(this._reset_Click);
@@ -141,36 +151,45 @@ namespace Vha.Chat.UI
             // _save
             // 
             this._save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._save.Location = new System.Drawing.Point(327, 447);
+            this._save.Location = new System.Drawing.Point(327, 550);
             this._save.Name = "_save";
             this._save.Size = new System.Drawing.Size(75, 23);
-            this._save.TabIndex = 13;
+            this._save.TabIndex = 16;
             this._save.Text = "Save";
             this._save.UseVisualStyleBackColor = true;
             this._save.Click += new System.EventHandler(this._save_Click);
             // 
             // _chatOptions
             // 
-            this._chatOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._chatOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._chatOptions.Controls.Add(this.label13);
             this._chatOptions.Controls.Add(this.label6);
+            this._chatOptions.Controls.Add(this._chatTextSize);
             this._chatOptions.Controls.Add(this._ignoreMethod);
             this._chatOptions.Controls.Add(this._panelPosition);
             this._chatOptions.Controls.Add(this.label1);
             this._chatOptions.Controls.Add(this._textStyle);
-            this._chatOptions.Controls.Add(this.label5);
             this._chatOptions.Controls.Add(this.label4);
             this._chatOptions.Controls.Add(this.label3);
             this._chatOptions.Controls.Add(this.label2);
-            this._chatOptions.Controls.Add(this._maximumTexts);
             this._chatOptions.Controls.Add(this._maximumMessages);
             this._chatOptions.Controls.Add(this._maximumHistory);
             this._chatOptions.Location = new System.Drawing.Point(12, 59);
             this._chatOptions.Name = "_chatOptions";
             this._chatOptions.Size = new System.Drawing.Size(390, 183);
-            this._chatOptions.TabIndex = 13;
+            this._chatOptions.TabIndex = 100;
             this._chatOptions.TabStop = false;
             this._chatOptions.Text = "Chat";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(7, 101);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(49, 13);
+            this.label13.TabIndex = 0;
+            this.label13.Text = "Font size";
             // 
             // label6
             // 
@@ -180,6 +199,28 @@ namespace Vha.Chat.UI
             this.label6.Size = new System.Drawing.Size(90, 13);
             this.label6.TabIndex = 0;
             this.label6.Text = "Ignore list method";
+            // 
+            // _chatTextSize
+            // 
+            this._chatTextSize.Location = new System.Drawing.Point(189, 99);
+            this._chatTextSize.Maximum = new decimal(new int[] {
+            24,
+            0,
+            0,
+            0});
+            this._chatTextSize.Minimum = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
+            this._chatTextSize.Name = "_chatTextSize";
+            this._chatTextSize.Size = new System.Drawing.Size(62, 20);
+            this._chatTextSize.TabIndex = 4;
+            this._chatTextSize.Value = new decimal(new int[] {
+            11,
+            0,
+            0,
+            0});
             // 
             // _ignoreMethod
             // 
@@ -217,15 +258,6 @@ namespace Vha.Chat.UI
             this._textStyle.Size = new System.Drawing.Size(192, 21);
             this._textStyle.TabIndex = 1;
             // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 101);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(97, 13);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "Info window history";
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -252,28 +284,6 @@ namespace Vha.Chat.UI
             this.label2.Size = new System.Drawing.Size(103, 13);
             this.label2.TabIndex = 0;
             this.label2.Text = "Lines of input history";
-            // 
-            // _maximumTexts
-            // 
-            this._maximumTexts.Location = new System.Drawing.Point(189, 99);
-            this._maximumTexts.Maximum = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            this._maximumTexts.Minimum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this._maximumTexts.Name = "_maximumTexts";
-            this._maximumTexts.Size = new System.Drawing.Size(62, 20);
-            this._maximumTexts.TabIndex = 4;
-            this._maximumTexts.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
             // 
             // _maximumMessages
             // 
@@ -309,10 +319,41 @@ namespace Vha.Chat.UI
             this._maximumHistory.Size = new System.Drawing.Size(62, 20);
             this._maximumHistory.TabIndex = 2;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(7, 21);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(69, 13);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "History buffer";
+            // 
+            // _maximumTexts
+            // 
+            this._maximumTexts.Location = new System.Drawing.Point(189, 19);
+            this._maximumTexts.Maximum = new decimal(new int[] {
+            500,
+            0,
+            0,
+            0});
+            this._maximumTexts.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this._maximumTexts.Name = "_maximumTexts";
+            this._maximumTexts.Size = new System.Drawing.Size(62, 20);
+            this._maximumTexts.TabIndex = 7;
+            this._maximumTexts.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
             // _proxyOptions
             // 
-            this._proxyOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._proxyOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._proxyOptions.Controls.Add(this.label10);
             this._proxyOptions.Controls.Add(this.label9);
             this._proxyOptions.Controls.Add(this.label8);
@@ -322,10 +363,10 @@ namespace Vha.Chat.UI
             this._proxyOptions.Controls.Add(this._proxyUsername);
             this._proxyOptions.Controls.Add(this._proxyAddress);
             this._proxyOptions.Controls.Add(this._proxyType);
-            this._proxyOptions.Location = new System.Drawing.Point(12, 248);
+            this._proxyOptions.Location = new System.Drawing.Point(12, 357);
             this._proxyOptions.Name = "_proxyOptions";
             this._proxyOptions.Size = new System.Drawing.Size(390, 128);
-            this._proxyOptions.TabIndex = 14;
+            this._proxyOptions.TabIndex = 102;
             this._proxyOptions.TabStop = false;
             this._proxyOptions.Text = "Proxy";
             // 
@@ -371,7 +412,7 @@ namespace Vha.Chat.UI
             this._proxyPassword.Name = "_proxyPassword";
             this._proxyPassword.PasswordChar = '*';
             this._proxyPassword.Size = new System.Drawing.Size(192, 20);
-            this._proxyPassword.TabIndex = 11;
+            this._proxyPassword.TabIndex = 14;
             // 
             // _proxyPort
             // 
@@ -383,7 +424,7 @@ namespace Vha.Chat.UI
             0});
             this._proxyPort.Name = "_proxyPort";
             this._proxyPort.Size = new System.Drawing.Size(62, 20);
-            this._proxyPort.TabIndex = 9;
+            this._proxyPort.TabIndex = 12;
             this._proxyPort.Value = new decimal(new int[] {
             8080,
             0,
@@ -395,14 +436,14 @@ namespace Vha.Chat.UI
             this._proxyUsername.Location = new System.Drawing.Point(189, 73);
             this._proxyUsername.Name = "_proxyUsername";
             this._proxyUsername.Size = new System.Drawing.Size(192, 20);
-            this._proxyUsername.TabIndex = 10;
+            this._proxyUsername.TabIndex = 13;
             // 
             // _proxyAddress
             // 
             this._proxyAddress.Location = new System.Drawing.Point(189, 47);
             this._proxyAddress.Name = "_proxyAddress";
             this._proxyAddress.Size = new System.Drawing.Size(124, 20);
-            this._proxyAddress.TabIndex = 8;
+            this._proxyAddress.TabIndex = 11;
             // 
             // _proxyType
             // 
@@ -411,19 +452,28 @@ namespace Vha.Chat.UI
             this._proxyType.Location = new System.Drawing.Point(189, 19);
             this._proxyType.Name = "_proxyType";
             this._proxyType.Size = new System.Drawing.Size(192, 21);
-            this._proxyType.TabIndex = 7;
+            this._proxyType.TabIndex = 10;
             this._proxyType.SelectedIndexChanged += new System.EventHandler(this._proxyType_SelectedIndexChanged);
             // 
             // _miscOptions
             // 
             this._miscOptions.Controls.Add(this._donateVisible);
             this._miscOptions.Controls.Add(this.label11);
-            this._miscOptions.Location = new System.Drawing.Point(13, 383);
+            this._miscOptions.Location = new System.Drawing.Point(13, 492);
             this._miscOptions.Name = "_miscOptions";
             this._miscOptions.Size = new System.Drawing.Size(389, 45);
-            this._miscOptions.TabIndex = 15;
+            this._miscOptions.TabIndex = 103;
             this._miscOptions.TabStop = false;
             this._miscOptions.Text = "Misc";
+            // 
+            // _donateVisible
+            // 
+            this._donateVisible.AutoSize = true;
+            this._donateVisible.Location = new System.Drawing.Point(188, 19);
+            this._donateVisible.Name = "_donateVisible";
+            this._donateVisible.Size = new System.Drawing.Size(15, 14);
+            this._donateVisible.TabIndex = 15;
+            this._donateVisible.UseVisualStyleBackColor = true;
             // 
             // label11
             // 
@@ -434,20 +484,76 @@ namespace Vha.Chat.UI
             this.label11.TabIndex = 0;
             this.label11.Text = "Show donate button";
             // 
-            // _donateVisible
+            // _infoWindowOptions
             // 
-            this._donateVisible.AutoSize = true;
-            this._donateVisible.Location = new System.Drawing.Point(188, 19);
-            this._donateVisible.Name = "_donateVisible";
-            this._donateVisible.Size = new System.Drawing.Size(15, 14);
-            this._donateVisible.TabIndex = 1;
-            this._donateVisible.UseVisualStyleBackColor = true;
+            this._infoWindowOptions.Controls.Add(this._infoWindowBehavior);
+            this._infoWindowOptions.Controls.Add(this.label14);
+            this._infoWindowOptions.Controls.Add(this.label12);
+            this._infoWindowOptions.Controls.Add(this._infoWindowTextSize);
+            this._infoWindowOptions.Controls.Add(this.label5);
+            this._infoWindowOptions.Controls.Add(this._maximumTexts);
+            this._infoWindowOptions.Location = new System.Drawing.Point(12, 249);
+            this._infoWindowOptions.Name = "_infoWindowOptions";
+            this._infoWindowOptions.Size = new System.Drawing.Size(390, 102);
+            this._infoWindowOptions.TabIndex = 101;
+            this._infoWindowOptions.TabStop = false;
+            this._infoWindowOptions.Text = "Info Window";
+            // 
+            // _infoWindowBehavior
+            // 
+            this._infoWindowBehavior.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._infoWindowBehavior.FormattingEnabled = true;
+            this._infoWindowBehavior.Location = new System.Drawing.Point(189, 71);
+            this._infoWindowBehavior.Name = "_infoWindowBehavior";
+            this._infoWindowBehavior.Size = new System.Drawing.Size(192, 21);
+            this._infoWindowBehavior.TabIndex = 9;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(7, 74);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(49, 13);
+            this.label14.TabIndex = 0;
+            this.label14.Text = "Behavior";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(7, 47);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(49, 13);
+            this.label12.TabIndex = 0;
+            this.label12.Text = "Font size";
+            // 
+            // _infoWindowTextSize
+            // 
+            this._infoWindowTextSize.Location = new System.Drawing.Point(189, 45);
+            this._infoWindowTextSize.Maximum = new decimal(new int[] {
+            24,
+            0,
+            0,
+            0});
+            this._infoWindowTextSize.Minimum = new decimal(new int[] {
+            9,
+            0,
+            0,
+            0});
+            this._infoWindowTextSize.Name = "_infoWindowTextSize";
+            this._infoWindowTextSize.Size = new System.Drawing.Size(62, 20);
+            this._infoWindowTextSize.TabIndex = 8;
+            this._infoWindowTextSize.Value = new decimal(new int[] {
+            11,
+            0,
+            0,
+            0});
             // 
             // OptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(414, 482);
+            this.ClientSize = new System.Drawing.Size(414, 585);
+            this.Controls.Add(this._infoWindowOptions);
             this.Controls.Add(this._miscOptions);
             this.Controls.Add(this._proxyOptions);
             this.Controls.Add(this._chatOptions);
@@ -469,14 +575,18 @@ namespace Vha.Chat.UI
             ((System.ComponentModel.ISupportInitialize)(this._icon)).EndInit();
             this._chatOptions.ResumeLayout(false);
             this._chatOptions.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._maximumTexts)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._chatTextSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._maximumMessages)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._maximumHistory)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._maximumTexts)).EndInit();
             this._proxyOptions.ResumeLayout(false);
             this._proxyOptions.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._proxyPort)).EndInit();
             this._miscOptions.ResumeLayout(false);
             this._miscOptions.PerformLayout();
+            this._infoWindowOptions.ResumeLayout(false);
+            this._infoWindowOptions.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._infoWindowTextSize)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -516,5 +626,12 @@ namespace Vha.Chat.UI
         private System.Windows.Forms.GroupBox _miscOptions;
         private System.Windows.Forms.CheckBox _donateVisible;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.NumericUpDown _chatTextSize;
+        private System.Windows.Forms.GroupBox _infoWindowOptions;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.NumericUpDown _infoWindowTextSize;
+        private System.Windows.Forms.ComboBox _infoWindowBehavior;
+        private System.Windows.Forms.Label label14;
     }
 }

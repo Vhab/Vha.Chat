@@ -214,6 +214,7 @@ namespace Vha.Chat.UI
             // Update AomlBox settings
             this._outputBox.MaximumTexts = args.MaximumTexts;
             this._outputBox.MaximumLines = args.MaximumMessages;
+            this._outputBox.TextSize = args.ChatTextSize;
             // Update donate button
             this._donate.Visible = args.DonateVisible;
         }

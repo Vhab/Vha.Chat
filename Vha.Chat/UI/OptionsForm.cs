@@ -59,6 +59,9 @@ namespace Vha.Chat.UI
             this._proxyType.Items.Add(ProxyType.Socks4a);
             this._proxyType.Items.Add(ProxyType.Socks5);
             this._proxyType.SelectedIndex = 0;
+            this._infoWindowBehavior.Items.Add(InfoWindowBehavior.OpenNew);
+            this._infoWindowBehavior.Items.Add(InfoWindowBehavior.UseExisting);
+            this._infoWindowBehavior.SelectedIndex = 0;
 
             // Manually trigger this to get in sync
             this._readOptions(this._context.Options);
@@ -109,12 +112,15 @@ namespace Vha.Chat.UI
         private void _readOptions(Options o)
         {
             // Sync options with visuals
+            this._chatTextSize.Value = o.ChatTextSize;
+            this._infoWindowTextSize.Value = o.InfoWindowTextSize;
             this._textStyle.SelectedItem = o.TextStyle;
             this._maximumHistory.Value = o.MaximumHistory;
             this._maximumMessages.Value = o.MaximumMessages;
             this._maximumTexts.Value = o.MaximumTexts;
             this._panelPosition.SelectedItem = o.PanelPosition;
             this._ignoreMethod.SelectedItem = o.IgnoreMethod;
+            this._infoWindowBehavior.SelectedItem = o.InfoWindowBehavior;
             // Proxy
             this._proxyType.SelectedItem = o.Proxy.Type;
             this._proxyAddress.Text = o.Proxy.Address;
@@ -132,12 +138,15 @@ namespace Vha.Chat.UI
             // Ensure the proxy data is good
             if (!_checkProxy()) return false;
             // Options
+            o.ChatTextSize = (int)this._chatTextSize.Value;
+            o.InfoWindowTextSize = (int)this._infoWindowTextSize.Value;
             o.TextStyle = (TextStyle)this._textStyle.SelectedItem;
             o.MaximumHistory = (int)this._maximumHistory.Value;
             o.MaximumMessages = (int)this._maximumMessages.Value;
             o.MaximumTexts = (int)this._maximumTexts.Value;
             o.PanelPosition = (HorizontalPosition)this._panelPosition.SelectedItem;
             o.IgnoreMethod = (IgnoreMethod)this._ignoreMethod.SelectedItem;
+            o.InfoWindowBehavior = (InfoWindowBehavior)this._infoWindowBehavior.SelectedItem;
             // Proxy
             o.Proxy.Type = (ProxyType)this._proxyType.SelectedItem;
             o.Proxy.Address = this._proxyAddress.Text;

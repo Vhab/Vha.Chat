@@ -75,6 +75,7 @@ namespace Vha.Chat.UI
             }
             this._outputBox.MaximumTexts = args.MaximumTexts;
             this._outputBox.MaximumLines = args.MaximumMessages;
+            this._outputBox.TextSize = args.ChatTextSize;
         }
 
         private void ChatPopupForm_FormClosed(object sender, FormClosedEventArgs e)

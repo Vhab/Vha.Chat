@@ -6,7 +6,6 @@
 <style type="text/css">
     body {
         font-family: verdana, helvetica, sans-serif;
-        font-size: 11px;
         padding: 0px 3px 0px 1px;
         margin: 0px;
     }
@@ -231,7 +230,7 @@ e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["
         if (typeof jQuery == "undefined") return false;
         return true;
     }
-  
+
     function setForegroundColor(color)
     {
         if (!isLoaded()) return;
@@ -250,6 +249,11 @@ e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["
         $('body').css('paddingBottom', bottom);
         $('body').css('paddingLeft', left);
     }
+    function setTextSize(size)
+    {
+        if (!isLoaded()) return;
+        $('body').css('font-size', size + 'px');
+    }
     
     function write(html, maximumLines)
     {
@@ -266,6 +270,13 @@ e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["
             // Remove top element
             $('body').children().first().remove();
         }
+    }
+
+    function clear()
+    {
+        if (!isLoaded()) return;
+        // Remove all elements
+        $('body').children().remove();
     }
     
     function scrollToBottom()

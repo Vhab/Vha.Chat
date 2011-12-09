@@ -37,5 +37,5 @@ using System;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.3.1.{MERCURIAL_REVISION_NUMBER}")]
-[assembly: AssemblyFileVersion("1.3.1.{MERCURIAL_REVISION_NUMBER}")]
+[assembly: AssemblyVersion("1.3.2.{MERCURIAL_REVISION_NUMBER}")]
+[assembly: AssemblyFileVersion("1.3.2.{MERCURIAL_REVISION_NUMBER}")]

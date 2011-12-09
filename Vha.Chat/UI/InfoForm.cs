@@ -33,6 +33,25 @@ namespace Vha.Chat.UI
 {
     public partial class InfoForm : BaseForm
     {
+        private static List<InfoForm> _activeForms = new List<InfoForm>();
+
+        public static bool HasActiveForms
+        {
+            get { lock (_activeForms) return _activeForms.Count > 0; }
+        }
+
+        public static InfoForm LatestActiveForm
+        {
+            get
+            {
+                lock (_activeForms)
+                {
+                    if (_activeForms.Count <= 0) return null;
+                    return _activeForms[_activeForms.Count - 1];
+                }
+            }
+        }
+
         protected Form _parent = null;
         protected Context _context = null;
 
@@ -51,7 +70,42 @@ namespace Vha.Chat.UI
             this._info.Write("{0}", element, TextStyle.Default, false);
             this._info.InnerPadding = new Padding(7, 6, 7, 7);
             this._info.EnableImages = true;
-            this._info.Initialize(context.Configuration.OutputMode);
+            this._info.Initialize(this._context.Configuration.OutputMode);
+
+            // Force options update manually
+            this._context_SavedEvent(this._context, this._context.Options);
+            // Listen to future updates
+            this._context.Options.SavedEvent += new Handler<Options>(this._context_SavedEvent);
+
+            // Used to keep track of open forms
+            lock (_activeForms) _activeForms.Add(this);
+            this.FormClosed += new FormClosedEventHandler(_onClosed);
+        }
+
+        private delegate void ReplaceContentDelegate(Element element);
+        public void ReplaceContent(Element element)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new ReplaceContentDelegate(ReplaceContent),
+                    new object[] { element });
+                return;
+            }
+            this._info.Clear();
+            this._info.Write("{0}", element, TextStyle.Default, false);
+        }
+
+        private void _context_SavedEvent(Context context, Options args)
+        {
+            this._info.TextSize = context.Options.InfoWindowTextSize;
+        }
+
+        private void _onClosed(object sender, FormClosedEventArgs e)
+        {
+            lock (_activeForms) _activeForms.Remove(this);
+            this.FormClosed -= new FormClosedEventHandler(_onClosed);
+            this._context.Options.SavedEvent -= new Handler<Options>(this._context_SavedEvent);
         }
     }
 }

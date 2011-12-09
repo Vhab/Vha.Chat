@@ -28,6 +28,8 @@ namespace Vha.Chat.Data
     [XmlRoot("Root")]
     public class OptionsV1 : Base
     {
+        public int ChatTextSize = 11;
+        public int InfoWindowTextSize = 11;
         public int MaximumMessages = 250;
         public int MaximumTexts = 50;
         public int MaximumHistory = 20;
@@ -35,6 +37,7 @@ namespace Vha.Chat.Data
         public TextStyle TextStyle = TextStyle.Strip;
         public IgnoreMethod IgnoreMethod = IgnoreMethod.Character;
         public HorizontalPosition PanelPosition = HorizontalPosition.Right;
+        public InfoWindowBehavior InfoWindowBehavior = InfoWindowBehavior.OpenNew;
 
         public OptionsV1Proxy Proxy = null;
 

@@ -42,6 +42,16 @@ namespace Vha.Chat
         /// </summary>
         public event Handler<Options> SavedEvent;
 
+        public int ChatTextSize
+        {
+            get { return this._options.ChatTextSize; }
+            set { this._options.ChatTextSize = value; this.Touch(); }
+        }
+        public int InfoWindowTextSize
+        {
+            get { return this._options.InfoWindowTextSize; }
+            set { this._options.InfoWindowTextSize = value; this.Touch(); }
+        }
         public int MaximumMessages
         {
             get { return this._options.MaximumMessages; }
@@ -76,6 +86,11 @@ namespace Vha.Chat
         {
             get { return this._options.PanelPosition; }
             set { this._options.PanelPosition = value; this.Touch(); }
+        }
+        public InfoWindowBehavior InfoWindowBehavior
+        {
+            get { return this._options.InfoWindowBehavior; }
+            set { this._options.InfoWindowBehavior = value; this.Touch(); }
         }
         public OptionsProxy Proxy
         {

@@ -191,4 +191,16 @@ namespace Vha.Chat
         Socks4a,
         Socks5
     }
+
+    public enum InfoWindowBehavior
+    {
+        /// <summary>
+        /// Only create a new info window of no other window exists
+        /// </summary>
+        UseExisting,
+        /// <summary>
+        /// Always create a new info window
+        /// </summary>
+        OpenNew
+    }
 }

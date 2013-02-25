@@ -18,7 +18,7 @@ using System;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vha.Chat Development Team")]
 [assembly: AssemblyProduct("Vha.AOML")]
-[assembly: AssemblyCopyright("Copyright ©  2010 Remco van Oosterhout")]
+[assembly: AssemblyCopyright("Copyright © 2010-2013 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

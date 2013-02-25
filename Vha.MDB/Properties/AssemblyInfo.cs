@@ -18,7 +18,7 @@ using System;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vha.Chat Development Team")]
 [assembly: AssemblyProduct("Vha.MDB")]
-[assembly: AssemblyCopyright("Copyright ©  2005-2010 Remco van Oosterhout")]
+[assembly: AssemblyCopyright("Copyright © 2005-2013 Remco van Oosterhout")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

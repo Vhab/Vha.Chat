@@ -70,7 +70,7 @@ namespace Vha.Chat.UI
             this._copyright.Name = "_copyright";
             this._copyright.Size = new System.Drawing.Size(230, 13);
             this._copyright.TabIndex = 3;
-            this._copyright.Text = "Copyright © 2009-2010 Remco van Oosterhout";
+            this._copyright.Text = "Copyright © 2009-2013 Remco van Oosterhout";
             // 
             // _license
             // 

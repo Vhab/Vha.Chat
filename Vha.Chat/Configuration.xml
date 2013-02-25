@@ -3,9 +3,8 @@
   <OptionsPath>.</OptionsPath>
   <OptionsFile>Options.xml</OptionsFile>
   <IgnoresFile>Ignores.xml</IgnoresFile>
-  <Dimension Name="Atlantean" Address="chat.d1.funcom.com" Port="7101" />
-  <Dimension Name="Rimor" Address="chat.d2.funcom.com" Port="7102" />
-  <Dimension Name="Test" Address="chat.dt.funcom.com" Port="7109" />
-  <!--Valid values: Detect, Direct, Delayed, External -->
+  <Dimension Name="Rubi-Ka" Address="chat.d1.funcom.com" Port="7105" />
+  <Dimension Name="TestLive" Address="chat.dt.funcom.com" Port="7109" />
+  <!-- Valid values: Detect, Direct, Delayed, External -->
   <OutputMode>Detect</OutputMode>
 </Root>

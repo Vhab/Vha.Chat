@@ -227,6 +227,21 @@ namespace Vha.AOML
             this.root = new ContainerElement();
         }
 
+        /// <summary>
+        /// Appends an element to the current instance
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public Builder Element(Element element)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException();
+            }
+            this.Add(element.Clone());
+            return this;
+        }
+
         #region Internal
         private Stack<Element> depth = new Stack<Element>();
         private ContainerElement root = new ContainerElement();

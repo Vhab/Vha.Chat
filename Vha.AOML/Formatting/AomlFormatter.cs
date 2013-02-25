@@ -128,7 +128,7 @@ namespace Vha.AOML.Formatting
             {
                 case LinkType.Command:
                     CommandLink command = (CommandLink)element.Link;
-                    href = "chatcmd://" + command.Command;
+                    href = "chatcmd://" + Web.EscapeHtml(command.Command);
                     break;
                 case LinkType.Window:
                     WindowLink window = (WindowLink)element.Link;
@@ -152,11 +152,11 @@ namespace Vha.AOML.Formatting
                     break;
                 case LinkType.User:
                     UserLink user = (UserLink)element.Link;
-                    href = "user://" + user.Character;
+                    href = "user://" + Web.EscapeHtml(user.Character);
                     break;
                 case LinkType.Other:
                     OtherLink other = (OtherLink)element.Link;
-                    href = other.Uri.ToString(); // Leave empty as it's potentially harmful
+                    href = other.Uri.ToString();
                     break;
                 case LinkType.Invalid:
                     href = ""; // Leave empty as it's potentially harmful

@@ -238,9 +238,10 @@ namespace Vha.AOML
             string type = href.Substring(0, index).ToLower();
             string argument = href.Substring(index + 3);
             Link link = null;
+            Element windowElement = null;
             // Verify header
             Regex validCharacters = new Regex("^[a-zA-Z]+$");
-            if (!validCharacters.IsMatch(type))
+            if (!validCharacters.IsMatch(type) || argument.Length == 0)
             {
                 // Invalid link
                 link = new InvalidLink(href);
@@ -251,7 +252,9 @@ namespace Vha.AOML
                 switch (type)
                 {
                     case "text":
-                        link = new WindowLink(Parse(argument));
+                        windowElement = Parse(argument);
+                        if (windowElement == null) { break; }
+                        link = new WindowLink(windowElement);
                         break;
                     case "charref":
                         index = argument.IndexOf("/");
@@ -259,7 +262,9 @@ namespace Vha.AOML
                         index = argument.IndexOf("/", index + 1);
                         if (index <= 0) { break; }
                         argument = argument.Substring(index + 1);
-                        link = new WindowLink(Parse(argument));
+                        windowElement = Parse(argument);
+                        if (windowElement == null) { break; }
+                        link = new WindowLink(windowElement);
                         break;
                     case "itemref":
                         string[] parts = argument.Split('/');

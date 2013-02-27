@@ -30,10 +30,10 @@ namespace Vha.Chat.Data
     {
         public int ChatTextSize = 11;
         public int InfoWindowTextSize = 11;
-        public int MaximumMessages = 250;
-        public int MaximumTexts = 50;
-        public int MaximumHistory = 20;
-        public int MessageBuffer = 15;
+        public int MaximumMessages = 1000;
+        public int MaximumTexts = 100;
+        public int MaximumHistory = 50;
+        public int MessageBuffer = 50;
         public TextStyle TextStyle = TextStyle.Strip;
         public IgnoreMethod IgnoreMethod = IgnoreMethod.Character;
         public HorizontalPosition PanelPosition = HorizontalPosition.Right;

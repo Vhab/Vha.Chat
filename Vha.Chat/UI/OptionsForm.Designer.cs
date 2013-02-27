@@ -289,7 +289,7 @@ namespace Vha.Chat.UI
             // 
             this._maximumMessages.Location = new System.Drawing.Point(189, 73);
             this._maximumMessages.Maximum = new decimal(new int[] {
-            1000,
+            10000,
             0,
             0,
             0});
@@ -302,7 +302,7 @@ namespace Vha.Chat.UI
             this._maximumMessages.Size = new System.Drawing.Size(62, 20);
             this._maximumMessages.TabIndex = 3;
             this._maximumMessages.Value = new decimal(new int[] {
-            50,
+            1000,
             0,
             0,
             0});
@@ -311,7 +311,7 @@ namespace Vha.Chat.UI
             // 
             this._maximumHistory.Location = new System.Drawing.Point(189, 47);
             this._maximumHistory.Maximum = new decimal(new int[] {
-            250,
+            1000,
             0,
             0,
             0});
@@ -332,7 +332,7 @@ namespace Vha.Chat.UI
             // 
             this._maximumTexts.Location = new System.Drawing.Point(189, 19);
             this._maximumTexts.Maximum = new decimal(new int[] {
-            500,
+            1000,
             0,
             0,
             0});

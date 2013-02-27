@@ -81,6 +81,7 @@ namespace Vha.Chat.UI
         private void ChatPopupForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             this._context.MessageEvent -= new Handler<MessageEventArgs>(_context_MessageEvent);
+            this._context.Options.SavedEvent -= new Handler<Options>(_context_SavedEvent);
         }
 
         private void _context_MessageEvent(Context context, MessageEventArgs args)

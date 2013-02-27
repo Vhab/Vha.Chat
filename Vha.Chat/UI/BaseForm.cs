@@ -109,6 +109,10 @@ namespace Vha.Chat.UI
                 window.Maximized = true;
             }
             this._context.Options.Save();
+            // Unhook events
+            this.Move -= new EventHandler(BaseForm_Move);
+            this.Resize -= new EventHandler(BaseForm_Resize);
+            this.FormClosed -= new FormClosedEventHandler(BaseForm_FormClosed);
         }
 
         private void BaseForm_Resize(object sender, EventArgs e)

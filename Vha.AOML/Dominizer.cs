@@ -268,7 +268,7 @@ namespace Vha.AOML
                         break;
                     case "itemref":
                         string[] itemParts = argument.Split('/');
-                        if (itemParts.Length != 3) break;
+                        if (itemParts.Length != 3) { break; }
                         uint lowId, highId, ql;
                         if (!uint.TryParse(itemParts[0], out lowId)) { break; }
                         if (!uint.TryParse(itemParts[1], out highId)) { break; }
@@ -278,7 +278,7 @@ namespace Vha.AOML
                     case "itemid":
                         string[] entityParts = argument.Split('/');
                         // itemid:// can come with 4 arguments, but we have no use for the last 2
-                        if (entityParts.Length != 2 && entityParts.Length != 4) break;
+                        if (entityParts.Length != 2 && entityParts.Length != 4) { break; }
                         uint typeId, instanceId;
                         if (!uint.TryParse(entityParts[0], out typeId)) { break; }
                         if (!uint.TryParse(entityParts[1], out instanceId)) { break; }

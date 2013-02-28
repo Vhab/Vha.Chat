@@ -44,7 +44,7 @@ namespace Vha.AOML.DOM
         /// <param name="typeID">The type id of the entity</param>
         /// <param name="instanceID">The template id of the entity</param>
         public EntityLink(UInt32 typeID, UInt32 instanceID)
-            : base(LinkType.Item)
+            : base(LinkType.Entity)
         {
             this.TypeID = typeID;
             this.InstanceID = instanceID;

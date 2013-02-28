@@ -130,6 +130,12 @@ namespace Vha.Chat.UI.Controls
                         item.LowID, item.HighID, item.Quality);
                     title = href;
                     break;
+                case LinkType.Entity:
+                    EntityLink entity = (EntityLink)element.Link;
+                    href = string.Format("itemid://{0}/{1}",
+                        entity.TypeID, entity.InstanceID);
+                    title = href;
+                    break;
                 case LinkType.User:
                     UserLink user = (UserLink)element.Link;
                     href = "character://" + HttpUtility.UrlEncode(user.Character);

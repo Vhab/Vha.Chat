@@ -32,7 +32,8 @@ namespace Vha.Chat.UI
     public enum BrowserFormType
     {
         Url,
-        Item
+        Item,
+        Entity
     }
 
     public partial class BrowserForm : BaseForm
@@ -45,9 +46,22 @@ namespace Vha.Chat.UI
             // Handle argument
             switch (type)
             {
+                case BrowserFormType.Entity:
+                    string[] entityParts = argument.Split(new char[] { '/' });
+                    if (entityParts.Length < 2)
+                    {
+                        this._browser.DocumentText = "Invalid entity: " + argument;
+                        return;
+                    }
+                    else
+                    {
+                        string url = "http://www.xyphos.com/ao/aodb.php?id={0}&minimode=1";
+                        this._browser.Navigate(string.Format(url, entityParts[1]));
+                    }
+                    break;
                 case BrowserFormType.Item:
-                    string[] parts = argument.Split(new char[] { '/' });
-                    if (parts.Length < 3)
+                    string[] itemParts = argument.Split(new char[] { '/' });
+                    if (itemParts.Length < 3)
                     {
                         this._browser.DocumentText = "Invalid item: " + argument;
                         return;
@@ -55,7 +69,7 @@ namespace Vha.Chat.UI
                     else
                     {
                         string url = "http://www.xyphos.com/ao/aodb.php?id={0}&id2={1}&ql={2}&minimode=1";
-                        this._browser.Navigate(string.Format(url, parts[0], parts[1], parts[2]));
+                        this._browser.Navigate(string.Format(url, itemParts[0], itemParts[1], itemParts[2]));
                     }
                     break;
                 case BrowserFormType.Url:

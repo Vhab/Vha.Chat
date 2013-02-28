@@ -390,6 +390,11 @@ namespace Vha.Chat.UI.Controls
                     if (e.MouseButtonsPressed != MouseButtons.Left && e.MouseButtonsPressed != MouseButtons.Middle) return;
                     Utils.InvokeShow(Program.ApplicationContext.MainForm, new BrowserForm(this._context, argument, BrowserFormType.Item));
                     return;
+                case "itemid":
+                    // Left and middle clicks on itemid:// shows item window
+                    if (e.MouseButtonsPressed != MouseButtons.Left && e.MouseButtonsPressed != MouseButtons.Middle) return;
+                    Utils.InvokeShow(Program.ApplicationContext.MainForm, new BrowserForm(this._context, argument, BrowserFormType.Entity));
+                    return;
                 case "character":
                     target = new MessageTarget(MessageType.Character, argument);
                     break;

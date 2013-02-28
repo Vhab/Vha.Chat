@@ -28,6 +28,7 @@ namespace Vha.AOML.DOM
         Command,
         Window,
         Item,
+        Entity,
         User,
         Other,
         Invalid

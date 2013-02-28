@@ -56,6 +56,9 @@ namespace Vha.AOML
         private const String Lowid = "low";
         private const String Highid = "high";
         private const String Quality = "ql";
+        private const String Entity = "entity";
+        private const String Typeid = "type";
+        private const String Instanceid = "instance";
         private const String User = "user";
         private const String Name = "name";
         private const String Style = "style";
@@ -265,6 +268,9 @@ namespace Vha.AOML
                 case Item:
                     HandleItem(node, builder);
                     break;
+                case Entity:
+                    HandleEntity(node, builder);
+                    break;
                 case User:
                     HandleUser(node, builder, windowNesting);
                     break;
@@ -386,6 +392,34 @@ namespace Vha.AOML
                                                        Quality, quality.Value));
             }
             builder.BeginLink(new ItemLink(low, high, ql), GetStyle(node));
+        }
+
+        private static void HandleEntity(XmlElement node, Builder builder)
+        {
+            XmlAttribute typeid = node.Attributes[Typeid];
+            uint type, instance;
+            if (typeid == null)
+            {
+                throw new AOXMLException(String.Format("'{0}' element without '{1}' attribute",
+                                                       Entity, Typeid));
+            }
+            else if (!uint.TryParse(typeid.Value, out type))
+            {
+                throw new AOXMLException(String.Format("'{0}' attribute has invalid value {1}",
+                                                       Typeid, typeid.Value));
+            }
+            XmlAttribute instanceid = node.Attributes[Instanceid];
+            if (instanceid == null)
+            {
+                throw new AOXMLException(String.Format("'{0}' element without '{1}' attribute",
+                                                       Entity, Instanceid));
+            }
+            else if (!uint.TryParse(instanceid.Value, out instance))
+            {
+                throw new AOXMLException(String.Format("'{0}' attribute has invalid value {1}",
+                                                       Instanceid, instanceid.Value));
+            }
+            builder.BeginLink(new EntityLink(type, instance), GetStyle(node));
         }
 
         private static void HandleCustomlink(XmlElement node, Builder builder, int nesting)

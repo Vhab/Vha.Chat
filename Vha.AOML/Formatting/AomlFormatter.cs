@@ -150,6 +150,12 @@ namespace Vha.AOML.Formatting
                         item.HighID, 
                         item.Quality);
                     break;
+                case LinkType.Entity:
+                    EntityLink entity = (EntityLink)element.Link;
+                    href = string.Format("itemid://{0}/{1}",
+                        entity.TypeID,
+                        entity.InstanceID);
+                    break;
                 case LinkType.User:
                     UserLink user = (UserLink)element.Link;
                     href = "user://" + Web.EscapeHtml(user.Character);

@@ -73,6 +73,7 @@
     <Compile Include="DOM\ContainerElement.cs" />
     <Compile Include="DOM\Element.cs" />
     <Compile Include="DOM\ElementCollection.cs" />
+    <Compile Include="DOM\EntityLink.cs" />
     <Compile Include="DOM\ImageElement.cs" />
     <Compile Include="DOM\InvalidLink.cs" />
     <Compile Include="DOM\ItalicElement.cs" />

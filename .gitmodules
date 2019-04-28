@@ -1,9 +1,6 @@
 [submodule "Vha.Build"]
 	path = Vha.Build
 	url = ../vha.build
-[submodule "Starksoft.Net.Proxy"]
-	path = Starksoft.Net.Proxy
-	url = ../starksoft.net.proxy
 [submodule "Vha.Common"]
 	path = Vha.Common
 	url = ../vha.common

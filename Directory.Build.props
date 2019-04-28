@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>6</LangVersion>
+    <Version>1.4.0</Version>
+    <Authors>Remco van Oosterhout</Authors>
+    <Copyright>Copyright © 2010-2019 Remco van Oosterhout</Copyright>
+    <RepositoryUrl>https://github.com/Vhab/Vha.Chat</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+    <Determinstic>true</Determinstic>
+  </PropertyGroup>
+</Project>

@@ -1,6 +1,3 @@
-[submodule "Vha.Build"]
-	path = Vha.Build
-	url = ../vha.build
 [submodule "Vha.Common"]
 	path = Vha.Common
 	url = ../vha.common

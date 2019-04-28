@@ -4,9 +4,6 @@
 [submodule "Vha.Common"]
 	path = Vha.Common
 	url = ../vha.common
-[submodule "Vha.AOML"]
-	path = Vha.AOML
-	url = ../vha.aoml
 [submodule "Vha.MDB"]
 	path = Vha.MDB
 	url = ../vha.mdb

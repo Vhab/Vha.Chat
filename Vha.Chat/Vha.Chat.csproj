@@ -15,4 +15,10 @@
     <ProjectReference Include="..\Vha.MDB\Vha.MDB.csproj" />
     <ProjectReference Include="..\Vha.Net\Vha.Net.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="UI\**\*Form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7BA3A4CF-1E58-465C-B614-151F8BEA848E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Vha.Net</RootNamespace>
+    <AssemblyName>Vha.Net</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Vha.Net.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Channel.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Events\AmdMuxInfoEventArgs.cs" />
+    <Compile Include="Events\BroadcastMessageEventArgs.cs" />
+    <Compile Include="Events\ChannelStatusEventArgs.cs" />
+    <Compile Include="Events\ChannelMessageEventArgs.cs" />
+    <Compile Include="Events\CharacterIDEventArgs.cs" />
+    <Compile Include="Events\DebugEventArgs.cs" />
+    <Compile Include="Events\ForwardEventArgs.cs" />
+    <Compile Include="Events\FriendStatusEventArgs.cs" />
+    <Compile Include="Events\LoginChararacterListEventArgs.cs" />
+    <Compile Include="Events\LoginErrorEventArgs.cs" />
+    <Compile Include="Events\LoginSeedEventArgs.cs" />
+    <Compile Include="Events\NameLookupEventArgs.cs" />
+    <Compile Include="Events\PrivateChannelMessageEventArgs.cs" />
+    <Compile Include="Events\PrivateChannelRequestEventArgs.cs" />
+    <Compile Include="Events\PrivateChannelStatusEventArgs.cs" />
+    <Compile Include="Events\PrivateMessageEventArgs.cs" />
+    <Compile Include="Events\SimpleMessageEventArgs.cs" />
+    <Compile Include="Events\StateChangeEventArgs.cs" />
+    <Compile Include="Events\SystemMessageEventArgs.cs" />
+    <Compile Include="Events\UnknownPacketEventArgs.cs" />
+    <Compile Include="Events\VicinityMessageEventArgs.cs" />
+    <Compile Include="Friend.cs" />
+    <Compile Include="Packets\FriendAddPacket.cs" />
+    <Compile Include="Packets\FriendRemovePacket.cs" />
+    <Compile Include="PrivateChannel.cs" />
+    <Compile Include="Proxy.cs" />
+    <Compile Include="Packets\AmdMuxInfoPacket.cs" />
+    <Compile Include="Packets\BroadcastMessagePacket.cs" />
+    <Compile Include="Packets\ChannelUpdatePacket.cs" />
+    <Compile Include="Packets\ClientNamePacket.cs" />
+    <Compile Include="NetConvert.cs" />
+    <Compile Include="NetString.cs" />
+    <Compile Include="Packets\FriendStatusPacket.cs" />
+    <Compile Include="Chat.cs" />
+    <Compile Include="Packets\ChatCommandPacket.cs" />
+    <Compile Include="Packets\EmptyPacket.cs" />
+    <Compile Include="Delegates.cs" />
+    <Compile Include="Packets\ForwardPacket.cs" />
+    <Compile Include="Packets\ChannelStatusPacket.cs" />
+    <Compile Include="Packets\ChannelMessagePacket.cs" />
+    <Compile Include="LoginCharacter.cs" />
+    <Compile Include="Packets\LoginCharacterListPacket.cs" />
+    <Compile Include="Packets\LoginSeedPacket.cs" />
+    <Compile Include="Packets\NameLookupPacket.cs" />
+    <Compile Include="Packets\Packet.cs" />
+    <Compile Include="PacketQueue.cs" />
+    <Compile Include="Packets\PrivateChannelStatusPacket.cs" />
+    <Compile Include="Packets\PrivateChannelMessagePacket.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Packets\SimpleIdPacket.cs" />
+    <Compile Include="Packets\SimpleStringPacket.cs" />
+    <Compile Include="Packets\SystemMessagePacket.cs" />
+    <Compile Include="Packets\PrivateMessagePacket.cs" />
+    <Compile Include="Packets\UnknownPacket.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Starksoft.Net.Proxy\Starksoft.Net.Proxy.csproj">
+      <Project>{56EB350E-089E-40BB-97CB-F2745A4251AE}</Project>
+      <Name>Starksoft.Net.Proxy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Vha.Common\Vha.Common.csproj">
+      <Project>{711F8307-944C-4864-8D5E-0987C87E903A}</Project>
+      <Name>Vha.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vha.Net.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

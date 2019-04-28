@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Vha.AOML
+Copyright (C) 2010-2011 Remco van Oosterhout
+See Credits.txt for all aknowledgements.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License only.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+USA
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://aodevs.com/xsd/AOXML.v1.xsd"
+           elementFormDefault="qualified"
+           xmlns:mstns="http://aodevs.com/xsd/AOXML.v1.xsd"
+           targetNamespace="http://aodevs.com/xsd/AOXML.v1.xsd">
+
+  <xs:complexType name="Image">
+    <xs:attribute name="src" type="xs:string" />
+  </xs:complexType>
+
+  <xs:complexType name="Whitespace">
+    <xs:attribute name="count" type="xs:positiveInteger" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="Color">
+    <xs:attribute name="value" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="#([a-fA-F0-9]){6}" />
+          <xs:pattern value="([^#]){1}([a-zA-Z0-9])+" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="BaseLink">
+    <xs:complexContent>
+      <xs:extension base="MarkupWithoutAnyLinks">
+        <xs:attribute name="style" use="optional" default="true" type="xs:boolean" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Command">
+    <xs:complexContent>
+      <xs:extension base="BaseLink">
+        <xs:attribute name="value" use="required" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Item">
+    <xs:complexContent>
+      <xs:extension base="BaseLink">
+        <xs:attribute name="low" use="required" type="xs:positiveInteger" />
+        <xs:attribute name="high" use="required" type="xs:positiveInteger" />
+        <xs:attribute name="ql" use="required" type="xs:positiveInteger" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="User">
+    <xs:complexContent>
+      <xs:extension base="BaseLink">
+        <xs:attribute name="name" use="required" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="CustomLink">
+    <xs:complexContent>
+      <xs:extension base="BaseLink">
+        <xs:attribute name="href" use="required" type="xs:anyURI" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Window">
+    <xs:sequence>
+      <xs:element name="link" type="BaseLink" />
+      <xs:element name="content" type="WindowMarkup" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:group name="ElementsWithoutAnyLinks">
+    <xs:choice>
+      <xs:element name="text" type="xs:string" />
+      <xs:element name="i" type="MarkupWithoutAnyLinks" />
+      <xs:element name="br">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="u" type="MarkupWithoutAnyLinks" />
+      <xs:element name="color">
+        <xs:complexType mixed="true">
+          <xs:complexContent>
+            <xs:extension base="Color">
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="ElementsWithoutAnyLinks" />
+              </xs:choice>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="whitespace" type="Whitespace" />
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="Elements">
+    <xs:choice>
+      <xs:element name="text" type="xs:string" />
+      <xs:element name="i" type="Markup" />
+      <xs:element name="br">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="u" type="Markup" />
+      <xs:element name="color">
+        <xs:complexType mixed="true">
+          <xs:complexContent>
+            <xs:extension base="Color">
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="Elements" />
+              </xs:choice>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="item" type="Item" />
+      <xs:element name="user" type="User" />
+      <xs:element name="whitespace" type="Whitespace" />
+    </xs:choice>
+  </xs:group>
+
+  <xs:group name="WindowElements">
+    <xs:choice>
+      <xs:element name="text" type="xs:string" />
+      <xs:element name="i" type="WindowMarkup" />
+      <xs:element name="br">
+        <xs:complexType />
+      </xs:element>
+      <xs:element name="u" type="WindowMarkup" />
+      <xs:element name="color">
+        <xs:complexType mixed="true">
+          <xs:complexContent>
+            <xs:extension base="Color">
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:group ref="WindowElements" />
+              </xs:choice>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="item" type="Item" />
+      <xs:element name="user" type="User" />
+      <xs:element name="customlink" type="CustomLink" />
+      <xs:element name="command" type="Command" />
+      <xs:element name="block" type="WindowMarkup" />
+      <xs:element name="left" type="WindowMarkup" />
+      <xs:element name="center" type="WindowMarkup" />
+      <xs:element name="right" type="WindowMarkup" />
+      <xs:element name="img" type="Image" />
+      <xs:element name="window" type="Window" />
+      <xs:element name="whitespace" type="Whitespace" />
+    </xs:choice>
+  </xs:group>
+
+  <xs:complexType name="Markup" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="Elements" />
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="WindowMarkup" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="WindowElements" />
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="MarkupWithoutAnyLinks" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="ElementsWithoutAnyLinks" />
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="AOXML" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="Elements" />
+      <xs:element name="window" type="Window" />
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:element name="aoxml" type="AOXML" />
+
+</xs:schema>

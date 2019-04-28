@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{817796E9-C1DC-41EF-A279-8589C732FCFC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Vha.AOML</RootNamespace>
+    <AssemblyName>Vha.AOML</AssemblyName>
+    <AssemblyOriginatorKeyFile>Vha.AOML.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <StartupObject>
+    </StartupObject>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AOXML.cs" />
+    <Compile Include="AOXMLException.cs" />
+    <Compile Include="Builder.cs" />
+    <Compile Include="Dominizer.cs" />
+    <Compile Include="CloseNode.cs" />
+    <Compile Include="ContentNode.cs" />
+    <Compile Include="DOM\AlignElement.cs" />
+    <Compile Include="DOM\BreakElement.cs" />
+    <Compile Include="DOM\Color.cs" />
+    <Compile Include="DOM\ColorElement.cs" />
+    <Compile Include="DOM\CommandLink.cs" />
+    <Compile Include="DOM\ContainerElement.cs" />
+    <Compile Include="DOM\Element.cs" />
+    <Compile Include="DOM\ElementCollection.cs" />
+    <Compile Include="DOM\EntityLink.cs" />
+    <Compile Include="DOM\ImageElement.cs" />
+    <Compile Include="DOM\InvalidLink.cs" />
+    <Compile Include="DOM\ItalicElement.cs" />
+    <Compile Include="DOM\ItemLink.cs" />
+    <Compile Include="DOM\Link.cs" />
+    <Compile Include="DOM\LinkElement.cs" />
+    <Compile Include="DOM\OtherLink.cs" />
+    <Compile Include="DOM\TextElement.cs" />
+    <Compile Include="DOM\UnderlineElement.cs" />
+    <Compile Include="DOM\UserLink.cs" />
+    <Compile Include="DOM\WindowLink.cs" />
+    <Compile Include="Formatting\AomlFormatter.cs" />
+    <Compile Include="Formatting\Formatter.cs" />
+    <Compile Include="Formatting\PlainTextFormatter.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="NodeCollection.cs" />
+    <Compile Include="OpenNode.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Formatting\TextFormatter.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="TokenCollection.cs" />
+    <Compile Include="Tokenizer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AOXML.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Resources\TextColors.xml" />
+    <None Include="Vha.AOML.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vha.Common\Vha.Common.csproj">
+      <Project>{711F8307-944C-4864-8D5E-0987C87E903A}</Project>
+      <Name>Vha.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

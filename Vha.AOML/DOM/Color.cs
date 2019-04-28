@@ -180,9 +180,8 @@ namespace Vha.AOML.DOM
                 if (defaultColors.Count > 0) { return; }
                 // Load TextColors.xml
 
-                MemoryStream stream = new MemoryStream(Properties.Resources.TextColors);
                 XmlDocument xml = new XmlDocument();
-                xml.Load(stream);
+                xml.LoadXml(Properties.Resources.TextColors);
                 Dictionary<string, string> dictionary = new Dictionary<string, string>();
                 // Fetch colors
                 XmlNodeList rawColors = xml.GetElementsByTagName("HTMLColor");

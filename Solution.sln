@@ -1,25 +1,19 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Net", "Vha.Net\Vha.Net.csproj", "{7BA3A4CF-1E58-465C-B614-151F8BEA848E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{711F8307-944C-4864-8D5E-0987C87E903A} = {711F8307-944C-4864-8D5E-0987C87E903A}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Common", "Vha.Common\Vha.Common.csproj", "{711F8307-944C-4864-8D5E-0987C87E903A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Chat", "Vha.Chat\Vha.Chat.csproj", "{4A2AA0D2-EC00-4EAE-B212-625966041F16}"
-	ProjectSection(ProjectDependencies) = postProject
-		{906BED6F-84F6-4615-BD2E-48BABCD61516} = {906BED6F-84F6-4615-BD2E-48BABCD61516}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.MDB", "Vha.MDB\Vha.MDB.csproj", "{B309DD92-78AE-40DE-89B5-C76C48D874B2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.AOML", "Vha.AOML\Vha.AOML.csproj", "{817796E9-C1DC-41EF-A279-8589C732FCFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starksoft.Net.Proxy", "Starksoft.Net.Proxy\Starksoft.Net.Proxy.csproj", "{56EB350E-089E-40BB-97CB-F2745A4251AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Build", "Vha.Build\Vha.Build.csproj", "{906BED6F-84F6-4615-BD2E-48BABCD61516}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.MDB", "Vha.MDB\Vha.MDB.csproj", "{B309DD92-78AE-40DE-89B5-C76C48D874B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +33,6 @@ Global
 		{4A2AA0D2-EC00-4EAE-B212-625966041F16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A2AA0D2-EC00-4EAE-B212-625966041F16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A2AA0D2-EC00-4EAE-B212-625966041F16}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{817796E9-C1DC-41EF-A279-8589C732FCFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{817796E9-C1DC-41EF-A279-8589C732FCFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{817796E9-C1DC-41EF-A279-8589C732FCFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,12 +41,15 @@ Global
 		{56EB350E-089E-40BB-97CB-F2745A4251AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56EB350E-089E-40BB-97CB-F2745A4251AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56EB350E-089E-40BB-97CB-F2745A4251AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{906BED6F-84F6-4615-BD2E-48BABCD61516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{906BED6F-84F6-4615-BD2E-48BABCD61516}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{906BED6F-84F6-4615-BD2E-48BABCD61516}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{906BED6F-84F6-4615-BD2E-48BABCD61516}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B309DD92-78AE-40DE-89B5-C76C48D874B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22EC36E6-ECF5-4CA4-BC42-5B6AE687BD43}
 	EndGlobalSection
 EndGlobal

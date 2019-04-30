@@ -55,7 +55,7 @@ namespace Vha.Chat.UI
                     }
                     else
                     {
-                        string url = "http://www.xyphos.com/ao/aodb.php?id={0}&minimode=1";
+                        string url = "http://aoitems.com/item/{0}";
                         this._browser.Navigate(string.Format(url, entityParts[1]));
                     }
                     break;
@@ -68,8 +68,8 @@ namespace Vha.Chat.UI
                     }
                     else
                     {
-                        string url = "http://www.xyphos.com/ao/aodb.php?id={0}&id2={1}&ql={2}&minimode=1";
-                        this._browser.Navigate(string.Format(url, itemParts[0], itemParts[1], itemParts[2]));
+                        string url = "http://aoitems.com/item/{0}/{1}";
+                        this._browser.Navigate(string.Format(url, itemParts[0], itemParts[2]));
                     }
                     break;
                 case BrowserFormType.Url:

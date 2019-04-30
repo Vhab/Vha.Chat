@@ -1,7 +1,7 @@
 /*
 * Vha.MDB
 * Copyright (C) 2005-2010 Remco van Oosterhout
-* See Credits.txt for all aknowledgements.
+* See Credits.txt for all acknowledgements.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal

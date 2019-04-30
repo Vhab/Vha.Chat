@@ -1,19 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Net", "Vha.Net\Vha.Net.csproj", "{7BA3A4CF-1E58-465C-B614-151F8BEA848E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vha.Net", "Vha.Net\Vha.Net.csproj", "{7BA3A4CF-1E58-465C-B614-151F8BEA848E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Common", "Vha.Common\Vha.Common.csproj", "{711F8307-944C-4864-8D5E-0987C87E903A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vha.Common", "Vha.Common\Vha.Common.csproj", "{711F8307-944C-4864-8D5E-0987C87E903A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.Chat", "Vha.Chat\Vha.Chat.csproj", "{4A2AA0D2-EC00-4EAE-B212-625966041F16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vha.Chat", "Vha.Chat\Vha.Chat.csproj", "{4A2AA0D2-EC00-4EAE-B212-625966041F16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.AOML", "Vha.AOML\Vha.AOML.csproj", "{817796E9-C1DC-41EF-A279-8589C732FCFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vha.AOML", "Vha.AOML\Vha.AOML.csproj", "{817796E9-C1DC-41EF-A279-8589C732FCFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Starksoft.Net.Proxy", "Starksoft.Net.Proxy\Starksoft.Net.Proxy.csproj", "{56EB350E-089E-40BB-97CB-F2745A4251AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Starksoft.Net.Proxy", "Starksoft.Net.Proxy\Starksoft.Net.Proxy.csproj", "{56EB350E-089E-40BB-97CB-F2745A4251AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vha.MDB", "Vha.MDB\Vha.MDB.csproj", "{B309DD92-78AE-40DE-89B5-C76C48D874B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vha.MDB", "Vha.MDB\Vha.MDB.csproj", "{B309DD92-78AE-40DE-89B5-C76C48D874B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{7EC89A1F-6137-4F87-8AFF-E348834C1480}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+		version.json = version.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -146,7 +146,7 @@ namespace Vha.Chat
             MessageBox.Show("An unhandled exception has occurred. This application will now close.\n\n" +
                 "The full error message has been written to error.log.\n" +
                 "You can find this file in the following directory:\n" + ApplicationConfigDirectory + ".\n\n" +
-                "Please assist us in fixing this bug and report this error at http://aodevs.com/forums/.",
+                "Please assist us in fixing this bug and report this error at https://github.com/Vhab/Vha.Chat/issues.",
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(1);
         }

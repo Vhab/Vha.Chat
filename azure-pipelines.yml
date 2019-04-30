@@ -17,7 +17,25 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
+# Restore depndencies
+- task: NuGetToolInstaller@0
+  inputs:
+    versionSpec: '5.0.0'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    solution: 'Solution.sln'
+
 # Build
+- task: MSBuild@1
+  inputs:
+    solution: 'Solution.sln'
+    msbuildArchitecture: 'x64'
+    configuration: 'Release'
+    maximumCpuCount: true
+
+# Publish
 - task: MSBuild@1
   inputs:
     solution: 'Vha.Chat/Vha.Chat.csproj'
@@ -25,9 +43,7 @@ steps:
     configuration: 'Release'
     msbuildArguments: '/p:OutputPath=$(build.artifactstagingdirectory)/Vha.Chat'
     maximumCpuCount: true
-    restoreNugetPackages: true
 
-# Publish
 - task: PublishBuildArtifacts@1
   displayName: 'publish artifacts'
   inputs:

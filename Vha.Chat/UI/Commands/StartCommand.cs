@@ -58,7 +58,7 @@ namespace Vha.Chat.UI.Commands
                 "Open web link", // Name
                 new string[] { "start" }, // Triggers
                 new string[] { "start [url]" }, // Usage
-                new string[] { "start http://www.vhabot.net" }, // Examples
+                new string[] { "start http://www.google.com" }, // Examples
                 // Description
                 "The start command allows you to open web pages in your default browser."
             ) { }

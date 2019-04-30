@@ -50,8 +50,6 @@ namespace Vha.Chat.Data
         [XmlElement("Size")]
         public List<OptionsV1Size> Sizes = new List<OptionsV1Size>();
 
-        public bool DonateVisible = true;
-
         #region Implement Base
         public OptionsV1()
             : base("Options", 1, false, typeof(OptionsV1))

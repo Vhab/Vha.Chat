@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
-    <LangVersion>6</LangVersion>
+    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+    <LangVersion>latest</LangVersion>
     <Authors>Remco van Oosterhout</Authors>
     <Copyright>Copyright © 2010-2019 Remco van Oosterhout</Copyright>
     <RepositoryUrl>https://github.com/Vhab/Vha.Chat</RepositoryUrl>

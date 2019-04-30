@@ -14,11 +14,6 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
-# Install dependencies
-- task: DotNetCoreInstaller@0
-  inputs:
-    version: '2.2.106'
-
 # Restore nuget packages
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'

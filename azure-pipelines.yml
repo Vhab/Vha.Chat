@@ -17,31 +17,33 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
-# Restore nuget packages
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
+# Restore depndencies
+- task: NuGetToolInstaller@0
   inputs:
-    command: restore
-    projects: 'Solution.sln'
+    versionSpec: '5.x'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    solution: 'Solution.sln'
 
 # Build
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
+# We're using MSBuild instead of dotnet cli because of: https://github.com/Microsoft/msbuild/issues/2221
+- task: MSBuild@1
   inputs:
-    command: build
-    projects: 'Solution.sln'
-    arguments: '--no-restore -c Release'
+    solution: 'Solution.sln'
+    msbuildArchitecture: 'x64'
+    configuration: 'Release'
+    maximumCpuCount: true
 
 # Publish
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet publish'
+- task: MSBuild@1
   inputs:
-    command: publish
-    publishWebProjects: false
-    projects: Vha.Chat/Vha.Chat.csproj
-    arguments: --no-restore --no-build -c Release -o $(build.artifactstagingdirectory)/Vha.Chat
-    zipAfterPublish: false
-    modifyOutputPath: false
+    solution: 'Vha.Chat/Vha.Chat.csproj'
+    msbuildArchitecture: 'x64'
+    configuration: 'Release'
+    msbuildArguments: '/t:Publish /p:PublishDir=$(build.artifactstagingdirectory)/Vha.Chat'
+    maximumCpuCount: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'publish artifacts'

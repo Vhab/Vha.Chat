@@ -1,0 +1,52 @@
+name: $(SourceBranchName)-$(date:yyyyMMdd)$(rev:.r)
+trigger:
+  branches:
+    include:
+    - master
+    - release/*
+pr:
+  branches:
+    include:
+    - master
+    - release/*
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+  
+steps:
+# Install dependencies
+- task: DotNetCoreInstaller@0
+  inputs:
+    version: '2.2.106'
+
+# Restore nuget packages
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+    projects: 'Solution.sln'
+
+# Build
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
+  inputs:
+    command: build
+    projects: 'Backend/Backend.sln'
+    arguments: '--no-restore -c Release'
+
+# Publish
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet publish'
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: Vha.Chat/Vha.Chat.csproj
+    arguments: --no-restore --no-build -c Release -o $(build.artifactstagingdirectory)/Vha.Chat
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: PublishBuildArtifacts@1
+  displayName: 'publish artifacts'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)/Vha.Chat'
+    ArtifactName: Vha.Chat

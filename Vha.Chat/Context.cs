@@ -563,7 +563,6 @@ namespace Vha.Chat
             this.Input.RegisterCommand(new CCCommand());
             this.Input.RegisterCommand(new ColorsCommand());
             this.Input.RegisterCommand(new CrashCommand());
-            this.Input.RegisterCommand(new DonateCommand());
             this.Input.RegisterCommand(new FriendCommand());
             this.Input.RegisterCommand(new HelpCommand());
             this.Input.RegisterCommand(new IgnoreCommand());

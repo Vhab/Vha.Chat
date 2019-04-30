@@ -31,7 +31,7 @@ namespace Vha.Chat.UI.Controls
 {
     public class OutputControlFormatter : Formatter
     {
-        public static readonly string IconUrlTemplate = "http://static.aodevs.com/icon/{0}";
+        public static readonly string IconUrlTemplate = "https://static.aoitems.com/icon/{0}";
         public static readonly string GuiTextureUrlTemplate = "http://static.aodevs.com/texture/gui/{0}";
 
         public override string OnOpen() { return ""; }

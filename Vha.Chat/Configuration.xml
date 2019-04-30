@@ -4,6 +4,7 @@
   <OptionsFile>Options.xml</OptionsFile>
   <IgnoresFile>Ignores.xml</IgnoresFile>
   <Dimension Name="Rubi-Ka" Address="chat.d1.funcom.com" Port="7105" />
+  <Dimension Name="Rubi-Ka 2019" Address="chat.d1.funcom.com" Port="7106" />
   <Dimension Name="TestLive" Address="chat.dt.funcom.com" Port="7109" />
   <!-- Valid values: Detect, Direct, Delayed, External -->
   <OutputMode>Detect</OutputMode>

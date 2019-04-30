@@ -215,8 +215,6 @@ namespace Vha.Chat.UI
             this._outputBox.MaximumTexts = args.MaximumTexts;
             this._outputBox.MaximumLines = args.MaximumMessages;
             this._outputBox.TextSize = args.ChatTextSize;
-            // Update donate button
-            this._donate.Visible = args.DonateVisible;
         }
 
         void _context_StateEvent(Context context, StateEventArgs args)
@@ -687,11 +685,6 @@ namespace Vha.Chat.UI
             if (this._context == null || !this._initialized) return;
             OptionsSize size = this._context.Options.GetSize("ChatForm", "Splitter", true);
             size.Size = this._container.SplitterDistance;
-        }
-        
-        private void _donate_Click(object sender, EventArgs e)
-        {
-            this._context.Input.Command("donate");
         }
         #endregion
 

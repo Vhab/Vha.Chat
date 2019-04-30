@@ -129,8 +129,6 @@ namespace Vha.Chat.UI
             this._proxyPassword.Text = o.Proxy.Password;
             // Update 'the view'
             _updateProxy();
-            // Misc
-            this._donateVisible.Checked = o.DonateVisible;
         }
 
         private bool _saveOptions(Options o)
@@ -153,8 +151,6 @@ namespace Vha.Chat.UI
             o.Proxy.Port = (int)this._proxyPort.Value;
             o.Proxy.Username = this._proxyUsername.Text;
             o.Proxy.Password = this._proxyPassword.Text;
-            // Misc
-            o.DonateVisible = this._donateVisible.Checked;
             // Save
             o.Save();
             return true;

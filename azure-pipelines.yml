@@ -20,7 +20,7 @@ steps:
 # Restore depndencies
 - task: NuGetToolInstaller@0
   inputs:
-    versionSpec: '5.0.0'
+    versionSpec: '5.x'
 
 - task: NuGetCommand@2
   inputs:
@@ -28,6 +28,7 @@ steps:
     solution: 'Solution.sln'
 
 # Build
+# We're using MSBuild instead of dotnet cli because of: https://github.com/Microsoft/msbuild/issues/2221
 - task: MSBuild@1
   inputs:
     solution: 'Solution.sln'
@@ -41,7 +42,7 @@ steps:
     solution: 'Vha.Chat/Vha.Chat.csproj'
     msbuildArchitecture: 'x64'
     configuration: 'Release'
-    msbuildArguments: '/p:OutputPath=$(build.artifactstagingdirectory)/Vha.Chat'
+    msbuildArguments: '/t:Publish /p:PublishDir=$(build.artifactstagingdirectory)/Vha.Chat'
     maximumCpuCount: true
 
 - task: PublishBuildArtifacts@1

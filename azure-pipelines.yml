@@ -11,7 +11,7 @@ pr:
     - release/*
 
 pool:
-  vmImage: 'Ubuntu-16.04'
+  vmImage: 'windows-2019'
   
 steps:
 # Install dependencies

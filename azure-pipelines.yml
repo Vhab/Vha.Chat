@@ -17,32 +17,17 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
-# Restore nuget packages
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
-  inputs:
-    command: restore
-    projects: 'Solution.sln'
-
 # Build
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
+- task: MSBuild@1
   inputs:
-    command: build
-    projects: 'Solution.sln'
-    arguments: '--no-restore -c Release'
+    solution: 'Vha.Chat/Vha.Chat.csproj'
+    msbuildArchitecture: 'x64'
+    configuration: 'Release'
+    msbuildArguments: '/p:OutputPath=$(build.artifactstagingdirectory)/Vha.Chat'
+    maximumCpuCount: true
+    restoreNugetPackages: true
 
 # Publish
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet publish'
-  inputs:
-    command: publish
-    publishWebProjects: false
-    projects: Vha.Chat/Vha.Chat.csproj
-    arguments: --no-restore --no-build -c Release -o $(build.artifactstagingdirectory)/Vha.Chat
-    zipAfterPublish: false
-    modifyOutputPath: false
-
 - task: PublishBuildArtifacts@1
   displayName: 'publish artifacts'
   inputs:

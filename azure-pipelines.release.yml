@@ -10,14 +10,10 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
+- template: azure-pipelines/install-dependencies.yml
 - template: azure-pipelines/get-version.yml
 
 # Restore dependencies
-- task: NuGetToolInstaller@0
-  displayName: 'Install NuGet 5.x'
-  inputs:
-    versionSpec: '5.x'
-
 - task: NuGetCommand@2
   displayName: 'Restore Dependencies'
   inputs:

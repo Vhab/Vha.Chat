@@ -1,4 +1,9 @@
 steps:
+- powershell: |
+    Write-Host "##vso[task.setvariable variable=DOTNET_SKIP_FIRST_TIME_EXPERIENCE;]true"
+    Write-Host "##vso[task.setvariable variable=DOTNET_CLI_TELEMETRY_OPTOUT;]1"
+  displayName: 'Opt-Out of .NET Core telemetry'
+
 - task: NuGetToolInstaller@0
   displayName: 'Install NuGet 5.x'
   inputs:

@@ -1,15 +1,16 @@
 ; A little bit of useful information
 Name "Vha.Chat ${Version}"
-VIAddVersionKey "ProductName" "Vha.Chat ${Version} Installer"
+VIAddVersionKey "ProductName" "Vha.Chat ${Version}"
 VIAddVersionKey "LegalCopyright" "© Remco van Oosterhout"
 VIAddVersionKey "FileVersion" "${Version}"
+VIAddVersionKey "ProductVersion" "${Version}"
 VIProductVersion ${Version}
 
 ; The file to write
 OutFile "${DistDir}\Vha.Chat-${Version}-Setup.exe"
 
 ; The default installation directory
-InstallDir "$PROGRAMFILES\Vha.Chat"
+InstallDir "$PROGRAMFILES64\Vha.Chat"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
@@ -42,7 +43,10 @@ Section "Vha.Chat (required)"
   
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VhaChat" "DisplayName" "Vha.Chat ${Version}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VhaChat" "DisplayVersion" "${Version}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VhaChat" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VhaChat" "InstallLocation" "$INSTDIR"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VhaChat" "URLInfoAbout" "https://github.com/Vhab/Vha.Chat"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VhaChat" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VhaChat" "NoRepair" 1
   WriteUninstaller "uninstall.exe"

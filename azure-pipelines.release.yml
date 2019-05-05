@@ -1,0 +1,59 @@
+name: $(SourceBranchName)-$(date:yyyyMMdd)$(rev:.r)
+trigger:
+  branches:
+    include:
+    - master
+    - release/*
+
+pool:
+  vmImage: 'windows-2019'
+  
+steps:
+- template: azure-pipelines/get-version.yml
+
+# Restore dependencies
+- task: NuGetToolInstaller@0
+  inputs:
+    versionSpec: '5.x'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    solution: 'Solution.sln'
+
+# Build
+# We're using MSBuild instead of dotnet cli because of: https://github.com/Microsoft/msbuild/issues/2221
+- task: MSBuild@1
+  inputs:
+    solution: 'Vha.Chat/Vha.Chat.csproj'
+    msbuildArchitecture: 'x64'
+    configuration: 'Release'
+    maximumCpuCount: true
+
+# Publish
+- task: MSBuild@1
+  inputs:
+    solution: 'Vha.Chat/Vha.Chat.csproj'
+    msbuildArchitecture: 'x64'
+    configuration: 'Release'
+    msbuildArguments: '/t:Publish /p:PublishDir=$(build.artifactstagingdirectory)/bin'
+    maximumCpuCount: true
+
+- task: ArchiveFiles@2
+  displayName: 'create release package'
+  inputs:
+    rootFolderOrFile: '$(build.artifactstagingdirectory)/bin'
+    includeRootFolder: false
+    archiveFile: '$(build.artifactstagingdirectory)/dist/Vha.Chat-$(GitBuildVersion).zip'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'publish artifacts'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)/bin'
+    ArtifactName: bin
+
+- task: PublishBuildArtifacts@1
+  displayName: 'publish artifacts'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)/dist'
+    ArtifactName: dist

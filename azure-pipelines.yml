@@ -14,7 +14,9 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
-# Restore depndencies
+- template: azure-pipelines/get-version.yml
+
+# Restore dependencies
 - task: NuGetToolInstaller@0
   inputs:
     versionSpec: '5.x'
@@ -32,18 +34,3 @@ steps:
     msbuildArchitecture: 'x64'
     configuration: 'Release'
     maximumCpuCount: true
-
-# Publish
-- task: MSBuild@1
-  inputs:
-    solution: 'Vha.Chat/Vha.Chat.csproj'
-    msbuildArchitecture: 'x64'
-    configuration: 'Release'
-    msbuildArguments: '/t:Publish /p:PublishDir=$(build.artifactstagingdirectory)/Vha.Chat'
-    maximumCpuCount: true
-
-- task: PublishBuildArtifacts@1
-  displayName: 'publish artifacts'
-  inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)/Vha.Chat'
-    ArtifactName: Vha.Chat

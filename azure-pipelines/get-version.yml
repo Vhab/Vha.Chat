@@ -1,0 +1,20 @@
+steps:
+# Install https://github.com/AArnott/Nerdbank.GitVersioning
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'custom'
+    custom: 'tool'
+    arguments: 'install -g nbgv'
+
+# Set environment with current version
+# As there's no way to prevent 'nbgv cloud' from modifying the Azure Pipelines build number
+# (or customizing its build number format), we'll set the environment variables manually here
+- powershell: |
+    $ErrorActionPreference = "Stop"
+    $version = nbgv get-version -f json | ConvertFrom-Json
+    $version.CloudBuildVersionVars.PSObject.Properties | ForEach-Object {
+        "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
+    }
+    $version.CloudBuildAllVars.PSObject.Properties | ForEach-Object {
+        "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
+    }

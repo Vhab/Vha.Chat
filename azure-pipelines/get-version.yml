@@ -1,6 +1,7 @@
 steps:
 # Install https://github.com/AArnott/Nerdbank.GitVersioning
 - task: DotNetCoreCLI@2
+  displayName: 'Install Nerdbank.GitVersioning'
   inputs:
     command: 'custom'
     custom: 'tool'
@@ -13,8 +14,11 @@ steps:
     $ErrorActionPreference = "Stop"
     $version = nbgv get-version -f json | ConvertFrom-Json
     $version.CloudBuildVersionVars.PSObject.Properties | ForEach-Object {
-        "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
+        Write-Host "Set $($_.Name) to $($_.Value)"
+        Write-Host "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
     }
     $version.CloudBuildAllVars.PSObject.Properties | ForEach-Object {
-        "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
+        Write-Host "Set $($_.Name) to $($_.Value)"
+        Write-Host "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
     }
+  displayName: 'Detect and set version variables'

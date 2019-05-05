@@ -7,7 +7,8 @@ steps:
     arguments: 'install -g nbgv'
 
 # Set environment with current version
-# This does the same as 'nbgv cloud', but without modifying the build number
+# As there's no way to prevent 'nbgv cloud' from modifying the Azure Pipelines build number
+# (or customizing its build number format), we'll set the environment variables manually here
 - powershell: |
     $ErrorActionPreference = "Stop"
     $version = nbgv get-version -f json | ConvertFrom-Json

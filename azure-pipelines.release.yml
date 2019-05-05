@@ -9,9 +9,9 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
-  - template: azure-pipelines/get-version.yml
+- template: azure-pipelines/get-version.yml
 
-# Restore depndencies
+# Restore dependencies
 - task: NuGetToolInstaller@0
   inputs:
     versionSpec: '5.x'

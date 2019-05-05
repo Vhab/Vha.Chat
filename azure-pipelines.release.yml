@@ -30,31 +30,35 @@ steps:
     configuration: 'Release'
     maximumCpuCount: true
 
-# Publish
+# Package and upload binaries
 - task: MSBuild@1
   displayName: 'Publish Vha.Chat.csproj'
   inputs:
     solution: 'Vha.Chat/Vha.Chat.csproj'
     msbuildArchitecture: 'x64'
     configuration: 'Release'
-    msbuildArguments: '/t:Publish /p:PublishDir=$(build.artifactstagingdirectory)/bin'
+    msbuildArguments: '/t:Publish /p:PublishDir=$(Build.StagingDirectory)/bin'
     maximumCpuCount: true
-
-- task: ArchiveFiles@2
-  displayName: 'Create Release Package'
-  inputs:
-    rootFolderOrFile: '$(build.artifactstagingdirectory)/bin'
-    includeRootFolder: false
-    archiveFile: '$(build.artifactstagingdirectory)/dist/Vha.Chat-$(GitBuildVersion).zip'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Binaries'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)/bin'
+    PathtoPublish: '$(Build.StagingDirectory)/bin'
     ArtifactName: bin
 
+# Package and upload distributables
+- task: ArchiveFiles@2
+  displayName: 'Create Release Package'
+  inputs:
+    rootFolderOrFile: '$(Build.StagingDirectory)/bin'
+    includeRootFolder: false
+    archiveFile: '$(Build.StagingDirectory)/dist/Vha.Chat-$(GitBuildVersion).zip'
+
+- script: makensis /DVersion=$(GitBuildVersion) /DBinDir=$(Build.StagingDirectory)/bin /DDistDir=$(Build.StagingDirectory)/dist azure-pipelines/installer.nsi
+  displayName: 'Create Installer'
+  
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Release Package'
   inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)/dist'
+    PathtoPublish: '$(Build.StagingDirectory)/dist'
     ArtifactName: dist

@@ -1,0 +1,17 @@
+steps:
+- task: NuGetToolInstaller@0
+  displayName: 'Install NuGet 5.x'
+  inputs:
+    versionSpec: '5.x'
+
+- script: nuget --version
+  displayName: Show NuGet version
+
+- task: DotNetCoreInstaller@0
+  displayName: Install .NET Core SDK 	2.2.105
+  inputs:
+    packageType: sdk
+    version: 	2.2.105
+
+- script: dotnet --info
+  displayName: Show .NET Core info

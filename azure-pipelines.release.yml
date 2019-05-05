@@ -4,6 +4,7 @@ trigger:
     include:
     - master
     - release/*
+pr: none
 
 pool:
   vmImage: 'windows-2019'

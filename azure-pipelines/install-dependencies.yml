@@ -4,9 +4,6 @@ steps:
   inputs:
     versionSpec: '5.x'
 
-- script: nuget --version
-  displayName: Show NuGet version
-
 - task: DotNetCoreInstaller@0
   displayName: Install .NET Core SDK 	2.2.105
   inputs:

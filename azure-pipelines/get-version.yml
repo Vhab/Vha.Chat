@@ -1,0 +1,19 @@
+steps:
+# Install https://github.com/AArnott/Nerdbank.GitVersioning
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'custom'
+    custom: 'tool'
+    arguments: 'install -g nbgv'
+
+# Set environment with current version
+# This does the same as 'nbgv cloud', but without modifying the build number
+- powershell: |
+    $ErrorActionPreference = "Stop"
+    $version = nbgv get-version -f json | ConvertFrom-Json
+    $version.CloudBuildVersionVars.PSObject.Properties | ForEach-Object {
+        "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
+    }
+    $version.CloudBuildAllVars.PSObject.Properties | ForEach-Object {
+        "##vso[task.setvariable variable=$($_.Name);]$($_.Value)"
+    }

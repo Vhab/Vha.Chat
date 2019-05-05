@@ -9,14 +9,7 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
-# Make current version available to current context
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'custom'
-    custom: 'tool'
-    arguments: 'install -g nbgv'
-
-- script: 'nbgv cloud'
+  - template: azure-pipelines/get-version.yml
 
 # Restore depndencies
 - task: NuGetToolInstaller@0

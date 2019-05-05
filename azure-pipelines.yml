@@ -14,8 +14,8 @@ pool:
   vmImage: 'windows-2019'
   
 steps:
-- template: azure-pipelines/get-version.yml
 - template: azure-pipelines/install-dependencies.yml
+- template: azure-pipelines/get-version.yml
 
 # Restore dependencies
 - task: NuGetCommand@2

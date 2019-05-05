@@ -18,10 +18,12 @@ steps:
 
 # Restore dependencies
 - task: NuGetToolInstaller@0
+  displayName: 'Install NuGet 5.x'
   inputs:
     versionSpec: '5.x'
 
 - task: NuGetCommand@2
+  displayName: 'Restore Dependencies'
   inputs:
     command: 'restore'
     solution: 'Solution.sln'
@@ -29,6 +31,7 @@ steps:
 # Build
 # We're using MSBuild instead of dotnet cli because of: https://github.com/Microsoft/msbuild/issues/2221
 - task: MSBuild@1
+  displayName: 'Build Solution.sln'
   inputs:
     solution: 'Solution.sln'
     msbuildArchitecture: 'x64'

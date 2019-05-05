@@ -13,10 +13,12 @@ steps:
 
 # Restore dependencies
 - task: NuGetToolInstaller@0
+  displayName: 'Install NuGet 5.x'
   inputs:
     versionSpec: '5.x'
 
 - task: NuGetCommand@2
+  displayName: 'Restore Dependencies'
   inputs:
     command: 'restore'
     solution: 'Solution.sln'
@@ -24,6 +26,7 @@ steps:
 # Build
 # We're using MSBuild instead of dotnet cli because of: https://github.com/Microsoft/msbuild/issues/2221
 - task: MSBuild@1
+  displayName: 'Build Vha.Chat.csproj'
   inputs:
     solution: 'Vha.Chat/Vha.Chat.csproj'
     msbuildArchitecture: 'x64'
@@ -32,6 +35,7 @@ steps:
 
 # Publish
 - task: MSBuild@1
+  displayName: 'Publish Vha.Chat.csproj'
   inputs:
     solution: 'Vha.Chat/Vha.Chat.csproj'
     msbuildArchitecture: 'x64'
@@ -40,20 +44,20 @@ steps:
     maximumCpuCount: true
 
 - task: ArchiveFiles@2
-  displayName: 'create release package'
+  displayName: 'Create Release Package'
   inputs:
     rootFolderOrFile: '$(build.artifactstagingdirectory)/bin'
     includeRootFolder: false
     archiveFile: '$(build.artifactstagingdirectory)/dist/Vha.Chat-$(GitBuildVersion).zip'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'publish artifacts'
+  displayName: 'Publish Binaries'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)/bin'
     ArtifactName: bin
 
 - task: PublishBuildArtifacts@1
-  displayName: 'publish artifacts'
+  displayName: 'Publish Release Package'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)/dist'
     ArtifactName: dist

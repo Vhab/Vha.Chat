@@ -65,7 +65,20 @@ namespace Vha.Chat.UI.Controls
         /// </summary>
         public OutputControlInitializationMode InitializationMode { get { return this._initializationMode; } }
         /// <summary>
-        /// Gets or sets the background color
+        /// Gets or sets whether the output uses dark theme colors.
+        /// </summary>
+        public bool DarkTheme
+        {
+            get { return this._darkTheme; }
+            set
+            {
+                this._darkTheme = value;
+                this._updateProperties();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the background color.
         /// </summary>
         public System.Drawing.Color BackgroundColor
         {
@@ -254,6 +267,7 @@ namespace Vha.Chat.UI.Controls
         private OutputControlInitializationMode _initializationMode;
         private bool _enableImages = true;
         private bool _initialized = false;
+        private bool _darkTheme = false;
 
         private void _updateProperties()
         {
@@ -261,6 +275,7 @@ namespace Vha.Chat.UI.Controls
             // Foreground color
             string fgcolor = string.Format("#{0:X2}{1:X2}{2:X2}", this.ForegroundColor.R, this.ForegroundColor.G, this.ForegroundColor.B);
             this._execute("setForegroundColor", fgcolor);
+            this._execute("setDarkTheme", this._darkTheme ? "true" : "false");
             // Background color
             string bgcolor = string.Format("#{0:X2}{1:X2}{2:X2}", this.BackgroundColor.R, this.BackgroundColor.G, this.BackgroundColor.B);
             this._execute("setBackgroundColor", bgcolor);

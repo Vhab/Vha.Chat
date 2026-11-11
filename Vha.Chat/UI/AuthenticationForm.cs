@@ -44,8 +44,29 @@ namespace Vha.Chat.UI
         {
             this._context = context;
             InitializeComponent();
-        }
 
+            bool dark = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (dark)
+            {
+                ThemeManager.ApplyControls(this, true);
+                ThemeManager.ConfigureComboBox(this._server, true);
+            }
+        }
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            bool dark = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            ThemeManager.ApplyTitleBar(this, dark);
+        }
         private void AuthenticationForm_Load(object sender, EventArgs e)
         {
             // Add dimensions

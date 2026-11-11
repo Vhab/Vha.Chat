@@ -56,7 +56,7 @@ namespace Vha.Chat.UI
         protected Context _context = null;
 
         public InfoForm(Context context, Form parent, Element element)
-            : base (context, "Info")
+            : base(context, "Info")
         {
             InitializeComponent();
             base.Initialize();
@@ -98,7 +98,37 @@ namespace Vha.Chat.UI
 
         private void _context_SavedEvent(Context context, Options args)
         {
-            this._info.TextSize = context.Options.InfoWindowTextSize;
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(
+                    new Handler<Options>(this._context_SavedEvent),
+                    new object[] { context, args });
+                return;
+            }
+
+            bool dark = string.Equals(
+                args.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (dark)
+            {
+                this.BackColor = System.Drawing.Color.FromArgb(32, 33, 36);
+                this.ForeColor = System.Drawing.Color.FromArgb(225, 228, 232);
+            }
+            else
+            {
+                // Preserve InfoForm's original appearance.
+                this.BackColor = System.Drawing.Color.Black;
+                this.ForeColor = System.Drawing.Color.White;
+            }
+
+            this._info.DarkTheme = dark;
+            this._info.BackgroundColor = this.BackColor;
+            this._info.ForegroundColor = this.ForeColor;
+            this._info.TextSize = args.InfoWindowTextSize;
+
+            ThemeManager.ApplyTitleBar(this, dark);
         }
 
         private void _onClosed(object sender, FormClosedEventArgs e)

@@ -64,6 +64,49 @@
     .AnnouncementsChannel, .AnnouncementsChannel .Link { color: #f0007c; }
     .RaidChannel, .RaidChannel .Link { color: #b86b2c; }
     .BattlestationChannel, .BattlestationChannel .Link { color: #b86b2c; }
+    /* Dark theme overrides */
+    body.DarkTheme .Time {
+        color: #9aa0a6;
+    }
+
+    body.DarkTheme a {
+        color: #8ab4f8;
+    }
+
+    body.DarkTheme .Text,
+    body.DarkTheme .Text .Link,
+    body.DarkTheme .SystemMessage,
+    body.DarkTheme .SystemMessage .Link,
+    body.DarkTheme .UnknownChannel,
+    body.DarkTheme .UnknownChannel .Link {
+        color: #e1e4e8;
+    }
+
+    body.DarkTheme .PrivateChannel,
+    body.DarkTheme .PrivateChannel .Link {
+        color: #b8c0cc;
+    }
+
+    body.DarkTheme .OrganizationChannel,
+    body.DarkTheme .OrganizationChannel .Link {
+        color: #a8d56f;
+    }
+
+    body.DarkTheme .ShoppingChannel,
+    body.DarkTheme .ShoppingChannel .Link {
+        color: #9daeff;
+    }
+
+    /* Dark scrollbar for the legacy Internet Explorer renderer */
+    html.DarkTheme {
+        scrollbar-face-color: #3a3d42;
+        scrollbar-track-color: #202124;
+        scrollbar-arrow-color: #d1d5db;
+        scrollbar-highlight-color: #4a4d52;
+        scrollbar-shadow-color: #202124;
+        scrollbar-3dlight-color: #202124;
+        scrollbar-darkshadow-color: #202124;
+    }
 </style>
 <script type="text/javascript">
 /*!
@@ -235,6 +278,21 @@ e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["
     {
         if (!isLoaded()) return;
         $('body').css('color', color);
+    }
+    function setDarkTheme(enabled)
+    {
+        if (!isLoaded()) return;
+
+        if (enabled == 'true')
+        {
+            $('body').addClass('DarkTheme');
+            $('html').addClass('DarkTheme');
+        }
+        else
+        {
+            $('body').removeClass('DarkTheme');
+            $('html').removeClass('DarkTheme');
+        }
     }
     function setBackgroundColor(color)
     {

@@ -32,11 +32,47 @@ namespace Vha.Chat.UI
     public partial class OptionsForm : Form
     {
         private Context _context;
+        private GroupBox _appearanceOptions;
+        private Label _themeLabel;
+        private ComboBox _theme;
 
         public OptionsForm(Context context)
         {
             InitializeComponent();
+            // Make room for the Appearance section.
+            this._infoWindowOptions.Top += 68;
+            this._proxyOptions.Top += 68;
 
+            this.ClientSize = new Size(
+                this.ClientSize.Width,
+                this.ClientSize.Height + 68);
+
+            // Create Appearance section.
+            this._appearanceOptions = new GroupBox();
+            this._appearanceOptions.Text = "Appearance";
+            this._appearanceOptions.Location = new Point(12, 249);
+            this._appearanceOptions.Size = new Size(390, 61);
+            this._appearanceOptions.Anchor =
+                AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            this._themeLabel = new Label();
+            this._themeLabel.Text = "Theme";
+            this._themeLabel.AutoSize = true;
+            this._themeLabel.Location = new Point(7, 27);
+
+            this._theme = new ComboBox();
+            this._theme.DropDownStyle = ComboBoxStyle.DropDownList;
+            // Configure the Appearance dropdown after loading the saved options.
+            this._theme.Location = new Point(189, 24);
+            this._theme.Size = new Size(185, 21);
+            this._theme.Items.Add("Light");
+            this._theme.Items.Add("Dark");
+            this._theme.SelectedIndex = 0;
+
+            this._appearanceOptions.Controls.Add(this._themeLabel);
+            this._appearanceOptions.Controls.Add(this._theme);
+
+            this.Controls.Add(this._appearanceOptions);
             this._context = context;
             this._context.Options.SavedEvent += new Handler<Options>(_context_SavedEvent);
 
@@ -63,8 +99,36 @@ namespace Vha.Chat.UI
             this._infoWindowBehavior.Items.Add(InfoWindowBehavior.UseExisting);
             this._infoWindowBehavior.SelectedIndex = 0;
 
+            // Apply owner-drawing to the existing Options dropdowns.
+            ComboBox[] themedComboBoxes =
+            {
+                this._textStyle,
+                this._panelPosition,
+                this._ignoreMethod,
+                this._infoWindowBehavior,
+                this._proxyType
+            };
+
+            bool darkTheme = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            foreach (ComboBox combo in themedComboBoxes)
+            {
+                ThemeManager.ConfigureComboBox(combo, darkTheme);
+            }
+
             // Manually trigger this to get in sync
             this._readOptions(this._context.Options);
+            ThemeManager.ConfigureComboBox(this._theme, darkTheme);
+            bool dark = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            ThemeManager.ApplyControls(this, dark);
+            ThemeManager.ApplyTitleBar(this, dark);
         }
 
         private void OptionsForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -121,6 +185,10 @@ namespace Vha.Chat.UI
             this._panelPosition.SelectedItem = o.PanelPosition;
             this._ignoreMethod.SelectedItem = o.IgnoreMethod;
             this._infoWindowBehavior.SelectedItem = o.InfoWindowBehavior;
+            this._theme.SelectedItem =
+                string.Equals(o.Theme, "Dark", StringComparison.OrdinalIgnoreCase)
+                ? "Dark"
+                : "Light";
             // Proxy
             this._proxyType.SelectedItem = o.Proxy.Type;
             this._proxyAddress.Text = o.Proxy.Address;
@@ -145,6 +213,7 @@ namespace Vha.Chat.UI
             o.PanelPosition = (HorizontalPosition)this._panelPosition.SelectedItem;
             o.IgnoreMethod = (IgnoreMethod)this._ignoreMethod.SelectedItem;
             o.InfoWindowBehavior = (InfoWindowBehavior)this._infoWindowBehavior.SelectedItem;
+            o.Theme = (string)this._theme.SelectedItem;
             // Proxy
             o.Proxy.Type = (ProxyType)this._proxyType.SelectedItem;
             o.Proxy.Address = this._proxyAddress.Text;
@@ -245,6 +314,17 @@ namespace Vha.Chat.UI
                     return true;
             }
             return true;
+        }
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            bool dark = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            ThemeManager.ApplyTitleBar(this, dark);
         }
     }
 }

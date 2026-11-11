@@ -28,6 +28,10 @@ namespace Vha.Chat.UI
 {
     public partial class IgnoresForm : BaseForm
     {
+        protected override bool UseStandardControlTheme
+        {
+            get { return true; }
+        }
         public IgnoresForm(Context context)
             : base(context, "Ignores")
         {
@@ -149,7 +153,7 @@ namespace Vha.Chat.UI
             if (this._context.Ignores.Contains(this._character.Text))
             {
                 MessageBox.Show(
-                    Format.UppercaseFirst(this._character.Text)+" already is on your ignore list",
+                    Format.UppercaseFirst(this._character.Text) + " already is on your ignore list",
                     "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }

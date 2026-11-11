@@ -38,6 +38,7 @@ namespace Vha.Chat.Data
         public IgnoreMethod IgnoreMethod = IgnoreMethod.Character;
         public HorizontalPosition PanelPosition = HorizontalPosition.Right;
         public InfoWindowBehavior InfoWindowBehavior = InfoWindowBehavior.OpenNew;
+        public string Theme = "Light";
 
         public OptionsV1Proxy Proxy = null;
 

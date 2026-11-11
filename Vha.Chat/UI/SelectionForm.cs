@@ -35,9 +35,11 @@ namespace Vha.Chat.UI
     public partial class SelectionForm : Form
     {
         public Character Character = null;
+        private readonly Context _themeContext;
 
         public SelectionForm(Context context, Character[] characters)
         {
+            this._themeContext = context;
             InitializeComponent();
             List<Character> list = new List<Character>(characters);
             list.Sort();
@@ -67,8 +69,31 @@ namespace Vha.Chat.UI
                     break;
                 }
             }
-        }
+            // Apply the selected theme.
+            bool dark = string.Equals(
+                context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
 
+            if (dark)
+            {
+                ThemeManager.ApplyControls(this, true);
+                ThemeManager.ConfigureComboBox(this._characters, true);
+            }
+        }
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            // The window handle exists by the time OnShown runs.
+            // Use the same saved theme as the other windows.
+            ThemeManager.ApplyTitleBar(
+                this,
+                string.Equals(
+                    _themeContext.Options.Theme,
+                    "Dark",
+                    StringComparison.OrdinalIgnoreCase));
+        }
         private void _cancel_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
@@ -83,7 +108,7 @@ namespace Vha.Chat.UI
             }
             this.Character = (Character)this._characters.SelectedItem;
             this.DialogResult = DialogResult.OK;
-           
+
             // Create ignore list. Doing so here lets us ignore offline tells and system messages reporting them,
             // since we haven't *really* selected a character yet.. but we know which one we are selecting.
             /*if (true)

@@ -72,7 +72,7 @@ namespace Vha.Chat.UI
             this._context.FriendAddedEvent += new Handler<FriendEventArgs>(_context_FriendAddedEvent);
             this._context.FriendRemovedEvent += new Handler<FriendEventArgs>(_context_FriendRemovedEvent);
             this._context.FriendUpdatedEvent += new Handler<FriendEventArgs>(_context_FriendUpdatedEvent);
-            
+
             this._tree.Nodes.Add(this._onlineFriends);
             this._tree.Nodes.Add(this._offlineFriends);
             this._tree.Nodes.Add(this._recentFriends);
@@ -215,6 +215,7 @@ namespace Vha.Chat.UI
             this._outputBox.MaximumTexts = args.MaximumTexts;
             this._outputBox.MaximumLines = args.MaximumMessages;
             this._outputBox.TextSize = args.ChatTextSize;
+            this.ApplyTheme(args.Theme);
         }
 
         void _context_StateEvent(Context context, StateEventArgs args)
@@ -647,7 +648,7 @@ namespace Vha.Chat.UI
 
         private void _about_Click(object sender, EventArgs e)
         {
-            AboutForm form = new AboutForm();
+            AboutForm form = new AboutForm(this._context);
             form.ShowDialog();
         }
 
@@ -687,7 +688,80 @@ namespace Vha.Chat.UI
             size.Size = this._container.SplitterDistance;
         }
         #endregion
+        private void ApplyTheme(string theme)
+        {
+            bool dark = string.Equals(
+                theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+            ThemeManager.ApplyTitleBar(this, dark);
 
-        
+            if (dark)
+            {
+                Color background = Color.FromArgb(32, 33, 36);
+                Color surface = Color.FromArgb(42, 44, 48);
+                Color foreground = Color.FromArgb(225, 228, 232);
+
+                this._outputBox.DarkTheme = true;
+                this.BackColor = background;
+                this.ForeColor = foreground;
+                // Dark toolbar
+                this._buttons.BackColor = background;
+                this._buttons.ForeColor = foreground;
+                this._buttons.RenderMode = ToolStripRenderMode.System;
+
+                foreach (ToolStripItem item in this._buttons.Items)
+                {
+                    item.ForeColor = foreground;
+                }
+
+                // Dark target dropdown
+                this._target.FlatStyle = FlatStyle.Popup;
+
+                this._tree.BackColor = surface;
+                this._tree.ForeColor = foreground;
+
+                this._inputBox.BackColor = surface;
+                this._inputBox.ForeColor = foreground;
+
+                this._target.BackColor = surface;
+                this._target.ForeColor = foreground;
+
+                this._outputBox.BackgroundColor = background;
+                this._outputBox.ForegroundColor = foreground;
+            }
+            else
+            {
+                this.BackColor = SystemColors.Control;
+                this.ForeColor = SystemColors.ControlText;
+                this._outputBox.DarkTheme = false;
+                // Restore the original toolbar appearance
+                this._buttons.BackColor = SystemColors.Control;
+                this._buttons.ForeColor = SystemColors.ControlText;
+                this._buttons.RenderMode = ToolStripRenderMode.ManagerRenderMode;
+
+                foreach (ToolStripItem item in this._buttons.Items)
+                {
+                    item.ForeColor = SystemColors.ControlText;
+                }
+
+                // Restore original dropdown styling
+                this._target.FlatStyle = FlatStyle.System;
+
+                this._tree.BackColor = SystemColors.Window;
+                this._tree.ForeColor = SystemColors.WindowText;
+
+                this._inputBox.BackColor = SystemColors.Window;
+                this._inputBox.ForeColor = SystemColors.WindowText;
+
+                this._target.BackColor = SystemColors.Window;
+                this._target.ForeColor = SystemColors.WindowText;
+
+                this._outputBox.BackgroundColor = this.BackColor;
+                this._outputBox.ForegroundColor = this.ForeColor;
+            }
+        }
+
     }
+
 }

@@ -46,11 +46,44 @@ namespace Vha.Chat.UI
             this._name = name;
         }
 
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+
+            if (this._context != null)
+            {
+                bool dark = string.Equals(
+                    this._context.Options.Theme,
+                    "Dark",
+                    StringComparison.OrdinalIgnoreCase);
+
+                ThemeManager.ApplyTitleBar(this, dark);
+            }
+        }
         protected void Initialize()
         {
             this.Load += new EventHandler(BaseForm_Load);
         }
+        protected virtual bool UseStandardControlTheme
+        {
+            get { return false; }
+        }
 
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            if (this._context == null || !this.UseStandardControlTheme)
+                return;
+
+            bool dark = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (dark)
+                ThemeManager.ApplyControls(this, true);
+        }
         private void BaseForm_Load(object sender, EventArgs e)
         {
             OptionsWindow window = this._context.Options.GetWindow(this._name, false);

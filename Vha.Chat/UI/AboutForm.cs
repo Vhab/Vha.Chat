@@ -31,11 +31,37 @@ namespace Vha.Chat.UI
 {
     public partial class AboutForm : Form
     {
-        public AboutForm()
+        private readonly Context _context;
+
+        public AboutForm(Context context)
         {
+            this._context = context;
+
             InitializeComponent();
+
             // Set the version
             this._version.Text = "Version " + Application.ProductVersion;
+
+            // Apply dark colors without changing the original Light theme.
+            bool dark = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (dark)
+                ThemeManager.ApplyControls(this, true);
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            bool dark = string.Equals(
+                this._context.Options.Theme,
+                "Dark",
+                StringComparison.OrdinalIgnoreCase);
+
+            ThemeManager.ApplyTitleBar(this, dark);
         }
 
         private void AboutForm_Load(object sender, EventArgs e)

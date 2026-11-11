@@ -92,6 +92,15 @@ namespace Vha.Chat
             get { return this._options.InfoWindowBehavior; }
             set { this._options.InfoWindowBehavior = value; this.Touch(); }
         }
+        public string Theme
+        {
+            get { return this._options.Theme; }
+            set
+            {
+                this._options.Theme = value;
+                this.Touch();
+            }
+        }
         public OptionsProxy Proxy
         {
             get
